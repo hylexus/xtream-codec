@@ -1,0 +1,5 @@
+
+User-agent:*
+Disallow:
+
+Sitemap: https://mister-hope.github.io/xtream-codec/sitemap.xml
