@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.base.web.domain.values;
+package io.github.hylexus.xtream.codec.ext.jt1078.dashboard.controller;
+
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
+ * 这个类应该位于内置处理器所在的顶级包中，仅仅用于筛选内置处理器
+ *
  * @author hylexus
+ * @see RestControllerAdvice#basePackageClasses()
  */
-public interface RespCode {
-
-    int status();
-
-    String code();
-
-    String message();
-
+public interface BuiltinJt1078ControllerMarkerInterface {
 }

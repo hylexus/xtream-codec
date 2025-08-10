@@ -57,7 +57,8 @@ public class BuiltinJt1078SubscriptionWebSocketHandlerServlet extends AbstractWe
 
     @Override
     public void afterConnectionEstablished(@Nonnull WebSocketSession session) {
-        final String clientIp = XtreamWebUtils.getClient(session).map(XtreamWebUtils::filterClientIp).orElseThrow();
+        final String clientIp = XtreamWebUtils.getClientIp(session.getHandshakeHeaders()::getFirst, session.getRemoteAddress())
+                .map(XtreamWebUtils::filterClientIp).orElseThrow();
         final Jt1078VideoStreamSubscriberDto dto = Jt1078DashboardUtils.parseJt1078VideoStreamSubscriberDto(session, uriTemplate);
         final Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("clientIp", clientIp);

@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.base.web.domain.vo;
+package io.github.hylexus.xtream.codec.base.web.exception;
 
-import io.github.hylexus.xtream.codec.base.web.domain.values.Resp;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+public class XtreamHttpTransparentException extends RuntimeException {
+    private final int status;
+    private final Object error;
 
-public class XtreamWebErrorResponse extends ResponseEntity<Resp<Object>> {
-
-    public XtreamWebErrorResponse(Resp<Object> body) {
-        this(HttpStatusCode.valueOf(body.getStatus()), body);
+    public XtreamHttpTransparentException(int status, Object error) {
+        this.status = status;
+        this.error = error;
     }
 
-    public XtreamWebErrorResponse(HttpStatusCode status, Resp<Object> body) {
-        super(body, status);
+    public int status() {
+        return status;
     }
 
+    public Object error() {
+        return error;
+    }
 }

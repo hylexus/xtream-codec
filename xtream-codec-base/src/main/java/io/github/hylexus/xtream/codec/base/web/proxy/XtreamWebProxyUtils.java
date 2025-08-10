@@ -16,11 +16,15 @@
 
 package io.github.hylexus.xtream.codec.base.web.proxy;
 
+import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpCallException;
+import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpErrorDetails;
+import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpTransparentException;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -34,6 +38,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -58,7 +63,19 @@ public final class XtreamWebProxyUtils {
     public static Mono<Void> proxyReactiveRequest(XtreamWebProxy proxy, XtreamWebProxyBackend backend, ServerWebExchange exchange) {
         final ServerHttpResponse response = exchange.getResponse();
         return proxyReactiveRequest(proxy, backend, exchange.getRequest(), clientResponse -> {
-            response.setStatusCode(clientResponse.statusCode());
+            final HttpStatusCode httpStatusCode = clientResponse.statusCode();
+            if (!httpStatusCode.is2xxSuccessful()) {
+                return clientResponse.bodyToMono(Object.class)
+                        .switchIfEmpty(Mono.defer(() -> {
+                            final XtreamHttpErrorDetails.ProxyErrorDetails errorDetails = XtreamHttpErrorDetails.ProxyErrorDetails.of(exchange.getRequest().getURI().toString(), backend.getBaseUrl(), "Failed to proxy request to [" + backend.getBaseUrl() + "]");
+                            final XtreamHttpCallException error = new XtreamHttpCallException(httpStatusCode, "001:" + httpStatusCode.value(), "Failed to proxy request to downstream service " + backend.getBaseUrl(), List.of(errorDetails));
+                            return Mono.error(error);
+                        })).flatMap(error -> {
+                            final XtreamHttpTransparentException transparentException = new XtreamHttpTransparentException(httpStatusCode.value(), error);
+                            return Mono.error(transparentException);
+                        });
+            }
+            response.setStatusCode(httpStatusCode);
             response.getHeaders().addAll(proxy.httpHeaderFilter().filterHeaders(clientResponse.headers().asHttpHeaders()));
             return response.writeAndFlushWith(clientResponse.body(BodyExtractors.toDataBuffers()).window(1));
         });

@@ -17,23 +17,13 @@
 package io.github.hylexus.xtream.codec.base.web.exception;
 
 
-import io.github.hylexus.xtream.codec.base.web.domain.values.DefaultRespCode;
-import io.github.hylexus.xtream.codec.base.web.domain.values.RespCode;
+import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
 import jakarta.annotation.Nullable;
-import org.springframework.http.HttpStatus;
 
 public class XtreamHttpGatewayTimeoutException extends XtreamHttpException {
 
-    public XtreamHttpGatewayTimeoutException(String code, @Nullable String error) {
-        super(HttpStatus.GATEWAY_TIMEOUT.value(), code, error);
-    }
-
-    public XtreamHttpGatewayTimeoutException(@Nullable String error) {
-        this(DefaultRespCode.GATEWAY_TIMEOUT.code(), error);
-    }
-
-    public XtreamHttpGatewayTimeoutException(RespCode code, @Nullable String error) {
-        this(code.code(), error);
+    public XtreamHttpGatewayTimeoutException(@Nullable String message) {
+        super(null, XtreamApiErrorCode.GATEWAY_TIMEOUT, message, null);
     }
 
 }

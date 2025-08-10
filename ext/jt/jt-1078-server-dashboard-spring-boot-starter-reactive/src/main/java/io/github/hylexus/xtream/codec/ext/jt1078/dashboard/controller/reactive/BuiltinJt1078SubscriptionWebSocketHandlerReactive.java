@@ -53,7 +53,8 @@ public class BuiltinJt1078SubscriptionWebSocketHandlerReactive implements WebSoc
     @Override
     @Nonnull
     public Mono<Void> handle(@Nonnull WebSocketSession session) {
-        final String clientIp = XtreamWebUtils.getClientIp(session).map(XtreamWebUtils::filterClientIp).orElseThrow();
+        final String clientIp = XtreamWebUtils.getClientIp(session.getHandshakeInfo().getHeaders()::getFirst, session.getHandshakeInfo().getRemoteAddress())
+                .map(XtreamWebUtils::filterClientIp).orElseThrow();
         final Jt1078VideoStreamSubscriberDto dto = Jt1078DashboardUtils.parseJt1078VideoStreamSubscriberDto(session, uriTemplate);
 
         // websocket inbound

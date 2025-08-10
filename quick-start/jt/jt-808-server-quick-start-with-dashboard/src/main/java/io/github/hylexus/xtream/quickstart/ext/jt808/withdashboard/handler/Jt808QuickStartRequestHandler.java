@@ -132,17 +132,17 @@ public class Jt808QuickStartRequestHandler {
 
 
     /**
-     * 位置上报(V2019)
+     * 位置上报
      * <p>
      * 7e02004086010000000001893094655200E4000000000000000101D907F2073D336C000000000000211124114808010400000026030200003001153101002504000000001404000000011504000000FA160400000000170200001803000000EA10FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF02020000EF0400000000F31B017118000000000000000000000000000000000000000000000000567e
      */
-    @Jt808RequestHandlerMapping(messageIds = 0x0200, versions = Jt808ProtocolVersion.VERSION_2019)
+    @Jt808RequestHandlerMapping(messageIds = 0x0200, versions = Jt808ProtocolVersion.AUTO_DETECTION)
     @Jt808ResponseBody(messageId = 0x8001, maxPackageSize = 1000)
     public Mono<ServerCommonReplyMessage> processMessage0200V2019(
             Jt808Session session,
             Jt808Request request,
             @Jt808RequestBody BuiltinMessage0200 body) {
-        log.info("v2019-0x0200: {}", body);
+        log.info("{}-0x0200: {}", request.header().version(), body);
         return this.processLocationMessage(session, body).map(result -> {
             // ...
             return ServerCommonReplyMessage.of(request, result);

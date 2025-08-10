@@ -21,9 +21,6 @@ import io.github.hylexus.xtream.codec.base.web.annotation.ClientIp;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.reactive.socket.WebSocketSession;
-import org.springframework.web.server.ServerWebExchange;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -81,35 +78,6 @@ public final class XtreamWebUtils {
                         .map(InetSocketAddress::getAddress)
                         .map(InetAddress::getHostAddress)
                 );
-    }
-
-    /**
-     * HTTP-Reactive
-     */
-    public static Optional<String> getClientIp(ServerWebExchange exchange) {
-        return getClientIp(exchange.getRequest().getHeaders()::getFirst, exchange.getRequest().getRemoteAddress());
-    }
-
-    /**
-     * Http-Servlet
-     */
-    public static Optional<String> getClientIp(HttpServletRequest request) {
-        return getClientIp(request::getHeader)
-                .or(() -> Optional.ofNullable(request.getRemoteAddr()));
-    }
-
-    /**
-     * WebSocket-Reactive
-     */
-    public static Optional<String> getClientIp(WebSocketSession session) {
-        return XtreamWebUtils.getClientIp(session.getHandshakeInfo().getHeaders()::getFirst, session.getHandshakeInfo().getRemoteAddress());
-    }
-
-    /**
-     * WebSocket-Servlet
-     */
-    public static Optional<String> getClient(org.springframework.web.socket.WebSocketSession session) {
-        return getClientIp(session.getHandshakeHeaders()::getFirst, session.getRemoteAddress());
     }
 
     @Nonnull

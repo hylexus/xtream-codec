@@ -42,7 +42,7 @@ public class ClientIpArgumentResolverReactive implements HandlerMethodArgumentRe
     @Override
     public Mono<Object> resolveArgument(@Nonnull MethodParameter parameter, @Nonnull BindingContext bindingContext, @Nonnull ServerWebExchange exchange) {
         final ClientIp annotation = Objects.requireNonNull(parameter.getParameterAnnotation(ClientIp.class));
-        final String clientIp = XtreamWebUtils.getClientIp(exchange)
+        final String clientIp = XtreamWebUtils.getClientIp(exchange.getRequest().getHeaders()::getFirst, exchange.getRequest().getRemoteAddress())
                 .map(ip -> XtreamWebUtils.filterClientIp(ip, annotation.defaultValue(), annotation.ignoreLocalhost(), annotation.localhostValue()))
                 .orElse(null);
         return Mono.justOrEmpty(clientIp);

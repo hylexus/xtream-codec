@@ -36,6 +36,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 @Import({
         XtreamExtJt808WebFluxAutoConfiguration.class,
+        XtreamJt808Rfc7807StyleWebExceptionHandlerReactive.class,
 })
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 public class XtreamExtJt808ServerAutoConfigurationReactive {

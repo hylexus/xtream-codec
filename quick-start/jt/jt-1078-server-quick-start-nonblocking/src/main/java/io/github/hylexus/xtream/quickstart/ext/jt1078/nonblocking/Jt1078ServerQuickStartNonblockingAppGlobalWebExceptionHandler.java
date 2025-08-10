@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.debug.ext.jt1078;
+package io.github.hylexus.xtream.quickstart.ext.jt1078.nonblocking;
 
 import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
 import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiProblemDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 
 @Controller
 @RestControllerAdvice
-public class Jt1078DebugGlobalWebExceptionHandler {
+public class Jt1078ServerQuickStartNonblockingAppGlobalWebExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(Jt1078DebugGlobalWebExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(Jt1078ServerQuickStartNonblockingAppGlobalWebExceptionHandler.class);
 
     @ExceptionHandler(Throwable.class)
-    public XtreamApiProblemDetails handleThrowable(Throwable ex) {
+    public ResponseEntity<XtreamApiProblemDetails> handleThrowable(Throwable ex) {
         log.error(ex.getMessage(), ex);
-        return XtreamApiProblemDetails.newBuilderFrom(XtreamApiErrorCode.SERVER_ERROR)
+        final XtreamApiProblemDetails problemDetails = XtreamApiProblemDetails.newBuilderFrom(XtreamApiErrorCode.SERVER_ERROR)
+                .detail(ex.getMessage())
                 .build();
+        return problemDetails.toResponseEntity();
     }
 
 }

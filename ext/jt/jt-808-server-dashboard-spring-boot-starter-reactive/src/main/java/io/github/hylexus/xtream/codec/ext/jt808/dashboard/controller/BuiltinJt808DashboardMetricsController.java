@@ -81,6 +81,9 @@ public class BuiltinJt808DashboardMetricsController {
             @Max(message = "`duration` must be letter than or equal to 60", value = 60)
             @RequestParam(value = "duration", required = false, defaultValue = "5") long duration) {
 
+        if (this.jt808DashboardMetricsServiceWithMicroMeter == null) {
+            return Flux.empty();
+        }
         return this.jt808DashboardMetricsServiceWithMicroMeter.getSchedulerMetrics(Duration.ofSeconds(duration));
     }
 

@@ -34,6 +34,7 @@ import java.net.URI;
 
 @Import({
         XtreamExtJt808WebMvcAutoConfiguration.class,
+        XtreamJt808Rfc7807StyleWebExceptionHandlerServlet.class,
 })
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class XtreamExtJt808ServerAutoConfigurationServlet {

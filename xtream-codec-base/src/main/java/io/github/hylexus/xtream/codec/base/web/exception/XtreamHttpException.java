@@ -17,72 +17,81 @@
 package io.github.hylexus.xtream.codec.base.web.exception;
 
 
-import io.github.hylexus.xtream.codec.base.web.domain.values.RespCode;
+import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
+import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiProblemDetails;
 import jakarta.annotation.Nullable;
-import org.springframework.http.HttpStatus;
 
-import static io.github.hylexus.xtream.codec.base.utils.XtreamBaseInternalUtils.isBlankStr;
+import java.net.URI;
+import java.util.List;
 
-public class XtreamHttpException extends RuntimeException {
-    private final int httpStatus;
-    private final String code;
-    private final String error;
+public class XtreamHttpException extends RuntimeException implements XtreamApiProblemDetails {
 
-    public XtreamHttpException(int httpStatus, String code, String error) {
-        super(error);
-        this.httpStatus = httpStatus;
-        this.code = isBlankStr(code) ? "http:" + httpStatus : code;
-        this.error = error;
+    protected URI type = BLANK_TYPE;
+    protected String title;
+    protected int status;
+    protected URI instance;
+    protected String errorCode;
+    protected List<? extends XtreamHttpErrorDetails> errorDetails;
+
+    public XtreamHttpException(Throwable cause, XtreamApiErrorCode apiErrorCode, String detail, List<? extends XtreamHttpErrorDetails> errorDetails) {
+        this(cause, BLANK_TYPE, apiErrorCode.getTitle(), apiErrorCode.getStatus(), detail, null, apiErrorCode.getErrorCode(), errorDetails);
     }
 
-    public XtreamHttpException(HttpStatus httpStatus, String code, @Nullable String error) {
-        this(httpStatus.value(), code, isBlankStr(error) ? httpStatus.getReasonPhrase() : error);
+    public XtreamHttpException(Throwable cause, URI type, String title, int status, String detail, URI instance, String errorCode, List<? extends XtreamHttpErrorDetails> errorDetails) {
+        super(detail, cause);
+        this.type = type;
+        this.title = title;
+        this.status = status;
+        this.instance = instance;
+        this.errorCode = errorCode;
+        this.errorDetails = errorDetails;
     }
 
-    public XtreamHttpException(HttpStatus httpStatus, RespCode apiCode, @Nullable String error) {
-        this(
-                httpStatus.value(),
-                apiCode.code(),
-                isBlankStr(error)
-                        ? (isBlankStr(apiCode.message()) ? httpStatus.getReasonPhrase() : apiCode.message())
-                        : error
-        );
+    @Override
+    public URI getType() {
+        return this.type;
     }
 
-    public int getHttpStatus() {
-        return httpStatus;
+    @Override
+    public String getTitle() {
+        return this.title;
     }
 
-    public String getError() {
-        return error;
+    @Override
+    public int getStatus() {
+        return this.status;
     }
 
-    public String getCode() {
-        return code;
+    @Override
+    public String getDetail() {
+        return this.getMessage();
+    }
+
+    @Override
+    public URI getInstance() {
+        return this.instance;
+    }
+
+    @Override
+    public String getErrorCode() {
+        return this.errorCode;
+    }
+
+    @Override
+    public List<? extends XtreamHttpErrorDetails> getErrorDetails() {
+        return this.errorDetails;
     }
 
     public static XtreamHttpException notFound(@Nullable String error) {
         return new XtreamResourceNotFoundException(error);
     }
 
-    public static XtreamHttpException notFound(String code, @Nullable String error) {
-        return new XtreamResourceNotFoundException(code, error);
-    }
-
     public static XtreamHttpException timeout(@Nullable String error) {
         return new XtreamHttpGatewayTimeoutException(error);
     }
 
-    public static XtreamHttpException timeout(String code, @Nullable String error) {
-        return new XtreamHttpGatewayTimeoutException(code, error);
-    }
-
     public static XtreamHttpException badRequest(@Nullable String error) {
         return new XtreamBadRequestException(error);
-    }
-
-    public static XtreamHttpException badRequest(String code, @Nullable String error) {
-        return new XtreamBadRequestException(code, error);
     }
 
 }

@@ -42,6 +42,7 @@ import java.util.Map;
 
 @Import({
         XtreamExtJt1078WebFluxAutoConfiguration.class,
+        XtreamJt1078Rfc7807StyleWebExceptionHandlerReactive.class,
 })
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 public class XtreamExtJt1078ServerAutoConfigurationReactive {

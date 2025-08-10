@@ -28,6 +28,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author hylexus
@@ -48,9 +49,13 @@ public class ClientIpArgumentResolverServlet implements HandlerMethodArgumentRes
             return XtreamWebUtils.filterNullIp(annotation.defaultValue());
         }
 
-        return XtreamWebUtils.getClientIp(servletRequest)
+        return getClientIp(servletRequest)
                 .map(ip -> XtreamWebUtils.filterClientIp(ip, annotation.defaultValue(), annotation.ignoreLocalhost(), annotation.localhostValue()))
                 .orElse(null);
     }
 
+    public static Optional<String> getClientIp(HttpServletRequest request) {
+        return XtreamWebUtils.getClientIp(request::getHeader)
+                .or(() -> Optional.ofNullable(request.getRemoteAddr()));
+    }
 }

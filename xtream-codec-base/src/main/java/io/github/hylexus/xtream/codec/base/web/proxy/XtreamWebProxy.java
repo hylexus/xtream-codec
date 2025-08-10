@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.base.web.proxy;
 
+import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpCallException;
+import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpErrorDetails;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +109,9 @@ public class XtreamWebProxy {
             }
             if (cause instanceof IOException) {
                 log.error("Proxy-Request for BACKEND {} with URL '{}' errored", backend, request.uri, cause);
-                return responseHandler.apply(ClientResponse.create(HttpStatus.BAD_GATEWAY, this.strategies).build());
+                final XtreamHttpErrorDetails.ProxyErrorDetails errorDetails = XtreamHttpErrorDetails.ProxyErrorDetails.of(request.uri.toString(), backend.getBaseUrl(), cause.getMessage());
+                final XtreamHttpCallException error = new XtreamHttpCallException(cause, HttpStatus.BAD_GATEWAY, "001:502", "Failed to proxy request to downstream service " + backend.getBaseUrl(), List.of(errorDetails));
+                return Mono.error(error);
             }
             return Mono.error(throwable);
         });

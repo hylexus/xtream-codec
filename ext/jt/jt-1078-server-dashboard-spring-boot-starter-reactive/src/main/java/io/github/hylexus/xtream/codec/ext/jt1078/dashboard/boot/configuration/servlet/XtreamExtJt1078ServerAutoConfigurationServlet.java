@@ -42,6 +42,7 @@ import static io.github.hylexus.xtream.codec.ext.jt1078.dashboard.boot.configura
 @EnableWebSocket
 @Import({
         XtreamExtJt1078WebMvcAutoConfiguration.class,
+        XtreamJt1078Rfc7807StyleWebExceptionHandlerServlet.class,
 })
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class XtreamExtJt1078ServerAutoConfigurationServlet {

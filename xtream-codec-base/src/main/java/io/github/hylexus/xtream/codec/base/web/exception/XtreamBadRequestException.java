@@ -17,23 +17,13 @@
 package io.github.hylexus.xtream.codec.base.web.exception;
 
 
-import io.github.hylexus.xtream.codec.base.web.domain.values.DefaultRespCode;
-import io.github.hylexus.xtream.codec.base.web.domain.values.RespCode;
+import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
 import jakarta.annotation.Nullable;
-import org.springframework.http.HttpStatus;
 
 public class XtreamBadRequestException extends XtreamHttpException {
 
-    public XtreamBadRequestException(String code, @Nullable String error) {
-        super(HttpStatus.BAD_REQUEST.value(), code, error);
-    }
-
     public XtreamBadRequestException(@Nullable String error) {
-        this(DefaultRespCode.BAD_REQUEST.code(), error);
-    }
-
-    public XtreamBadRequestException(RespCode code, @Nullable String error) {
-        this(code.code(), error);
+        super(null, XtreamApiErrorCode.BAD_REQUEST, error, null);
     }
 
 }

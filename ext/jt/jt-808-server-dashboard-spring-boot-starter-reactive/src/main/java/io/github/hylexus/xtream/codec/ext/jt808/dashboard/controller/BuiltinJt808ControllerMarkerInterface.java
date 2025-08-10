@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.base.web.exception;
+package io.github.hylexus.xtream.codec.ext.jt808.dashboard.controller;
 
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
-import jakarta.annotation.Nullable;
-
-public class XtreamResourceNotFoundException extends XtreamHttpException {
-
-    public XtreamResourceNotFoundException(@Nullable String message) {
-        super(null, XtreamApiErrorCode.NOT_FOUND, message, null);
-    }
-
+/**
+ * 这个类应该位于内置处理器所在的顶级包中，仅仅用于筛选内置处理器
+ *
+ * @author hylexus
+ * @see RestControllerAdvice#basePackageClasses()
+ */
+public interface BuiltinJt808ControllerMarkerInterface {
 }

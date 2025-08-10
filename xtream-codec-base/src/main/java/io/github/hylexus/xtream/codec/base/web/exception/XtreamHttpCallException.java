@@ -16,34 +16,19 @@
 
 package io.github.hylexus.xtream.codec.base.web.exception;
 
-import io.github.hylexus.xtream.codec.base.utils.Numbers;
-import io.github.hylexus.xtream.codec.base.web.domain.values.RespCode;
-import jakarta.annotation.Nullable;
-import org.springframework.http.HttpStatus;
+import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiProblemDetails;
+import org.springframework.http.HttpStatusCode;
 
-import java.util.Map;
+import java.util.List;
 
 public class XtreamHttpCallException extends XtreamHttpException {
-    public XtreamHttpCallException(int httpStatus, String code, String error) {
-        super(httpStatus, code, error);
+
+    public XtreamHttpCallException(HttpStatusCode httpStatusCode, String code, String message, List<? extends XtreamHttpErrorDetails> details) {
+        super(null, BLANK_TYPE, XtreamApiProblemDetails.parseHttpStatusTitle(httpStatusCode), httpStatusCode.value(), message, null, code, details);
     }
 
-    public XtreamHttpCallException(HttpStatus httpStatus, String code, @Nullable String error) {
-        super(httpStatus, code, error);
-    }
-
-    public XtreamHttpCallException(HttpStatus httpStatus, RespCode apiCode, @Nullable String error) {
-        super(httpStatus, apiCode, error);
-    }
-
-    public static XtreamHttpCallException from(Map<String, Object> errorResponse) {
-        final Integer httpStatus = Numbers.parseInteger(errorResponse.get("httpStatus")).orElse(500);
-        final Object code = errorResponse.get("code");
-        return new XtreamHttpCallException(
-                httpStatus,
-                code == null ? null : code.toString(),
-                (String) errorResponse.get("error")
-        );
+    public XtreamHttpCallException(Throwable cause, HttpStatusCode httpStatusCode, String code, String message, List<? extends XtreamHttpErrorDetails> details) {
+        super(cause, BLANK_TYPE, XtreamApiProblemDetails.parseHttpStatusTitle(httpStatusCode), httpStatusCode.value(), message, null, code, details);
     }
 
 }

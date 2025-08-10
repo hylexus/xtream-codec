@@ -27,7 +27,7 @@ import java.util.List;
 public class XtreamExtJt808WebMvcAutoConfiguration {
 
     @Bean
-    WebMvcConfigurer xtreamExtJt1078WebMvcConfigure() {
+    WebMvcConfigurer xtreamExtJt808WebMvcConfigure() {
 
         return new WebMvcConfigurer() {
 

@@ -25,7 +25,7 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 public class XtreamExtJt808WebFluxAutoConfiguration {
 
     @Bean
-    WebFluxConfigurer xtreamExtJt1078WebFluxConfigure() {
+    WebFluxConfigurer xtreamExtJt808WebFluxConfigure() {
 
         return new WebFluxConfigurer() {
 
