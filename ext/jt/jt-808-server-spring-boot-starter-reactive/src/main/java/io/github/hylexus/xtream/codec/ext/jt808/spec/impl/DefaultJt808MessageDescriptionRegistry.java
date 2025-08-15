@@ -60,6 +60,7 @@ public class DefaultJt808MessageDescriptionRegistry implements Jt808MessageDescr
             registry.registerDescription(0x8100, "终端注册应答");
             registry.registerDescription(0x0102, "终端鉴权");
             registry.registerDescription(0x0200, "定位数据上报");
+            registry.registerDescription(0x0702, "驾驶员身份信息采集上报");
             registry.registerDescription(0x0704, "定位数据批量上报");
             registry.registerDescription(0x0104, "终端参数查询结果");
             registry.registerDescription(0x0800, "多媒体事件信息上传");

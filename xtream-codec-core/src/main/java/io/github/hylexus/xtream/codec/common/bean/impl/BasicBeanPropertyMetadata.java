@@ -196,8 +196,23 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     public Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
+        int rb = input.readableBytes();
+        if (rb == 0) {
+            return null;
+        }
         final int length = this.fieldLengthExtractor.extractFieldLength(context, context.evaluationContext(), input);
-        return fieldCodec().deserialize(this, context, input, length);
+        if (rb >= length) {
+            return fieldCodec().deserialize(this, context, input, length);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void setProperty(Object instance, Object value) {
+        if (value != null) {
+            BeanPropertyMetadata.super.setProperty(instance, value);
+        }
     }
 
     @Override

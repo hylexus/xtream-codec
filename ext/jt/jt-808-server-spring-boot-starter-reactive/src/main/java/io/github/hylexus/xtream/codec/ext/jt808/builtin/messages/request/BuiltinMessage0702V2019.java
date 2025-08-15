@@ -38,7 +38,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Accessors(chain = true)
-@Jt808ResponseBody(messageId = 0x0107, desc = "驾驶员身份信息采集上报(2019)")
+@Jt808ResponseBody(messageId = 0x0702, desc = "驾驶员身份信息采集上报(2019)")
 public class BuiltinMessage0702V2019 {
 
     /**
