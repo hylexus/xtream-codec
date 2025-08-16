@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.utils;
 
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808InstructionServerTcpHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.TcpXtreamHandlerAdapterBuilder;
@@ -25,13 +27,26 @@ import io.netty.buffer.ByteBufAllocator;
  * @author hylexus
  */
 public class Jt808InstructionServerTcpHandlerAdapterBuilder extends TcpXtreamHandlerAdapterBuilder {
+    Jt808RequestDecoder requestDecoder;
+    Jt808RequestLifecycleListener requestLifecycleListener;
+
     public Jt808InstructionServerTcpHandlerAdapterBuilder(ByteBufAllocator allocator) {
         super(allocator);
+    }
+
+    public Jt808InstructionServerTcpHandlerAdapterBuilder requestDecoder(Jt808RequestDecoder requestDecoder) {
+        this.requestDecoder = requestDecoder;
+        return this;
+    }
+
+    public Jt808InstructionServerTcpHandlerAdapterBuilder requestLifecycleListener(Jt808RequestLifecycleListener requestLifecycleListener) {
+        this.requestLifecycleListener = requestLifecycleListener;
+        return this;
     }
 
     @Override
     public Jt808InstructionServerTcpHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808InstructionServerTcpHandlerAdapter(super.byteBufAllocator, super.xtreamExchangeCreator, exceptionHandlingHandler);
+        return new Jt808InstructionServerTcpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.requestDecoder, this.requestLifecycleListener);
     }
 }

@@ -16,12 +16,19 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.extensions.handler;
 
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchangeCreator;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
+import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Request;
+import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ServerType;
+import io.github.hylexus.xtream.codec.server.reactive.spec.*;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.DefaultTcpXtreamNettyHandlerAdapter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
@@ -32,15 +39,54 @@ import java.net.InetSocketAddress;
  * @author hylexus
  */
 public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNettyHandlerAdapter {
-    public Jt808InstructionServerTcpHandlerAdapter(ByteBufAllocator allocator, XtreamExchangeCreator xtreamExchangeCreator, XtreamHandler xtreamHandler) {
-        super(allocator, xtreamExchangeCreator, xtreamHandler);
+    private static final Logger log = LoggerFactory.getLogger(Jt808InstructionServerTcpHandlerAdapter.class);
+    protected final Jt808RequestDecoder requestDecoder;
+    protected final Jt808RequestLifecycleListener requestLifecycleListener;
+
+    public Jt808InstructionServerTcpHandlerAdapter(ByteBufAllocator allocator, XtreamSessionManager<? extends XtreamSession> sessionManager, XtreamHandler xtreamHandler, Jt808RequestDecoder requestDecoder, Jt808RequestLifecycleListener requestLifecycleListener) {
+        super(allocator, sessionManager, xtreamHandler);
+        this.requestDecoder = requestDecoder;
+        this.requestLifecycleListener = requestLifecycleListener;
+    }
+
+    @Override
+    public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
+        return nettyInbound.receive().flatMap(byteBuf -> {
+            if (byteBuf.readableBytes() <= 0) {
+                return Mono.empty();
+            }
+            final InetSocketAddress remoteAddress = this.initTcpRemoteAddress(nettyInbound);
+            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, remoteAddress)
+                    .onErrorResume(Throwable.class, throwable -> {
+                        log.error("Unexpected Exception", throwable);
+                        return Mono.empty();
+                    });
+        }).onErrorResume(throwable -> {
+            log.error("Unexpected Error", throwable);
+            return Mono.empty();
+        });
     }
 
     protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
-        final XtreamExchange exchange = this.xtreamExchangeCreator.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
+        final XtreamExchange exchange = this.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
         return this.doTcpExchange(exchange).doFinally(signalType -> {
             // ...
             exchange.request().release();
         });
     }
+
+    public XtreamExchange createTcpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf byteBuf, InetSocketAddress remoteAddress) {
+        final XtreamRequest.Type type = XtreamRequest.Type.TCP;
+        final XtreamRequest request = this.doCreateTcpRequest(allocator, nettyInbound, byteBuf, remoteAddress, type);
+        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
+
+        return new DefaultXtreamExchange(sessionManager, request, response);
+    }
+
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
+        final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.INSTRUCTION_SERVER, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.TCP, byteBuf, remoteAddress);
+        this.requestLifecycleListener.afterRequestDecoded(nettyInbound, byteBuf, request);
+        return request;
+    }
+
 }

@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.utils;
 
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808AttachmentServerTcpHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DispatcherXtreamHandler;
@@ -27,9 +29,21 @@ import io.netty.buffer.ByteBufAllocator;
  */
 public class Jt808AttachmentServerTcpHandlerAdapterBuilder extends TcpXtreamHandlerAdapterBuilder {
     protected XtreamHandler attachementdispatcherXtreamHandler;
+    Jt808RequestDecoder requestDecoder;
+    Jt808RequestLifecycleListener requestLifecycleListener;
 
     public Jt808AttachmentServerTcpHandlerAdapterBuilder(ByteBufAllocator allocator) {
         super(allocator);
+    }
+
+    public Jt808AttachmentServerTcpHandlerAdapterBuilder requestDecoder(Jt808RequestDecoder requestDecoder) {
+        this.requestDecoder = requestDecoder;
+        return this;
+    }
+
+    public Jt808AttachmentServerTcpHandlerAdapterBuilder requestLifecycleListener(Jt808RequestLifecycleListener requestLifecycleListener) {
+        this.requestLifecycleListener = requestLifecycleListener;
+        return this;
     }
 
     public Jt808AttachmentServerTcpHandlerAdapterBuilder setAttachmentDispatcherXtreamHandler(DispatcherXtreamHandler dispatcherXtreamHandler) {
@@ -40,6 +54,6 @@ public class Jt808AttachmentServerTcpHandlerAdapterBuilder extends TcpXtreamHand
     @Override
     public Jt808AttachmentServerTcpHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808AttachmentServerTcpHandlerAdapter(super.byteBufAllocator, super.xtreamExchangeCreator, exceptionHandlingHandler, this.attachementdispatcherXtreamHandler);
+        return new Jt808AttachmentServerTcpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.requestDecoder, this.requestLifecycleListener, this.attachementdispatcherXtreamHandler);
     }
 }

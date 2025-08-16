@@ -17,6 +17,10 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl.udp;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamRequest;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.socket.DatagramPacket;
 import org.reactivestreams.Publisher;
@@ -26,6 +30,7 @@ import reactor.core.publisher.Mono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
+import java.net.InetSocketAddress;
 import java.time.Instant;
 
 /**
@@ -36,14 +41,12 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
     private static final Logger log = LoggerFactory.getLogger(DefaultUdpXtreamNettyHandlerAdapter.class);
     protected final XtreamHandler xtreamHandler;
     protected final ByteBufAllocator allocator;
-    protected final XtreamExchangeCreator exchangeCreator;
     protected final XtreamSessionManager<? extends XtreamSession> sessionManager;
 
-    public DefaultUdpXtreamNettyHandlerAdapter(ByteBufAllocator allocator, XtreamExchangeCreator exchangeCreator, XtreamHandler xtreamHandler) {
+    public DefaultUdpXtreamNettyHandlerAdapter(ByteBufAllocator allocator, XtreamSessionManager<? extends XtreamSession> sessionManager, XtreamHandler xtreamHandler) {
         this.xtreamHandler = xtreamHandler;
         this.allocator = allocator;
-        this.exchangeCreator = exchangeCreator;
-        this.sessionManager = exchangeCreator.sessionManager();
+        this.sessionManager = sessionManager;
         log.info("DefaultUdpXtreamNettyHandlerAdapter initialized");
     }
 
@@ -66,9 +69,20 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
     }
 
     protected Mono<Void> handleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket) {
-        // final XtreamExchange exchange = this.exchangeCreator.createUdpExchange(allocator, nettyInbound, nettyOutbound, datagramPacket);
-        final XtreamExchange exchange = this.exchangeCreator.createUdpExchange(allocator, nettyInbound, nettyOutbound, datagramPacket.content(), datagramPacket.sender());
+        final XtreamExchange exchange = this.createUdpExchange(allocator, nettyInbound, nettyOutbound, datagramPacket.content(), datagramPacket.sender());
         return this.doUdpExchange(exchange);
+    }
+
+    public XtreamExchange createUdpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
+        final XtreamRequest.Type type = XtreamRequest.Type.UDP;
+        final XtreamRequest request = this.doCreateUdpRequest(allocator, nettyInbound, payload, remoteAddress, type);
+        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
+
+        return new DefaultXtreamExchange(sessionManager, request, response);
+    }
+
+    protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
+        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, type, payload, remoteAddress);
     }
 
     protected Mono<Void> doUdpExchange(XtreamExchange exchange) {

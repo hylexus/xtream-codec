@@ -20,8 +20,10 @@ import io.github.hylexus.xtream.codec.common.utils.BufferFactoryHolder;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.condition.ConditionalOnJt808Server;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.utils.Jt808ConfigurationUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSplitter;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808InstructionServerExchangeCreator;
+import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionManager;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.Jt808InstructionServerUdpHandlerAdapterBuilder;
 import io.github.hylexus.xtream.codec.server.reactive.spec.UdpXtreamNettyHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamFilter;
@@ -58,7 +60,9 @@ public class BuiltinJt808InstructionServerUdpConfiguration {
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_UDP_XTREAM_NETTY_HANDLER_ADAPTER_INSTRUCTION_SERVER)
     UdpXtreamNettyHandlerAdapter udpXtreamNettyHandlerAdapter(
             BufferFactoryHolder bufferFactoryHolder,
-            Jt808InstructionServerExchangeCreator exchangeCreator,
+            Jt808RequestDecoder requestDecoder,
+            Jt808RequestLifecycleListener requestLifecycleListener,
+            Jt808SessionManager sessionManager,
             Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter,
             List<XtreamHandlerMapping> handlerMappings,
             List<XtreamHandlerAdapter> handlerAdapters,
@@ -67,7 +71,9 @@ public class BuiltinJt808InstructionServerUdpConfiguration {
             List<XtreamRequestExceptionHandler> exceptionHandlers) {
 
         return new Jt808InstructionServerUdpHandlerAdapterBuilder(bufferFactoryHolder.getAllocator(), udpDatagramPackageSplitter)
-                .setXtreamExchangeCreator(exchangeCreator)
+                .requestDecoder(requestDecoder)
+                .requestLifecycleListener(requestLifecycleListener)
+                .sessionManager(sessionManager)
                 .addHandlerMappings(handlerMappings)
                 .addHandlerAdapters(handlerAdapters)
                 .addHandlerResultHandlers(handlerResultHandlers)

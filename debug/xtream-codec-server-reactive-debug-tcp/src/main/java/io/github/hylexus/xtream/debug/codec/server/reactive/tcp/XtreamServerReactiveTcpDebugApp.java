@@ -39,6 +39,8 @@ public class XtreamServerReactiveTcpDebugApp {
      * 7e02004086010000000001893094655200E4000000000000000101D907F2073D336C000000000000211124114808010400000026030200003001153101002504000000001404000000011504000000FA160400000000170200001803000000EA10FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF02020000EF0400000000F31B017118000000000000000000000000000000000000000000000000567e
      */
     public static void main(String[] args) {
+        // FIXME 如果你不了解 ResourceLeakDetector 是做什么的,请务必注释掉下面这行代码!!!
+        io.netty.util.ResourceLeakDetector.setLevel(io.netty.util.ResourceLeakDetector.Level.PARANOID);
         XtreamServerBuilder.newTcpServerBuilder()
                 .addServerCustomizer(server -> server.host("localhost")
                         .port(8888)

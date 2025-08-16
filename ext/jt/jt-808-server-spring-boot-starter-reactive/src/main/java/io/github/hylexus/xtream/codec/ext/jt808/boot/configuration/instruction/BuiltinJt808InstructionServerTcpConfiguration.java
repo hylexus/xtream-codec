@@ -19,7 +19,8 @@ package io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.instruction;
 import io.github.hylexus.xtream.codec.common.utils.BufferFactoryHolder;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.utils.Jt808ConfigurationUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808InstructionServerExchangeCreator;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionManager;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.BuiltinConfigurationUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.Jt808InstructionServerTcpHandlerAdapterBuilder;
@@ -60,7 +61,9 @@ public class BuiltinJt808InstructionServerTcpConfiguration {
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_TCP_XTREAM_NETTY_HANDLER_ADAPTER_INSTRUCTION_SERVER)
     TcpXtreamNettyHandlerAdapter tcpXtreamNettyHandlerAdapter(
             BufferFactoryHolder bufferFactoryHolder,
-            Jt808InstructionServerExchangeCreator exchangeCreator,
+            Jt808RequestDecoder requestDecoder,
+            Jt808RequestLifecycleListener requestLifecycleListener,
+            Jt808SessionManager sessionManager,
             List<XtreamHandlerMapping> handlerMappings,
             List<XtreamHandlerAdapter> handlerAdapters,
             List<XtreamHandlerResultHandler> handlerResultHandlers,
@@ -68,7 +71,9 @@ public class BuiltinJt808InstructionServerTcpConfiguration {
             List<XtreamRequestExceptionHandler> exceptionHandlers) {
 
         return new Jt808InstructionServerTcpHandlerAdapterBuilder(bufferFactoryHolder.getAllocator())
-                .setXtreamExchangeCreator(exchangeCreator)
+                .requestDecoder(requestDecoder)
+                .requestLifecycleListener(requestLifecycleListener)
+                .sessionManager(sessionManager)
                 .addHandlerMappings(handlerMappings)
                 .addHandlerAdapters(handlerAdapters)
                 .addHandlerResultHandlers(handlerResultHandlers)

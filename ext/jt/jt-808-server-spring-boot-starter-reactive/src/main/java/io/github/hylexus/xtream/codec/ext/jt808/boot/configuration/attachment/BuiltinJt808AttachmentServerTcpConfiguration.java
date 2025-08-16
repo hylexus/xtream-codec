@@ -20,7 +20,8 @@ import io.github.hylexus.xtream.codec.common.utils.BufferFactoryHolder;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.utils.Jt808ConfigurationUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.DelimiterAndLengthFieldBasedByteToMessageDecoder;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808AttachmentServerExchangeCreator;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808AttachmentSessionManager;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.BuiltinConfigurationUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.Jt808AttachmentServerTcpHandlerAdapterBuilder;
@@ -60,7 +61,9 @@ public class BuiltinJt808AttachmentServerTcpConfiguration {
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_TCP_XTREAM_NETTY_HANDLER_ADAPTER_ATTACHMENT_SERVER)
     TcpXtreamNettyHandlerAdapter tcpXtreamNettyHandlerAdapter(
             BufferFactoryHolder bufferFactoryHolder,
-            Jt808AttachmentServerExchangeCreator exchangeCreator,
+            Jt808RequestDecoder requestDecoder,
+            Jt808RequestLifecycleListener requestLifecycleListener,
+            Jt808AttachmentSessionManager sessionManager,
             List<XtreamHandlerMapping> handlerMappings,
             List<XtreamHandlerAdapter> handlerAdapters,
             List<XtreamHandlerResultHandler> handlerResultHandlers,
@@ -70,8 +73,10 @@ public class BuiltinJt808AttachmentServerTcpConfiguration {
         final DispatcherXtreamHandler dispatcherHandler = new DispatcherXtreamHandler(handlerMappings, handlerAdapters, handlerResultHandlers);
 
         return new Jt808AttachmentServerTcpHandlerAdapterBuilder(bufferFactoryHolder.getAllocator())
+                .requestDecoder(requestDecoder)
+                .requestLifecycleListener(requestLifecycleListener)
                 .setAttachmentDispatcherXtreamHandler(dispatcherHandler)
-                .setXtreamExchangeCreator(exchangeCreator)
+                .sessionManager(sessionManager)
                 .addHandlerMappings(handlerMappings)
                 .addHandlerAdapters(handlerAdapters)
                 .addHandlerResultHandlers(handlerResultHandlers)

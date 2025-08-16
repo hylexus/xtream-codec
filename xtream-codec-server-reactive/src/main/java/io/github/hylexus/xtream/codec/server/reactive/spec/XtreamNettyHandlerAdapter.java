@@ -23,6 +23,7 @@ import org.reactivestreams.Publisher;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 /**
@@ -49,6 +50,10 @@ public interface XtreamNettyHandlerAdapter extends BiFunction<NettyInbound, Nett
     Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound);
 
     default void shutdown() {
+    }
+
+    default String generateRequestId(NettyInbound ignored) {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
 }

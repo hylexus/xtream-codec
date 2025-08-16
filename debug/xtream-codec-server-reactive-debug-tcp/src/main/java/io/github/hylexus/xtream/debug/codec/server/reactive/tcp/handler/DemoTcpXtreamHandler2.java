@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
+import static io.github.hylexus.xtream.codec.common.utils.XtreamAssertions.assertNotSame;
 import static io.github.hylexus.xtream.codec.common.utils.XtreamAssertions.assertSame;
 
 /**
@@ -52,7 +53,8 @@ public class DemoTcpXtreamHandler2 {
             XtreamExchange exchange,
             @XtreamRequestBody DemoLocationMsg01 msg01,
             @XtreamRequestBody DemoLocationMsg02 msg02,
-            @XtreamRequestBody ByteBuf msg03,
+            @XtreamRequestBody(bufferAsSlice = false) ByteBuf msg03,
+            @XtreamRequestBody ByteBuf msg04,
             XtreamSession session,
             XtreamRequest request,
             DefaultXtreamRequest tcpRequest,
@@ -60,6 +62,7 @@ public class DemoTcpXtreamHandler2 {
             DefaultXtreamResponse tcpResponse) {
 
         assertSame(exchange.request().payload(), msg03);
+        assertNotSame(exchange.request().payload(), msg04);
         assertSame(exchange.request(), request);
         assertSame(exchange.request(), tcpRequest);
         assertSame(exchange.response(), response);

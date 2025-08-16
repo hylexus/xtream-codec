@@ -45,9 +45,8 @@ public abstract class AbstractXtreamHandlerAdapterBuilder<C extends AbstractXtre
 
     private final List<XtreamFilter> xtreamFilters;
     private final List<XtreamRequestExceptionHandler> exceptionHandlers;
-    protected XtreamExchangeCreator xtreamExchangeCreator;
 
-    protected XtreamSchedulerRegistry schedulerRegistry;
+    protected XtreamSessionManager<? extends XtreamSession> sessionManager;
 
     public AbstractXtreamHandlerAdapterBuilder(ByteBufAllocator allocator) {
         this.handlerMappings = new ArrayList<>();
@@ -175,24 +174,17 @@ public abstract class AbstractXtreamHandlerAdapterBuilder<C extends AbstractXtre
         return self();
     }
 
-    public C setXtreamExchangeCreator(XtreamExchangeCreator xtreamExchangeCreator) {
-        this.xtreamExchangeCreator = xtreamExchangeCreator;
-        return self();
-    }
-
-    public C schedulerRegistry(XtreamSchedulerRegistry schedulerRegistry) {
-        this.schedulerRegistry = schedulerRegistry;
+    public C sessionManager(XtreamSessionManager<? extends XtreamSession> sessionManager) {
+        this.sessionManager = sessionManager;
         return self();
     }
 
     public abstract XtreamNettyHandlerAdapter build();
 
     protected XtreamHandler createRequestHandler() {
-        if (this.xtreamExchangeCreator == null) {
+        if (this.sessionManager == null) {
             // todo 优化
-            this.xtreamExchangeCreator = new DefaultXtreamExchangeCreator(
-                    new DefaultXtreamSessionManager(true, new UdpSessionIdleStateCheckerProps(), new XtreamSessionIdGenerator.DefalutXtreamSessionIdGenerator())
-            );
+            this.sessionManager = new DefaultXtreamSessionManager(true, new UdpSessionIdleStateCheckerProps(), new XtreamSessionIdGenerator.DefalutXtreamSessionIdGenerator());
         }
         if (this.handlerMappings.isEmpty()) {
             throw new IllegalStateException("No [" + XtreamHandlerMapping.class.getSimpleName() + "] instance configured.");

@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+server:
+  port: 8888
+
 spring:
   application:
     name: jt-808-attachment-server-quick-start-nonblocking

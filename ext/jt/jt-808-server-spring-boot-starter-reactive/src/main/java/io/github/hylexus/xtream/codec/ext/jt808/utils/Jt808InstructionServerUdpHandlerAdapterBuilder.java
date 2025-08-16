@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.utils;
 
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSplitter;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808InstructionServerUdpHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.UdpXtreamNettyHandlerAdapter;
@@ -29,6 +31,18 @@ import io.netty.buffer.ByteBufAllocator;
 public class Jt808InstructionServerUdpHandlerAdapterBuilder extends UdpXtreamHandlerAdapterBuilder {
 
     protected final Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter;
+    protected Jt808RequestDecoder requestDecoder;
+    protected Jt808RequestLifecycleListener requestLifecycleListener;
+
+    public Jt808InstructionServerUdpHandlerAdapterBuilder requestDecoder(Jt808RequestDecoder requestDecoder) {
+        this.requestDecoder = requestDecoder;
+        return this;
+    }
+
+    public Jt808InstructionServerUdpHandlerAdapterBuilder requestLifecycleListener(Jt808RequestLifecycleListener requestLifecycleListener) {
+        this.requestLifecycleListener = requestLifecycleListener;
+        return this;
+    }
 
     public Jt808InstructionServerUdpHandlerAdapterBuilder(ByteBufAllocator allocator, Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter) {
         super(allocator);
@@ -38,7 +52,7 @@ public class Jt808InstructionServerUdpHandlerAdapterBuilder extends UdpXtreamHan
     @Override
     public UdpXtreamNettyHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808InstructionServerUdpHandlerAdapter(super.byteBufAllocator, super.xtreamExchangeCreator, exceptionHandlingHandler, this.udpDatagramPackageSplitter);
+        return new Jt808InstructionServerUdpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.udpDatagramPackageSplitter, this.requestDecoder, this.requestLifecycleListener);
     }
 
 }

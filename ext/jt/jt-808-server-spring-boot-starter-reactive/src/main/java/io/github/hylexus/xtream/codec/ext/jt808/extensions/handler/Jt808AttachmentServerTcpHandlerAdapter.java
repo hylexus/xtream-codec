@@ -17,6 +17,8 @@
 package io.github.hylexus.xtream.codec.ext.jt808.extensions.handler;
 
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestCombiner;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808RequestHeader;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ServerType;
@@ -24,10 +26,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808MessageBodyProps;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.JtProtocolUtils;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchangeCreator;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
+import io.github.hylexus.xtream.codec.server.reactive.spec.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.DefaultTcpXtreamNettyHandlerAdapter;
@@ -47,10 +46,14 @@ import java.time.Instant;
  */
 public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNettyHandlerAdapter {
     private static final Logger log = LoggerFactory.getLogger(Jt808AttachmentServerTcpHandlerAdapter.class);
+    protected final Jt808RequestDecoder requestDecoder;
+    protected final Jt808RequestLifecycleListener requestLifecycleListener;
     protected final XtreamHandler attachmentHandler;
 
-    public Jt808AttachmentServerTcpHandlerAdapter(ByteBufAllocator allocator, XtreamExchangeCreator xtreamExchangeCreator, XtreamHandler xtreamHandler, XtreamHandler attachmentHandler) {
-        super(allocator, xtreamExchangeCreator, xtreamHandler);
+    public Jt808AttachmentServerTcpHandlerAdapter(ByteBufAllocator allocator, XtreamSessionManager<? extends XtreamSession> sessionManager, XtreamHandler xtreamHandler, Jt808RequestDecoder requestDecoder, Jt808RequestLifecycleListener requestLifecycleListener, XtreamHandler attachmentHandler) {
+        super(allocator, sessionManager, xtreamHandler);
+        this.requestDecoder = requestDecoder;
+        this.requestLifecycleListener = requestLifecycleListener;
         this.attachmentHandler = attachmentHandler;
     }
 
@@ -62,7 +65,7 @@ public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNett
         }
 
         // 普通的指令消息
-        final XtreamExchange exchange = this.xtreamExchangeCreator.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
+        final XtreamExchange exchange = this.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
         return doTcpExchange(exchange).doFinally(signalType -> {
             // ...
             exchange.request().release();
@@ -74,7 +77,7 @@ public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNett
             session.lastCommunicateTime(Instant.now());
             final Jt808Request jt808Request = simulateJt808Request(allocator, nettyInbound, payload, session, remoteAddress);
             final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, XtreamInbound.Type.TCP, remoteAddress);
-            final XtreamExchange simulatedExchange = new DefaultXtreamExchange(this.xtreamExchangeCreator.sessionManager(), jt808Request, response);
+            final XtreamExchange simulatedExchange = new DefaultXtreamExchange(this.sessionManager, jt808Request, response);
             return this.attachmentHandler.handle(simulatedExchange);
         });
     }
@@ -90,7 +93,7 @@ public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNett
 
         return new DefaultJt808Request(
                 Jt808ServerType.ATTACHMENT_SERVER,
-                this.xtreamExchangeCreator.generateRequestId(nettyInbound),
+                this.generateRequestId(nettyInbound),
                 Jt808RequestCombiner.randomTraceId(),
                 allocator,
                 nettyInbound,
@@ -118,5 +121,19 @@ public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNett
         final String[] sessionIdHolder = new String[1];
         inbound.withConnection(connection -> sessionIdHolder[0] = this.sessionManager.sessionIdGenerator().generateTcpSessionId(connection.channel()));
         return sessionIdHolder[0];
+    }
+
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
+        final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.ATTACHMENT_SERVER, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.TCP, byteBuf, remoteAddress);
+        this.requestLifecycleListener.afterRequestDecoded(nettyInbound, byteBuf, request);
+        return request;
+    }
+
+    public XtreamExchange createTcpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf byteBuf, InetSocketAddress remoteAddress) {
+        final XtreamRequest.Type type = XtreamRequest.Type.TCP;
+        final XtreamRequest request = this.doCreateTcpRequest(allocator, nettyInbound, byteBuf, remoteAddress, type);
+        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
+
+        return new DefaultXtreamExchange(sessionManager, request, response);
     }
 }

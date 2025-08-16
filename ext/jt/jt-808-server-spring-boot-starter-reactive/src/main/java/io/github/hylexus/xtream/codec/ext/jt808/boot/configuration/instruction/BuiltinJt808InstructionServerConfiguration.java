@@ -18,12 +18,9 @@ package io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.instruction;
 
 import io.github.hylexus.xtream.codec.common.utils.BufferFactoryHolder;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
-import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808ResponseEncoder;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808CommandSender;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808InstructionServerExchangeCreator;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.impl.BuiltinJt808InstructionServerExchangeCreator;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.impl.DefaultJt808XtreamCommandSender;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808FlowIdGenerator;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionEventListener;
@@ -62,15 +59,6 @@ public class BuiltinJt808InstructionServerConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    Jt808InstructionServerExchangeCreator jt808InstructionServerExchangeCreator(
-            Jt808SessionManager sessionManager,
-            Jt808RequestDecoder requestDecoder,
-            Jt808RequestLifecycleListener requestLifecycleListener) {
-        return new BuiltinJt808InstructionServerExchangeCreator(sessionManager, requestDecoder, requestLifecycleListener);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     Jt808CommandSender jt808CommandSender(
             BufferFactoryHolder holder,
             Jt808SessionManager sessionManager,
@@ -79,4 +67,5 @@ public class BuiltinJt808InstructionServerConfiguration {
             Jt808RequestLifecycleListener requestLifecycleListener) {
         return new DefaultJt808XtreamCommandSender(holder.getAllocator(), sessionManager, encoder, flowIdGenerator, requestLifecycleListener);
     }
+
 }

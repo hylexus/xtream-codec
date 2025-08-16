@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.utils;
 
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSplitter;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808AttachmentServerUdpHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
@@ -36,10 +38,20 @@ public class Jt808AttachmentServerUdpHandlerAdapterBuilder extends Jt808Instruct
         return this;
     }
 
+    public Jt808AttachmentServerUdpHandlerAdapterBuilder requestDecoder(Jt808RequestDecoder requestDecoder) {
+        this.requestDecoder = requestDecoder;
+        return this;
+    }
+
+    public Jt808AttachmentServerUdpHandlerAdapterBuilder requestLifecycleListener(Jt808RequestLifecycleListener requestLifecycleListener) {
+        this.requestLifecycleListener = requestLifecycleListener;
+        return this;
+    }
+
     @Override
     public Jt808AttachmentServerUdpHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808AttachmentServerUdpHandlerAdapter(super.byteBufAllocator, super.xtreamExchangeCreator, exceptionHandlingHandler, this.udpDatagramPackageSplitter, this.attachementdispatcherXtreamHandler);
+        return new Jt808AttachmentServerUdpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.udpDatagramPackageSplitter, this.attachementdispatcherXtreamHandler, this.requestDecoder, this.requestLifecycleListener);
     }
 
 }

@@ -20,8 +20,10 @@ import io.github.hylexus.xtream.codec.common.utils.BufferFactoryHolder;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.condition.ConditionalOnJt808Server;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.utils.Jt808ConfigurationUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSplitter;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808AttachmentServerExchangeCreator;
+import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808AttachmentSessionManager;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.Jt808AttachmentServerUdpHandlerAdapterBuilder;
 import io.github.hylexus.xtream.codec.server.reactive.spec.UdpXtreamNettyHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamFilter;
@@ -61,7 +63,9 @@ public class BuiltinJt808AttachmentServerUdpConfiguration {
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_UDP_XTREAM_NETTY_HANDLER_ADAPTER_ATTACHMENT_SERVER)
     UdpXtreamNettyHandlerAdapter udpXtreamNettyHandlerAdapter(
             BufferFactoryHolder bufferFactoryHolder,
-            Jt808AttachmentServerExchangeCreator exchangeCreator,
+            Jt808RequestDecoder requestDecoder,
+            Jt808RequestLifecycleListener requestLifecycleListener,
+            Jt808AttachmentSessionManager sessionManager,
             Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter,
             List<XtreamHandlerMapping> handlerMappings,
             List<XtreamHandlerAdapter> handlerAdapters,
@@ -72,8 +76,10 @@ public class BuiltinJt808AttachmentServerUdpConfiguration {
         final DispatcherXtreamHandler dispatcherHandler = new DispatcherXtreamHandler(handlerMappings, handlerAdapters, handlerResultHandlers);
 
         return new Jt808AttachmentServerUdpHandlerAdapterBuilder(bufferFactoryHolder.getAllocator(), udpDatagramPackageSplitter)
+                .requestDecoder(requestDecoder)
+                .requestLifecycleListener(requestLifecycleListener)
                 .setAttachmentDispatcherHandler(dispatcherHandler)
-                .setXtreamExchangeCreator(exchangeCreator)
+                .sessionManager(sessionManager)
                 .addHandlerMappings(handlerMappings)
                 .addHandlerAdapters(handlerAdapters)
                 .addHandlerResultHandlers(handlerResultHandlers)

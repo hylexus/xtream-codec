@@ -16,7 +16,11 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp;
 
+import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamRequest;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.reactivestreams.Publisher;
@@ -37,14 +41,12 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
     private static final Logger log = LoggerFactory.getLogger(DefaultTcpXtreamNettyHandlerAdapter.class);
     protected final XtreamHandler xtreamHandler;
     protected final ByteBufAllocator allocator;
-    protected final XtreamExchangeCreator xtreamExchangeCreator;
     protected final XtreamSessionManager<? extends XtreamSession> sessionManager;
 
-    public DefaultTcpXtreamNettyHandlerAdapter(ByteBufAllocator allocator, XtreamExchangeCreator xtreamExchangeCreator, XtreamHandler xtreamHandler) {
+    public DefaultTcpXtreamNettyHandlerAdapter(ByteBufAllocator allocator, XtreamSessionManager<? extends XtreamSession> sessionManager, XtreamHandler xtreamHandler) {
         this.xtreamHandler = xtreamHandler;
         this.allocator = allocator;
-        this.xtreamExchangeCreator = xtreamExchangeCreator;
-        this.sessionManager = xtreamExchangeCreator.sessionManager();
+        this.sessionManager = sessionManager;
         log.info("DefaultTcpXtreamNettyHandlerAdapter initialized");
     }
 
@@ -55,10 +57,14 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
                 return Mono.empty();
             }
             final InetSocketAddress remoteAddress = this.initTcpRemoteAddress(nettyInbound);
+            byteBuf.retain();
             return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, remoteAddress)
                     .onErrorResume(Throwable.class, throwable -> {
                         log.error("Unexpected Exception", throwable);
                         return Mono.empty();
+                    }).doFinally(signalType -> {
+                        // ...
+                        XtreamBytes.releaseBuf(byteBuf);
                     });
         }).onErrorResume(throwable -> {
             log.error("Unexpected Error", throwable);
@@ -67,8 +73,20 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
     }
 
     protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
-        final XtreamExchange exchange = this.xtreamExchangeCreator.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
+        final XtreamExchange exchange = this.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
         return this.doTcpExchange(exchange);
+    }
+
+    public XtreamExchange createTcpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf byteBuf, InetSocketAddress remoteAddress) {
+        final XtreamRequest.Type type = XtreamRequest.Type.TCP;
+        final XtreamRequest request = this.doCreateTcpRequest(allocator, nettyInbound, byteBuf, remoteAddress, type);
+        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
+
+        return new DefaultXtreamExchange(sessionManager, request, response);
+    }
+
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
+        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, type, byteBuf, remoteAddress);
     }
 
     protected Mono<Void> doTcpExchange(XtreamExchange exchange) {

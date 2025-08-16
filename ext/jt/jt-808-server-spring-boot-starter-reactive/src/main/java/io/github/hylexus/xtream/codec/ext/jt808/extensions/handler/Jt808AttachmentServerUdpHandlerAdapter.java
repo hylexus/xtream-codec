@@ -17,6 +17,8 @@
 package io.github.hylexus.xtream.codec.ext.jt808.extensions.handler;
 
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestCombiner;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSplitter;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808RequestHeader;
@@ -25,10 +27,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808MessageBodyProps;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.utils.JtProtocolUtils;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchangeCreator;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
+import io.github.hylexus.xtream.codec.server.reactive.spec.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
 import io.netty.buffer.ByteBuf;
@@ -51,8 +50,8 @@ public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServ
     private static final Logger log = LoggerFactory.getLogger(Jt808AttachmentServerUdpHandlerAdapter.class);
     protected final XtreamHandler attachmentHandler;
 
-    public Jt808AttachmentServerUdpHandlerAdapter(ByteBufAllocator allocator, XtreamExchangeCreator exchangeCreator, XtreamHandler xtreamHandler, Jt808UdpDatagramPackageSplitter splitter, XtreamHandler attachmentHandler) {
-        super(allocator, exchangeCreator, xtreamHandler, splitter);
+    public Jt808AttachmentServerUdpHandlerAdapter(ByteBufAllocator allocator, XtreamSessionManager<? extends XtreamSession> sessionManager, XtreamHandler xtreamHandler, Jt808UdpDatagramPackageSplitter splitter, XtreamHandler attachmentHandler, Jt808RequestDecoder requestDecoder, Jt808RequestLifecycleListener requestLifecycleListener) {
+        super(allocator, sessionManager, xtreamHandler, splitter, requestDecoder, requestLifecycleListener);
         this.attachmentHandler = attachmentHandler;
     }
 
@@ -72,7 +71,7 @@ public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServ
             session.lastCommunicateTime(Instant.now());
             final Jt808Request jt808Request = simulateJt808Request(allocator, nettyInbound, payload, session, remoteAddress);
             final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, XtreamInbound.Type.UDP, remoteAddress);
-            final XtreamExchange simulatedExchange = new DefaultXtreamExchange(this.exchangeCreator.sessionManager(), jt808Request, response);
+            final XtreamExchange simulatedExchange = new DefaultXtreamExchange(this.sessionManager, jt808Request, response);
             return this.attachmentHandler.handle(simulatedExchange);
         });
     }
@@ -88,7 +87,7 @@ public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServ
 
         return new DefaultJt808Request(
                 Jt808ServerType.ATTACHMENT_SERVER,
-                this.exchangeCreator.generateRequestId(nettyInbound),
+                this.generateRequestId(nettyInbound),
                 Jt808RequestCombiner.randomTraceId(),
                 allocator,
                 nettyInbound,
@@ -110,5 +109,11 @@ public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServ
                     return jt808Session;
                 })
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new IllegalStateException("Attachment session not found: " + remoteAddress))));
+    }
+
+    protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
+        final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.ATTACHMENT_SERVER, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.UDP, payload, remoteAddress);
+        this.requestLifecycleListener.afterRequestDecoded(nettyInbound, payload, request);
+        return request;
     }
 }

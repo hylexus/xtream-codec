@@ -17,10 +17,6 @@
 package io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.attachment;
 
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
-import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
-import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808AttachmentServerExchangeCreator;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.impl.BuiltinJt808AttachmentServerExchangeCreator;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808AttachmentSessionManager;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionEventListener;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808AttachmentSessionManager;
@@ -56,12 +52,4 @@ public class BuiltinJt808AttachmentServerConfiguration {
         return args -> listeners.orderedStream().forEach(sessionManager::addListener);
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    Jt808AttachmentServerExchangeCreator jt808AttachmentServerExchangeCreator(
-            Jt808AttachmentSessionManager sessionManager,
-            Jt808RequestDecoder requestDecoder,
-            Jt808RequestLifecycleListener requestLifecycleListener) {
-        return new BuiltinJt808AttachmentServerExchangeCreator(sessionManager, requestDecoder, requestLifecycleListener);
-    }
 }
