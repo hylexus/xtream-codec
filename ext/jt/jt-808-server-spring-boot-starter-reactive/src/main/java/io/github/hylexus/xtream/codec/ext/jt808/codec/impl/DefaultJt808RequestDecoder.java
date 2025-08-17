@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.codec.impl;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808BytesProcessor;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808ProtocolVersionDetector;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestCombiner;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
 import io.github.hylexus.xtream.codec.ext.jt808.exception.Jt808MessageDecodeException;
@@ -46,11 +47,17 @@ public class DefaultJt808RequestDecoder implements Jt808RequestDecoder {
     protected final Jt808BytesProcessor jt808MessageProcessor;
     protected final Jt808RequestCombiner requestCombiner;
     protected final Jt808MessageEncryptionHandler encryptionHandler;
+    private final Jt808ProtocolVersionDetector protocolVersionDetector;
 
-    public DefaultJt808RequestDecoder(Jt808BytesProcessor jt808MessageProcessor, Jt808MessageEncryptionHandler encryptionHandler, Jt808RequestCombiner requestCombiner) {
+    public DefaultJt808RequestDecoder(Jt808BytesProcessor jt808MessageProcessor, Jt808ProtocolVersionDetector protocolVersionDetector, Jt808MessageEncryptionHandler encryptionHandler, Jt808RequestCombiner requestCombiner) {
         this.jt808MessageProcessor = jt808MessageProcessor;
         this.requestCombiner = requestCombiner;
         this.encryptionHandler = encryptionHandler;
+        this.protocolVersionDetector = protocolVersionDetector;
+    }
+
+    public DefaultJt808RequestDecoder(Jt808BytesProcessor jt808MessageProcessor, Jt808MessageEncryptionHandler encryptionHandler, Jt808RequestCombiner requestCombiner) {
+        this(jt808MessageProcessor, Jt808ProtocolVersionDetector.DEFAULT, encryptionHandler, requestCombiner);
     }
 
     @Override
@@ -117,7 +124,7 @@ public class DefaultJt808RequestDecoder implements Jt808RequestDecoder {
         final int messageBodyPropsIntValue = XtreamBytes.getWord(byteBuf, 2);
         final Jt808RequestHeader.Jt808MessageBodyProps messageBodyProps = new DefaultJt808MessageBodyProps(messageBodyPropsIntValue);
 
-        final Jt808ProtocolVersion version = this.detectVersion(messageId, messageBodyProps, byteBuf);
+        final Jt808ProtocolVersion version = this.protocolVersionDetector.detectVersion(messageId, messageBodyProps, byteBuf);
         if (version.versionBit() == 1) {
             return this.parseHeaderGreatThanOrEqualsV2019(version, messageBodyProps, byteBuf);
         } else if (version == Jt808ProtocolVersion.VERSION_2013 || version == Jt808ProtocolVersion.VERSION_2011) {
@@ -125,18 +132,6 @@ public class DefaultJt808RequestDecoder implements Jt808RequestDecoder {
         }
 
         throw new Jt808MessageDecodeException("未知版本: " + version);
-    }
-
-    protected Jt808ProtocolVersion detectVersion(int messageId, Jt808RequestHeader.Jt808MessageBodyProps messageBodyProps, ByteBuf byteBuf) {
-        if (messageBodyProps.versionIdentifier() != 1) {
-            return Jt808ProtocolVersion.VERSION_2013;
-        }
-
-        final byte version = byteBuf.getByte(4);
-        if (version == Jt808ProtocolVersion.VERSION_2019.versionBit()) {
-            return Jt808ProtocolVersion.VERSION_2019;
-        }
-        return Jt808ProtocolVersion.VERSION_2013;
     }
 
     protected Jt808RequestHeader parseHeaderGreatThanOrEqualsV2019(

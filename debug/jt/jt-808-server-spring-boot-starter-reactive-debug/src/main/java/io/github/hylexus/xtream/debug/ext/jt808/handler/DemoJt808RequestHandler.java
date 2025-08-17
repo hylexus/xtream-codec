@@ -135,7 +135,7 @@ public class DemoJt808RequestHandler {
         final BuiltinMessage8100 builtinMessage8100 = new BuiltinMessage8100()
                 .setClientFlowId(request.header().flowId())
                 .setResult((short) 0)
-                .setAuthCode("auth-code-2019");
+                .setAuthCode("auth-code-2019--");
 
         return Mono.just(builtinMessage8100);
     }
@@ -150,7 +150,7 @@ public class DemoJt808RequestHandler {
         final BuiltinMessage8100 builtinMessage8100 = new BuiltinMessage8100()
                 .setClientFlowId(request.header().flowId())
                 .setResult((short) 0)
-                .setAuthCode("auth-code-2013");
+                .setAuthCode("auth-code-2013-");
 
         return Mono.just(builtinMessage8100);
     }

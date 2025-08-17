@@ -113,8 +113,14 @@ public class XtreamExtJt808ServerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    Jt808RequestDecoder jt808RequestDecoder(Jt808BytesProcessor jt808BytesProcessor, Jt808MessageEncryptionHandler encryptionHandler, Jt808RequestCombiner requestCombiner) {
-        return new DefaultJt808RequestDecoder(jt808BytesProcessor, encryptionHandler, requestCombiner);
+    Jt808ProtocolVersionDetector jt808ProtocolVersionDetector() {
+        return Jt808ProtocolVersionDetector.DEFAULT;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    Jt808RequestDecoder jt808RequestDecoder(Jt808BytesProcessor jt808BytesProcessor, Jt808ProtocolVersionDetector versionDetector, Jt808MessageEncryptionHandler encryptionHandler, Jt808RequestCombiner requestCombiner) {
+        return new DefaultJt808RequestDecoder(jt808BytesProcessor, versionDetector, encryptionHandler, requestCombiner);
     }
 
     @Bean
