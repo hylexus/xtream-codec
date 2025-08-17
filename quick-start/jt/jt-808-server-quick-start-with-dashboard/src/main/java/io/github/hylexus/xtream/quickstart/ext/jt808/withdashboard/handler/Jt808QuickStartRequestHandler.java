@@ -81,7 +81,7 @@ public class Jt808QuickStartRequestHandler {
      * 终端注册(V2019)
      */
     @Jt808RequestHandlerMapping(messageIds = 0x0100, versions = Jt808ProtocolVersion.VERSION_2019)
-    @Jt808ResponseBody(messageId = 0x8100, maxPackageSize = 1000)
+    @Jt808ResponseBody(messageId = 0x8100)
     public Mono<BuiltinMessage8100> processMessage0x0100V2019(Jt808Request request, @Jt808RequestBody BuiltinMessage0100V2019 requestBody) {
         log.info("receive message [0x0100-v2019]: {}", requestBody);
         log.info("{}", Thread.currentThread());
@@ -97,13 +97,28 @@ public class Jt808QuickStartRequestHandler {
      * 终端注册(V2013)
      */
     @Jt808RequestHandlerMapping(messageIds = 0x0100, versions = Jt808ProtocolVersion.VERSION_2013)
-    @Jt808ResponseBody(messageId = 0x8100, maxPackageSize = 1000)
+    @Jt808ResponseBody(messageId = 0x8100)
     public Mono<BuiltinMessage8100> processMessage0x0100V2013(Jt808Request request, @Jt808RequestBody BuiltinMessage0100V2013 requestBody) {
         log.info("receive message [0x0100-v2013]: {}", requestBody);
         final BuiltinMessage8100 builtinMessage8100 = new BuiltinMessage8100()
                 .setClientFlowId(request.header().flowId())
                 .setResult((short) 0)
                 .setAuthCode("auth-code-2013");
+
+        return Mono.just(builtinMessage8100);
+    }
+
+    /**
+     * 终端注册(V2013)
+     */
+    @Jt808RequestHandlerMapping(messageIds = 0x0100, versions = Jt808ProtocolVersion.VERSION_2011)
+    @Jt808ResponseBody(messageId = 0x8100)
+    public Mono<BuiltinMessage8100> processMessage0x0100V2011(Jt808Request request, @Jt808RequestBody BuiltinMessage0100V2011 requestBody) {
+        log.info("receive message [0x0100-v2011]: {}", requestBody);
+        final BuiltinMessage8100 builtinMessage8100 = new BuiltinMessage8100()
+                .setClientFlowId(request.header().flowId())
+                .setResult((short) 0)
+                .setAuthCode("auth-code-v2011");
 
         return Mono.just(builtinMessage8100);
     }
