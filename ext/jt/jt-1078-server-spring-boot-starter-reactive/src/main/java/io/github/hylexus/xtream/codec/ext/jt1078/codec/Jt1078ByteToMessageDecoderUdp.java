@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.ext.jt1078.spec.impl.DefaultJt1078Request;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.impl.DefaultJt1078RequestHeader;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.impl.DefaultJt1078Session;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamNettyHandlerAdapter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.socket.DatagramPacket;
@@ -43,37 +44,35 @@ public class Jt1078ByteToMessageDecoderUdp {
         this.jt1078SimConverter = jt1078SimConverter;
     }
 
-    public Jt1078Request decode(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket) {
-        final InetSocketAddress remoteAddress = datagramPacket.sender();
-
+    public Jt1078Request decode(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket, XtreamNettyHandlerAdapter.InboundInfo inboundInfo) {
         final ByteBuf udpPayload = datagramPacket.content();
         if (udpPayload.readableBytes() <= 4) {
             throw new IllegalStateException("Parse JT/T 1078 stream-data error");
         }
         // 去掉30316364前缀
         final ByteBuf byteBuf = udpPayload.slice(4, udpPayload.readableBytes() - 4);
-        return this.doDecode(nettyInbound, nettyOutbound, remoteAddress, byteBuf);
+        return this.doDecode(nettyInbound, nettyOutbound, inboundInfo, byteBuf);
     }
 
-    private Jt1078Request doDecode(NettyInbound nettyInbound, NettyOutbound nettyOutbound, InetSocketAddress remoteAddress, ByteBuf buffer) {
-        final Jt1078Session session = this.sessionManager.getUdpSession(remoteAddress);
+    private Jt1078Request doDecode(NettyInbound nettyInbound, NettyOutbound nettyOutbound, XtreamNettyHandlerAdapter.InboundInfo inboundInfo, ByteBuf buffer) {
+        final Jt1078Session session = this.sessionManager.getUdpSession(inboundInfo.remoteAddress());
         if (session != null) {
-            final Jt1078Request request = this.decodeRequest(buffer, session.simLength(), nettyInbound, remoteAddress);
+            final Jt1078Request request = this.decodeRequest(buffer, session.simLength(), nettyInbound, inboundInfo);
             this.updateSession(session, request);
             return request;
         }
 
-        final String sessionId = this.sessionManager.sessionIdGenerator().generateUdpSessionId(remoteAddress);
-        final Jt1078Request requestWithSimLength6 = this.tryDecodeRequest(buffer, 6, nettyInbound, remoteAddress);
+        final String sessionId = this.sessionManager.sessionIdGenerator().generateUdpSessionId(inboundInfo.remoteAddress());
+        final Jt1078Request requestWithSimLength6 = this.tryDecodeRequest(buffer, 6, nettyInbound, inboundInfo);
         if (requestWithSimLength6 != null) {
-            final DefaultJt1078Session newSession = this.initSession(nettyOutbound, sessionId, requestWithSimLength6, remoteAddress, 6);
+            final DefaultJt1078Session newSession = this.initSession(nettyOutbound, sessionId, requestWithSimLength6, inboundInfo.remoteAddress(), 6);
             this.updateSession(newSession, requestWithSimLength6);
             return requestWithSimLength6;
         }
 
-        final Jt1078Request requestWithSimLength10 = this.tryDecodeRequest(buffer, 10, nettyInbound, remoteAddress);
+        final Jt1078Request requestWithSimLength10 = this.tryDecodeRequest(buffer, 10, nettyInbound, inboundInfo);
         if (requestWithSimLength10 != null) {
-            final DefaultJt1078Session newSession = this.initSession(nettyOutbound, sessionId, requestWithSimLength10, remoteAddress, 10);
+            final DefaultJt1078Session newSession = this.initSession(nettyOutbound, sessionId, requestWithSimLength10, inboundInfo.remoteAddress(), 10);
             this.updateSession(newSession, requestWithSimLength10);
             return requestWithSimLength10;
         }
@@ -108,7 +107,7 @@ public class Jt1078ByteToMessageDecoderUdp {
         return jt1078Session;
     }
 
-    Jt1078Request tryDecodeRequest(ByteBuf in, int simLen, NettyInbound inbound, InetSocketAddress remoteAddress) {
+    Jt1078Request tryDecodeRequest(ByteBuf in, int simLen, NettyInbound inbound, XtreamNettyHandlerAdapter.InboundInfo inboundInfo) {
         // 这里输入的报文没有 30316364 前缀
         // +5 = 1byte(V,P,X,CC) + 1byte(M,PT) + 2byte(sequenceNumber) + 1byte(channelNumber)
         // FIXME 重复代码
@@ -125,12 +124,12 @@ public class Jt1078ByteToMessageDecoderUdp {
         final short messageBodyLength = in.getShort(lengthFieldOffset);
         final int totalPackageSize = messageBodyLength + lengthFieldOffset + 2;
         if (totalPackageSize == in.readableBytes()) {
-            return this.decodeRequest(in, simLen, inbound, remoteAddress);
+            return this.decodeRequest(in, simLen, inbound, inboundInfo);
         }
         return null;
     }
 
-    private Jt1078Request decodeRequest(ByteBuf in, int simLen, NettyInbound inbound, InetSocketAddress remoteAddress) {
+    private Jt1078Request decodeRequest(ByteBuf in, int simLen, NettyInbound inbound, XtreamNettyHandlerAdapter.InboundInfo inboundInfo) {
         // FIXME 重复代码
         // noinspection Duplicates 重复代码先不处理
         final XtreamByteReader reader = XtreamByteReader.of(in);
@@ -179,7 +178,8 @@ public class Jt1078ByteToMessageDecoderUdp {
                 allocator,
                 inbound,
                 XtreamInbound.Type.TCP,
-                remoteAddress,
+                inboundInfo.channel(),
+                inboundInfo.remoteAddress(),
                 headerBuilder,
                 body
         );

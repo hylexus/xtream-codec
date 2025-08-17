@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.impl.AbstractXtreamRe
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
 import reactor.netty.NettyInbound;
 
 import java.net.InetSocketAddress;
@@ -38,21 +39,18 @@ public class DefaultJt808Request extends DefaultXtreamRequest implements Jt808Re
     protected final String traceId;
     protected final Jt808ServerType serverType;
 
-    /**
-     * TCP
-     */
     public DefaultJt808Request(
             Jt808ServerType serverType,
             String requestId,
             String traceId,
             ByteBufAllocator allocator,
             NettyInbound nettyInbound,
-            Type type, ByteBuf payload, InetSocketAddress remoteAddress,
+            Type type, ByteBuf payload, Channel channel, InetSocketAddress remoteAddress,
             Jt808RequestHeader header,
             int originalCheckSum,
             int calculatedCheckSum) {
 
-        super(requestId, allocator, nettyInbound, type, payload, remoteAddress);
+        super(requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
         this.serverType = serverType;
         this.traceId = traceId;
         this.header = header;
@@ -93,15 +91,15 @@ public class DefaultJt808Request extends DefaultXtreamRequest implements Jt808Re
     @Override
     public String toString() {
         return "DefaultJt808Request{"
-                + "type=" + type()
-                + ", serverType=" + serverType()
-                + ", requestId=" + requestId()
-                + ", remoteAddress=" + remoteAddress()
-                + ", messageId=" + header().messageId() + "(0x" + FormatUtils.toHexString(header.messageId(), 4) + ")"
-                + ", header=" + header()
-                + ", payload=" + (payload.refCnt() > 0 ? FormatUtils.toHexString(payload) : "<FREED>")
-                + ", checkSum=" + originalCheckSum
-                + '}';
+               + "type=" + type()
+               + ", serverType=" + serverType()
+               + ", requestId=" + requestId()
+               + ", remoteAddress=" + remoteAddress()
+               + ", messageId=" + header().messageId() + "(0x" + FormatUtils.toHexString(header.messageId(), 4) + ")"
+               + ", header=" + header()
+               + ", payload=" + (payload.refCnt() > 0 ? FormatUtils.toHexString(payload) : "<FREED>")
+               + ", checkSum=" + originalCheckSum
+               + '}';
     }
 
     public static class DefaultJt808RequestBuilder
@@ -151,6 +149,7 @@ public class DefaultJt808Request extends DefaultXtreamRequest implements Jt808Re
                     this.delegateRequest.underlyingInbound(),
                     this.delegateRequest.type(),
                     this.payload == null ? this.delegateRequest.payload() : this.payload,
+                    this.channel != null ? this.channel : this.delegateRequest.underlyingChannel(),
                     this.remoteAddress != null ? this.remoteAddress : this.delegateRequest.remoteAddress(),
                     this.header != null ? this.header : this.delegateRequest.header(),
                     this.originalCheckSum != null ? this.originalCheckSum : this.delegateRequest.originalCheckSum(),

@@ -30,7 +30,6 @@ import reactor.core.publisher.Mono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
-import java.net.InetSocketAddress;
 import java.time.Instant;
 
 /**
@@ -54,7 +53,8 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
     public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
         return nettyInbound.receiveObject().flatMap(object -> {
             if (object instanceof DatagramPacket datagramPacket) {
-                return handleRequest(nettyInbound, nettyOutbound, datagramPacket)
+                final InboundInfo inboundInfo = this.initUdpInboundInfo(nettyInbound, datagramPacket);
+                return handleRequest(nettyInbound, nettyOutbound, datagramPacket, inboundInfo)
                         .onErrorResume(Throwable.class, throwable -> {
                             log.error("Unexpected Exception", throwable);
                             return Mono.empty();
@@ -68,21 +68,21 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
         });
     }
 
-    protected Mono<Void> handleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket) {
-        final XtreamExchange exchange = this.createUdpExchange(allocator, nettyInbound, nettyOutbound, datagramPacket.content(), datagramPacket.sender());
+    protected Mono<Void> handleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket, InboundInfo inboundInfo) {
+        final XtreamExchange exchange = this.createUdpExchange(allocator, nettyInbound, nettyOutbound, datagramPacket.content(), inboundInfo);
         return this.doUdpExchange(exchange);
     }
 
-    public XtreamExchange createUdpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
+    protected XtreamExchange createUdpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {
         final XtreamRequest.Type type = XtreamRequest.Type.UDP;
-        final XtreamRequest request = this.doCreateUdpRequest(allocator, nettyInbound, payload, remoteAddress, type);
-        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
+        final XtreamRequest request = this.doCreateUdpRequest(allocator, nettyInbound, payload, inboundInfo);
+        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, inboundInfo.remoteAddress());
 
         return new DefaultXtreamExchange(sessionManager, request, response);
     }
 
-    protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
-        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, type, payload, remoteAddress);
+    protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InboundInfo inboundInfo) {
+        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.UDP, payload, inboundInfo.channel(), inboundInfo.remoteAddress());
     }
 
     protected Mono<Void> doUdpExchange(XtreamExchange exchange) {

@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.ext.jt1078.spec.impl.DefaultJt1078Request;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.impl.DefaultJt1078RequestHeader;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.impl.DefaultJt1078Session;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamNettyHandlerAdapter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,9 +31,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.netty.Connection;
-import reactor.netty.NettyInbound;
 
-import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -51,16 +50,16 @@ public class Jt1078ByteToMessageDecoder extends ByteToMessageDecoder {
     private final Jt1078SimConverter jt1078SimConverter;
     private final Connection connection;
     private final Jt1078SessionManager sessionManager;
-    private final InetSocketAddress remoteAddress;
 
     private int simLength = 0;
     private Jt1078Session session;
+    final XtreamNettyHandlerAdapter.InboundInfo inboundInfo;
 
     public Jt1078ByteToMessageDecoder(Jt1078SimConverter jt1078SimConverter, Connection connection, Jt1078SessionManager sessionManager) {
         this.jt1078SimConverter = jt1078SimConverter;
         this.connection = connection;
         this.sessionManager = sessionManager;
-        this.remoteAddress = this.initTcpRemoteAddress(connection.inbound());
+        this.inboundInfo = XtreamNettyHandlerAdapter.InboundInfo.forTcp(connection.inbound());
     }
 
     @Override
@@ -112,16 +111,10 @@ public class Jt1078ByteToMessageDecoder extends ByteToMessageDecoder {
                 request.header().rawSim(),
                 request.header().convertedSim(),
                 request.header().channelNumber(),
-                this.remoteAddress
+                this.inboundInfo.remoteAddress()
         );
         this.session = jt1078Session;
         this.sessionManager.createSession(jt1078Session);
-    }
-
-    protected InetSocketAddress initTcpRemoteAddress(NettyInbound nettyInbound) {
-        final InetSocketAddress[] remoteAddress = new InetSocketAddress[1];
-        nettyInbound.withConnection(connection -> remoteAddress[0] = (InetSocketAddress) connection.channel().remoteAddress());
-        return remoteAddress[0];
     }
 
     Jt1078Request tryDecodeRequest(ByteBuf in, int simLen) {
@@ -195,7 +188,8 @@ public class Jt1078ByteToMessageDecoder extends ByteToMessageDecoder {
                 allocator,
                 this.connection.inbound(),
                 XtreamInbound.Type.TCP,
-                remoteAddress,
+                this.inboundInfo.channel(),
+                this.inboundInfo.remoteAddress(),
                 headerBuilder,
                 body
         );

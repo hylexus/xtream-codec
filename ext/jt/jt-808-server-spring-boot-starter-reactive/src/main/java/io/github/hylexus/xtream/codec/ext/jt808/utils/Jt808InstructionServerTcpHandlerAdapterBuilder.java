@@ -20,13 +20,13 @@ import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808InstructionServerTcpHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
-import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.TcpXtreamHandlerAdapterBuilder;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.AbstractXtreamHandlerAdapterBuilderTcp;
 import io.netty.buffer.ByteBufAllocator;
 
 /**
  * @author hylexus
  */
-public class Jt808InstructionServerTcpHandlerAdapterBuilder extends TcpXtreamHandlerAdapterBuilder {
+public class Jt808InstructionServerTcpHandlerAdapterBuilder extends AbstractXtreamHandlerAdapterBuilderTcp<Jt808InstructionServerTcpHandlerAdapterBuilder> {
     Jt808RequestDecoder requestDecoder;
     Jt808RequestLifecycleListener requestLifecycleListener;
 

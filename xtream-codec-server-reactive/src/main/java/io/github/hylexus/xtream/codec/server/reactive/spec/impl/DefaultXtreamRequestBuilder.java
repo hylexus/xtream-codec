@@ -36,6 +36,7 @@ public class DefaultXtreamRequestBuilder
                 this.delegateRequest.underlyingInbound(),
                 this.delegateRequest.type(),
                 this.payload != null ? this.payload : this.delegateRequest.payload(),
+                this.channel != null ? this.channel : this.delegateRequest.underlyingChannel(),
                 this.remoteAddress != null ? this.remoteAddress : this.delegateRequest.remoteAddress()
         );
     }

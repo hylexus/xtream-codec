@@ -63,6 +63,6 @@ class DefaultJt808RequestDecoderTest {
 
     private Jt808Request doDecode(String hexString) {
         final ByteBuf payload = XtreamBytes.byteBufFromHexString(allocator, hexString);
-        return decoder.decode(Jt808ServerType.INSTRUCTION_SERVER, null, allocator, nettyInbound, XtreamRequest.Type.TCP, payload, null);
+        return decoder.decode(Jt808ServerType.INSTRUCTION_SERVER, null, allocator, nettyInbound, XtreamRequest.Type.TCP, payload, null, null);
     }
 }

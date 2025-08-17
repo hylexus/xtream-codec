@@ -61,7 +61,8 @@ public class Jt1078ServerUdpHandlerAdapter implements UdpXtreamNettyHandlerAdapt
                 .flatMap(datagramPacket -> {
                     final Jt1078Request request;
                     try {
-                        request = this.byteToMessageDecoder.decode(nettyInbound, nettyOutbound, datagramPacket);
+                        final InboundInfo inboundInfo = InboundInfo.forUdp(nettyInbound, datagramPacket);
+                        request = this.byteToMessageDecoder.decode(nettyInbound, nettyOutbound, datagramPacket, inboundInfo);
                     } catch (Throwable throwable) {
                         log.error("Unexpected Error", throwable);
                         return Mono.error(throwable);

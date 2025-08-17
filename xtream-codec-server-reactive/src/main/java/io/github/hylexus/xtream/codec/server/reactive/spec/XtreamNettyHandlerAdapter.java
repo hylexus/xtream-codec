@@ -19,10 +19,13 @@ package io.github.hylexus.xtream.codec.server.reactive.spec;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.TcpXtreamHandlerAdapterBuilder;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.udp.UdpXtreamHandlerAdapterBuilder;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
+import io.netty.channel.socket.DatagramPacket;
 import org.reactivestreams.Publisher;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
+import java.net.InetSocketAddress;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -54,6 +57,35 @@ public interface XtreamNettyHandlerAdapter extends BiFunction<NettyInbound, Nett
 
     default String generateRequestId(NettyInbound ignored) {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    record InboundInfo(Channel channel, InetSocketAddress remoteAddress) {
+
+        public static InboundInfo forTcp(NettyInbound nettyInbound) {
+            final Channel[] channelHolder = new Channel[1];
+            nettyInbound.withConnection(connection -> channelHolder[0] = connection.channel());
+
+            final Channel channel = channelHolder[0];
+            final InetSocketAddress remotedAddress = (InetSocketAddress) channel.remoteAddress();
+            return new InboundInfo(channel, remotedAddress);
+        }
+
+        public static InboundInfo forUdp(NettyInbound nettyInbound, DatagramPacket datagramPacket) {
+            final Channel[] channelHolder = new Channel[1];
+            nettyInbound.withConnection(connection -> channelHolder[0] = connection.channel());
+
+            final Channel channel = channelHolder[0];
+            final InetSocketAddress remoteAddress = datagramPacket.sender();
+            return new InboundInfo(channel, remoteAddress);
+        }
+    }
+
+    default InboundInfo initTcpInboundInfo(NettyInbound nettyInbound) {
+        return InboundInfo.forTcp(nettyInbound);
+    }
+
+    default InboundInfo initUdpInboundInfo(NettyInbound nettyInbound, DatagramPacket datagramPacket) {
+        return InboundInfo.forUdp(nettyInbound, datagramPacket);
     }
 
 }

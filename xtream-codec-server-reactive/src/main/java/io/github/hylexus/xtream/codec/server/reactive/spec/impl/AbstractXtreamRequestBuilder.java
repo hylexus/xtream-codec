@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
@@ -30,10 +31,12 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
 
     protected ByteBuf payload;
     protected InetSocketAddress remoteAddress;
+    protected Channel channel;
 
     public AbstractXtreamRequestBuilder(R delegateRequest) {
         this.delegateRequest = delegateRequest;
         this.payload = delegateRequest.payload();
+        this.channel = delegateRequest.underlyingChannel();
         this.remoteAddress = delegateRequest.remoteAddress();
     }
 

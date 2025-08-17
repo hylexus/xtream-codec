@@ -23,11 +23,10 @@ import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSpl
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ServerType;
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
-import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
-import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.udp.DefaultUdpXtreamNettyHandlerAdapter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,41 +54,37 @@ public class Jt808InstructionServerUdpHandlerAdapter extends DefaultUdpXtreamNet
         this.requestLifecycleListener = requestLifecycleListener;
     }
 
-    protected Mono<Void> handleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket) {
-        final InetSocketAddress remoteAddress = datagramPacket.sender();
+    @Override
+    protected Mono<Void> handleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket, InboundInfo inboundInfo) {
         // 一个 UDP 包可能包含多个 JT808 (完整)报文
         final List<ByteBuf> byteBufList = this.splitter.split(datagramPacket.content());
 
         // 只有一个包(绝大多数场景)
         if (byteBufList.size() == 1) {
-            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBufList.getFirst(), remoteAddress);
+            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBufList.getFirst(), inboundInfo);
         }
 
         // 每个(完整)包都触发一次处理逻辑
         return Flux.fromIterable(byteBufList).flatMap(byteBuf -> {
             // ...
-            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, remoteAddress);
+            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, inboundInfo);
         }).then();
     }
 
-    protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
-        final XtreamExchange exchange = this.createUdpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
+    protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {
+        final XtreamExchange exchange = this.createUdpExchange(allocator, nettyInbound, nettyOutbound, payload, inboundInfo);
         return this.doUdpExchange(exchange).doFinally(signalType -> {
             XtreamBytes.releaseBuf(payload);
             exchange.request().release();
         });
     }
 
-    public XtreamExchange createUdpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
-        final XtreamRequest.Type type = XtreamRequest.Type.UDP;
-        final XtreamRequest request = this.doCreateUdpRequest(allocator, nettyInbound, payload, remoteAddress, type);
-        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
-
-        return new DefaultXtreamExchange(sessionManager, request, response);
-    }
-
-    protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
-        final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.INSTRUCTION_SERVER, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.UDP, payload, remoteAddress);
+    @Override
+    protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InboundInfo inboundInfo) {
+        final String requestId = this.generateRequestId(nettyInbound);
+        final Channel channel = inboundInfo.channel();
+        final InetSocketAddress remoteAddress = inboundInfo.remoteAddress();
+        final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.INSTRUCTION_SERVER, requestId, allocator, nettyInbound, XtreamInbound.Type.UDP, payload, channel, remoteAddress);
         this.requestLifecycleListener.afterRequestDecoded(nettyInbound, payload, request);
         return request;
     }

@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078RequestHeader;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
 import reactor.netty.NettyInbound;
 
 import java.net.InetSocketAddress;
@@ -32,9 +33,9 @@ public class DefaultJt1078Request extends DefaultXtreamRequest implements Jt1078
     private final Jt1078RequestHeader header;
 
     public DefaultJt1078Request(
-            String requestId, ByteBufAllocator allocator, NettyInbound nettyInbound, Type type, InetSocketAddress remoteAddress,
+            String requestId, ByteBufAllocator allocator, NettyInbound nettyInbound, Type type, Channel channel, InetSocketAddress remoteAddress,
             Jt1078RequestHeader header, ByteBuf payload) {
-        super(requestId, allocator, nettyInbound, type, payload, remoteAddress);
+        super(requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
         this.header = header;
     }
 

@@ -46,7 +46,7 @@ public class XtreamServerReactiveUdpDebugApp {
                         .doOnUnbound(connection -> log.info("doOnUnbound, {}", connection))
                         .wiretap(true)
                         .host("localhost")
-                        .port(8989)
+                        .port(3721)
                         .doOnChannelInit((observer, channel, remoteAddress) -> log.info("doOnChannelInit {}", channel))
                 )
                 .addServerCustomizer(server -> server.handle(

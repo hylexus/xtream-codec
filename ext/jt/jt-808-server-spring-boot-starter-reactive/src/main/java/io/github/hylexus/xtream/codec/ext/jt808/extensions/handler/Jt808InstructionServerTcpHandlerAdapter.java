@@ -21,11 +21,10 @@ import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListe
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ServerType;
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
-import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
-import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.DefaultTcpXtreamNettyHandlerAdapter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +50,12 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
 
     @Override
     public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
+        final InboundInfo inboundInfo = this.initTcpInboundInfo(nettyInbound);
         return nettyInbound.receive().flatMap(byteBuf -> {
             if (byteBuf.readableBytes() <= 0) {
                 return Mono.empty();
             }
-            final InetSocketAddress remoteAddress = this.initTcpRemoteAddress(nettyInbound);
-            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, remoteAddress)
+            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, inboundInfo)
                     .onErrorResume(Throwable.class, throwable -> {
                         log.error("Unexpected Exception", throwable);
                         return Mono.empty();
@@ -67,24 +66,21 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
         });
     }
 
-    protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
-        final XtreamExchange exchange = this.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
+    @Override
+    protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {
+        final XtreamExchange exchange = this.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, inboundInfo);
         return this.doTcpExchange(exchange).doFinally(signalType -> {
             // ...
             exchange.request().release();
         });
     }
 
-    public XtreamExchange createTcpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf byteBuf, InetSocketAddress remoteAddress) {
-        final XtreamRequest.Type type = XtreamRequest.Type.TCP;
-        final XtreamRequest request = this.doCreateTcpRequest(allocator, nettyInbound, byteBuf, remoteAddress, type);
-        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
-
-        return new DefaultXtreamExchange(sessionManager, request, response);
-    }
-
-    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
-        final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.INSTRUCTION_SERVER, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.TCP, byteBuf, remoteAddress);
+    @Override
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamRequest.Type type) {
+        final Channel channel = inboundInfo.channel();
+        final InetSocketAddress remoteAddress = inboundInfo.remoteAddress();
+        final String requestId = this.generateRequestId(nettyInbound);
+        final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.INSTRUCTION_SERVER, requestId, allocator, nettyInbound, XtreamInbound.Type.TCP, byteBuf, channel, remoteAddress);
         this.requestLifecycleListener.afterRequestDecoded(nettyInbound, byteBuf, request);
         return request;
     }

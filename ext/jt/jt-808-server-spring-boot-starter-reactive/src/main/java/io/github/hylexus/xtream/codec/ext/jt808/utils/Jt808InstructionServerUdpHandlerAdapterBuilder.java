@@ -22,13 +22,13 @@ import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSpl
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808InstructionServerUdpHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.UdpXtreamNettyHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
-import io.github.hylexus.xtream.codec.server.reactive.spec.impl.udp.UdpXtreamHandlerAdapterBuilder;
+import io.github.hylexus.xtream.codec.server.reactive.spec.impl.udp.AbstractXtreamHandlerAdapterBuilderUdp;
 import io.netty.buffer.ByteBufAllocator;
 
 /**
  * @author hylexus
  */
-public class Jt808InstructionServerUdpHandlerAdapterBuilder extends UdpXtreamHandlerAdapterBuilder {
+public class Jt808InstructionServerUdpHandlerAdapterBuilder extends AbstractXtreamHandlerAdapterBuilderUdp<Jt808InstructionServerUdpHandlerAdapterBuilder> {
 
     protected final Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter;
     protected Jt808RequestDecoder requestDecoder;

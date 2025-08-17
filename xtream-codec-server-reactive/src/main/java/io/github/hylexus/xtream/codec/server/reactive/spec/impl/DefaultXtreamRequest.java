@@ -38,17 +38,14 @@ public class DefaultXtreamRequest implements XtreamRequest {
     protected InetSocketAddress remoteAddress;
     protected final Channel channel;
 
-    public DefaultXtreamRequest(String requestId, ByteBufAllocator allocator, NettyInbound delegate, Type type, ByteBuf payload, InetSocketAddress remoteAddress) {
+    public DefaultXtreamRequest(String requestId, ByteBufAllocator allocator, NettyInbound delegate, Type type, ByteBuf payload, Channel channel, InetSocketAddress remoteAddress) {
         this.requestId = requestId;
         this.allocator = allocator;
         this.delegate = delegate;
         this.payload = payload;
         this.type = type;
         this.remoteAddress = remoteAddress;
-
-        final Channel[] channels = new Channel[1];
-        delegate.withConnection(connection -> channels[0] = connection.channel());
-        this.channel = channels[0];
+        this.channel = channel;
     }
 
     @Override

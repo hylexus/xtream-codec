@@ -30,7 +30,6 @@ import reactor.core.publisher.Mono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
-import java.net.InetSocketAddress;
 import java.time.Instant;
 
 /**
@@ -52,13 +51,13 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
 
     @Override
     public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
+        final InboundInfo inboundInfo = this.initTcpInboundInfo(nettyInbound);
         return nettyInbound.receive().flatMap(byteBuf -> {
             if (byteBuf.readableBytes() <= 0) {
                 return Mono.empty();
             }
-            final InetSocketAddress remoteAddress = this.initTcpRemoteAddress(nettyInbound);
             byteBuf.retain();
-            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, remoteAddress)
+            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, inboundInfo)
                     .onErrorResume(Throwable.class, throwable -> {
                         log.error("Unexpected Exception", throwable);
                         return Mono.empty();
@@ -72,21 +71,21 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
         });
     }
 
-    protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InetSocketAddress remoteAddress) {
-        final XtreamExchange exchange = this.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, remoteAddress);
+    protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {
+        final XtreamExchange exchange = this.createTcpExchange(allocator, nettyInbound, nettyOutbound, payload, inboundInfo);
         return this.doTcpExchange(exchange);
     }
 
-    public XtreamExchange createTcpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf byteBuf, InetSocketAddress remoteAddress) {
+    protected XtreamExchange createTcpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf byteBuf, InboundInfo inboundInfo) {
         final XtreamRequest.Type type = XtreamRequest.Type.TCP;
-        final XtreamRequest request = this.doCreateTcpRequest(allocator, nettyInbound, byteBuf, remoteAddress, type);
-        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, remoteAddress);
+        final XtreamRequest request = this.doCreateTcpRequest(allocator, nettyInbound, byteBuf, inboundInfo, type);
+        final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, inboundInfo.remoteAddress());
 
         return new DefaultXtreamExchange(sessionManager, request, response);
     }
 
-    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InetSocketAddress remoteAddress, XtreamRequest.Type type) {
-        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, type, byteBuf, remoteAddress);
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamRequest.Type type) {
+        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, type, byteBuf, inboundInfo.channel(), inboundInfo.remoteAddress());
     }
 
     protected Mono<Void> doTcpExchange(XtreamExchange exchange) {
@@ -94,12 +93,6 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
             session.lastCommunicateTime(Instant.now());
             return xtreamHandler.handle(exchange);
         });
-    }
-
-    protected InetSocketAddress initTcpRemoteAddress(NettyInbound nettyInbound) {
-        final InetSocketAddress[] remoteAddress = new InetSocketAddress[1];
-        nettyInbound.withConnection(connection -> remoteAddress[0] = (InetSocketAddress) connection.channel().remoteAddress());
-        return remoteAddress[0];
     }
 
 }

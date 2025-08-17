@@ -78,7 +78,7 @@ public class BaseCodecTest {
     protected Jt808Request decodeAsRequest(String hex) {
         final ByteBuf payload = XtreamBytes.byteBufFromHexString(allocator, hex);
         try {
-            return decoder.decode(Jt808ServerType.INSTRUCTION_SERVER, null, allocator, nettyInbound, XtreamRequest.Type.TCP, payload, null);
+            return decoder.decode(Jt808ServerType.INSTRUCTION_SERVER, null, allocator, nettyInbound, XtreamRequest.Type.TCP, payload, null, null);
         } finally {
             XtreamBytes.releaseBuf(payload);
         }
