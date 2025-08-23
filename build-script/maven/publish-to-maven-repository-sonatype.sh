@@ -13,8 +13,9 @@ cd ${XTREAM_PROJECT_ROOT_DIR}
 echo "Working-Directory        : ${XTREAM_PROJECT_ROOT_DIR}"
 
 # org.gradle.parallel=false @see https://stackoverflow.com/questions/72664149/gradle-maven-publish-sonatype-creates-multiple-repositories-that-cant-be-clos
+# https://central.sonatype.org/publish/publish-portal-api/
 
-./gradlew clean build publishMavenPublicationToSonatypeRepository \
+./gradlew clean build publishToMavenCentralPortal \
 -D org.gradle.parallel=false \
 -P buildJt808DashboardUi=true \
 -P buildJt808DebugUi=false \

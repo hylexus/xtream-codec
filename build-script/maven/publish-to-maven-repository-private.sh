@@ -16,6 +16,7 @@ echo "Working-Directory        : ${XTREAM_PROJECT_ROOT_DIR}"
 
 ./gradlew clean build publishMavenPublicationToPrivateRepository \
 -D org.gradle.parallel=false \
+-P xtream.maven.publications.private.enabled=true \
 -P buildJt808DashboardUi=true \
 -P buildJt808DebugUi=false \
 -P xtream.skip.checkstyle=false \

@@ -6,11 +6,15 @@ pluginManagement {
         id("com.github.joschi.licenser") version "0.6.0" apply false
         id("com.github.jk1.dependency-license-report") version "2.9" apply false
         id("com.namics.oss.gradle.license-enforce-plugin") version "1.7.0" apply false
+        id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1" apply false
     }
 
     repositories {
         maven {
-            url = uri("https://maven.aliyun.com/repository/gradle-plugin")
+            //url = uri("https://maven.aliyun.com/repository/gradle-plugin")
+            //url = uri("https://maven.aliyun.com/repository/public")
+            url = uri("https://mirrors.cloud.tencent.com/nexus/repository/maven-public")
+            //url = uri("https://repo.huaweicloud.com/repository/maven")
             name = "aliyunGradlePlugin"
             content {
                 // 404: https://maven.aliyun.com/repository/gradle-plugin/gradle/plugin/com/github/joschi/licenser/licenser/0.6.0/licenser-0.6.0.jar

@@ -6,6 +6,7 @@ plugins {
     id("java-library")
     id("io.spring.dependency-management")
     id("maven-publish")
+    id("io.gitee.pkmer.pkmerboot-central-publisher") apply false
     id("signing")
     id("checkstyle")
     id("com.github.joschi.licenser")
@@ -233,7 +234,24 @@ configure(subprojects) {
         from(tasks.named("javadoc"))
     }
 
+    val stagingRepositoryPath = "/tmp/gradle/maven-tmp"
     if (isMavenPublications(project)) {
+        apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
+        tasks.withType<io.gitee.pkmer.tasks.BundleTask>().configureEach {
+            dependsOn(tasks.test, tasks.checkstyleTest, tasks.checkstyleMain)
+        }
+        // 延迟配置，在插件完全应用后再执行
+        afterEvaluate {
+            project.extensions.findByType<io.gitee.pkmer.extension.PkmerBootPluginExtension>()?.apply {
+                sonatypeMavenCentral {
+                    stagingRepository.set(file(stagingRepositoryPath))
+                    username.set(mavenRepoConfig.getProperty("sonatype-staging.username"))
+                    password.set(mavenRepoConfig.getProperty("sonatype-staging.password"))
+                    publishingType.set(io.gitee.pkmer.enums.PublishingType.USER_MANAGED)
+                }
+            }
+        }
+
         publishing {
             publications {
                 create<MavenPublication>("maven") {
@@ -292,23 +310,31 @@ configure(subprojects) {
                         // 1. 发布到你自己的私有仓库
                         // 1.1 将 build-script/maven/repo-credentials.debug-template.properties 另存到 ~/.gradle/repo-credentials.properties 然后修改用户名和密码等属性
                         // 1.2 在 ~/.gradle/gradle.properties 中配置 signing.keyId, signing.password, signing.secretKeyRingFile
-                        maven {
-                            name = "private"
-                            url = uri(mavenRepoConfig.getProperty("privateRepo-release.url"))
-                            credentials {
-                                username = mavenRepoConfig.getProperty("privateRepo-release.username")
-                                password = mavenRepoConfig.getProperty("privateRepo-release.password")
+                        if (getConfigAsBoolean("xtream.maven.publications.private.enabled")) {
+                            maven {
+                                name = "private"
+                                url = uri(mavenRepoConfig.getProperty("privateRepo-release.url"))
+                                credentials {
+                                    username = mavenRepoConfig.getProperty("privateRepo-release.username")
+                                    password = mavenRepoConfig.getProperty("privateRepo-release.password")
+                                }
                             }
                         }
 
                         // 2. 发布到 Maven 中央仓库
+//                        maven {
+//                            name = "centralPortal"
+//                            url = uri(mavenRepoConfig.getProperty("sonatype-staging.url"))
+//                            credentials {
+//                                username = mavenRepoConfig.getProperty("sonatype-staging.username")
+//                                password = mavenRepoConfig.getProperty("sonatype-staging.password")
+//                            }
+//                        }
+
                         maven {
-                            name = "sonatype"
-                            url = uri(mavenRepoConfig.getProperty("sonatype-staging.url"))
-                            credentials {
-                                username = mavenRepoConfig.getProperty("sonatype-staging.username")
-                                password = mavenRepoConfig.getProperty("sonatype-staging.password")
-                            }
+                            name = "localTmp"
+                            // Specify the local staging repo path in the configuration.
+                            url = uri(stagingRepositoryPath)
                         }
                     }
                 }
