@@ -1,3 +1,20 @@
+## 0.0.1-rc.7(2025-08-23)
+
+### ⭐ New Features
+
+- [jt-808-server-dashboard-ui](ext/jt/jt-808-server-dashboard-ui) 完善
+- 代码优化
+
+### 🐞 Bug Fixes
+
+- [无法自动识别808的2011版导致Jt808RequestHandlerMapping注解设为2011版本时失效 #3](https://github.com/hylexus/xtream-codec/issues/3)
+
+### ❤️ Contributors
+
+- [@makeclan 何事惊慌](https://github.com/makeclan)
+- [@dfEric](https://github.com/dfEric)
+- [@hylexus](https://github.com/hylexus)
+
 ## 0.0.1-rc.6(2025-06-29)
 
 ### ⭐ New Features

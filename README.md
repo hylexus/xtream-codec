@@ -13,7 +13,7 @@
     <a href="https://openjdk.org/projects/jdk/21">
         <img alt="JDK" src="https://img.shields.io/badge/jdk-21-red" />
     </a>
-    <a href="https://search.maven.org/search?q=g:%22io.github.hylexus.xtream%22%20AND%20a:%22xtream-codec-core%22">
+    <a href="https://central.sonatype.com/namespace/io.github.hylexus.xtream">
             <img alt="Maven%20Central" src="https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central&color=green" />
     </a>
 </p>
