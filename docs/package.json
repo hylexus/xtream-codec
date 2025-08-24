@@ -4,6 +4,10 @@
   "description": "docs for xtream-codec",
   "license": "Apache License 2.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=9.12.1"
+  },
   "scripts": {
     "docs:dev": "vuepress-vite dev src",
     "docs:clean-dev": "vuepress-vite dev src --clean-cache",
@@ -11,16 +15,16 @@
     "docs:update-package": "pnpm dlx vp-update"
   },
   "devDependencies": {
-    "@vuepress/bundler-vite": "2.0.0-rc.23",
-    "@vuepress/plugin-search": "2.0.0-rc.110",
-    "@vuepress/plugin-slimsearch": "2.0.0-rc.110",
-    "sass-embedded": "^1.89.2",
-    "vue": "^3.5.17",
-    "vuepress": "2.0.0-rc.23",
+    "@vuepress/bundler-vite": "2.0.0-rc.24",
+    "@vuepress/plugin-search": "2.0.0-rc.112",
+    "@vuepress/plugin-slimsearch": "2.0.0-rc.112",
+    "sass-embedded": "^1.90.0",
+    "vue": "^3.5.19",
+    "vuepress": "2.0.0-rc.24",
     "vuepress-plugin-llms": "1.0.1",
-    "vuepress-theme-hope": "2.0.0-rc.93"
+    "vuepress-theme-hope": "2.0.0-rc.94"
   },
   "dependencies": {
-    "vuepress-shared": "2.0.0-rc.90"
+    "vuepress-shared": "2.0.0-rc.94"
   }
 }

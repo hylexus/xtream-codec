@@ -114,6 +114,12 @@
 - 请参考生成的 **.jar** 文件中的 `META-INF/NOTICE.txt` 文件 。
 - 或者, 执行 `./gradlew clean generateLicenseReport` 之后查看生成的 `build/reports/dependency-license/THIRD-PARTY-NOTICES.txt` 文件。
 
+## Funding
+
+项目的发展离不开你的支持，请作者喝一杯🍺吧！
+
+![有钱的捧个钱场 没钱的捧个人场](https://img.iotplanet.top/img/pay.png)
+
 ## TODO
 
 - [JT/T 1078 扩展](ext/jt/jt-1078-server-spring-boot-starter-reactive)
