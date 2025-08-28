@@ -37,6 +37,7 @@ import java.net.SocketException;
 import java.util.function.Consumer;
 
 /**
+ * @author <a href="https://gitee.com/qinglang1208">何事惊慌</a>
  * @author hylexus
  */
 public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNettyHandlerAdapter {
@@ -83,6 +84,7 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
             return Mono.empty();
         });
     }
+
     protected void doWithSessionManager(Consumer<XtreamSessionManager<? extends XtreamSession>> consumer) {
         if (this.sessionManager != null) {
             consumer.accept(this.sessionManager);
