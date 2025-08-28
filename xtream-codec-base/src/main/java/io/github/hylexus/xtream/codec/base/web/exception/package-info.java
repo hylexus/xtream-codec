@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
+@NullMarked
 package io.github.hylexus.xtream.codec.base.web.exception;
 
-
-import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
-import org.jspecify.annotations.Nullable;
-
-public class XtreamBadRequestException extends XtreamHttpException {
-
-    public XtreamBadRequestException(@Nullable String error) {
-        super(null, XtreamApiErrorCode.BAD_REQUEST, error, null);
-    }
-
-}
+import org.jspecify.annotations.NullMarked;

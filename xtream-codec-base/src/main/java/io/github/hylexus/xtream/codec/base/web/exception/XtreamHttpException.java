@@ -19,7 +19,7 @@ package io.github.hylexus.xtream.codec.base.web.exception;
 
 import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
 import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiProblemDetails;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URI;
 import java.util.List;
@@ -29,15 +29,16 @@ public class XtreamHttpException extends RuntimeException implements XtreamApiPr
     protected URI type = BLANK_TYPE;
     protected String title;
     protected int status;
-    protected URI instance;
-    protected String errorCode;
-    protected List<? extends XtreamHttpErrorDetails> errorDetails;
 
-    public XtreamHttpException(Throwable cause, XtreamApiErrorCode apiErrorCode, String detail, List<? extends XtreamHttpErrorDetails> errorDetails) {
+    protected @Nullable URI instance;
+    protected String errorCode;
+    protected @Nullable List<? extends XtreamHttpErrorDetails> errorDetails;
+
+    public XtreamHttpException(@Nullable Throwable cause, XtreamApiErrorCode apiErrorCode, @Nullable String detail, @Nullable List<? extends XtreamHttpErrorDetails> errorDetails) {
         this(cause, BLANK_TYPE, apiErrorCode.getTitle(), apiErrorCode.getStatus(), detail, null, apiErrorCode.getErrorCode(), errorDetails);
     }
 
-    public XtreamHttpException(Throwable cause, URI type, String title, int status, String detail, URI instance, String errorCode, List<? extends XtreamHttpErrorDetails> errorDetails) {
+    public XtreamHttpException(@Nullable Throwable cause, URI type, String title, int status, @Nullable String detail, @Nullable URI instance, String errorCode, @Nullable List<? extends XtreamHttpErrorDetails> errorDetails) {
         super(detail, cause);
         this.type = type;
         this.title = title;
@@ -68,6 +69,7 @@ public class XtreamHttpException extends RuntimeException implements XtreamApiPr
     }
 
     @Override
+    @Nullable
     public URI getInstance() {
         return this.instance;
     }
@@ -78,6 +80,7 @@ public class XtreamHttpException extends RuntimeException implements XtreamApiPr
     }
 
     @Override
+    @Nullable
     public List<? extends XtreamHttpErrorDetails> getErrorDetails() {
         return this.errorDetails;
     }

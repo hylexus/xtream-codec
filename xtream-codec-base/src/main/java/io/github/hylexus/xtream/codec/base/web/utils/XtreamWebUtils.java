@@ -19,8 +19,8 @@ package io.github.hylexus.xtream.codec.base.web.utils;
 
 import io.github.hylexus.xtream.codec.base.web.annotation.ClientIp;
 import io.micrometer.common.util.StringUtils;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -32,11 +32,13 @@ import static java.util.Objects.requireNonNull;
  * @author hylexus
  * @see <a href="https://stackoverflow.com/questions/22877350/how-to-extract-ip-address-in-spring-mvc-controller-get-call">https://stackoverflow.com/questions/22877350/how-to-extract-ip-address-in-spring-mvc-controller-get-call</a>
  */
+@NullMarked
 public final class XtreamWebUtils {
     private XtreamWebUtils() {
     }
 
     public interface HttpRequestHeaderProvider {
+        @Nullable
         String get(String name);
     }
 
@@ -72,7 +74,7 @@ public final class XtreamWebUtils {
         return Optional.empty();
     }
 
-    public static Optional<String> getClientIp(HttpRequestHeaderProvider headerProvider, InetSocketAddress remoteAddress) {
+    public static Optional<String> getClientIp(HttpRequestHeaderProvider headerProvider, @Nullable InetSocketAddress remoteAddress) {
         return getClientIp(headerProvider)
                 .or(() -> Optional.ofNullable(remoteAddress)
                         .map(InetSocketAddress::getAddress)
@@ -80,13 +82,12 @@ public final class XtreamWebUtils {
                 );
     }
 
-    @Nonnull
     public static String filterClientIp(String ip) {
         return requireNonNull(filterClientIp(ip, "unknown", false, ClientIp.LOCALHOST_VALUE));
     }
 
     @Nullable
-    public static String filterClientIp(String ip, String nullCallback, boolean ignoreLocalhost, String localhostValue) {
+    public static String filterClientIp(@Nullable String ip, String nullCallback, boolean ignoreLocalhost, String localhostValue) {
         if (ip == null) {
             return filterNullIp(nullCallback);
         }
@@ -101,7 +102,7 @@ public final class XtreamWebUtils {
     }
 
     @Nullable
-    public static String filterNullIp(String ip) {
+    public static String filterNullIp(@Nullable String ip) {
         if (ip == null) {
             return null;
         }
@@ -111,7 +112,7 @@ public final class XtreamWebUtils {
         return ip;
     }
 
-    public static boolean isLocalhost(String ip) {
+    public static boolean isLocalhost(@Nullable String ip) {
         if (ip == null) {
             return false;
         }

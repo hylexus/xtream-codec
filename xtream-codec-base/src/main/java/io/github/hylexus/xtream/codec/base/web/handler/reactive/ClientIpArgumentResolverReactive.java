@@ -19,7 +19,7 @@ package io.github.hylexus.xtream.codec.base.web.handler.reactive;
 
 import io.github.hylexus.xtream.codec.base.web.annotation.ClientIp;
 import io.github.hylexus.xtream.codec.base.web.utils.XtreamWebUtils;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
@@ -31,6 +31,7 @@ import java.util.Objects;
 /**
  * @author hylexus
  */
+@NullMarked
 public class ClientIpArgumentResolverReactive implements HandlerMethodArgumentResolver {
 
     @Override
@@ -38,9 +39,8 @@ public class ClientIpArgumentResolverReactive implements HandlerMethodArgumentRe
         return parameter.hasParameterAnnotation(ClientIp.class);
     }
 
-    @Nonnull
     @Override
-    public Mono<Object> resolveArgument(@Nonnull MethodParameter parameter, @Nonnull BindingContext bindingContext, @Nonnull ServerWebExchange exchange) {
+    public Mono<Object> resolveArgument(MethodParameter parameter, BindingContext bindingContext, ServerWebExchange exchange) {
         final ClientIp annotation = Objects.requireNonNull(parameter.getParameterAnnotation(ClientIp.class));
         final String clientIp = XtreamWebUtils.getClientIp(exchange.getRequest().getHeaders()::getFirst, exchange.getRequest().getRemoteAddress())
                 .map(ip -> XtreamWebUtils.filterClientIp(ip, annotation.defaultValue(), annotation.ignoreLocalhost(), annotation.localhostValue()))

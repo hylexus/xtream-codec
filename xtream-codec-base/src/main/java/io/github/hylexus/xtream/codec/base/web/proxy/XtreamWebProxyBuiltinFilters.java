@@ -16,7 +16,7 @@
 
 package io.github.hylexus.xtream.codec.base.web.proxy;
 
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -33,6 +33,7 @@ import java.net.URI;
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/1433ca5b8343247075ff775d558c9a82341e2ac6/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/InstanceWebProxy.java#L58">de.codecentric.boot.admin.server.web.InstanceWebProxy</a>
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/1433ca5b8343247075ff775d558c9a82341e2ac6/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/client/InstanceWebClient.java#L31">de.codecentric.boot.admin.server.web.client.InstanceWebClient</a>
  */
+@NullMarked
 public final class XtreamWebProxyBuiltinFilters {
     private static final String ATTR_KEY_BACKEND_SERVER = "__BACKEND_SERVER_INSTANCE__";
     private static final Logger log = LoggerFactory.getLogger(XtreamWebProxyBuiltinFilters.class);
@@ -52,9 +53,8 @@ public final class XtreamWebProxyBuiltinFilters {
             this.backendMono = backendMono;
         }
 
-        @Nonnull
         @Override
-        public Mono<ClientResponse> filter(@Nonnull ClientRequest request, @Nonnull ExchangeFunction next) {
+        public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
             return this.backendMono
                     .switchIfEmpty(Mono.error(() -> new IllegalStateException("Can not found BackendServer")))
                     .flatMap((backend) -> {
@@ -74,9 +74,8 @@ public final class XtreamWebProxyBuiltinFilters {
             this.backend = backend;
         }
 
-        @Nonnull
         @Override
-        public Mono<ClientResponse> filter(@Nonnull ClientRequest request, ExchangeFunction next) {
+        public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
             final ClientRequest newRequest = setBackend(request, this.backend);
             return next.exchange(newRequest);
         }
@@ -106,9 +105,8 @@ public final class XtreamWebProxyBuiltinFilters {
             this.delegateFilter = delegateFilter;
         }
 
-        @Nonnull
         @Override
-        public Mono<ClientResponse> filter(ClientRequest request, @Nonnull ExchangeFunction next) {
+        public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
             return request.attribute(ATTR_KEY_BACKEND_SERVER)
                     .map(XtreamWebProxyBackend.class::cast)
                     .map((instance) -> delegateFilter.filter(instance, request, next))

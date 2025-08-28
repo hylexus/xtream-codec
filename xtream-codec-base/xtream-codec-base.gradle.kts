@@ -8,6 +8,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    api("org.jspecify:jspecify")
     // common end
 
     compileOnly("jakarta.annotation:jakarta.annotation-api")
