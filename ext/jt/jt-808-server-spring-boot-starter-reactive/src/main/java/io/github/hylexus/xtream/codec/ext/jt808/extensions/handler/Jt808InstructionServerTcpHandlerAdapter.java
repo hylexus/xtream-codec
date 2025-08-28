@@ -33,6 +33,8 @@ import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
 import java.net.InetSocketAddress;
+import java.net.SocketException;
+import java.util.function.Consumer;
 
 /**
  * @author hylexus
@@ -60,10 +62,42 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
                         log.error("Unexpected Exception", throwable);
                         return Mono.empty();
                     });
+        }).doOnError(SocketException.class, throwable -> {
+            this.doWithSessionManager(manager -> {
+                boolean closed = false;
+                Channel channel = inboundInfo.channel();
+                if (channel == null) {
+                    return;
+                }
+                try {
+                    final String sessionId = sessionManager.sessionIdGenerator().generateTcpSessionId(channel);
+                    closed = sessionManager.closeSessionById(sessionId, XtreamSessionEventListener.DefaultSessionCloseReason.CLOSED_BY_CLIENT);
+                } finally {
+                    if (!closed) {
+                        closeAndIgnoreException(channel, "Close channel because of [Socket Exception]: {}");
+                    }
+                }
+            });
         }).onErrorResume(throwable -> {
             log.error("Unexpected Error", throwable);
             return Mono.empty();
         });
+    }
+    protected void doWithSessionManager(Consumer<XtreamSessionManager<? extends XtreamSession>> consumer) {
+        if (this.sessionManager != null) {
+            consumer.accept(this.sessionManager);
+        } else {
+            throw new IllegalStateException("No session manager found");
+        }
+    }
+
+    private static void closeAndIgnoreException(Channel channel, String message) {
+        try {
+            log.info(message, channel);
+            channel.close();
+        } catch (Exception ignored) {
+            // ignored
+        }
     }
 
     @Override
