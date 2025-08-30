@@ -7,17 +7,34 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/hylexus/xtream-codec/actions/workflows/building.yml">
-        <img alt="Building" src="https://github.com/hylexus/xtream-codec/actions/workflows/building.yml/badge.svg" />
-    </a>
     <a href="https://www.apache.org/licenses/LICENSE-2.0">
-        <img alt="license" src="https://img.shields.io/badge/license-Apache2-blue" />
+        <img alt="license" src="https://img.shields.io/badge/License-Apache2-blue" />
     </a>
     <a href="https://openjdk.org/projects/jdk/21">
-        <img alt="JDK" src="https://img.shields.io/badge/jdk-21-red" />
+        <img alt="JDK" src="https://img.shields.io/badge/JDK-21-red" />
     </a>
     <a href="https://central.sonatype.com/namespace/io.github.hylexus.xtream">
-            <img alt="Maven%20Central" src="https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central&color=green" />
+        <img alt="Maven%20Central" src="https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central&color=green-light" />
+    </a>
+    <br/>
+    <a href="https://github.com/hylexus/xtream-codec/actions/workflows/gradle-build.yml">
+        <img alt="Gradle Build" src="https://img.shields.io/github/actions/workflow/status/hylexus/xtream-codec/building.yml?logo=gradle&label=Gradle%20Build">
+    </a>
+    <br/>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/hylexus/xtream-codec?logo=github&label=Last%20Commit&color=blue">
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/hylexus/xtream-codec?logo=github&label=Total%20Commits"/>
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/w/hylexus/xtream-codec?logo=github&label=Commit%20Activity"/>
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/hylexus/xtream-codec?logo=github&label=Commit%20Activity"/>
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/hylexus/xtream-codec?logo=github&label=Commit%20Activity"/>
     </a>
 </p>
 

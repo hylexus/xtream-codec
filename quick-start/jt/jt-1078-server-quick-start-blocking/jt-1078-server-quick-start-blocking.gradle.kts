@@ -18,16 +18,6 @@ tasks.bootJar {
 apply<XtreamCodecFastModePlugin>()
 
 dependencies {
-    // common start
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-    testCompileOnly("org.projectlombok:lombok")
-    testAnnotationProcessor("org.projectlombok:lombok")
-
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    // common end
-
     // api(project(":ext:jt:jt-1078-server-spring-boot-starter-reactive"))
     api(project(":ext:jt:jt-1078-server-dashboard-spring-boot-starter-reactive"))
     api("org.springframework.boot:spring-boot-starter-web")

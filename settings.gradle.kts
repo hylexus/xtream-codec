@@ -59,6 +59,16 @@ include("quick-start:jt:jt-808-server-quick-start-with-storage-blocking")
 include("quick-start:jt:jt-1078-server-quick-start-nonblocking")
 include("quick-start:jt:jt-1078-server-quick-start-blocking")
 
+dependencyResolutionManagement {
+    repositories {
+        extraMavenRepositoryUrls().forEach {
+            maven(it)
+        }
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
 setBuildFileName(rootProject)
 
 fun setBuildFileName(project: ProjectDescriptor) {
@@ -71,3 +81,21 @@ fun setBuildFileName(project: ProjectDescriptor) {
         setBuildFileName(it)
     }
 }
+
+fun extraMavenRepositoryUrls() = listOf(
+//        "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
+//        "https://repo.huaweicloud.com/repository/maven",
+    "https://maven.aliyun.com/repository/central",
+    "https://maven.aliyun.com/repository/public",
+    "https://maven.aliyun.com/repository/google",
+    "https://maven.aliyun.com/repository/spring",
+    // Central
+    "https://repo1.maven.org/maven2",
+    "https://maven.aliyun.com/repository/spring-plugin",
+    "https://maven.aliyun.com/repository/gradle-plugin",
+    "https://maven.aliyun.com/repository/grails-core",
+    "https://maven.aliyun.com/repository/apache-snapshots",
+    "https://plugins.gradle.org/m2/",
+    "https://repo.spring.io/release",
+    "https://repo.spring.io/snapshot"
+)

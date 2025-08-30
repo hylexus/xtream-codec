@@ -31,13 +31,18 @@ configure(subprojects) {
     println("configure ....... " + project.name)
 
     apply(plugin = "java-library")
-    apply(plugin = "io.spring.dependency-management")
-
     java {
         sourceCompatibility = JavaVersion.toVersion(getJavaVersion())
         targetCompatibility = JavaVersion.toVersion(getJavaVersion())
     }
+    tasks.test {
+        useJUnitPlatform()
+    }
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-parameters")
+    }
 
+    apply(plugin = "io.spring.dependency-management")
     dependencyManagement {
         resolutionStrategy {
             cacheChangingModulesFor(0, TimeUnit.SECONDS)
@@ -70,21 +75,17 @@ configure(subprojects) {
         group = "xtream-codec"
         version = getProjectVersion()
     }
+    dependencies {
+        // common start
+        compileOnly("org.projectlombok:lombok")
+        annotationProcessor("org.projectlombok:lombok")
+        testCompileOnly("org.projectlombok:lombok")
+        testAnnotationProcessor("org.projectlombok:lombok")
 
-    repositories {
-        extraMavenRepositoryUrls().forEach {
-            maven(it)
-        }
-        mavenCentral()
-        mavenLocal()
-    }
-
-    tasks.test {
-        useJUnitPlatform()
-    }
-
-    tasks.withType<JavaCompile> {
-        options.compilerArgs.add("-parameters")
+        testImplementation("org.junit.jupiter:junit-jupiter")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+        api("org.jspecify:jspecify")
+        // common end
     }
 
     apply(plugin = "checkstyle")
@@ -165,8 +166,6 @@ configure(subprojects) {
     if (!isJavaProject(project)) {
         return@configure
     }
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
 
     normalization {
         runtimeClasspath {
@@ -235,6 +234,7 @@ configure(subprojects) {
         from(tasks.named("javadoc"))
     }
 
+    apply(plugin = "maven-publish")
     val stagingRepositoryPath = "/tmp/gradle/maven-tmp"
     if (isMavenPublications(project)) {
         apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
@@ -343,6 +343,7 @@ configure(subprojects) {
 
         }
 
+        apply(plugin = "signing")
         signing {
             if (needSign()) {
                 sign(publishing.publications["maven"])
@@ -409,24 +410,4 @@ fun getMavenRepoConfig(): Properties {
         properties.load(rootProject.file("build-script/maven/debug-template.repo-credentials.properties").inputStream())
     }
     return properties
-}
-
-fun extraMavenRepositoryUrls(): List<String> {
-    return listOf(
-//        "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
-//        "https://repo.huaweicloud.com/repository/maven",
-        "https://maven.aliyun.com/repository/central",
-        "https://maven.aliyun.com/repository/public",
-        "https://maven.aliyun.com/repository/google",
-        "https://maven.aliyun.com/repository/spring",
-        // Central
-        "https://repo1.maven.org/maven2",
-        "https://maven.aliyun.com/repository/spring-plugin",
-        "https://maven.aliyun.com/repository/gradle-plugin",
-        "https://maven.aliyun.com/repository/grails-core",
-        "https://maven.aliyun.com/repository/apache-snapshots",
-        "https://plugins.gradle.org/m2/",
-        "https://repo.spring.io/release",
-        "https://repo.spring.io/snapshot"
-    )
 }
