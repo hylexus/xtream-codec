@@ -14,16 +14,16 @@
         <img alt="JDK" src="https://img.shields.io/badge/JDK-21-red" />
     </a>
     <a href="https://central.sonatype.com/namespace/io.github.hylexus.xtream">
-        <img alt="Maven%20Central" src="https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central&color=green-light" />
+        <img alt="Maven Central" src="https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central&color=green-light" />
     </a>
     <br/>
     <a href="https://github.com/hylexus/xtream-codec/actions/workflows/gradle-build.yml">
-        <img alt="Gradle Build" src="https://img.shields.io/github/actions/workflow/status/hylexus/xtream-codec/building.yml?logo=gradle&label=Gradle%20Build">
+        <img alt="Gradle Build" src="https://img.shields.io/github/actions/workflow/status/hylexus/xtream-codec/gradle-build.yml?logo=gradle&label=Gradle%20Build">
     </a>
-    <br/>
     <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
         <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/hylexus/xtream-codec?logo=github&label=Last%20Commit&color=blue">
     </a>
+    <br/>
     <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
         <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/hylexus/xtream-codec?logo=github&label=Total%20Commits"/>
     </a>

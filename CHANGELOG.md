@@ -1,3 +1,20 @@
+## 0.0.1-rc.8(2025-08-30)
+
+### ⭐ New Features
+
+- [JSpecify](https://jspecify.dev/)
+    - [xtream-codec-base](xtream-codec-base) 模块使用 `@org.jspecify.annotations.Nullable` 替代 `@jakarta.annotation.Nullable`
+    - 后续将逐步替换其他模块
+
+### 🐞 Bug Fixes
+
+- [jt808: 优化 TCP 连接异常关闭处理逻辑 Gitee#1](https://gitee.com/hylexus/xtream-codec/pulls/1)
+
+### ❤️ Contributors
+
+- [@makeclan 何事惊慌](https://gitee.com/qinglang1208)
+- [@hylexus](https://github.com/hylexus)
+
 ## 0.0.1-rc.7(2025-08-23)
 
 ### ⭐ New Features
