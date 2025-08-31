@@ -39,6 +39,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     protected final BeanMetadataRegistry beanMetadataRegistry;
     private final String name;
     private final Class<?> type;
+    private final int version;
     private final FiledDataType filedValueType;
     private final Field field;
     // private final PropertyDescriptor propertyDescriptor;
@@ -53,16 +54,18 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     @Setter
     private FieldCodec<?> fieldCodec;
 
-    public BasicBeanPropertyMetadata(BeanMetadataRegistry registry, String name, Class<?> type, Field field, PropertyGetter getter, PropertySetter setter) {
+    public BasicBeanPropertyMetadata(BeanMetadataRegistry registry, String name, Class<?> type, int version, XtreamField xtreamField, Field field, PropertyGetter getter, PropertySetter setter) {
         this.beanMetadataRegistry = registry;
         this.name = name;
         this.type = type;
+        this.version = version;
         this.field = field;
         this.propertyGetter = getter;
         this.propertySetter = setter;
         this.order = initOrder();
         this.filedValueType = XtreamTypes.detectFieldDataType(field);
-        this.xtreamField = findAnnotation(XtreamField.class).orElseThrow();
+        this.xtreamField = xtreamField;
+        // this.xtreamField = findAnnotation(XtreamField.class).orElseThrow();
         this.fieldLengthExtractor = detectFieldLengthExtractor(this.xtreamField);
         this.fieldConditionEvaluator = detectFieldConditionalEvaluator(this.xtreamField);
         this.prependLengthFieldByteCounts = this.detectPrependLengthFieldByteCounts(xtreamField);
@@ -130,7 +133,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     protected int initOrder() {
-        return this.findAnnotation(XtreamField.class).map(XtreamField::order).orElse(0);
+        return this.findAnnotation(XtreamField.class).map(XtreamField::order).orElse(XtreamField.DEFAULT_ORDER);
     }
 
     @Override
@@ -141,6 +144,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     @Override
     public Class<?> rawClass() {
         return this.type;
+    }
+
+    @Override
+    public int version() {
+        return this.version;
     }
 
     @Override

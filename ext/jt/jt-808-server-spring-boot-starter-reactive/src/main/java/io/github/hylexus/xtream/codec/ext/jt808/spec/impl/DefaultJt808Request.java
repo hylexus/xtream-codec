@@ -40,6 +40,7 @@ public class DefaultJt808Request extends DefaultXtreamRequest implements Jt808Re
     protected final Jt808ServerType serverType;
 
     public DefaultJt808Request(
+            int version,
             Jt808ServerType serverType,
             String requestId,
             String traceId,
@@ -50,7 +51,7 @@ public class DefaultJt808Request extends DefaultXtreamRequest implements Jt808Re
             int originalCheckSum,
             int calculatedCheckSum) {
 
-        super(requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
+        super(version, requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
         this.serverType = serverType;
         this.traceId = traceId;
         this.header = header;
@@ -142,6 +143,7 @@ public class DefaultJt808Request extends DefaultXtreamRequest implements Jt808Re
         @Override
         public Jt808Request build() {
             return new DefaultJt808Request(
+                    this.delegateRequest.version(),
                     this.delegateRequest.serverType(),
                     this.delegateRequest.requestId(),
                     this.traceId,

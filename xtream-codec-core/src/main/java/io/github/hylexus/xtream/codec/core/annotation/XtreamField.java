@@ -37,7 +37,11 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(XtreamFieldContainer.class)
 public @interface XtreamField {
+
+    int DEFAULT_VERSION = Integer.MIN_VALUE;
+    int DEFAULT_ORDER = -1;
 
     /**
      * 指定被当前注解标记的属性的类型: 基础类型、嵌套类型、List 类型。
@@ -51,7 +55,7 @@ public @interface XtreamField {
      *
      * @see <a href="https://stackoverflow.com/questions/5001172/java-reflection-getting-fields-and-methods-in-declaration-order">java-reflection-getting-fields-and-methods-in-declaration-order</a>
      */
-    int order() default -1;
+    int order() default DEFAULT_ORDER;
 
     /**
      * 反序列化时当前属性的长度。
@@ -164,5 +168,7 @@ public @interface XtreamField {
      * 描述字段；和 jt-framework 保持一致，没有特殊作用。
      */
     String desc() default "";
+
+    int[] version() default {DEFAULT_VERSION};
 
 }

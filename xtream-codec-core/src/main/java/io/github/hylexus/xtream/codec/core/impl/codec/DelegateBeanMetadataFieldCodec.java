@@ -41,22 +41,22 @@ public class DelegateBeanMetadataFieldCodec implements FieldCodec<Object> {
 
     @Override
     public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return context.entityDecoder().decode(beanMetadata, input);
+        return context.entityDecoder().decode(context.version(), beanMetadata, input);
     }
 
     @Override
     public Object deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return context.entityDecoder().decodeWithTracker(beanMetadata, input, context.codecTracker());
+        return context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, context.codecTracker());
     }
 
     @Override
     public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
-        context.entityEncoder().encode(this.beanMetadata, instance, output);
+        context.entityEncoder().encode(context.version(), this.beanMetadata, instance, output);
     }
 
     @Override
     public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
-        context.entityEncoder().encodeWithTracker(this.beanMetadata, instance, output, context.codecTracker());
+        context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, context.codecTracker());
     }
 
 }

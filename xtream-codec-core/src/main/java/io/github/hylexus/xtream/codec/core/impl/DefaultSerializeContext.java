@@ -27,16 +27,18 @@ public class DefaultSerializeContext implements FieldCodec.SerializeContext {
     private final EntityEncoder entityEncoder;
     private final Object containerInstance;
     private final EvaluationContext evaluationContext;
+    private final int version;
     private final CodecTracker codecTracker;
 
     public DefaultSerializeContext(FieldCodec.SerializeContext another, Object containerInstance) {
-        this(another.entityEncoder(), containerInstance, another.codecTracker());
+        this(another.entityEncoder(), containerInstance, another.version(), another.codecTracker());
     }
 
-    public DefaultSerializeContext(EntityEncoder entityEncoder, Object containerInstance, CodecTracker codecTracker) {
+    public DefaultSerializeContext(EntityEncoder entityEncoder, Object containerInstance, int version, CodecTracker codecTracker) {
         this.entityEncoder = entityEncoder;
         this.containerInstance = containerInstance;
         this.evaluationContext = new StandardEvaluationContext(containerInstance);
+        this.version = version;
         this.codecTracker = codecTracker;
     }
 
@@ -53,6 +55,11 @@ public class DefaultSerializeContext implements FieldCodec.SerializeContext {
     @Override
     public EvaluationContext evaluationContext() {
         return this.evaluationContext;
+    }
+
+    @Override
+    public int version() {
+        return this.version;
     }
 
     @Override

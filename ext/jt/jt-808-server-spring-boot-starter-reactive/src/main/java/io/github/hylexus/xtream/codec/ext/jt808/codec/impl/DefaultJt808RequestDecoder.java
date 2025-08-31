@@ -91,8 +91,9 @@ public class DefaultJt808RequestDecoder implements Jt808RequestDecoder {
                 final Jt808RequestHeader.Jt808MessageBodyProps newMessageBodyProps = header.messageBodyProps().mutate().messageBodyLength(newBodyLength).build();
                 newHeader = header.mutate().messageBodyProps(newMessageBodyProps).build();
             }
-
+            final byte version = header.version().versionIdentifier();
             return new DefaultJt808Request(
+                    version,
                     serverType,
                     requestId,
                     traceId,

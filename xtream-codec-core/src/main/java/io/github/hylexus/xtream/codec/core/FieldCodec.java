@@ -76,6 +76,8 @@ public interface FieldCodec<T> {
 
         EvaluationContext evaluationContext();
 
+        int version();
+
         CodecTracker codecTracker();
 
     }

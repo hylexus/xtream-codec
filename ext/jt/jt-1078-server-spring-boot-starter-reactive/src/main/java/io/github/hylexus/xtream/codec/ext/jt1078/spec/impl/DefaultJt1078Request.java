@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt1078.spec.impl;
 
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Request;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078RequestHeader;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamRequest;
@@ -35,7 +36,7 @@ public class DefaultJt1078Request extends DefaultXtreamRequest implements Jt1078
     public DefaultJt1078Request(
             String requestId, ByteBufAllocator allocator, NettyInbound nettyInbound, Type type, Channel channel, InetSocketAddress remoteAddress,
             Jt1078RequestHeader header, ByteBuf payload) {
-        super(requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
+        super(XtreamField.DEFAULT_VERSION, requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
         this.header = header;
     }
 

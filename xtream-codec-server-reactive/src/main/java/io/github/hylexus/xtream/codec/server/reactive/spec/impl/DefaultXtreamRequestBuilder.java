@@ -31,6 +31,7 @@ public class DefaultXtreamRequestBuilder
 
     public XtreamRequest build() {
         return new DefaultXtreamRequest(
+                this.delegateRequest.version(),
                 this.delegateRequest.requestId(),
                 this.delegateRequest.bufferFactory(),
                 this.delegateRequest.underlyingInbound(),

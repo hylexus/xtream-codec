@@ -85,8 +85,9 @@ public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServ
                 .terminalId(session.terminalId())
                 .flowId(0)
                 .build();
-
+        final byte version = session.protocolVersion().versionIdentifier();
         return new DefaultJt808Request(
+                version,
                 Jt808ServerType.ATTACHMENT_SERVER,
                 this.generateRequestId(nettyInbound),
                 Jt808RequestCombiner.randomTraceId(),

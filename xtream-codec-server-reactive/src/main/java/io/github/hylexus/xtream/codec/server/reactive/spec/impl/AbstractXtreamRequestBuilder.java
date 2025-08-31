@@ -20,7 +20,6 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
 
@@ -28,7 +27,7 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
         implements XtreamRequest.XtreamRequestBuilder {
 
     protected final R delegateRequest;
-
+    protected int version;
     protected ByteBuf payload;
     protected InetSocketAddress remoteAddress;
     protected Channel channel;
@@ -38,6 +37,7 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
         this.payload = delegateRequest.payload();
         this.channel = delegateRequest.underlyingChannel();
         this.remoteAddress = delegateRequest.remoteAddress();
+        this.version = delegateRequest.version();
     }
 
     @SuppressWarnings("unchecked")
@@ -64,13 +64,12 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
         return self();
     }
 
+    @Override
+    public XtreamRequest.XtreamRequestBuilder version(int version) {
+        this.version = version;
+        return self();
+    }
+
     public abstract R build();
 
-    protected DatagramPacket createDatagramPacket(ByteBuf payload) {
-        return new DatagramPacket(
-                payload != null ? payload : this.delegateRequest.payload(),
-                null,
-                this.remoteAddress != null ? this.remoteAddress : this.delegateRequest.remoteAddress()
-        );
-    }
 }

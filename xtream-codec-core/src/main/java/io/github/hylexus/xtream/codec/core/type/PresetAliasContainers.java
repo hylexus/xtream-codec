@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.core;
+package io.github.hylexus.xtream.codec.core.type;
 
-public interface BeanMetadataRegistryAware {
+import java.lang.annotation.*;
 
-    void setBeanMetadataRegistry(int version, BeanMetadataRegistry registry);
+final class PresetAliasContainers {
+
+    private PresetAliasContainers() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustU32Container {
+        Preset.RustStyle.u32[] value();
+    }
 
 }

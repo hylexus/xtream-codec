@@ -63,7 +63,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
             final ByteBuf slice = length < 0
                     ? input // all remaining
                     : input.readSlice(length);
-            final BeanMetadata beanMetadata = entityDecoder.getBeanMetadataRegistry().getBeanMetadata(targetClass);
+            final BeanMetadata beanMetadata = entityDecoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
             return entityDecoder.decode(beanMetadata, slice);
         }
     }
@@ -87,7 +87,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
             final ByteBuf slice = length < 0
                     ? input // all remaining
                     : input.readSlice(length);
-            final BeanMetadata beanMetadata = entityDecoder.getBeanMetadataRegistry().getBeanMetadata(targetClass);
+            final BeanMetadata beanMetadata = entityDecoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
             final int parentIndexBeforeRead = slice.readerIndex();
             final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(propertyMetadata, this, targetClass.getTypeName());
 
@@ -114,8 +114,8 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
             @SuppressWarnings("unchecked") final FieldCodec<Object> codec = (FieldCodec<Object>) fieldCodec.get();
             codec.serialize(propertyMetadata, context, output, value);
         } else {
-            final BeanMetadata beanMetadata = entityEncoder.getBeanMetadataRegistry().getBeanMetadata(targetClass);
-            entityEncoder.encode(beanMetadata, value, output);
+            final BeanMetadata beanMetadata = entityEncoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
+            entityEncoder.encode(context.version(), beanMetadata, value, output);
         }
     }
 
@@ -140,7 +140,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
         } else {
             final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(propertyMetadata, this, targetClass.getTypeName());
 
-            final BeanMetadata beanMetadata = entityEncoder.getBeanMetadataRegistry().getBeanMetadata(targetClass);
+            final BeanMetadata beanMetadata = entityEncoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
             entityEncoder.encodeWithTracker(beanMetadata, value, output, context.codecTracker());
 
             nestedFieldSpan.setHexString(FormatUtils.toHexString(output, parentIndexBeforeWrite, output.writerIndex() - parentIndexBeforeWrite));

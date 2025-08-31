@@ -22,13 +22,13 @@ public enum Jt808ProtocolVersion {
      */
     AUTO_DETECTION("ALL", (byte) -1, (byte) -2),
     /**
-     * 2013 版
-     */
-    VERSION_2013("2013", (byte) 0, (byte) 0),
-    /**
      * 2011 版
      */
     VERSION_2011("2011", (byte) 0, (byte) -1),
+    /**
+     * 2013 版
+     */
+    VERSION_2013("2013", (byte) 0, (byte) 0),
     /**
      * 2019 版
      */

@@ -63,11 +63,16 @@ public class BaseJt808Msg {
         return header.msgBodyLength();
     }
 
+    public BaseJt808Msg setHeader(Jt808MsgHeader header) {
+        this.header = header;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "BaseJt808Msg{"
-                + "header=" + header
-                + ", checkSum=" + checkSum
-                + '}';
+               + "header=" + header
+               + ", checkSum=" + checkSum
+               + '}';
     }
 }

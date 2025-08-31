@@ -40,8 +40,8 @@ public class SimpleSubPackageEntityCodec extends EntityCodec {
     }
 
     @Override
-    public <T> T decode(T instance, ByteBuf source) {
-        return this.decoder.decode(source, instance);
+    public <T> T decode(int version, T instance, ByteBuf source) {
+        return this.decoder.decode(version, source, instance);
     }
 
     @Override
@@ -50,8 +50,8 @@ public class SimpleSubPackageEntityCodec extends EntityCodec {
     }
 
     @Override
-    public void encode(Object instance, ByteBuf target) {
+    public void encode(int version, Object instance, ByteBuf target) {
         // todo 实现支持分包的编码逻辑...
-        super.encode(instance, target);
+        super.encode(version, instance, target);
     }
 }

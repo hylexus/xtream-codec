@@ -182,14 +182,13 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
     @Override
     public Optional<FieldCodec<?>> getFieldCodec(BeanPropertyMetadata metadata) {
 
-        final XtreamField xtreamField = metadata.findAnnotation(XtreamField.class)
-                .orElseThrow();
+        final XtreamField xtreamField = metadata.xtreamFieldAnnotation();
 
         if (xtreamField.fieldCodec() != FieldCodec.Placeholder.class) {
             @SuppressWarnings({"rawtypes"}) final Class<? extends FieldCodec> aClass = xtreamField.fieldCodec();
             final FieldCodec<?> newInstance = BeanUtils.createNewInstance(aClass);
             if (newInstance instanceof BeanMetadataRegistryAware registryAware) {
-                registryAware.setBeanMetadataRegistry(metadata.beanMetadataRegistry());
+                registryAware.setBeanMetadataRegistry(metadata.version(), metadata.beanMetadataRegistry());
             }
             return Optional.of(newInstance);
         }

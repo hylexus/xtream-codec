@@ -38,7 +38,7 @@ public class SequenceBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     private final IterationTimesExtractor iterationTimesExtractor;
 
     public SequenceBeanPropertyMetadata(BeanMetadataRegistry beanMetadataRegistry, BeanPropertyMetadata delegate, NestedBeanPropertyMetadata metadata) {
-        super(beanMetadataRegistry, delegate.name(), delegate.rawClass(), delegate.field(), delegate.propertyGetter(), delegate.propertySetter());
+        super(beanMetadataRegistry, delegate.name(), delegate.rawClass(), delegate.version(), delegate.xtreamFieldAnnotation(), delegate.field(), delegate.propertyGetter(), delegate.propertySetter());
         this.nestedBeanPropertyMetadata = metadata;
         this.delegate = delegate;
         this.containerInstanceFactory = this.xtreamField.containerInstanceFactory() == ContainerInstanceFactory.PlaceholderContainerInstanceFactory.class

@@ -39,8 +39,8 @@ import io.netty.buffer.ByteBuf;
 public class EntityFieldCodec<E> implements FieldCodec<Object> {
     protected final BeanMetadata beanMetadata;
 
-    public EntityFieldCodec(BeanMetadataRegistry registry, Class<E> entityClass) {
-        this.beanMetadata = registry.getBeanMetadata(entityClass);
+    public EntityFieldCodec(int version, BeanMetadataRegistry registry, Class<E> entityClass) {
+        this.beanMetadata = registry.getBeanMetadata(entityClass, version);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class EntityFieldCodec<E> implements FieldCodec<Object> {
 
     @Override
     public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
-        context.entityEncoder().encode(this.beanMetadata, instance, output);
+        context.entityEncoder().encode(context.version(), this.beanMetadata, instance, output);
     }
 
     @Override

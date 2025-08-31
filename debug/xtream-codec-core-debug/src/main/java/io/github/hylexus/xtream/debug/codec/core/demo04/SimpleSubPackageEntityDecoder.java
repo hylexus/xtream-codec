@@ -51,13 +51,13 @@ public class SimpleSubPackageEntityDecoder extends EntityDecoder {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T decode(ByteBuf source, BeanMetadata beanMetadata, Object instance) {
+    public <T> T decode(int version, ByteBuf source, BeanMetadata beanMetadata, Object instance) {
         // BaseJt808Msg 子类 --> 有可能是子包
         if (instance instanceof BaseJt808Msg jt808Msg) {
             return (T) this.tryMergeSubPackagesOrNull(jt808Msg, source);
         }
         // 不是 BaseJt808Msg 类型 --> 直接视为完整包
-        return super.decode(source, beanMetadata, instance);
+        return super.decode(version, source, beanMetadata, instance);
     }
 
     private BaseJt808Msg tryMergeSubPackagesOrNull(BaseJt808Msg jt808Msg, ByteBuf source) {

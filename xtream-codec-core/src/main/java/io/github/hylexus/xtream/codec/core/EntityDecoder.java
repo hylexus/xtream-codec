@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultDeserializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
@@ -35,23 +36,39 @@ public class EntityDecoder {
     }
 
     public <T> T decode(Class<T> entityClass, ByteBuf source) {
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass);
+        return this.decode(XtreamField.DEFAULT_VERSION, entityClass, source);
+    }
+
+    public <T> T decode(int version, Class<T> entityClass, ByteBuf source) {
+        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass, version);
         final Object containerInstance = beanMetadata.createNewInstance();
-        return this.decode(source, beanMetadata, containerInstance);
+        return this.decode(version, source, beanMetadata, containerInstance);
     }
 
     public <T> T decode(BeanMetadata beanMetadata, ByteBuf source) {
+        return this.decode(XtreamField.DEFAULT_VERSION, beanMetadata, source);
+    }
+
+    public <T> T decode(int version, BeanMetadata beanMetadata, ByteBuf source) {
         final Object containerInstance = beanMetadata.createNewInstance();
-        return decode(source, beanMetadata, containerInstance);
+        return decode(version, source, beanMetadata, containerInstance);
     }
 
     public <T> T decode(ByteBuf source, Object containerInstance) {
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(containerInstance.getClass());
-        return decode(source, beanMetadata, containerInstance);
+        return this.decode(XtreamField.DEFAULT_VERSION, source, containerInstance);
+    }
+
+    public <T> T decode(int version, ByteBuf source, Object containerInstance) {
+        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(containerInstance.getClass(), version);
+        return decode(version, source, beanMetadata, containerInstance);
     }
 
     public <T> T decode(ByteBuf source, BeanMetadata beanMetadata, Object containerInstance) {
-        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this, containerInstance, null);
+        return decode(XtreamField.DEFAULT_VERSION, source, beanMetadata, containerInstance);
+    }
+
+    public <T> T decode(int version, ByteBuf source, BeanMetadata beanMetadata, Object containerInstance) {
+        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this, containerInstance, version, null);
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
             if (propertyMetadata.conditionEvaluator().evaluate(context)) {
                 final Object fieldValue = propertyMetadata.decodePropertyValue(context, source);
@@ -65,28 +82,44 @@ public class EntityDecoder {
     // with tracker
     // with tracer
     public <T> T decodeWithTracker(Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass);
+        return this.decodeWithTracker(XtreamField.DEFAULT_VERSION, entityClass, source, tracker);
+    }
+
+    public <T> T decodeWithTracker(int version, Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
+        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass, version);
         final Object containerInstance = beanMetadata.createNewInstance();
-        return this.decodeWithTracker(source, beanMetadata, containerInstance, tracker);
+        return this.decodeWithTracker(version, source, beanMetadata, containerInstance, tracker);
     }
 
     public <T> T decodeWithTracker(BeanMetadata beanMetadata, ByteBuf source, CodecTracker tracker) {
+        return this.decodeWithTracker(XtreamField.DEFAULT_VERSION, beanMetadata, source, tracker);
+    }
+
+    public <T> T decodeWithTracker(int version, BeanMetadata beanMetadata, ByteBuf source, CodecTracker tracker) {
         final Object containerInstance = beanMetadata.createNewInstance();
-        return decodeWithTracker(source, beanMetadata, containerInstance, tracker);
+        return decodeWithTracker(version, source, beanMetadata, containerInstance, tracker);
     }
 
     public <T> T decodeWithTracker(ByteBuf source, Object containerInstance, CodecTracker tracker) {
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(containerInstance.getClass());
-        return decodeWithTracker(source, beanMetadata, containerInstance, tracker);
+        return this.decodeWithTracker(XtreamField.DEFAULT_VERSION, source, containerInstance, tracker);
+    }
+
+    public <T> T decodeWithTracker(int version, ByteBuf source, Object containerInstance, CodecTracker tracker) {
+        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(containerInstance.getClass(), version);
+        return decodeWithTracker(version, source, beanMetadata, containerInstance, tracker);
     }
 
     public <T> T decodeWithTracker(ByteBuf source, BeanMetadata beanMetadata, Object containerInstance, CodecTracker tracker) {
+        return decodeWithTracker(XtreamField.DEFAULT_VERSION, source, beanMetadata, containerInstance, tracker);
+    }
+
+    public <T> T decodeWithTracker(int version, ByteBuf source, BeanMetadata beanMetadata, Object containerInstance, CodecTracker tracker) {
         Objects.requireNonNull(tracker);
         final int indexBeforeRead = source.readerIndex();
         if (tracker.getRootSpan().getEntityClass() == null) {
             tracker.getRootSpan().setEntityClass(beanMetadata.getRawType().getName());
         }
-        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this, containerInstance, tracker);
+        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this, containerInstance, version, tracker);
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
             if (propertyMetadata.conditionEvaluator().evaluate(context)) {
                 final Object fieldValue = propertyMetadata.decodePropertyValueWithTracker(context, source);

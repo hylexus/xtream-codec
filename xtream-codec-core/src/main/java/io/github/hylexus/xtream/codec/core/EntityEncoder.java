@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultSerializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
@@ -34,18 +35,26 @@ public class EntityEncoder {
     }
 
     public void encode(Object instance, ByteBuf target) {
+        this.encode(XtreamField.DEFAULT_VERSION, instance, target);
+    }
+
+    public void encode(int version, Object instance, ByteBuf target) {
         if (instance == null) {
             return;
         }
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass());
-        this.encode(beanMetadata, instance, target);
+        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass(), version);
+        this.encode(version, beanMetadata, instance, target);
     }
 
     public void encode(BeanMetadata beanMetadata, Object instance, ByteBuf target) {
+        this.encode(XtreamField.DEFAULT_VERSION, beanMetadata, instance, target);
+    }
+
+    public void encode(int version, BeanMetadata beanMetadata, Object instance, ByteBuf target) {
         if (instance == null) {
             return;
         }
-        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this, instance, null);
+        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this, instance, version, null);
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
             final Object value = propertyMetadata.getProperty(instance);
             if (value == null) {
@@ -60,18 +69,26 @@ public class EntityEncoder {
 
     // with tracker
     public void encodeWithTracker(Object instance, ByteBuf target, CodecTracker tracker) {
+        this.encodeWithTracker(XtreamField.DEFAULT_VERSION, instance, target, tracker);
+    }
+
+    public void encodeWithTracker(int version, Object instance, ByteBuf target, CodecTracker tracker) {
         if (instance == null) {
             return;
         }
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass());
-        this.encodeWithTracker(beanMetadata, instance, target, tracker);
+        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass(), version);
+        this.encodeWithTracker(version, beanMetadata, instance, target, tracker);
     }
 
     public void encodeWithTracker(BeanMetadata beanMetadata, Object instance, ByteBuf target, CodecTracker tracker) {
+        this.encodeWithTracker(XtreamField.DEFAULT_VERSION, beanMetadata, instance, target, tracker);
+    }
+
+    public void encodeWithTracker(int version, BeanMetadata beanMetadata, Object instance, ByteBuf target, CodecTracker tracker) {
         if (instance == null) {
             return;
         }
-        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this, instance, tracker);
+        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this, instance, version, tracker);
         final int indexBeforeWrite = target.writerIndex();
         if (tracker.getRootSpan().getEntityClass() == null) {
             tracker.getRootSpan().setEntityClass(beanMetadata.getRawType().getName());

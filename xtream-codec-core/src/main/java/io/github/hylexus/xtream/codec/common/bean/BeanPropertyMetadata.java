@@ -41,6 +41,8 @@ public interface BeanPropertyMetadata {
 
     Class<?> rawClass();
 
+    int version();
+
     FiledDataType dataType();
 
     Field field();

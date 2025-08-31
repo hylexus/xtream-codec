@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec;
 
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +25,10 @@ import reactor.core.publisher.Mono;
  */
 public interface XtreamCommandSender<S extends XtreamSession> extends InternalXtreamCommandSender<S> {
 
-    Mono<Void> sendObject(String sessionId, Publisher<Object> data);
+    default Mono<Void> sendObject(String sessionId, Publisher<Object> data) {
+        return this.sendObject(XtreamField.DEFAULT_VERSION, sessionId, data);
+    }
+
+    Mono<Void> sendObject(int version, String sessionId, Publisher<Object> data);
 
 }

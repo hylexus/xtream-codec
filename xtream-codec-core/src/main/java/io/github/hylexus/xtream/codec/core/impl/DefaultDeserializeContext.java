@@ -27,15 +27,17 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
     private final EntityDecoder entityDecoder;
     private final Object containerInstance;
     private final EvaluationContext evaluationContext;
+    private final int version;
 
     public DefaultDeserializeContext(FieldCodec.DeserializeContext another, Object containerInstance) {
-        this(another.entityDecoder(), containerInstance, another.codecTracker());
+        this(another.entityDecoder(), containerInstance, another.version(), another.codecTracker());
     }
 
-    public DefaultDeserializeContext(EntityDecoder entityDecoder, Object containerInstance, CodecTracker tracker) {
+    public DefaultDeserializeContext(EntityDecoder entityDecoder, Object containerInstance, int version, CodecTracker tracker) {
         this.entityDecoder = entityDecoder;
         this.containerInstance = containerInstance;
         this.evaluationContext = new StandardEvaluationContext(containerInstance);
+        this.version = version;
         this.codecTracker = tracker;
     }
 
@@ -47,6 +49,11 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
     @Override
     public EvaluationContext evaluationContext() {
         return this.evaluationContext;
+    }
+
+    @Override
+    public int version() {
+        return this.version;
     }
 
     @Override

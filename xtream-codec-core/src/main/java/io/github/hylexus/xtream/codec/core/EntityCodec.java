@@ -16,10 +16,12 @@
 
 package io.github.hylexus.xtream.codec.core;
 
-import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultFieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.impl.SimpleBeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 public class EntityCodec {
     private final EntityEncoder entityEncoder;
@@ -37,38 +39,62 @@ public class EntityCodec {
     }
 
     public void encode(Object instance, ByteBuf target) {
-        entityEncoder.encode(instance, target);
+        this.encode(XtreamField.DEFAULT_VERSION, instance, target);
+    }
+
+    public void encode(int version, Object instance, ByteBuf target) {
+        this.entityEncoder.encode(version, instance, target);
     }
 
     public void encode(Object instance, ByteBuf target, CodecTracker tracker) {
+        this.encode(XtreamField.DEFAULT_VERSION, instance, target, tracker);
+    }
+
+    public void encode(int version, Object instance, ByteBuf target, @Nullable CodecTracker tracker) {
         if (tracker == null) {
-            entityEncoder.encode(instance, target);
+            this.entityEncoder.encode(version, instance, target);
         } else {
-            entityEncoder.encodeWithTracker(instance, target, tracker);
+            this.entityEncoder.encodeWithTracker(version, instance, target, tracker);
         }
     }
 
     public <T> T decode(Class<T> entityClass, ByteBuf source) {
-        return entityDecoder.decode(entityClass, source);
+        return this.decode(XtreamField.DEFAULT_VERSION, entityClass, source);
+    }
+
+    public <T> T decode(int version, Class<T> entityClass, ByteBuf source) {
+        return entityDecoder.decode(version, entityClass, source);
     }
 
     public <T> T decode(Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
+        return this.decode(XtreamField.DEFAULT_VERSION, entityClass, source, tracker);
+    }
+
+    public <T> T decode(int version, Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
         if (tracker == null) {
-            return entityDecoder.decode(entityClass, source);
+            return entityDecoder.decode(version, entityClass, source);
         } else {
-            return entityDecoder.decodeWithTracker(entityClass, source, tracker);
+            return entityDecoder.decodeWithTracker(version, entityClass, source, tracker);
         }
     }
 
     public <T> T decode(T instance, ByteBuf source) {
-        return entityDecoder.decode(source, instance);
+        return this.decode(XtreamField.DEFAULT_VERSION, instance, source);
+    }
+
+    public <T> T decode(int version, T instance, ByteBuf source) {
+        return entityDecoder.decode(version, source, instance);
     }
 
     public <T> T decode(T instance, ByteBuf source, CodecTracker tracker) {
+        return this.decode(XtreamField.DEFAULT_VERSION, instance, source, tracker);
+    }
+
+    public <T> T decode(int version, T instance, ByteBuf source, CodecTracker tracker) {
         if (tracker == null) {
-            return entityDecoder.decode(source, instance);
+            return entityDecoder.decode(version, source, instance);
         } else {
-            return entityDecoder.decodeWithTracker(source, instance, tracker);
+            return entityDecoder.decodeWithTracker(version, source, instance, tracker);
         }
     }
 }

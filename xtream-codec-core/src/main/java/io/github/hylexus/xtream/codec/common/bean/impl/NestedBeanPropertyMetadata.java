@@ -36,7 +36,7 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     private final ContainerInstanceFactory containerInstanceFactory;
 
     public NestedBeanPropertyMetadata(BeanMetadataRegistry beanMetadataRegistry, BeanMetadata nestedBeanMetadata, BeanPropertyMetadata pm, FieldLengthExtractor fieldLengthExtractor) {
-        super(beanMetadataRegistry, pm.name(), pm.rawClass(), pm.field(), pm.propertyGetter(), pm.propertySetter());
+        super(beanMetadataRegistry, pm.name(), pm.rawClass(), pm.version(), pm.xtreamFieldAnnotation(), pm.field(), pm.propertyGetter(), pm.propertySetter());
         this.nestedBeanMetadata = nestedBeanMetadata;
         this.delegate = pm;
         this.fieldLengthExtractor = fieldLengthExtractor == null

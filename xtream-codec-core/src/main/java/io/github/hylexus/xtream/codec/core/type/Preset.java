@@ -107,6 +107,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -166,10 +169,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustU32Container.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
         @interface u32 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -202,6 +209,9 @@ public @interface Preset {
         @interface str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;

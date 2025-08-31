@@ -33,7 +33,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.utils.JtProtocolConstant;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         if (body instanceof ByteBuf byteBuf) {
             return this.doBuild(describer, byteBuf, tracker);
         }
-        final ByteBuf bodyBuf = this.encodeBody(body, tracker);
+        final ByteBuf bodyBuf = this.encodeBody(describer, body, tracker);
         return this.doBuild(describer, bodyBuf, tracker);
     }
 
@@ -197,7 +197,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         final CodecTracker headerTracker = new CodecTracker();
         final ByteBuf tempHeaderBuffer = allocator.buffer();
         try {
-            this.entityCodec.encode(header, tempHeaderBuffer, headerTracker);
+            this.entityCodec.encode(describer.version().versionIdentifier(), header, tempHeaderBuffer, headerTracker);
         } finally {
             XtreamBytes.releaseBuf(tempHeaderBuffer);
         }
@@ -219,13 +219,14 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         details.getChildren().add(new VirtualFieldSpan("checkSum", "校验码", "java.lang.Byte", checkSum).setHexString(FormatUtils.toHexString(checkSum, 2)));
     }
 
-    private ByteBuf encodeBody(Object entity, @Nullable CodecTracker tracker) {
+    private ByteBuf encodeBody(Jt808MessageDescriber describer, Object entity, @Nullable CodecTracker tracker) {
         if (entity instanceof ByteBuf byteBuf) {
             return byteBuf;
         }
         final ByteBuf buffer = allocator.buffer();
         try {
-            this.entityCodec.encode(entity, buffer, tracker);
+            final int version = describer.version().versionIdentifier();
+            this.entityCodec.encode(version, entity, buffer, tracker);
         } catch (Throwable e) {
             XtreamBytes.releaseBuf(buffer);
             throw e;

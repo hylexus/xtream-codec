@@ -73,7 +73,8 @@ class EntityCodecTest {
     @Accessors(chain = true)
     public static class UserEntity {
 
-        @Preset.RustStyle.u32(desc = "用户ID(32位无符号数)")
+        @Preset.RustStyle.u32(desc = "用户ID(32位无符号数1)")
+        @Preset.RustStyle.u32(desc = "用户ID(32位无符号数2)", version = {1, 2, 3})
         private Long id;
 
         // prependLengthFieldType: 前置一个 u8 类型的字段表示当前字段的长度

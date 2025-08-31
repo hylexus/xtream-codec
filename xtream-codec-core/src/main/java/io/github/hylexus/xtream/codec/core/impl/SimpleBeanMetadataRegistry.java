@@ -30,7 +30,8 @@ import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.RuntimeTypeFieldCodec;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import io.github.hylexus.xtream.codec.core.utils.ReflectionUtils;
+import org.springframework.core.annotation.MergedAnnotations;
 
 import java.beans.BeanDescriptor;
 import java.beans.BeanInfo;
@@ -42,9 +43,12 @@ import java.lang.reflect.WildcardType;
 import java.util.*;
 import java.util.function.Function;
 
-// todo 重构
+/**
+ * @author hylexus
+ */
 public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
-    protected final Map<Class<?>, BeanMetadata> cache = new HashMap<>();
+    // <class, <version, metadata>>
+    protected final Map<Class<?>, Map<Integer, BeanMetadata>> multiVersionCache = new HashMap<>();
     protected final FieldCodecRegistry fieldCodecRegistry;
     protected final XtreamCacheableClassPredicate cacheableClassPredicate;
 
@@ -59,39 +63,47 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     }
 
     @Override
-    public BeanMetadata getBeanMetadata(Class<?> beanClass) {
-        return this.getBeanMetadata(beanClass, this::createBeanPropertyMetadata);
-    }
-
-    @Override
-    public BeanMetadata getBeanMetadata(Class<?> beanClass, Function<PropertyDescriptor, BeanPropertyMetadata> creator) {
+    public BeanMetadata getBeanMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator) {
         if (!this.cacheableClassPredicate.test(beanClass)) {
-            return this.doGetMetadata(beanClass, creator);
+            return this.doGetMetadata(beanClass, version, creator);
         }
 
-        BeanMetadata result = cache.get(beanClass);
-        if (result != null) {
-            return result;
+        Map<Integer, BeanMetadata> metadataVersionMapping = multiVersionCache.get(beanClass);
+        if (metadataVersionMapping != null) {
+            final BeanMetadata beanMetadata = metadataVersionMapping.get(version);
+            if (beanMetadata != null) {
+                return beanMetadata;
+            }
         }
 
         synchronized (SimpleBeanMetadataRegistry.class) {
-            if ((result = cache.get(beanClass)) != null) {
-                return result;
+            if ((metadataVersionMapping = multiVersionCache.get(beanClass)) != null) {
+                final BeanMetadata beanMetadata = metadataVersionMapping.get(version);
+                if (beanMetadata != null) {
+                    return beanMetadata;
+                }
             }
-            result = this.doGetMetadata(beanClass, creator);
-            cache.put(beanClass, result);
-            return result;
+            final BeanMetadata beanMetadata = this.doGetMetadata(beanClass, version, creator);
+            final Map<Integer, BeanMetadata> versionMappings = multiVersionCache.computeIfAbsent(beanClass, k -> new HashMap<>());
+            versionMappings.put(version, beanMetadata);
+            return beanMetadata;
         }
 
     }
 
-    public BasicBeanPropertyMetadata createBeanPropertyMetadata(PropertyDescriptor pd) {
-        final BeanUtils.BasicPropertyDescriptor basicPropertyDescriptor = (BeanUtils.BasicPropertyDescriptor) pd;
+    @Override
+    public BeanMetadata getBeanMetadata(Class<?> beanClass, int version) {
+        return this.getBeanMetadata(beanClass, version, this::createBeanPropertyMetadata);
+    }
+
+    public BasicBeanPropertyMetadata createBeanPropertyMetadata(PropertyInfo pi) {
+        final BeanUtils.BasicPropertyDescriptor basicPropertyDescriptor = (BeanUtils.BasicPropertyDescriptor) pi.propertyDescriptor();
         final BasicBeanPropertyMetadata metadata = new BasicBeanPropertyMetadata(
                 this,
-                pd.getName(),
-                pd.getPropertyType(),
-                basicPropertyDescriptor.getField(),
+                basicPropertyDescriptor.getName(),
+                basicPropertyDescriptor.getPropertyType(),
+                pi.version(),
+                pi.xtreamField(), basicPropertyDescriptor.getField(),
                 // pd,
                 BeanUtils.createGetter(basicPropertyDescriptor),
                 BeanUtils.createSetter(basicPropertyDescriptor)
@@ -100,40 +112,68 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
         return metadata;
     }
 
-    public BeanMetadata doGetMetadata(Class<?> beanClass, Function<PropertyDescriptor, BeanPropertyMetadata> creator) {
-        final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> AnnotatedElementUtils.findMergedAnnotation(field, XtreamField.class) != null);
+    public BeanMetadata doGetMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator) {
+        // final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> AnnotatedElementUtils.findMergedAnnotation(field, XtreamField.class) != null);
+        final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> MergedAnnotations.from(field).isPresent(XtreamField.class));
         final BeanDescriptor beanDescriptor = beanInfo.getBeanDescriptor();
         final ArrayList<BeanPropertyMetadata> pdList = new ArrayList<>();
         for (final PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-            final BeanPropertyMetadata basicPropertyMetadata = creator.apply(pd);
-            if (basicPropertyMetadata.fieldCodec() != null) {
-                // 用户自定义 FieldCodec
-                pdList.add(basicPropertyMetadata);
-                continue;
-            }
-            if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.basic) {
-                pdList.add(basicPropertyMetadata);
-            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.struct) {
-                final BeanMetadata nestedMetadata = doGetMetadata(pd.getPropertyType(), creator);
-                final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, null);
-                pdList.add(metadata);
-            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.sequence) {
-                final List<Class<?>> genericClass = getGenericClass(basicPropertyMetadata.field());
-                final BeanMetadata valueMetadata = doGetMetadata(genericClass.getFirst(), creator);
-                final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, valueMetadata, basicPropertyMetadata, new FieldLengthExtractor.ConstantFieldLengthExtractor(-2));
-                final SequenceBeanPropertyMetadata seqMetadata = new SequenceBeanPropertyMetadata(this, basicPropertyMetadata, metadata);
-                pdList.add(seqMetadata);
-            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.map) {
-                final MapBeanPropertyMetadata mapMedata = new MapBeanPropertyMetadata(basicPropertyMetadata, fieldCodecRegistry, this);
-                pdList.add(mapMedata);
-            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.dynamic) {
-                pdList.add(basicPropertyMetadata);
-            } else {
-                throw new IllegalStateException("Cannot determine dataType for " + basicPropertyMetadata.field());
+            final BeanUtils.BasicPropertyDescriptor basicPropertyDescriptor = (BeanUtils.BasicPropertyDescriptor) pd;
+            final Field field = basicPropertyDescriptor.getField();
+            final List<XtreamField> xtreamFieldAnnotations = ReflectionUtils.findXtreamFieldAnnotations(field);
+            for (final XtreamField xtreamFieldAnnotation : xtreamFieldAnnotations) {
+                final int[] allVersions = xtreamFieldAnnotation.version();
+                final boolean versionMatched = isVersionMatched(version, allVersions);
+                if (!versionMatched) {
+                    continue;
+                }
+                final BeanPropertyMetadata basicPropertyMetadata = creator.apply(new PropertyInfo(pd, xtreamFieldAnnotation, version));
+                if (basicPropertyMetadata.fieldCodec() != null) {
+                    // 用户自定义 FieldCodec
+                    pdList.add(basicPropertyMetadata);
+                    continue;
+                }
+                if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.basic) {
+                    pdList.add(basicPropertyMetadata);
+                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.struct) {
+                    final BeanMetadata nestedMetadata = doGetMetadata(pd.getPropertyType(), version, creator);
+                    final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, null);
+                    pdList.add(metadata);
+                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.sequence) {
+                    final List<Class<?>> genericClass = getGenericClass(basicPropertyMetadata.field());
+                    final BeanMetadata valueMetadata = doGetMetadata(genericClass.getFirst(), version, creator);
+                    final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, valueMetadata, basicPropertyMetadata, new FieldLengthExtractor.ConstantFieldLengthExtractor(-2));
+                    final SequenceBeanPropertyMetadata seqMetadata = new SequenceBeanPropertyMetadata(this, basicPropertyMetadata, metadata);
+                    pdList.add(seqMetadata);
+                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.map) {
+                    final MapBeanPropertyMetadata mapMedata = new MapBeanPropertyMetadata(basicPropertyMetadata, fieldCodecRegistry, this);
+                    pdList.add(mapMedata);
+                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.dynamic) {
+                    pdList.add(basicPropertyMetadata);
+                } else {
+                    throw new IllegalStateException("Cannot determine dataType for " + basicPropertyMetadata.field());
+                }
             }
         }
         pdList.sort(Comparator.comparing(BeanPropertyMetadata::order));
         return new BeanMetadata(beanInfo.getBeanDescriptor().getBeanClass(), BeanUtils.getConstructor(beanDescriptor), pdList);
+    }
+
+    protected boolean isVersionMatched(int targetVersion, int[] versionCandidates) {
+        boolean foundDefault = false;
+
+        for (int v : versionCandidates) {
+            if (v == targetVersion) {
+                // 一旦发现目标版本，立即成功
+                return true;
+            } else if (v == XtreamField.DEFAULT_VERSION) {
+                // 仅记录默认版本存在
+                foundDefault = true;
+            }
+        }
+
+        // 无目标版本时，依赖默认版本兜底
+        return foundDefault;
     }
 
     private List<Class<?>> getGenericClass(Field field) {

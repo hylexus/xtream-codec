@@ -63,7 +63,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     private final Map<Object, FieldCodec<Object>> valueDecoders;
 
     public MapBeanPropertyMetadata(BeanPropertyMetadata delegate, FieldCodecRegistry fieldCodecRegistry, BeanMetadataRegistry beanMetadataRegistry) {
-        super(beanMetadataRegistry, delegate.name(), delegate.rawClass(), delegate.field(), delegate.propertyGetter(), delegate.propertySetter());
+        super(beanMetadataRegistry, delegate.name(), delegate.rawClass(), delegate.version(), delegate.xtreamFieldAnnotation(), delegate.field(), delegate.propertyGetter(), delegate.propertySetter());
         this.delegate = delegate;
         this.fieldCodecRegistry = fieldCodecRegistry;
         this.xtreamFieldMapDescriptor = this.findAnnotation(XtreamFieldMapDescriptor.class)
