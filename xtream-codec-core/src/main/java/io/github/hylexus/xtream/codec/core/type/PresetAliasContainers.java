@@ -31,4 +31,11 @@ final class PresetAliasContainers {
         Preset.RustStyle.u32[] value();
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStrContainer {
+        Preset.RustStyle.str[] value();
+    }
+
 }

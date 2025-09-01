@@ -41,6 +41,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 /**
@@ -48,7 +50,7 @@ import java.util.function.Function;
  */
 public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     // <class, <version, metadata>>
-    protected final Map<Class<?>, Map<Integer, BeanMetadata>> multiVersionCache = new HashMap<>();
+    protected final ConcurrentMap<Class<?>, ConcurrentMap<Integer, BeanMetadata>> multiVersionCache = new ConcurrentHashMap<>();
     protected final FieldCodecRegistry fieldCodecRegistry;
     protected final XtreamCacheableClassPredicate cacheableClassPredicate;
 
@@ -84,7 +86,7 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
                 }
             }
             final BeanMetadata beanMetadata = this.doGetMetadata(beanClass, version, creator);
-            final Map<Integer, BeanMetadata> versionMappings = multiVersionCache.computeIfAbsent(beanClass, k -> new HashMap<>());
+            final Map<Integer, BeanMetadata> versionMappings = multiVersionCache.computeIfAbsent(beanClass, k -> new ConcurrentHashMap<>());
             versionMappings.put(version, beanMetadata);
             return beanMetadata;
         }

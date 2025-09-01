@@ -205,6 +205,7 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStrContainer.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = "utf-8")
         @interface str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")

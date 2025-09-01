@@ -169,7 +169,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
 
                 // 3. value(dynamic)(tmp)
                 final Object data = entry.getValue();
-                final FieldCodec<Object> valueFieldCodec = this.getValueEncoder(key, data);
+                final FieldCodec<Object> valueFieldCodec = this.getValueEncoder(context.version(), key, data);
                 if (logger.isDebugEnabled()) {
                     logger.debug("MapValueEncoder: key={}, valueFieldCodec={}, data={}", key, valueFieldCodec, data);
                 }
@@ -213,7 +213,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
 
                 // 3. value(dynamic)(tmp)
                 final Object data = entry.getValue();
-                final FieldCodec<Object> valueFieldCodec = this.getValueEncoder(key, data);
+                final FieldCodec<Object> valueFieldCodec = this.getValueEncoder(context.version(), key, data);
                 context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE);
                 valueFieldCodec.serializeWithTracker(this, context, temp, data);
 
@@ -274,7 +274,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         return map;
     }
 
-    FieldCodec<Object> getValueEncoder(Object key, Object data) {
+    FieldCodec<Object> getValueEncoder(int version, Object key, Object data) {
         final FieldCodec<Object> fieldCodec = valueEncoders.get(key);
         if (fieldCodec != null) {
             return fieldCodec;
@@ -291,7 +291,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
                     )
                     .orElseThrow(() -> new IllegalArgumentException("Can not determine [FieldCodec] for " + javaType));
         } else {
-            return new DelegateBeanMetadataFieldCodec(this.beanMetadataRegistry.getBeanMetadata(javaType));
+            return new DelegateBeanMetadataFieldCodec(this.beanMetadataRegistry.getBeanMetadata(javaType, version));
         }
     }
 
@@ -318,7 +318,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
                     )
                     .orElseThrow(() -> new IllegalArgumentException("Can not determine [FieldCodec] for " + javaType));
         } else {
-            return new DelegateBeanMetadataFieldCodec(this.beanMetadataRegistry.getBeanMetadata(javaType));
+            return new DelegateBeanMetadataFieldCodec(this.beanMetadataRegistry.getBeanMetadata(javaType, this.version()));
         }
     }
 
@@ -337,7 +337,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
                             .orElseThrow(() -> new UnsupportedOperationException("Can not determine fieldCodec for Map field: " + valueEncoderConfig));
                     map.put(mapKey, fieldCodec);
                 } else {
-                    map.put(mapKey, new DelegateBeanMetadataFieldCodec(this.beanMetadataRegistry.getBeanMetadata(valueEncoderConfig.javaType())));
+                    map.put(mapKey, new DelegateBeanMetadataFieldCodec(this.beanMetadataRegistry.getBeanMetadata(valueEncoderConfig.javaType(), this.version())));
                 }
             }
         }
