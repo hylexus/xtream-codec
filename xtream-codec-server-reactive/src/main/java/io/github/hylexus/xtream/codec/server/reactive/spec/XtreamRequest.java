@@ -47,11 +47,11 @@ public interface XtreamRequest extends XtreamInbound {
 
     interface XtreamRequestBuilder {
 
+        XtreamRequestBuilder version(int version);
+
         default XtreamRequestBuilder payload(ByteBuf payload) {
             return this.payload(payload, true);
         }
-
-        XtreamRequestBuilder version(int version);
 
         XtreamRequestBuilder payload(ByteBuf payload, boolean autoRelease);
 

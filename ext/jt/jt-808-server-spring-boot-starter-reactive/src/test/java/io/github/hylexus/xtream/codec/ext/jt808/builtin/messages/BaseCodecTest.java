@@ -85,10 +85,24 @@ public class BaseCodecTest {
     }
 
     protected <T> T decodeAsEntity(Class<T> entityClass, String hex) {
+        return decodeAsEntity(null, entityClass, hex);
+    }
+
+    protected <T> T decodeAsEntity(Jt808ProtocolVersion protocolVersion, Class<T> entityClass, String hex) {
         Jt808Request jt808Request = null;
+        hex = hex.toLowerCase();
+        if (hex.startsWith("7e")) {
+            hex = hex.substring(2);
+        }
+        if (hex.endsWith("7e")) {
+            hex = hex.substring(0, hex.length() - 2);
+        }
         try {
             jt808Request = this.decodeAsRequest(hex);
-            return entityCodec.decode(entityClass, jt808Request.payload());
+            final int version = protocolVersion != null
+                    ? protocolVersion.versionIdentifier()
+                    : jt808Request.version();
+            return entityCodec.decode(version, entityClass, jt808Request.payload().slice());
         } finally {
             if (jt808Request != null) {
                 jt808Request.release();

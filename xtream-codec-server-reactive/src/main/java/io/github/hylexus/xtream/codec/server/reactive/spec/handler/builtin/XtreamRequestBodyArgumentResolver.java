@@ -48,7 +48,8 @@ public class XtreamRequestBodyArgumentResolver implements XtreamHandlerMethodArg
             }
             return Mono.justOrEmpty(exchange.request().payload());
         }
-        final Object instance = this.messageCodec.decode(parameter.getParameterType(), exchange.request().payload().slice());
+        final int version = exchange.request().version();
+        final Object instance = this.messageCodec.decode(version, parameter.getParameterType(), exchange.request().payload().slice());
         return Mono.justOrEmpty(instance);
     }
 }

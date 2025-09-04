@@ -47,7 +47,8 @@ public class Jt808RequestEntityArgumentResolver implements XtreamHandlerMethodAr
             return this.createEntity(exchange, exchange.request().payload().slice());
         }
         @SuppressWarnings("unchecked") final Class<Object> genericType = (Class<Object>) parameter.getGenericType().getFirst();
-        final Object instance = this.messageCodec.decode(genericType, exchange.request().payload().slice());
+        final int version = exchange.request().version();
+        final Object instance = this.messageCodec.decode(version, genericType, exchange.request().payload().slice());
         return this.createEntity(exchange, instance);
     }
 

@@ -38,11 +38,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerI8.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
         @interface i8 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -54,11 +58,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerU8.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
         @interface u8 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -70,11 +78,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerI16.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
         @interface i16 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -86,11 +98,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerI16Le.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true)
         @interface i16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -102,6 +118,7 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerU16.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
         @interface u16 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
@@ -121,11 +138,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerU16Le.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true)
         @interface u16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -137,11 +158,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerI32.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
         @interface i32 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -153,11 +178,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerI32Le.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true)
         @interface i32_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
@@ -169,7 +198,7 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @Repeatable(PresetAliasContainers.RustU32Container.class)
+        @Repeatable(PresetAliasContainers.RustStyleContainerU32.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
         @interface u32 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
@@ -189,10 +218,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerU32Le.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true)
         @interface u32_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -205,7 +238,7 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @Repeatable(PresetAliasContainers.RustStrContainer.class)
+        @Repeatable(PresetAliasContainers.RustStyleContainerStr.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = "utf-8")
         @interface str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
@@ -249,11 +282,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerStruct.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.struct)
         @interface struct {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
@@ -280,11 +317,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerDyn.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.dynamic)
         @interface dyn {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
@@ -311,10 +352,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerList.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence, containerInstanceFactory = ContainerInstanceFactory.ArrayListContainerInstanceFactory.class)
         @interface list {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -345,10 +390,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerMap.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.map, containerInstanceFactory = ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class)
         @interface map {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -379,10 +428,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerByteArray.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
         @interface byte_array {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -411,12 +464,16 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerWord.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
         @interface Word {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "littleEndian")
             boolean littleEndian() default false;
 
@@ -430,12 +487,16 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerDword.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
         @interface Dword {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "littleEndian")
             boolean littleEndian() default false;
 
@@ -449,10 +510,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBcd.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = XtreamConstants.CHARSET_NAME_BCD_8421)
         @interface Bcd {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -479,8 +544,13 @@ public @interface Preset {
         @Target({ElementType.FIELD, ElementType.METHOD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBcdDateTime.class)
         @XtreamDateTimeField(pattern = "yyMMddHHmmss", charset = XtreamConstants.CHARSET_NAME_BCD_8421)
         @interface BcdDateTime {
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamDateTimeField.class, attribute = "pattern")
             String pattern() default "yyMMddHHmmss";
 
@@ -506,10 +576,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerByte.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
         @interface Byte {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -521,10 +595,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBytes.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
         @interface Bytes {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -552,10 +630,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerStr.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = XtreamConstants.CHARSET_NAME_GBK)
         @interface Str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -591,11 +673,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerObject.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.struct)
         @interface Object {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
@@ -621,11 +707,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerRuntimeType.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.dynamic)
         @interface RuntimeType {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
@@ -651,10 +741,14 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerList.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence, containerInstanceFactory = ContainerInstanceFactory.ArrayListContainerInstanceFactory.class)
         @interface List {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -690,11 +784,15 @@ public @interface Preset {
         @Target({ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerMap.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.map, containerInstanceFactory = ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class)
         @interface Map {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.DEFAULT_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;

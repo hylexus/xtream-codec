@@ -24,18 +24,197 @@ final class PresetAliasContainers {
         throw new UnsupportedOperationException();
     }
 
+    // region RustStyle
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     @Documented
-    public @interface RustU32Container {
+    public @interface RustStyleContainerI8 {
+        Preset.RustStyle.i8[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerU8 {
+        Preset.RustStyle.u8[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerI16 {
+        Preset.RustStyle.i16[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerI16Le {
+        Preset.RustStyle.i16_le[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerU16 {
+        Preset.RustStyle.u16[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerU16Le {
+        Preset.RustStyle.u16_le[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerI32 {
+        Preset.RustStyle.i32[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerI32Le {
+        Preset.RustStyle.i32_le[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerU32 {
         Preset.RustStyle.u32[] value();
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     @Documented
-    public @interface RustStrContainer {
+    public @interface RustStyleContainerU32Le {
+        Preset.RustStyle.u32_le[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerStr {
         Preset.RustStyle.str[] value();
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerStruct {
+        Preset.RustStyle.struct[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerDyn {
+        Preset.RustStyle.dyn[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerList {
+        Preset.RustStyle.list[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerMap {
+        Preset.RustStyle.map[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface RustStyleContainerByteArray {
+        Preset.RustStyle.byte_array[] value();
+    }
+    // endregion RustStyle
+
+    // region JtStyle
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerWord {
+        Preset.JtStyle.Word[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerDword {
+        Preset.JtStyle.Dword[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerBcd {
+        Preset.JtStyle.Bcd[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerBcdDateTime {
+        Preset.JtStyle.BcdDateTime[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerByte {
+        Preset.JtStyle.Byte[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerBytes {
+        Preset.JtStyle.Bytes[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerStr {
+        Preset.JtStyle.Str[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerObject {
+        Preset.JtStyle.Object[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerRuntimeType {
+        Preset.JtStyle.RuntimeType[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerList {
+        Preset.JtStyle.List[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @Documented
+    public @interface JtStyleContainerMap {
+        Preset.JtStyle.Map[] value();
+    }
+    // endregion JtStyle
 
 }

@@ -18,7 +18,9 @@ package io.github.hylexus.xtream.codec.core;
 
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
+import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -28,11 +30,24 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EntityCodecTest {
 
     EntityCodec entityCodec = EntityCodec.DEFAULT;
+
+    void doEncode(int version, UserEntity userEntity, BiConsumer<ByteBuf, UserEntity> consumer) {
+        final ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
+        try {
+            this.entityCodec.encode(version, userEntity, buffer);
+            consumer.accept(buffer, userEntity);
+        } finally {
+            assertEquals(1, buffer.refCnt());
+        }
+    }
 
     @Test
     void testEncode() {
@@ -41,11 +56,38 @@ class EntityCodecTest {
                 .setName("无名氏")
                 .setAge(1024)
                 .setAddress("保密");
-        final ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
-        try {
-            this.entityCodec.encode(userEntity, buffer);
+        doEncode(XtreamField.DEFAULT_VERSION, userEntity, (buffer, entity) -> {
             final String hexString = FormatUtils.toHexString(buffer);
             assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
+        });
+        doEncode(XtreamField.DEFAULT_VERSION, userEntity, (buffer, entity) -> {
+            final String hexString = FormatUtils.toHexString(buffer);
+            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
+        });
+
+        doEncode(1, userEntity, (buffer, entity) -> {
+            final String hexString = FormatUtils.toHexString(buffer);
+            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
+        });
+        doEncode(1, userEntity, (buffer, entity) -> {
+            final String hexString = FormatUtils.toHexString(buffer);
+            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
+        });
+
+        doEncode(2, userEntity, (buffer, entity) -> {
+            final String hexString = FormatUtils.toHexString(buffer);
+            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
+        });
+        doEncode(2, userEntity, (buffer, entity) -> {
+            final String hexString = FormatUtils.toHexString(buffer);
+            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
+        });
+    }
+
+    <T> void doDecode(int version, Class<T> type, ByteBuf buffer, Consumer<T> consumer) {
+        try {
+            final T entity = this.entityCodec.decode(version, type, buffer);
+            consumer.accept(entity);
         } finally {
             buffer.release();
             assertEquals(0, buffer.refCnt());
@@ -54,17 +96,21 @@ class EntityCodecTest {
 
     @Test
     void testDecode() {
-        final ByteBuf buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f040006e4bf9de5af86");
-        try {
-            final UserEntity entity = this.entityCodec.decode(UserEntity.class, buffer);
-            assertEquals(100L, entity.getId());
-            assertEquals("无名氏", entity.getName());
-            assertEquals(1024, entity.getAge());
-            assertEquals("保密", entity.getAddress());
-        } finally {
-            buffer.release();
-            assertEquals(0, buffer.refCnt());
-        }
+        ByteBuf buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f040006e4bf9de5af86");
+        doDecode(XtreamField.DEFAULT_VERSION, UserEntity.class, buffer, EntityCodecTest::doCompare);
+
+        buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86");
+        doDecode(1, UserEntity.class, buffer, EntityCodecTest::doCompare);
+
+        buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86");
+        doDecode(2, UserEntity.class, buffer, EntityCodecTest::doCompare);
+    }
+
+    private static void doCompare(UserEntity entity) {
+        assertEquals(100L, entity.getId());
+        assertEquals("无名氏", entity.getName());
+        assertEquals(1024, entity.getAge());
+        assertEquals("保密", entity.getAddress());
     }
 
     @Getter
@@ -74,11 +120,11 @@ class EntityCodecTest {
     public static class UserEntity {
 
         @Preset.RustStyle.u32(desc = "用户ID(32位无符号数1)")
-        @Preset.RustStyle.u32(desc = "用户ID(32位无符号数2)", version = {1, 2, 3})
         private Long id;
 
         // prependLengthFieldType: 前置一个 u8 类型的字段表示当前字段的长度
-        @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "用户名")
+        @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "用户名(UTF-8)")
+        @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "用户名(GBK)", version = {1, 2}, charset = XtreamConstants.CHARSET_NAME_GBK)
         private String name;
 
         @Preset.RustStyle.u16(desc = "年龄(16位无符号数)")
