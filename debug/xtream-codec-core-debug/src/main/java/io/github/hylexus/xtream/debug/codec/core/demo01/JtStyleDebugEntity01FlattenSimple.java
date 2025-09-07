@@ -32,7 +32,7 @@ public class JtStyleDebugEntity01FlattenSimple {
     //////////////////////// header
     // 固定为 0x80901234
     @Preset.JtStyle.Dword
-    private int magicNumber = 0x80901234;
+    private long magicNumber = 0x80901234L;
 
     // 主版本号 无符号数 1字节
     @Preset.JtStyle.Byte
@@ -73,7 +73,7 @@ public class JtStyleDebugEntity01FlattenSimple {
     @Preset.JtStyle.Word
     private int age;
 
-    // 状态 有符号数 2字节
+    // 状态 无符号数 2字节
     @Preset.JtStyle.Word
-    private short status;
+    private int status;
 }

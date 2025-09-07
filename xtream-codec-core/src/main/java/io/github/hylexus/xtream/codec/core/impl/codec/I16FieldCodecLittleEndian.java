@@ -17,17 +17,28 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
-public class I16FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
-    public static final I16FieldCodecLittleEndian INSTANCE = new I16FieldCodecLittleEndian();
+import java.util.function.Function;
 
-    private I16FieldCodecLittleEndian() {
+public class I16FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    public static final I16FieldCodecLittleEndian INSTANCE = new I16FieldCodecLittleEndian(Short.class, Function.identity());
+    public static final I16FieldCodecLittleEndian INTEGER_INSTANCE = new I16FieldCodecLittleEndian(Integer.class, Short::intValue);
+    public static final I16FieldCodecLittleEndian LONG_INSTANCE = new I16FieldCodecLittleEndian(Long.class, Short::longValue);
+
+    private final Class<?> targetType;
+    private final Function<Short, ? extends Number> converter;
+
+    private I16FieldCodecLittleEndian(Class<?> targetType, Function<Short, ? extends Number> converter) {
+        this.targetType = targetType;
+        this.converter = converter;
     }
 
     @Override
-    public Short deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return input.readShortLE();
+    public Number deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+        final short value = input.readShortLE();
+        return this.converter.apply(value);
     }
 
     @Override
@@ -37,6 +48,12 @@ public class I16FieldCodecLittleEndian extends AbstractFieldCodec<Number> implem
 
     @Override
     public Class<?> underlyingJavaType() {
-        return Short.class;
+        return this.targetType;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.SIGNED;
+    }
+
 }

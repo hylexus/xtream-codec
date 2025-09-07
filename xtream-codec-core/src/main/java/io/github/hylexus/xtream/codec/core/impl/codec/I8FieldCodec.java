@@ -17,17 +17,29 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
-public class I8FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
-    public static final I8FieldCodec INSTANCE = new I8FieldCodec();
+import java.util.function.Function;
 
-    private I8FieldCodec() {
+public class I8FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    public static final I8FieldCodec INSTANCE = new I8FieldCodec(Byte.class, Function.identity());
+    public static final I8FieldCodec SHORT_INSTANCE = new I8FieldCodec(Short.class, Byte::shortValue);
+    public static final I8FieldCodec INTEGER_INSTANCE = new I8FieldCodec(Integer.class, Byte::intValue);
+    public static final I8FieldCodec LONG_INSTANCE = new I8FieldCodec(Long.class, Byte::longValue);
+
+    private final Class<?> targetType;
+    private final Function<Byte, ? extends Number> converter;
+
+    private I8FieldCodec(Class<?> targetType, Function<Byte, ? extends Number> converter) {
+        this.targetType = targetType;
+        this.converter = converter;
     }
 
     @Override
-    public Byte deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return input.readByte();
+    public Number deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+        final byte value = input.readByte();
+        return this.converter.apply(value);
     }
 
     @Override
@@ -37,6 +49,12 @@ public class I8FieldCodec extends AbstractFieldCodec<Number> implements Integral
 
     @Override
     public Class<?> underlyingJavaType() {
-        return Byte.class;
+        return this.targetType;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.SIGNED;
+    }
+
 }

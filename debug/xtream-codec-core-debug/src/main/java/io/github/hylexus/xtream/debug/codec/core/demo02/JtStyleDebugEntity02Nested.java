@@ -38,7 +38,7 @@ public class JtStyleDebugEntity02Nested {
 
     // 校验码
     @Preset.JtStyle.Byte
-    private byte checkSum;
+    private short checkSum;
 
     @Getter
     @Setter
@@ -54,7 +54,7 @@ public class JtStyleDebugEntity02Nested {
 
         // byte[4]     协议版本号
         @Preset.JtStyle.Byte
-        private byte protocolVersion;
+        private short protocolVersion;
 
         // byte[5-15)    终端手机号或设备ID bcd[10]
         @Preset.JtStyle.Bcd(length = 10)

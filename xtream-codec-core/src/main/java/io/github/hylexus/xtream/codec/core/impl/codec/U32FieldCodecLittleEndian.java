@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
 public class U32FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
@@ -39,4 +40,10 @@ public class U32FieldCodecLittleEndian extends AbstractFieldCodec<Number> implem
     public Class<?> underlyingJavaType() {
         return Long.class;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.UNSIGNED;
+    }
+
 }

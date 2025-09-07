@@ -51,7 +51,7 @@ public class DemoJt808Msg0100V2019 extends BaseJt808Msg {
 
     // 6. [75]   BYTE    车牌颜色
     @Preset.RustStyle.u8
-    private byte color;
+    private short color;
 
     /**
      * 7. [76,n)   String    车辆标识

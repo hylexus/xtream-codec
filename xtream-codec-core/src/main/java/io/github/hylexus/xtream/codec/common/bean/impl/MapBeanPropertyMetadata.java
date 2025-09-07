@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamFieldMapDescriptor;
 import io.github.hylexus.xtream.codec.core.impl.codec.DelegateBeanMetadataFieldCodec;
@@ -255,10 +256,9 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
 
     Class<?> getJavaTypeForFieldLengthField(int lengthFieldSize) {
         return switch (lengthFieldSize) {
-            case 1 -> byte.class;
-            case 2 -> short.class;
-            case 4 -> int.class;
-            case 8 -> long.class;
+            case 1 -> short.class;
+            case 2 -> int.class;
+            case 4 -> long.class;
             default -> throw new IllegalArgumentException("Unsupported length: " + lengthFieldSize);
         };
     }
@@ -267,7 +267,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         Map<Object, FieldCodec<Object>> map = new HashMap<>();
         metadataMap.forEach((key, value) -> {
             final Class<?> javaType = this.getJavaTypeForFieldLengthField(value.length());
-            final FieldCodec<Object> fieldCodec = this.fieldCodecRegistry.getFieldCodecAndCastToObject(javaType, value.length, null, value.littleEndian)
+            final FieldCodec<Object> fieldCodec = this.fieldCodecRegistry.getFieldCodecAndCastToObject(value.length, NumberSignedness.UNSIGNED, null, value.littleEndian, javaType)
                     .orElseThrow(() -> new IllegalArgumentException("Can not determine [FieldCodec] for " + value));
             map.put(key, fieldCodec);
         });
@@ -284,10 +284,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         final XtreamField defaultConfig = this.xtreamFieldMapDescriptor.valueEncoderDescriptors().defaultValueEncoderDescriptor().config();
         if (XtreamTypes.isBasicType(javaType)) {
             return this.fieldCodecRegistry.getFieldCodecAndCastToObject(
-                            javaType,
-                            XtreamTypes.getDefaultSizeInBytes(javaType).orElse(defaultConfig.length()),
-                            defaultConfig.charset(),
-                            defaultConfig.littleEndian()
+                            XtreamTypes.getDefaultSizeInBytes(javaType).orElse(defaultConfig.length()), defaultConfig.signedness(), defaultConfig.charset(), defaultConfig.littleEndian(), javaType
                     )
                     .orElseThrow(() -> new IllegalArgumentException("Can not determine [FieldCodec] for " + javaType));
         } else {
@@ -310,11 +307,8 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
                 .orElse(-1);
         if (XtreamTypes.isBasicType(javaType)) {
             return this.fieldCodecRegistry.getFieldCodecAndCastToObject(
-                            javaType,
+                            length, config.signedness(), config.charset(), config.littleEndian(), javaType
                             // XtreamTypes.getDefaultSizeInBytes(javaType).orElse(config.length()),
-                            length,
-                            config.charset(),
-                            config.littleEndian()
                     )
                     .orElseThrow(() -> new IllegalArgumentException("Can not determine [FieldCodec] for " + javaType));
         } else {
@@ -333,7 +327,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
                 map.put(mapKey, newInstance);
             } else {
                 if (XtreamTypes.isBasicType(valueEncoderConfig.javaType())) {
-                    final FieldCodec<Object> fieldCodec = this.fieldCodecRegistry.getFieldCodecAndCastToObject(valueEncoderConfig.javaType(), config.length(), config.charset(), config.littleEndian())
+                    final FieldCodec<Object> fieldCodec = this.fieldCodecRegistry.getFieldCodecAndCastToObject(config.length(), config.signedness(), config.charset(), config.littleEndian(), valueEncoderConfig.javaType())
                             .orElseThrow(() -> new UnsupportedOperationException("Can not determine fieldCodec for Map field: " + valueEncoderConfig));
                     map.put(mapKey, fieldCodec);
                 } else {
@@ -375,7 +369,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     FieldCodec<Object> detectKeyFieldCodec(XtreamFieldMapDescriptor xtreamFieldMapDescriptor, ParsedMapCodecMetadata parsedMapItemMetadata) {
         final XtreamFieldMapDescriptor.KeyDescriptor keyDescriptor = xtreamFieldMapDescriptor.keyDescriptor();
         final MapItemMetadata keyMetadata = parsedMapItemMetadata.keyCodecMetadata();
-        return fieldCodecRegistry.getFieldCodecAndCastToObject(keyMetadata.javaType(), keyMetadata.length(), keyMetadata.charset(), keyMetadata.littleEndian())
+        return fieldCodecRegistry.getFieldCodecAndCastToObject(keyMetadata.length(), keyDescriptor.type().getSignedness(), keyMetadata.charset(), keyMetadata.littleEndian(), keyMetadata.javaType())
                 .orElseThrow(() -> new RuntimeException("Can not determine [FieldCodec] for Key : " + keyDescriptor));
     }
 
@@ -383,7 +377,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         final XtreamFieldMapDescriptor.ValueLengthFieldDescriptor config = xtreamFieldMapDescriptor.valueLengthFieldDescriptor();
 
         final Class<?> javaType = this.getJavaTypeForFieldLengthField(config.length());
-        return fieldCodecRegistry.getFieldCodecAndCastToObject(javaType, config.length(), null, config.littleEndian())
+        return fieldCodecRegistry.getFieldCodecAndCastToObject(config.length(), NumberSignedness.UNSIGNED, null, config.littleEndian(), javaType)
                 .orElseThrow(() -> new RuntimeException("Can not determine [FieldCodec] for [defaultValueLengthSize] : " + xtreamFieldMapDescriptor));
     }
 

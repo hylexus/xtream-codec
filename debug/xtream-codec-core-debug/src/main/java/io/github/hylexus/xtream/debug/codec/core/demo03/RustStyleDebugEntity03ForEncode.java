@@ -16,7 +16,7 @@
 
 package io.github.hylexus.xtream.debug.codec.core.demo03;
 
-import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamFieldMapDescriptor;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -43,11 +43,13 @@ public class RustStyleDebugEntity03ForEncode {
             valueLengthFieldDescriptor = @XtreamFieldMapDescriptor.ValueLengthFieldDescriptor(length = 1, littleEndian = false),
             valueEncoderDescriptors = @XtreamFieldMapDescriptor.ValueEncoderDescriptors(
                     defaultValueEncoderDescriptor = @XtreamFieldMapDescriptor.ValueEncoderDescriptor(
-                            config = @XtreamField(charset = "utf-8")
+                            config = @XtreamField(charset = "utf-8", signedness = NumberSignedness.NONE)
                     ),
                     valueEncoderDescriptors = {
                             @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 1, javaType = String.class),
-                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 2, javaType = String.class, config = @XtreamField(charset = XtreamConstants.CHARSET_NAME_GBK), valueLengthFieldSize = 2),
+                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 2, javaType = String.class, config = @XtreamField(), valueLengthFieldSize = 2),
+                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 3, javaType = Integer.class, config = @XtreamField(signedness = NumberSignedness.UNSIGNED, length = 2), valueLengthFieldSize = 2),
+                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 4, javaType = String.class),
                     }
             )
     )

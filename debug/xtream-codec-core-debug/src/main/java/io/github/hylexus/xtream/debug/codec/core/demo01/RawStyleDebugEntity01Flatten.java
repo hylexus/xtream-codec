@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.debug.codec.core.demo01;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,28 +29,28 @@ import lombok.ToString;
 public class RawStyleDebugEntity01Flatten {
     /// ///////////////////// header
     // 固定为 0x80901234
-    @XtreamField(length = 4)
+    @XtreamField(length = 4, signedness = NumberSignedness.SIGNED)
     private int magicNumber = 0x80901234;
 
     // 主版本号 无符号数 1字节
-    @XtreamField(length = 1)
+    @XtreamField(length = 1, signedness = NumberSignedness.UNSIGNED)
     private short majorVersion;
 
     // 次版本号 无符号数 1字节
-    @XtreamField(length = 1)
+    @XtreamField(length = 1, signedness = NumberSignedness.UNSIGNED)
     private short minorVersion;
 
     // 消息类型 无符号数 2字节
-    @XtreamField(length = 2)
+    @XtreamField(length = 2, signedness = NumberSignedness.UNSIGNED)
     private int msgType;
 
     // 消息体长度 无符号数 2字节
-    @XtreamField(length = 2)
+    @XtreamField(length = 2, signedness = NumberSignedness.UNSIGNED)
     private int msgBodyLength;
 
     /// ///////////////////// body
     // 下一个字段长度 无符号数 2字节
-    @XtreamField(length = 2)
+    @XtreamField(length = 2, signedness = NumberSignedness.UNSIGNED)
     private int usernameLength;
 
     // 用户名 String, "UTF-8"
@@ -57,7 +58,7 @@ public class RawStyleDebugEntity01Flatten {
     private String username;
 
     // 下一个字段长度 无符号数 2字节
-    @XtreamField(length = 2)
+    @XtreamField(length = 2, signedness = NumberSignedness.UNSIGNED)
     private int passwordLength;
 
     // 密码 String, "GBK"
@@ -73,10 +74,10 @@ public class RawStyleDebugEntity01Flatten {
     private String phoneNumber;
 
     // 年龄 无符号数 2字节
-    @XtreamField(length = 2)
+    @XtreamField(length = 2, signedness = NumberSignedness.UNSIGNED)
     private int age;
 
     // 状态 有符号数 2字节
-    @XtreamField(length = 2)
+    @XtreamField(length = 2, signedness = NumberSignedness.SIGNED)
     private short status;
 }

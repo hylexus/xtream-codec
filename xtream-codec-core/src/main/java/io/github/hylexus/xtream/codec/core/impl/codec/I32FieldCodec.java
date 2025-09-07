@@ -17,17 +17,26 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
-public class I32FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
-    public static final I32FieldCodec INSTANCE = new I32FieldCodec();
+import java.util.function.Function;
 
-    private I32FieldCodec() {
+public class I32FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    public static final I32FieldCodec INSTANCE = new I32FieldCodec(Integer.class, Function.identity());
+    public static final I32FieldCodec LONG_INSTANCE = new I32FieldCodec(Long.class, Integer::longValue);
+    private final Class<?> targetType;
+    private final Function<Integer, ? extends Number> converter;
+
+    private I32FieldCodec(Class<?> targetType, Function<Integer, ? extends Number> converter) {
+        this.targetType = targetType;
+        this.converter = converter;
     }
 
     @Override
-    public Integer deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return input.readInt();
+    public Number deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+        final int value = input.readInt();
+        return this.converter.apply(value);
     }
 
     @Override
@@ -37,6 +46,13 @@ public class I32FieldCodec extends AbstractFieldCodec<Number> implements Integra
 
     @Override
     public Class<?> underlyingJavaType() {
-        return Integer.class;
+        return this.targetType;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.SIGNED;
+    }
+
+
 }

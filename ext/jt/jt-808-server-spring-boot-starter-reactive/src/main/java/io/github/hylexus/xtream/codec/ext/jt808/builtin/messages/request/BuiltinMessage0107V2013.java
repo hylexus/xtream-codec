@@ -46,7 +46,7 @@ public class BuiltinMessage0107V2013 {
      * <li>bit7，0：一体机，1：分体机</li>
      */
     @Preset.JtStyle.Word(desc = "终端类型")
-    private short type;
+    private int type;
 
     @Preset.JtStyle.Bytes(length = 5, desc = "制造商ID(5)")
     private String manufacturerId;

@@ -31,7 +31,7 @@ class BuiltinMessage8003V2013Test extends BaseCodecTest {
     void testEncode() {
         final BuiltinMessage8003V2013 entity = new BuiltinMessage8003V2013()
                 .setOriginalMessageFlowId(111)
-                .setPackageCount((short) 3)
+                .setPackageCount((byte) 3)
                 .setPackageIdList(List.of(
                                 new WordWrapper(2),
                                 new WordWrapper(3),
@@ -49,7 +49,7 @@ class BuiltinMessage8003V2013Test extends BaseCodecTest {
         final BuiltinMessage8003V2013 entity = decodeAsEntity(BuiltinMessage8003V2013.class, "800300090139123443230000006f030002000300049d");
 
         assertEquals(111, entity.getOriginalMessageFlowId());
-        assertEquals(3, entity.getPackageCount());
+        assertEquals((byte) 3, entity.getPackageCount());
         assertEquals(3, entity.getPackageIdList().size());
         assertEquals(2, entity.getPackageIdList().get(0).asWord());
         assertEquals(3, entity.getPackageIdList().get(1).asWord());

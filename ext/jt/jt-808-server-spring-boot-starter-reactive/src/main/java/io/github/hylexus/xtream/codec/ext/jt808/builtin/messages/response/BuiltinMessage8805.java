@@ -36,7 +36,7 @@ import lombok.experimental.Accessors;
 public class BuiltinMessage8805 {
 
     @Preset.JtStyle.Dword(desc = "多媒体ID")
-    private int multimediaId;
+    private long multimediaId;
 
     @Preset.JtStyle.Byte(desc = "删除标志 0：保留；1：删除；")
     private short deleteFlag;

@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
 public class I64FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
@@ -39,4 +40,11 @@ public class I64FieldCodec extends AbstractFieldCodec<Number> implements Integra
     public Class<?> underlyingJavaType() {
         return Long.class;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.SIGNED;
+    }
+
+
 }

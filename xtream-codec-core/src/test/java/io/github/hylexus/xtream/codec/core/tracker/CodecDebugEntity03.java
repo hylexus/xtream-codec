@@ -47,7 +47,7 @@ public class CodecDebugEntity03 {
      * 多媒体数据总项数
      */
     @Preset.JtStyle.Word
-    private short multimediaDataItemCount;
+    private int multimediaDataItemCount;
 
     @Preset.JtStyle.List(iterationTimesExpression = "getMultimediaDataItemCount()")
     private List<Item> itemList;

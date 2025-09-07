@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistryAware;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
 import io.github.hylexus.xtream.codec.core.impl.codec.wrapper.*;
@@ -32,6 +33,8 @@ import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import io.github.hylexus.xtream.codec.core.type.wrapper.*;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -39,8 +42,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+
 public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
 
+    private static final Logger log = LoggerFactory.getLogger(DefaultFieldCodecRegistry.class);
     private final Map<String, FieldCodec<?>> mapping = new LinkedHashMap<>();
     @SuppressWarnings("rawtypes")
     private final Map<Class<? extends FieldCodec>, FieldCodec<?>> instanceMapping = new LinkedHashMap<>();
@@ -58,26 +63,57 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
     static void init(DefaultFieldCodecRegistry registry) {
         registry.register(I8FieldCodec.INSTANCE, byte.class, XtreamDataType.i8.sizeInBytes(), "", false);
         registry.register(I8FieldCodec.INSTANCE, Byte.class, XtreamDataType.i8.sizeInBytes(), "", false);
+        registry.register(I8FieldCodec.SHORT_INSTANCE, short.class, XtreamDataType.i8.sizeInBytes(), "", false);
+        registry.register(I8FieldCodec.SHORT_INSTANCE, Short.class, XtreamDataType.i8.sizeInBytes(), "", false);
+        registry.register(I8FieldCodec.INTEGER_INSTANCE, int.class, XtreamDataType.i8.sizeInBytes(), "", false);
+        registry.register(I8FieldCodec.INTEGER_INSTANCE, Integer.class, XtreamDataType.i8.sizeInBytes(), "", false);
+        registry.register(I8FieldCodec.LONG_INSTANCE, long.class, XtreamDataType.i8.sizeInBytes(), "", false);
+        registry.register(I8FieldCodec.LONG_INSTANCE, Long.class, XtreamDataType.i8.sizeInBytes(), "", false);
+
         registry.register(U8FieldCodec.INSTANCE, short.class, XtreamDataType.u8.sizeInBytes(), "", false);
         registry.register(U8FieldCodec.INSTANCE, Short.class, XtreamDataType.u8.sizeInBytes(), "", false);
+        registry.register(U8FieldCodec.INTEGER_INSTANCE, int.class, XtreamDataType.u8.sizeInBytes(), "", false);
+        registry.register(U8FieldCodec.INTEGER_INSTANCE, Integer.class, XtreamDataType.u8.sizeInBytes(), "", false);
+        registry.register(U8FieldCodec.LONG_INSTANCE, long.class, XtreamDataType.u8.sizeInBytes(), "", false);
+        registry.register(U8FieldCodec.LONG_INSTANCE, Long.class, XtreamDataType.u8.sizeInBytes(), "", false);
 
         registry.register(I16FieldCodec.INSTANCE, short.class, XtreamDataType.i16.sizeInBytes(), "", false);
         registry.register(I16FieldCodec.INSTANCE, Short.class, XtreamDataType.i16.sizeInBytes(), "", false);
+        registry.register(I16FieldCodec.INTEGER_INSTANCE, int.class, XtreamDataType.i16.sizeInBytes(), "", false);
+        registry.register(I16FieldCodec.INTEGER_INSTANCE, Integer.class, XtreamDataType.i16.sizeInBytes(), "", false);
+        registry.register(I16FieldCodec.LONG_INSTANCE, long.class, XtreamDataType.i16.sizeInBytes(), "", false);
+        registry.register(I16FieldCodec.LONG_INSTANCE, Long.class, XtreamDataType.i16.sizeInBytes(), "", false);
+
         registry.register(U16FieldCodec.INSTANCE, int.class, XtreamDataType.u16.sizeInBytes(), "", false);
         registry.register(U16FieldCodec.INSTANCE, Integer.class, XtreamDataType.u16.sizeInBytes(), "", false);
+        registry.register(U16FieldCodec.LONG_INSTANCE, long.class, XtreamDataType.u16.sizeInBytes(), "", false);
+        registry.register(U16FieldCodec.LONG_INSTANCE, Long.class, XtreamDataType.u16.sizeInBytes(), "", false);
 
         registry.register(I16FieldCodecLittleEndian.INSTANCE, short.class, XtreamDataType.i16_le.sizeInBytes(), "", true);
         registry.register(I16FieldCodecLittleEndian.INSTANCE, Short.class, XtreamDataType.i16_le.sizeInBytes(), "", true);
+        registry.register(I16FieldCodecLittleEndian.INTEGER_INSTANCE, int.class, XtreamDataType.i16_le.sizeInBytes(), "", true);
+        registry.register(I16FieldCodecLittleEndian.INTEGER_INSTANCE, Integer.class, XtreamDataType.i16_le.sizeInBytes(), "", true);
+        registry.register(I16FieldCodecLittleEndian.LONG_INSTANCE, long.class, XtreamDataType.i16_le.sizeInBytes(), "", true);
+        registry.register(I16FieldCodecLittleEndian.LONG_INSTANCE, Long.class, XtreamDataType.i16_le.sizeInBytes(), "", true);
+
         registry.register(U16FieldCodecLittleEndian.INSTANCE, int.class, XtreamDataType.u16_le.sizeInBytes(), "", true);
         registry.register(U16FieldCodecLittleEndian.INSTANCE, Integer.class, XtreamDataType.u16_le.sizeInBytes(), "", true);
+        registry.register(U16FieldCodecLittleEndian.LONG_INSTANCE, long.class, XtreamDataType.u16_le.sizeInBytes(), "", true);
+        registry.register(U16FieldCodecLittleEndian.LONG_INSTANCE, Long.class, XtreamDataType.u16_le.sizeInBytes(), "", true);
 
         registry.register(I32FieldCodec.INSTANCE, int.class, XtreamDataType.i32.sizeInBytes(), "", false);
         registry.register(I32FieldCodec.INSTANCE, Integer.class, XtreamDataType.i32.sizeInBytes(), "", false);
+        registry.register(I32FieldCodec.LONG_INSTANCE, long.class, XtreamDataType.i32.sizeInBytes(), "", false);
+        registry.register(I32FieldCodec.LONG_INSTANCE, Long.class, XtreamDataType.i32.sizeInBytes(), "", false);
+
         registry.register(U32FieldCodec.INSTANCE, long.class, XtreamDataType.u32.sizeInBytes(), "", false);
         registry.register(U32FieldCodec.INSTANCE, Long.class, XtreamDataType.u32.sizeInBytes(), "", false);
 
         registry.register(I32FieldCodecLittleEndian.INSTANCE, int.class, XtreamDataType.i32_le.sizeInBytes(), "", true);
         registry.register(I32FieldCodecLittleEndian.INSTANCE, Integer.class, XtreamDataType.i32_le.sizeInBytes(), "", true);
+        registry.register(I32FieldCodecLittleEndian.LONG_INSTANCE, long.class, XtreamDataType.i32_le.sizeInBytes(), "", true);
+        registry.register(I32FieldCodecLittleEndian.LONG_INSTANCE, Long.class, XtreamDataType.i32_le.sizeInBytes(), "", true);
+
         registry.register(U32FieldCodecLittleEndian.INSTANCE, long.class, XtreamDataType.u32_le.sizeInBytes(), "", true);
         registry.register(U32FieldCodecLittleEndian.INSTANCE, Long.class, XtreamDataType.u32_le.sizeInBytes(), "", true);
 
@@ -148,35 +184,31 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         if (fieldCodec instanceof FieldCodecRegistryAware registryAware) {
             registryAware.setFieldCodecRegistry(this);
         }
-        String key = this.generateKey(targetType, sizeInBytes, charset, littleEndian);
+        final NumberSignedness signedness = fieldCodec.signedness();
+        final String key = this.generateKey(signedness, targetType, sizeInBytes, charset, littleEndian);
         mapping.put(key, fieldCodec);
-        instanceMapping.put(fieldCodec.getClass(), fieldCodec);
     }
 
-    protected String generateKey(Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian) {
+    protected String generateKey(NumberSignedness signedness, Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian) {
         if (String.class == targetType) {
-            return key(targetType, -1, charset, false);
+            return key(signedness, targetType, -1, charset, false);
         } else if (byte[].class == targetType || Byte[].class == targetType) {
-            return key(targetType, -1, "", false);
+            return key(signedness, targetType, -1, "", false);
         } else if (targetType == byte.class || targetType == Byte.class) {
-            return key(targetType, sizeInBytes, "", false);
+            return key(signedness, targetType, sizeInBytes, "", false);
         } else if (ByteBuf.class.isAssignableFrom(targetType)) {
-            return "ByteBuf <--> byte[n]";
+            return "byte[n] <--> ByteBuf";
         } else {
-            return key(targetType, sizeInBytes, "", littleEndian);
+            return key(signedness, targetType, sizeInBytes, "", littleEndian);
         }
     }
 
     @Override
-    public <T extends FieldCodec<?>> Optional<T> getFieldCodecInstanceByType(Class<T> targetType) {
-        @SuppressWarnings("unchecked") final T fieldCodec = (T) this.instanceMapping.get(targetType);
-        return Optional.ofNullable(fieldCodec);
-    }
-
-    @Override
-    public Optional<FieldCodec<?>> getFieldCodec(Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian) {
-        final String key = generateKey(targetType, sizeInBytes, charset, littleEndian);
-        return Optional.ofNullable(mapping.get(key));
+    public Optional<FieldCodec<?>> getFieldCodec(int sizeInBytes, NumberSignedness signedness, String charset, boolean littleEndian, Class<?> targetType) {
+        final String key = generateKey(signedness, targetType, sizeInBytes, charset, littleEndian);
+        final FieldCodec<?> value = mapping.get(key);
+        // log.info("getFieldCodec: targetType={}, key={}, value={}", targetType, key, value);
+        return Optional.ofNullable(value);
     }
 
     @Override
@@ -196,7 +228,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         final Class<?> rawClassType = metadata.rawClass();
         final int length = this.getDefaultSizeInBytes(xtreamField, rawClassType);
 
-        return this.getFieldCodec(rawClassType, length, xtreamField.charset(), xtreamField.littleEndian());
+        return this.getFieldCodec(length, xtreamField.signedness(), xtreamField.charset(), xtreamField.littleEndian(), rawClassType);
     }
 
     int getDefaultSizeInBytes(XtreamField xtreamField, Class<?> rawClassType) {
@@ -207,14 +239,17 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         return XtreamTypes.getDefaultSizeInBytes(rawClassType).orElseGet(xtreamField::length);
     }
 
-    String key(Class<?> targetType, int length, String charset, boolean littleEndian) {
+    String key(NumberSignedness signedness, Class<?> targetType, int length, String charset, boolean littleEndian) {
         final String numberTips = (targetType != byte.class && targetType != Byte.class && XtreamTypes.isNumberType(targetType))
                 ? (littleEndian ? "(LE)" : "(BE)")
                 : "";
+        final String signednessTips = signedness == NumberSignedness.NONE
+                ? ""
+                : "[" + signedness.value() + "]";
         if (XtreamUtils.hasElement(charset)) {
-            return targetType.getName() + numberTips + " <--> byte[" + (length <= 0 ? "n" : length) + "] (" + (charset.toLowerCase()) + ")";
+            return "byte[" + (length <= 0 ? "n" : length) + "] (" + (charset.toLowerCase()) + ") <--> " + targetType.getName() + numberTips + signednessTips;
         }
-        return targetType.getName() + numberTips + " <--> byte[" + (length <= 0 ? "n" : length) + "]";
+        return "byte[" + (length <= 0 ? "n" : length) + "] <--> " + targetType.getName() + numberTips + signednessTips;
     }
 
 }

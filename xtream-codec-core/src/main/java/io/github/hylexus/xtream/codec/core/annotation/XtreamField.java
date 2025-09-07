@@ -119,6 +119,11 @@ public @interface XtreamField {
     boolean littleEndian() default false;
 
     /**
+     * 符号位(只对数字类型有效)
+     */
+    NumberSignedness signedness() default NumberSignedness.NONE;
+
+    /**
      * List 类型的最大迭代次数
      * <li>反序列化才会用到；序列化用不到</li>
      * <li>只有 {@link java.util.List} 类型有效</li>

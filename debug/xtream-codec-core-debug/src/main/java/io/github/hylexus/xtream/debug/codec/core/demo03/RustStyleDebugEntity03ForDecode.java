@@ -16,7 +16,7 @@
 
 package io.github.hylexus.xtream.debug.codec.core.demo03;
 
-import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamFieldMapDescriptor;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -40,15 +40,17 @@ public class RustStyleDebugEntity03ForDecode {
     @Preset.RustStyle.map
     @XtreamFieldMapDescriptor(
             keyDescriptor = @XtreamFieldMapDescriptor.KeyDescriptor(type = XtreamFieldMapDescriptor.KeyType.u16),
-            valueLengthFieldDescriptor = @XtreamFieldMapDescriptor.ValueLengthFieldDescriptor(length = 1, littleEndian = false),
+            valueLengthFieldDescriptor = @XtreamFieldMapDescriptor.ValueLengthFieldDescriptor(length = 1),
             valueDecoderDescriptors = @XtreamFieldMapDescriptor.ValueDecoderDescriptors(
                     defaultValueDecoderDescriptor = @XtreamFieldMapDescriptor.ValueDecoderDescriptor(
-                            javaType = byte[].class
+                            javaType = byte[].class,
+                            config = @XtreamField(charset = "utf-8", signedness = NumberSignedness.NONE)
                     ),
                     valueDecoderDescriptors = {
                             @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 1, javaType = String.class),
-                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 2, javaType = String.class, config = @XtreamField(charset = XtreamConstants.CHARSET_NAME_GBK), valueLengthFieldSize = 2),
-                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 3, javaType = short.class, config = @XtreamField(length = 2)),
+                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 2, javaType = String.class, config = @XtreamField(), valueLengthFieldSize = 2),
+                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 3, javaType = Integer.class, config = @XtreamField(signedness = NumberSignedness.UNSIGNED, length = 2), valueLengthFieldSize = 2),
+                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 4, javaType = String.class),
                     }
             )
     )

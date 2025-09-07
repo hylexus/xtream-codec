@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamFieldMapDescriptor;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
@@ -113,16 +114,16 @@ class BuiltinMessage8103Sample3Test extends BaseCodecTest {
                 valueDecoderDescriptors = @XtreamFieldMapDescriptor.ValueDecoderDescriptors(
                         defaultValueDecoderDescriptor = @XtreamFieldMapDescriptor.ValueDecoderDescriptor(javaType = byte[].class),
                         valueDecoderDescriptors = {
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0001, config = @XtreamField(length = 4), javaType = Long.class, desc = "终端心跳发送间隔,单位为秒"),
+                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0001, config = @XtreamField(length = 4, signedness = NumberSignedness.UNSIGNED), javaType = Long.class, desc = "终端心跳发送间隔,单位为秒"),
                                 // 由于这里是个 Map, 所以多个相同 ID 的配置项会被覆盖(只剩下最后一个)
                                 @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0040, javaType = String.class, config = @XtreamField(charset = XtreamConstants.CHARSET_NAME_GBK), desc = "监控平台电话号码"),
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0081, config = @XtreamField(length = 2), javaType = Integer.class, desc = "车辆所在省域 ID"),
+                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0081, config = @XtreamField(length = 2, signedness = NumberSignedness.UNSIGNED), javaType = Integer.class, desc = "车辆所在省域 ID"),
                                 // 和 0x0081 一样，0x0082 可以解析为 Integer、ByteArrayContainer、ByteBufContainer、U16Wrapper、DataWrapper 等类型
                                 // @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, config = @XtreamField, javaType = ByteArrayContainer.class, desc = "车辆所在市域 ID"),
                                 // @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, javaType = DataWrapper.class, desc = "车辆所在市域 ID"),
                                 @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, javaType = U16Wrapper.class, desc = "车辆所在市域 ID"),
                                 // @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, config = @XtreamField(length = 2), javaType = Integer.class, desc = "车辆所在市域 ID"),
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0084, config = @XtreamField(length = 1), javaType = Short.class, desc = "车牌颜色"),
+                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0084, config = @XtreamField(length = 1, signedness = NumberSignedness.UNSIGNED), javaType = Short.class, desc = "车牌颜色"),
                         }
                 )
         )

@@ -41,7 +41,7 @@ public class BuiltinMessage0802 {
     private int flowId;
 
     @Preset.JtStyle.Word(desc = "多媒体数据总项数")
-    private short multimediaDataItemCount;
+    private int multimediaDataItemCount;
 
     @Preset.JtStyle.List(desc = "数据项列表")
     private List<Item> itemList;

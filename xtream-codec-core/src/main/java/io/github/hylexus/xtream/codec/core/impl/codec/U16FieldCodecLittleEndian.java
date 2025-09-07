@@ -17,19 +17,28 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
-public class U16FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
-    public static final U16FieldCodecLittleEndian INSTANCE = new U16FieldCodecLittleEndian();
+import java.util.function.Function;
 
-    private U16FieldCodecLittleEndian() {
+public class U16FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    public static final U16FieldCodecLittleEndian INSTANCE = new U16FieldCodecLittleEndian(Integer.class, Function.identity());
+    public static final U16FieldCodecLittleEndian LONG_INSTANCE = new U16FieldCodecLittleEndian(Long.class, Integer::longValue);
+
+    private final Class<?> targetType;
+    private final Function<Integer, ? extends Number> converter;
+
+    private U16FieldCodecLittleEndian(Class<?> targetType, Function<Integer, ? extends Number> converter) {
+        this.targetType = targetType;
+        this.converter = converter;
     }
 
     @Override
-    public Integer deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return input.readUnsignedShortLE();
+    public Number deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+        final int value = input.readUnsignedShortLE();
+        return this.converter.apply(value);
     }
-
 
     @Override
     protected void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Number value) {
@@ -38,6 +47,13 @@ public class U16FieldCodecLittleEndian extends AbstractFieldCodec<Number> implem
 
     @Override
     public Class<?> underlyingJavaType() {
-        return Integer.class;
+        return this.targetType;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.UNSIGNED;
+    }
+
+
 }

@@ -55,7 +55,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
         final Class<?> targetClass = supplier.getRuntimeType(propertyMetadata.name());
         final EntityDecoder entityDecoder = context.entityDecoder();
         final int sizeInBytes = xtreamField.length() > 0 ? xtreamField.length() : XtreamTypes.getDefaultSizeInBytes(targetClass).orElse(-1);
-        final Optional<FieldCodec<?>> fieldCodec = entityDecoder.getFieldCodecRegistry().getFieldCodec(targetClass, sizeInBytes, xtreamField.charset(), xtreamField.littleEndian());
+        final Optional<FieldCodec<?>> fieldCodec = entityDecoder.getFieldCodecRegistry().getFieldCodec(sizeInBytes, xtreamField.signedness(), xtreamField.charset(), xtreamField.littleEndian(), targetClass);
         if (fieldCodec.isPresent()) {
             @SuppressWarnings("unchecked") final FieldCodec<Object> codec = (FieldCodec<Object>) fieldCodec.get();
             return codec.deserialize(propertyMetadata, context, input, length);
@@ -78,7 +78,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
         final Class<?> targetClass = supplier.getRuntimeType(propertyMetadata.name());
         final EntityDecoder entityDecoder = context.entityDecoder();
         final int sizeInBytes = xtreamField.length() > 0 ? xtreamField.length() : XtreamTypes.getDefaultSizeInBytes(targetClass).orElse(-1);
-        final Optional<FieldCodec<?>> fieldCodec = entityDecoder.getFieldCodecRegistry().getFieldCodec(targetClass, sizeInBytes, xtreamField.charset(), xtreamField.littleEndian());
+        final Optional<FieldCodec<?>> fieldCodec = entityDecoder.getFieldCodecRegistry().getFieldCodec(sizeInBytes, xtreamField.signedness(), xtreamField.charset(), xtreamField.littleEndian(), targetClass);
 
         if (fieldCodec.isPresent()) {
             @SuppressWarnings("unchecked") final FieldCodec<Object> codec = (FieldCodec<Object>) fieldCodec.get();
@@ -108,7 +108,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
 
         final EntityEncoder entityEncoder = context.entityEncoder();
         final int sizeInBytes = xtreamField.length() > 0 ? xtreamField.length() : XtreamTypes.getDefaultSizeInBytes(targetClass).orElse(-1);
-        final Optional<FieldCodec<?>> fieldCodec = entityEncoder.getFieldCodecRegistry().getFieldCodec(targetClass, sizeInBytes, xtreamField.charset(), xtreamField.littleEndian());
+        final Optional<FieldCodec<?>> fieldCodec = entityEncoder.getFieldCodecRegistry().getFieldCodec(sizeInBytes, xtreamField.signedness(), xtreamField.charset(), xtreamField.littleEndian(), targetClass);
 
         if (fieldCodec.isPresent()) {
             @SuppressWarnings("unchecked") final FieldCodec<Object> codec = (FieldCodec<Object>) fieldCodec.get();
@@ -131,7 +131,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
 
         final EntityEncoder entityEncoder = context.entityEncoder();
         final int sizeInBytes = xtreamField.length() > 0 ? xtreamField.length() : XtreamTypes.getDefaultSizeInBytes(targetClass).orElse(-1);
-        final Optional<FieldCodec<?>> fieldCodec = entityEncoder.getFieldCodecRegistry().getFieldCodec(targetClass, sizeInBytes, xtreamField.charset(), xtreamField.littleEndian());
+        final Optional<FieldCodec<?>> fieldCodec = entityEncoder.getFieldCodecRegistry().getFieldCodec(sizeInBytes, xtreamField.signedness(), xtreamField.charset(), xtreamField.littleEndian(), targetClass);
         final int parentIndexBeforeWrite = output.writerIndex();
 
         if (fieldCodec.isPresent()) {

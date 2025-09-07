@@ -58,7 +58,7 @@ class JtStyleDebugEntity01FlattenTest extends BaseEntityCodecTest {
     JtStyleDebugEntity01Flatten createEntity() {
         final JtStyleDebugEntity01Flatten entity = new JtStyleDebugEntity01Flatten();
         // region header
-        entity.setMagicNumber(0x80901234);
+        entity.setMagicNumber(0x80901234L);
         entity.setMajorVersion((short) 1);
         entity.setMinorVersion((short) 2);
         entity.setMsgType(0x0007);
@@ -86,7 +86,7 @@ class JtStyleDebugEntity01FlattenTest extends BaseEntityCodecTest {
         entity.setAge(9999);
         msgBodyLength += 2;
 
-        entity.setStatus((short) -100);
+        entity.setStatus(999);
         msgBodyLength += 2;
 
         entity.setMsgBodyLength(msgBodyLength);

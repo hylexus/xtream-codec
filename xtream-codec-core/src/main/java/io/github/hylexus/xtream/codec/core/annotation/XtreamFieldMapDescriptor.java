@@ -102,21 +102,23 @@ public @interface XtreamFieldMapDescriptor {
 
     @Getter
     enum KeyType {
-        i8(Byte.class, 1),
-        u8(Short.class, 1),
-        i16(Short.class, 2),
-        u16(Integer.class, 2),
-        i32(Integer.class, 4),
-        u32(Long.class, 4),
-        str(String.class, -1),
+        i8(Byte.class, 1, NumberSignedness.SIGNED),
+        u8(Short.class, 1, NumberSignedness.UNSIGNED),
+        i16(Short.class, 2, NumberSignedness.SIGNED),
+        u16(Integer.class, 2, NumberSignedness.UNSIGNED),
+        i32(Integer.class, 4, NumberSignedness.SIGNED),
+        u32(Long.class, 4, NumberSignedness.UNSIGNED),
+        str(String.class, -1, NumberSignedness.NONE),
         ;
 
         private final Class<?> javaType;
         private final int sizeInBytes;
+        private final NumberSignedness signedness;
 
-        KeyType(Class<?> javaType, int sizeInBytes) {
+        KeyType(Class<?> javaType, int sizeInBytes, NumberSignedness signedness) {
             this.javaType = javaType;
             this.sizeInBytes = sizeInBytes;
+            this.signedness = signedness;
         }
     }
 

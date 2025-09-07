@@ -43,7 +43,7 @@ class DebugEntity03Test extends BaseEntityCodecTest {
         final Map<Integer, Object> attr = new LinkedHashMap<>();
         attr.put(1, "abcd");
         attr.put(2, "哈哈 123");
-        attr.put(3, (short) 111);
+        attr.put(3, 111);
         attr.put(4, "...。。。");
         entity.setAttr(attr);
 
@@ -57,7 +57,7 @@ class DebugEntity03Test extends BaseEntityCodecTest {
         assertEquals(attr.get(1), instance.getAttr().get(1));
         assertEquals(attr.get(2), instance.getAttr().get(2));
         assertEquals(attr.get(3), instance.getAttr().get(3));
-        assertArrayEquals(((String) attr.get(4)).getBytes(), ((byte[]) instance.getAttr().get(4)));
+        assertEquals(attr.get(4), instance.getAttr().get(4));
         // System.out.println(instance);
     }
 }

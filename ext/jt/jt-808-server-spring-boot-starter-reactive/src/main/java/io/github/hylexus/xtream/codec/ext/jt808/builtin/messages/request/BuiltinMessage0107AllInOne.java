@@ -47,7 +47,7 @@ public class BuiltinMessage0107AllInOne {
      * <li>bit8，0：不适用挂车，1：适用挂车</li>
      */
     @Preset.JtStyle.Word(desc = "终端类型")
-    private short type;
+    private int type;
 
     @Preset.JtStyle.Bytes(version = 1, length = 11, desc = "制造商ID[11](2019)")
     @Preset.JtStyle.Bytes(version = 0, length = 5, desc = "制造商ID[5](2013)")

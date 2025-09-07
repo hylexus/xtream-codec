@@ -20,10 +20,7 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.Padding;
-import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamDateTimeField;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.annotation.*;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -39,7 +36,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI8.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1, signedness = NumberSignedness.SIGNED)
         @interface i8 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -59,7 +56,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU8.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1, signedness = NumberSignedness.UNSIGNED)
         @interface u8 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -79,7 +76,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI16.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, signedness = NumberSignedness.SIGNED)
         @interface i16 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -99,7 +96,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI16Le.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true, signedness = NumberSignedness.SIGNED)
         @interface i16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -119,7 +116,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU16.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, signedness = NumberSignedness.UNSIGNED)
         @interface u16 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -139,7 +136,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU16Le.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true, signedness = NumberSignedness.UNSIGNED)
         @interface u16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -159,7 +156,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI32.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, signedness = NumberSignedness.SIGNED)
         @interface i32 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -179,7 +176,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI32Le.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true, signedness = NumberSignedness.SIGNED)
         @interface i32_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -199,7 +196,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU32.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, signedness = NumberSignedness.UNSIGNED)
         @interface u32 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -219,7 +216,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU32Le.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true, signedness = NumberSignedness.UNSIGNED)
         @interface u32_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
@@ -465,7 +462,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerWord.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, signedness = NumberSignedness.UNSIGNED)
         @interface Word {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
@@ -488,7 +485,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerDword.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, signedness = NumberSignedness.UNSIGNED)
         @interface Dword {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
@@ -577,7 +574,7 @@ public @interface Preset {
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerByte.class)
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1, signedness = NumberSignedness.UNSIGNED)
         @interface Byte {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;

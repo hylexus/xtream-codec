@@ -39,7 +39,7 @@ public class CodecDebugEntity04 implements RuntimeTypeSupplier {
     private Object body;
 
     @Preset.JtStyle.Byte(desc = "校验码")
-    private byte checkSum;
+    private short checkSum;
 
     @Override
     public Class<?> getRuntimeType(String name) {
@@ -69,7 +69,7 @@ public class CodecDebugEntity04 implements RuntimeTypeSupplier {
 
         // byte[4]     协议版本号
         @Preset.JtStyle.Byte(condition = "hasVersionField()", desc = "协议版本号(V2019+)")
-        private byte protocolVersion;
+        private short protocolVersion;
 
         // byte[5-15)    终端手机号或设备ID bcd[10]
         @Preset.JtStyle.Bcd(lengthExpression = "hasVersionField() ? 10: 6")

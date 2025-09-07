@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 
 import java.util.Optional;
 
@@ -24,14 +25,12 @@ public interface FieldCodecRegistry {
 
     Optional<FieldCodec<?>> getFieldCodec(BeanPropertyMetadata propertyMetadata);
 
-    Optional<FieldCodec<?>> getFieldCodec(Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian);
-
-    <T extends FieldCodec<?>> Optional<T> getFieldCodecInstanceByType(Class<T> targetType);
+    Optional<FieldCodec<?>> getFieldCodec(int sizeInBytes, NumberSignedness signedness, String charset, boolean littleEndian, Class<?> targetType);
 
     void register(FieldCodec<?> fieldCodec, Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian);
 
-    default Optional<FieldCodec<Object>> getFieldCodecAndCastToObject(Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian) {
-        return this.getFieldCodec(targetType, sizeInBytes, charset, littleEndian).map(it -> {
+    default Optional<FieldCodec<Object>> getFieldCodecAndCastToObject(int sizeInBytes, NumberSignedness signedness, String charset, boolean littleEndian, Class<?> targetType) {
+        return this.getFieldCodec(sizeInBytes, signedness, charset, littleEndian, targetType).map(it -> {
             @SuppressWarnings("unchecked") final FieldCodec<Object> cast = (FieldCodec<Object>) it;
             return cast;
         });

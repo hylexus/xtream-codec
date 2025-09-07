@@ -19,11 +19,16 @@ package io.github.hylexus.xtream.codec.core;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.exception.NotYetImplementedException;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
 import org.springframework.expression.EvaluationContext;
 
 public interface FieldCodec<T> {
+
+    default NumberSignedness signedness() {
+        return NumberSignedness.NONE;
+    }
 
     T deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length);
 

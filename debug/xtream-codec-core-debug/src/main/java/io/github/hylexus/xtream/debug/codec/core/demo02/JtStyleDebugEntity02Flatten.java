@@ -39,7 +39,7 @@ public class JtStyleDebugEntity02Flatten {
 
     // byte[4]     协议版本号
     @Preset.JtStyle.Byte
-    private byte protocolVersion;
+    private short protocolVersion;
 
     // byte[5-15)    终端手机号或设备ID bcd[10]
     @Preset.JtStyle.Bcd(length = 10)
@@ -94,7 +94,7 @@ public class JtStyleDebugEntity02Flatten {
 
     // 校验码
     @Preset.JtStyle.Byte
-    private byte checkSum;
+    private short checkSum;
 
     // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
     public int msgBodyLength() {

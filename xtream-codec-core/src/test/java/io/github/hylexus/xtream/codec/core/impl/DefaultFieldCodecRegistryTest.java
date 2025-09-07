@@ -18,8 +18,8 @@ package io.github.hylexus.xtream.codec.core.impl;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.impl.codec.I8FieldCodec;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,10 +61,10 @@ class DefaultFieldCodecRegistryTest {
 
             DefaultFieldCodecRegistry.init(registry);
 
-            Optional<FieldCodec<?>> i8FieldCodec = registry.getFieldCodec(byte.class, XtreamDataType.i8.sizeInBytes(), "", false);
+            Optional<FieldCodec<?>> i8FieldCodec = registry.getFieldCodec(XtreamDataType.i8.sizeInBytes(), NumberSignedness.SIGNED, "", false, byte.class);
             assertTrue(i8FieldCodec.isPresent(), "I8FieldCodec should be present in the registry");
 
-            Optional<FieldCodec<?>> stringFieldCodec = registry.getFieldCodec(String.class, -1, StandardCharsets.UTF_8.name(), false);
+            Optional<FieldCodec<?>> stringFieldCodec = registry.getFieldCodec(-1, NumberSignedness.NONE, StandardCharsets.UTF_8.name(), false, String.class);
             assertTrue(stringFieldCodec.isPresent(), "StringFieldCodec should be present in the registry");
         }
     }
@@ -72,6 +72,7 @@ class DefaultFieldCodecRegistryTest {
     @Test
     void testRegisterFieldCodec() {
         FieldCodec<?> fieldCodec = mock(FieldCodec.class);
+        when(fieldCodec.signedness()).thenReturn(NumberSignedness.SIGNED);
         Class<?> targetType = Integer.class;
         int sizeInBytes = 4;
         String charset = "UTF-8";
@@ -79,7 +80,7 @@ class DefaultFieldCodecRegistryTest {
 
         registry.register(fieldCodec, targetType, sizeInBytes, charset, littleEndian);
 
-        Optional<FieldCodec<?>> registeredCodec = registry.getFieldCodec(targetType, sizeInBytes, charset, littleEndian);
+        Optional<FieldCodec<?>> registeredCodec = registry.getFieldCodec(sizeInBytes, NumberSignedness.SIGNED, charset, littleEndian, targetType);
         assertTrue(registeredCodec.isPresent(), "FieldCodec should be registered");
         assertEquals(fieldCodec, registeredCodec.get(), "Registered codec should match the provided codec");
     }
@@ -91,27 +92,18 @@ class DefaultFieldCodecRegistryTest {
         String charset = "UTF-8";
         boolean littleEndian = false;
 
-        String key = registry.generateKey(targetType, sizeInBytes, charset, littleEndian);
-        assertEquals("java.lang.Integer(BE) <--> byte[4]", key, "Generated key should match expected format");
-    }
-
-    @Test
-    void testGetFieldCodecInstanceByType() {
-        Class<I8FieldCodec> codecType = I8FieldCodec.class;
-        Optional<I8FieldCodec> codecInstance = registry.getFieldCodecInstanceByType(codecType);
-
-        assertTrue(codecInstance.isPresent(), "FieldCodec instance should be present");
-        assertNotNull(codecInstance.get(), "FieldCodec instance should not be null");
+        String key = registry.generateKey(NumberSignedness.UNSIGNED, targetType, sizeInBytes, charset, littleEndian);
+        assertEquals("byte[4] <--> java.lang.Integer(BE)[Unsigned]", key, "Generated key should match expected format");
     }
 
     @Test
     void testGetFieldCodec() {
         Class<?> targetType = Integer.class;
-        int sizeInBytes = 4;
+        int sizeInBytes = 2;
         String charset = "UTF-8";
         boolean littleEndian = false;
 
-        Optional<FieldCodec<?>> fieldCodec = registry.getFieldCodec(targetType, sizeInBytes, charset, littleEndian);
+        Optional<FieldCodec<?>> fieldCodec = registry.getFieldCodec(sizeInBytes, NumberSignedness.UNSIGNED, charset, littleEndian, targetType);
         assertTrue(fieldCodec.isPresent(), "FieldCodec should be present");
         assertNotNull(fieldCodec.get(), "FieldCodec should not be null");
     }
@@ -133,12 +125,8 @@ class DefaultFieldCodecRegistryTest {
         String charset = "UTF-8";
         boolean littleEndian = true;
 
-        String key = registry.key(targetType, length, charset, littleEndian);
-        assertEquals("java.lang.Integer(LE) <--> byte[4] (utf-8)", key, "Key should match expected format");
+        String key = registry.key(NumberSignedness.UNSIGNED, targetType, length, charset, littleEndian);
+        assertEquals("byte[4] (utf-8) <--> java.lang.Integer(LE)[Unsigned]", key, "Key should match expected format");
     }
 
-    @Test
-    void testGetInstanceByType() {
-        assertEquals(I8FieldCodec.INSTANCE, registry.getFieldCodecInstanceByType(I8FieldCodec.class).orElseThrow());
-    }
 }
