@@ -36,7 +36,7 @@ tag:
 <dependency>
     <groupId>io.github.hylexus.xtream</groupId>
     <artifactId>jt-808-server-spring-boot-starter-reactive</artifactId>
-    <version>0.0.1-rc.8</version>
+    <version>0.0.1</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ tag:
 
 ```groovy
 
-api("io.github.hylexus.xtream:jt-808-server-spring-boot-starter-reactive:0.0.1-rc.8")
+api("io.github.hylexus.xtream:jt-808-server-spring-boot-starter-reactive:0.0.1")
 ```
 
 :::
