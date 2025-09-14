@@ -76,7 +76,7 @@ public class ParameterItem {
                 case U8FieldCodecs.U8FieldCodec ignored -> BYTE;
                 case U16FieldCodecs.U16FieldCodec ignored -> WORD;
                 case U32FieldCodecs.U32FieldCodec ignored -> DWORD;
-                case StringFieldCodecs.HexStringFieldCodec ignored -> STRING_HEX;
+                case StringFieldCodecs.StringFieldCodecHex ignored -> STRING_HEX;
                 case StringFieldCodecs.StringFieldCodec stringFieldCodec -> detectStringType(stringFieldCodec.charset().name());
                 default -> UNKNOWN;
             };

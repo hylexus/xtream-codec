@@ -77,7 +77,7 @@ public @interface XtreamMapField {
 
         ValueMatcher[] matchers() default {};
 
-        FallbackValueMatcher[] fallbackMatchers() default {@FallbackValueMatcher(valueCodecClass = BytesFieldCodecs.ByteArrayFieldCodec.class)};
+        FallbackValueMatcher[] fallbackMatchers() default {@FallbackValueMatcher(valueCodecClass = BytesFieldCodecs.ByteeFieldCodecByteArray.class)};
     }
 
     @interface ValueEncoder {

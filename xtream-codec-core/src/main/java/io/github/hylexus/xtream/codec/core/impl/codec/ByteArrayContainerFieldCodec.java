@@ -22,7 +22,7 @@ import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.netty.buffer.ByteBuf;
 
 /**
- * @deprecated Use {@link BytesFieldCodecs.ByteArrayContainerFieldCodec}
+ * @deprecated Use {@link BytesFieldCodecs.BytesFieldCodecByteArrayContainer}
  */
 @Deprecated
 public class ByteArrayContainerFieldCodec extends AbstractFieldCodec<ByteArrayContainer> {

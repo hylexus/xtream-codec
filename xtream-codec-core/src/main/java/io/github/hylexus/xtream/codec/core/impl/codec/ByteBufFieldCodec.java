@@ -20,7 +20,7 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.netty.buffer.ByteBuf;
 
 /**
- * @deprecated Use {@link BytesFieldCodecs.ByteBufFieldCodec} instead.
+ * @deprecated Use {@link BytesFieldCodecs.BytesFieldCodecByteBuf} instead.
  */
 @Deprecated(forRemoval = true, since = "0.1.0")
 public class ByteBufFieldCodec extends AbstractFieldCodec<ByteBuf> {

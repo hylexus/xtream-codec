@@ -117,7 +117,7 @@ public class MapFieldEntity {
                             },
                             fallbackMatchers = {
                                     @FallbackValueMatcher(version = ALL_VERSION, valueType = XtreamDataType.string_hex, charset = "HEX"),
-                                    @FallbackValueMatcher(version = {1, 2}, valueCodecClass = StringFieldCodecs.HexStringFieldCodec.class),
+                                    @FallbackValueMatcher(version = {1, 2}, valueCodecClass = StringFieldCodecs.StringFieldCodecHex.class),
                             }
                     )
             )

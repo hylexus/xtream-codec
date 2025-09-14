@@ -21,7 +21,7 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.netty.buffer.ByteBuf;
 
 /**
- * @deprecated Use {@link BytesFieldCodecs.ByteArrayFieldCodec} instead.
+ * @deprecated Use {@link BytesFieldCodecs.ByteeFieldCodecByteArray} instead.
  */
 @Deprecated
 public class ByteArrayFieldCodec extends AbstractFieldCodec<byte[]> {

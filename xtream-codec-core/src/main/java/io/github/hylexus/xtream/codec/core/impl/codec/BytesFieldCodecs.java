@@ -23,20 +23,20 @@ import io.github.hylexus.xtream.codec.core.type.ByteBufContainer;
 import io.netty.buffer.ByteBuf;
 
 public class BytesFieldCodecs {
-    public static ByteBufFieldCodec INSTANCE_BYTE_BUF = new ByteBufFieldCodec();
-    public static ByteBufContainerFieldCodec INSTANCE_BYTE_BUF_CONTAINER = new ByteBufContainerFieldCodec();
-    public static ByteArrayFieldCodec INSTANCE_BYTE_ARRAY = new ByteArrayFieldCodec();
-    public static ByteArrayFieldCodecBoxed INSTANCE_BYTE_ARRAY_BOXED = new ByteArrayFieldCodecBoxed();
-    public static ByteArrayContainerFieldCodec INSTANCE_BYTE_ARRAY_CONTAINER = new ByteArrayContainerFieldCodec();
+    public static BytesFieldCodecByteBuf INSTANCE_BYTE_BUF = new BytesFieldCodecByteBuf();
+    public static BytesFieldCodecByteBufContainer INSTANCE_BYTE_BUF_CONTAINER = new BytesFieldCodecByteBufContainer();
+    public static ByteeFieldCodecByteArray INSTANCE_BYTE_ARRAY = new ByteeFieldCodecByteArray();
+    public static BytesFieldCodecByteArrayBoxed INSTANCE_BYTE_ARRAY_BOXED = new BytesFieldCodecByteArrayBoxed();
+    public static BytesFieldCodecByteArrayContainer INSTANCE_BYTE_ARRAY_CONTAINER = new BytesFieldCodecByteArrayContainer();
 
     private BytesFieldCodecs() {
         throw new UnsupportedOperationException();
     }
 
-    public static final class ByteArrayFieldCodec extends AbstractFieldCodec<byte[]> {
-        public static ByteArrayFieldCodec INSTANCE = new ByteArrayFieldCodec();
+    public static final class ByteeFieldCodecByteArray extends AbstractFieldCodec<byte[]> {
+        public static ByteeFieldCodecByteArray INSTANCE = new ByteeFieldCodecByteArray();
 
-        private ByteArrayFieldCodec() {
+        private ByteeFieldCodecByteArray() {
         }
 
         @Override
@@ -54,10 +54,10 @@ public class BytesFieldCodecs {
         }
     }
 
-    public static final class ByteArrayFieldCodecBoxed extends AbstractFieldCodec<Byte[]> {
-        public static final ByteArrayFieldCodecBoxed INSTANCE = new ByteArrayFieldCodecBoxed();
+    public static final class BytesFieldCodecByteArrayBoxed extends AbstractFieldCodec<Byte[]> {
+        public static final BytesFieldCodecByteArrayBoxed INSTANCE = new BytesFieldCodecByteArrayBoxed();
 
-        private ByteArrayFieldCodecBoxed() {
+        private BytesFieldCodecByteArrayBoxed() {
         }
 
         @Override
@@ -78,8 +78,8 @@ public class BytesFieldCodecs {
         }
     }
 
-    public static final class ByteBufContainerFieldCodec extends AbstractFieldCodec<ByteBufContainer> {
-        private ByteBufContainerFieldCodec() {
+    public static final class BytesFieldCodecByteBufContainer extends AbstractFieldCodec<ByteBufContainer> {
+        private BytesFieldCodecByteBufContainer() {
         }
 
         @Override
@@ -95,8 +95,8 @@ public class BytesFieldCodecs {
         }
     }
 
-    public static final class ByteBufFieldCodec extends AbstractFieldCodec<ByteBuf> {
-        private ByteBufFieldCodec() {
+    public static final class BytesFieldCodecByteBuf extends AbstractFieldCodec<ByteBuf> {
+        private BytesFieldCodecByteBuf() {
         }
 
         @Override
@@ -114,8 +114,8 @@ public class BytesFieldCodecs {
         }
     }
 
-    public static final class ByteArrayContainerFieldCodec extends AbstractFieldCodec<ByteArrayContainer> {
-        private ByteArrayContainerFieldCodec() {
+    public static final class BytesFieldCodecByteArrayContainer extends AbstractFieldCodec<ByteArrayContainer> {
+        private BytesFieldCodecByteArrayContainer() {
         }
 
         @Override

@@ -33,8 +33,8 @@ public final class StringFieldCodecs {
     public static final FieldCodec<String> INSTANCE_UTF8 = new StringFieldCodecUtf8();
     public static final FieldCodec<String> INSTANCE_GBK = new StringFieldCodecGbk();
     public static final FieldCodec<String> INSTANCE_GB_2312 = new StringFieldCodecGb2312();
-    public static final FieldCodec<String> INSTANCE_BCD_8421 = new Bcd8421StringFieldCodec();
-    public static final FieldCodec<String> INSTANCE_HEX = new HexStringFieldCodec();
+    public static final FieldCodec<String> INSTANCE_BCD_8421 = new StringFieldCodecBcd8421();
+    public static final FieldCodec<String> INSTANCE_HEX = new StringFieldCodecHex();
 
     private StringFieldCodecs() {
         throw new UnsupportedOperationException();
@@ -60,8 +60,8 @@ public final class StringFieldCodecs {
         };
     }
 
-    public static final class Bcd8421StringFieldCodec implements CharSequenceFieldCodec<String> {
-        private Bcd8421StringFieldCodec() {
+    public static final class StringFieldCodecBcd8421 implements CharSequenceFieldCodec<String> {
+        private StringFieldCodecBcd8421() {
         }
 
         @Override
@@ -76,8 +76,8 @@ public final class StringFieldCodecs {
 
     }
 
-    public static final class HexStringFieldCodec implements CharSequenceFieldCodec<String> {
-        private HexStringFieldCodec() {
+    public static final class StringFieldCodecHex implements CharSequenceFieldCodec<String> {
+        private StringFieldCodecHex() {
         }
 
         @Override

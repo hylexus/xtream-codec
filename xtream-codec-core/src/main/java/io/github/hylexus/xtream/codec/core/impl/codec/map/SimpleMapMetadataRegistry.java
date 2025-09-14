@@ -223,9 +223,9 @@ public class SimpleMapMetadataRegistry {
                     return XtreamConstants.CHARSET_NAME_GB_2312;
                 } else if (StringFieldCodecs.StringFieldCodecUtf8.class.equals(codecClass)) {
                     return XtreamConstants.CHARSET_NAME_UTF8;
-                } else if (StringFieldCodecs.Bcd8421StringFieldCodec.class.equals(codecClass)) {
+                } else if (StringFieldCodecs.StringFieldCodecBcd8421.class.equals(codecClass)) {
                     return XtreamConstants.CHARSET_NAME_BCD_8421;
-                } else if (StringFieldCodecs.HexStringFieldCodec.class.equals(codecClass)) {
+                } else if (StringFieldCodecs.StringFieldCodecHex.class.equals(codecClass)) {
                     return XtreamConstants.CHARSET_NAME_HEX;
                 } else {
                     return assertNotBlank(firstOr(charset, commonCharset), "charset is empty");
