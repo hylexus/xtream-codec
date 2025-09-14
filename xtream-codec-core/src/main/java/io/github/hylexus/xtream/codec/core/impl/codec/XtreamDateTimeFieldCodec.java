@@ -43,7 +43,7 @@ public class XtreamDateTimeFieldCodec extends AbstractFieldCodec<Object> {
             case String string -> string;
             default -> throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
         };
-        final FieldCodec<String> stringFieldCodec = StringFieldCodec.createStringCodec(annotation.charset());
+        final FieldCodec<String> stringFieldCodec = StringFieldCodecs.createStringCodec(annotation.charset());
         stringFieldCodec.serialize(propertyMetadata, context, output, bcdString);
     }
 
@@ -51,7 +51,7 @@ public class XtreamDateTimeFieldCodec extends AbstractFieldCodec<Object> {
     public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
         final XtreamDateTimeField annotation = propertyMetadata.findAnnotation(XtreamDateTimeField.class).orElseThrow();
 
-        final FieldCodec<String> stringFieldCodec = StringFieldCodec.createStringCodec(annotation.charset());
+        final FieldCodec<String> stringFieldCodec = StringFieldCodecs.createStringCodec(annotation.charset());
         final String dateString = stringFieldCodec.deserialize(propertyMetadata, context, input, length);
 
         final Class<?> targetType = propertyMetadata.rawClass();

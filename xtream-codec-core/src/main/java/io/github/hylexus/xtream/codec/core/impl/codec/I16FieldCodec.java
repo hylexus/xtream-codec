@@ -22,10 +22,17 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.function.Function;
 
+/**
+ * @deprecated @deprecated Use {@link I16FieldCodecs.I16FieldCodec} instead. Will be removed in 1.0.0.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
 public class I16FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    /**
+     * @deprecated Use {@link I16FieldCodecs#SHORT_INSTANCE} instead.
+     */
+    @Deprecated
     public static final I16FieldCodec INSTANCE = new I16FieldCodec(Short.class, Function.identity());
-    public static final I16FieldCodec INTEGER_INSTANCE = new I16FieldCodec(Integer.class, Short::intValue);
-    public static final I16FieldCodec LONG_INSTANCE = new I16FieldCodec(Long.class, Short::longValue);
+
     private final Class<?> targetType;
     private final Function<Short, ? extends Number> converter;
 

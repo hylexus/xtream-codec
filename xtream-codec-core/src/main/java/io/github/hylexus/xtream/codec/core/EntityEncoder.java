@@ -23,9 +23,10 @@ import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultSerializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 
 public class EntityEncoder {
-
+    protected final ByteBufAllocator bufferFactory = ByteBufAllocator.DEFAULT;
     private final BeanMetadataRegistry beanMetadataRegistry;
     private final FieldCodecRegistry fieldCodecRegistry;
 
@@ -54,7 +55,7 @@ public class EntityEncoder {
         if (instance == null) {
             return;
         }
-        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this, instance, version, null);
+        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, null);
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
             final Object value = propertyMetadata.getProperty(instance);
             if (value == null) {
@@ -88,7 +89,7 @@ public class EntityEncoder {
         if (instance == null) {
             return;
         }
-        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this, instance, version, tracker);
+        final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, tracker);
         final int indexBeforeWrite = target.writerIndex();
         if (tracker.getRootSpan().getEntityClass() == null) {
             tracker.getRootSpan().setEntityClass(beanMetadata.getRawType().getName());

@@ -22,9 +22,16 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.function.Function;
 
+/**
+ * @deprecated Use {@link I32FieldCodecs.I32FieldCodecLittleEndian} instead.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
 public class I32FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    /**
+     * @deprecated Use {@link I32FieldCodecs#INTEGER_INSTANCE_LE} instead.
+     */
+    @Deprecated
     public static final I32FieldCodecLittleEndian INSTANCE = new I32FieldCodecLittleEndian(Integer.class, Function.identity());
-    public static final I32FieldCodecLittleEndian LONG_INSTANCE = new I32FieldCodecLittleEndian(Long.class, Integer::longValue);
 
     private final Class<?> targetType;
     private final Function<Integer, ? extends Number> converter;

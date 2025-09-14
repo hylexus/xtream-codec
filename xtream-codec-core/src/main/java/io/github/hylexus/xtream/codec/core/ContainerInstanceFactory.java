@@ -27,9 +27,10 @@ public interface ContainerInstanceFactory {
 
     Object create();
 
-    ContainerInstanceFactory PLACEHOLDER = new PlaceholderContainerInstanceFactory();
+    ContainerInstanceFactory PLACEHOLDER = PlaceholderContainerInstanceFactory.INSTANCE;
 
-    class PlaceholderContainerInstanceFactory implements ContainerInstanceFactory {
+    enum PlaceholderContainerInstanceFactory implements ContainerInstanceFactory {
+        INSTANCE;
 
         @Override
         public Object create() {

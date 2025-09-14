@@ -97,4 +97,15 @@ public class EntityCodec {
             return entityDecoder.decodeWithTracker(version, source, instance, tracker);
         }
     }
+
+    @SuppressWarnings("unused")
+    public EntityDecoder entityDecoder() {
+        return entityDecoder;
+    }
+
+    @SuppressWarnings("unused")
+    public EntityEncoder entityEncoder() {
+        return entityEncoder;
+    }
+
 }

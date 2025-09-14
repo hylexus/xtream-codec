@@ -16,15 +16,24 @@
 
 package io.github.hylexus.xtream.codec.core;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.exception.NotYetImplementedException;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import org.springframework.expression.EvaluationContext;
 
+import java.lang.annotation.*;
+
 public interface FieldCodec<T> {
+
+    @JsonValue
+    default String jsonValue() {
+        return this.getClass().getSimpleName();
+    }
 
     default NumberSignedness signedness() {
         return NumberSignedness.NONE;
@@ -76,6 +85,7 @@ public interface FieldCodec<T> {
     }
 
     interface CodecContext {
+        ByteBufAllocator bufferFactory();
 
         Object containerInstance();
 
@@ -83,8 +93,11 @@ public interface FieldCodec<T> {
 
         int version();
 
-        CodecTracker codecTracker();
+        FieldCodecRegistry fieldCodecRegistry();
 
+        BeanMetadataRegistry beanMetadataRegistry();
+
+        CodecTracker codecTracker();
     }
 
     interface DeserializeContext extends CodecContext {
@@ -92,12 +105,25 @@ public interface FieldCodec<T> {
     }
 
     interface SerializeContext extends CodecContext {
-
         EntityEncoder entityEncoder();
-
     }
 
     class Placeholder implements FieldCodec<Object> {
+        public static final Placeholder INSTANCE = new Placeholder();
+
+        public static <T> FieldCodec<T> createForInternalUse(String errorMessage) {
+            return new FieldCodec<T>() {
+                @Override
+                public T deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+                    throw new UnsupportedOperationException(errorMessage);
+                }
+
+                @Override
+                public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value) {
+                    throw new UnsupportedOperationException(errorMessage);
+                }
+            };
+        }
 
         @Override
         public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
@@ -109,4 +135,12 @@ public interface FieldCodec<T> {
             throw new UnsupportedOperationException();
         }
     }
+
+    @Documented
+    @Target({ElementType.CONSTRUCTOR})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface FieldCodecCreator {
+        boolean ignoreUnknownParameters() default false;
+    }
+
 }

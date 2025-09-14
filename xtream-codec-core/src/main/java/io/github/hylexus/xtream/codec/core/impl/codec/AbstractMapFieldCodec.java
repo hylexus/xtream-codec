@@ -106,7 +106,8 @@ public abstract class AbstractMapFieldCodec<
                 final Object mapKey = entry.getKey();
                 final Object mapValue = entry.getValue();
 
-                this.getKeyFieldCodec().serialize(propertyMetadata, context, output, mapKey);
+                final FieldCodec keyFieldCodec = this.getKeyFieldCodec();
+                keyFieldCodec.serialize(propertyMetadata, context, output, mapKey);
 
                 final FieldCodec valueFieldCodec = this.getValueFieldCodec((K) mapKey);
                 valueFieldCodec.serialize(propertyMetadata, context, temp, mapValue);

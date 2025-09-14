@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
+import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
 import io.netty.buffer.ByteBuf;
@@ -28,12 +29,13 @@ class BaseFieldCodecTest {
     protected final EntityCodec entityCodec = EntityCodec.DEFAULT;
     protected final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
 
-    <T> void codec(T instance, BiConsumer<T, T> assertion) {
+    <T> void codec(int version, T instance, BiConsumer<T, T> assertion) {
         final ByteBuf buffer = allocator.buffer();
         try {
-            this.entityCodec.encode(instance, buffer);
+            this.entityCodec.encode(version, instance, buffer);
+            System.out.println(FormatUtils.toHexString(buffer));
             @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
-            final T decode = this.entityCodec.decode(cls, buffer);
+            final T decode = this.entityCodec.decode(version, cls, buffer);
             assertion.accept(instance, decode);
         } finally {
             XtreamBytes.releaseBuf(buffer);

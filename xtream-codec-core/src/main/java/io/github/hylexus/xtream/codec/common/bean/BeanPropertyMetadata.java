@@ -49,9 +49,7 @@ public interface BeanPropertyMetadata {
 
     XtreamField xtreamFieldAnnotation();
 
-    default ContainerInstanceFactory containerInstanceFactory() {
-        return ContainerInstanceFactory.PLACEHOLDER;
-    }
+    ContainerInstanceFactory containerInstanceFactory();
 
     PropertyGetter propertyGetter();
 

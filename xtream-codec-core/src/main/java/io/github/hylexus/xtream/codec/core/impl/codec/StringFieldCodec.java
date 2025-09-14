@@ -28,9 +28,35 @@ import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.Charset;
 
+/**
+ * @deprecated Use {@link StringFieldCodecs.StringFieldCodec} instead. Will be removed in 1.0.0.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
 public class StringFieldCodec implements FieldCodec<String> {
+    /**
+     * @deprecated Use {@link StringFieldCodecs#INSTANCE_BCD_8421} instead.
+     */
+    @Deprecated
     public static final FieldCodec<String> INSTANCE_BCD_8421 = InternalBcdFieldCodec.INSTANCE;
+    /**
+     * @deprecated Use {@link StringFieldCodecs#INSTANCE_UTF8} instead.
+     */
+    @Deprecated
+    public static final FieldCodec<String> INSTANCE_UTF8 = InternalSimpleStringFieldCodec.INSTANCE_UTF8;
+    /**
+     * @deprecated Use {@link StringFieldCodecs#INSTANCE_GBK} instead.
+     */
+    @Deprecated
     public static final FieldCodec<String> INSTANCE_GBK = InternalSimpleStringFieldCodec.INSTANCE_GBK;
+    /**
+     * @deprecated Use {@link StringFieldCodecs#INSTANCE_GB_2312} instead.
+     */
+    @Deprecated
+    public static final FieldCodec<String> INSTANCE_GB_2312 = InternalSimpleStringFieldCodec.INSTANCE_GB_2312;
+    /**
+     * @deprecated Use {@link StringFieldCodecs#INSTANCE_HEX} instead.
+     */
+    @Deprecated
     public static final FieldCodec<String> INSTANCE_HEX = InternalHexStringFieldCodec.INSTANCE;
     protected final String charset;
 
@@ -75,11 +101,29 @@ public class StringFieldCodec implements FieldCodec<String> {
                + '}';
     }
 
+
+    /**
+     * @deprecated Use {@link StringFieldCodecs#createStringCodecAndCastToObject(String)} instead.
+     */
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    public static FieldCodec<Object> createStringCodecAndCastToObject(String charset) {
+        final FieldCodec<?> stringCodec = createStringCodec(charset);
+        return (FieldCodec<Object>) stringCodec;
+    }
+
+
+    /**
+     * @deprecated Use {@link StringFieldCodecs#createStringCodec(String)} instead.
+     */
+    @Deprecated
     public static FieldCodec<String> createStringCodec(String charset) {
         return switch (charset.toUpperCase()) {
-            case XtreamConstants.CHARSET_NAME_GBK -> InternalSimpleStringFieldCodec.INSTANCE_GBK;
-            case XtreamConstants.CHARSET_NAME_BCD_8421 -> InternalBcdFieldCodec.INSTANCE;
-            case XtreamConstants.CHARSET_NAME_HEX -> InternalHexStringFieldCodec.INSTANCE;
+            case XtreamConstants.CHARSET_NAME_GBK -> StringFieldCodec.INSTANCE_GBK;
+            case XtreamConstants.CHARSET_NAME_GB_2312 -> StringFieldCodec.INSTANCE_GB_2312;
+            case XtreamConstants.CHARSET_NAME_UTF8 -> StringFieldCodec.INSTANCE_UTF8;
+            case XtreamConstants.CHARSET_NAME_BCD_8421 -> StringFieldCodec.INSTANCE_BCD_8421;
+            case XtreamConstants.CHARSET_NAME_HEX -> StringFieldCodec.INSTANCE_HEX;
             default -> {
                 final Charset nomalCharset = Charset.forName(charset);
                 yield new InternalSimpleStringFieldCodec(nomalCharset);
@@ -87,8 +131,14 @@ public class StringFieldCodec implements FieldCodec<String> {
         };
     }
 
+    /**
+     * @deprecated Use {@link StringFieldCodecs.StringFieldCodec} instead. Will be removed in 1.0.0.
+     */
+    @Deprecated(forRemoval = true, since = "0.1.0")
     public static class InternalSimpleStringFieldCodec extends AbstractFieldCodec<String> {
-        public static final FieldCodec<String> INSTANCE_GBK = new InternalSimpleStringFieldCodec(XtreamConstants.CHARSET_GBK);
+        private static final FieldCodec<String> INSTANCE_GBK = new InternalSimpleStringFieldCodec(XtreamConstants.CHARSET_GBK);
+        private static final FieldCodec<String> INSTANCE_GB_2312 = new InternalSimpleStringFieldCodec(XtreamConstants.CHARSET_GB_2312);
+        private static final FieldCodec<String> INSTANCE_UTF8 = new InternalSimpleStringFieldCodec(XtreamConstants.CHARSET_UTF8);
         private final Charset charset;
 
         public InternalSimpleStringFieldCodec(Charset charset) {
@@ -122,6 +172,10 @@ public class StringFieldCodec implements FieldCodec<String> {
         }
     }
 
+    /**
+     * @deprecated Use {@link StringFieldCodecs.StringFieldCodec} instead. Will be removed in 1.0.0.
+     */
+    @Deprecated(forRemoval = true, since = "0.1.0")
     public static class InternalBcdFieldCodec extends AbstractFieldCodec<String> {
         public static final InternalBcdFieldCodec INSTANCE = new InternalBcdFieldCodec(XtreamConstants.CHARSET_NAME_BCD_8421);
         protected final String charset;
@@ -142,6 +196,10 @@ public class StringFieldCodec implements FieldCodec<String> {
 
     }
 
+    /**
+     * @deprecated Use {@link StringFieldCodecs.StringFieldCodec} instead. Will be removed in 1.0.0.
+     */
+    @Deprecated(forRemoval = true, since = "0.1.0")
     public static class InternalHexStringFieldCodec extends AbstractFieldCodec<String> {
         public static final InternalHexStringFieldCodec INSTANCE = new InternalHexStringFieldCodec();
 

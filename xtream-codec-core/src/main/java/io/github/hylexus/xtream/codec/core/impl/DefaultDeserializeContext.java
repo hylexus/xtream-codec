@@ -16,29 +16,43 @@
 
 package io.github.hylexus.xtream.codec.core.impl;
 
+import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.EntityDecoder;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
+import io.netty.buffer.ByteBufAllocator;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public class DefaultDeserializeContext implements FieldCodec.DeserializeContext {
-    private final CodecTracker codecTracker;
+    private final ByteBufAllocator bufferFactory;
     private final EntityDecoder entityDecoder;
     private final Object containerInstance;
     private final EvaluationContext evaluationContext;
+    private final FieldCodecRegistry fieldCodecRegistry;
+    private final BeanMetadataRegistry beanMetadataRegistry;
     private final int version;
+    private final CodecTracker codecTracker;
 
     public DefaultDeserializeContext(FieldCodec.DeserializeContext another, Object containerInstance) {
-        this(another.entityDecoder(), containerInstance, another.version(), another.codecTracker());
+        this(another.bufferFactory(), another.entityDecoder(), containerInstance, another.version(), another.beanMetadataRegistry(), another.codecTracker());
     }
 
-    public DefaultDeserializeContext(EntityDecoder entityDecoder, Object containerInstance, int version, CodecTracker tracker) {
+    public DefaultDeserializeContext(ByteBufAllocator bufferFactory, EntityDecoder entityDecoder, Object containerInstance, int version, BeanMetadataRegistry beanMetadataRegistry, CodecTracker tracker) {
+        this.bufferFactory = bufferFactory;
         this.entityDecoder = entityDecoder;
         this.containerInstance = containerInstance;
         this.evaluationContext = new StandardEvaluationContext(containerInstance);
         this.version = version;
         this.codecTracker = tracker;
+        this.beanMetadataRegistry = beanMetadataRegistry;
+        this.fieldCodecRegistry = beanMetadataRegistry.getFieldCodecRegistry();
+    }
+
+    @Override
+    public ByteBufAllocator bufferFactory() {
+        return this.bufferFactory;
     }
 
     @Override
@@ -54,6 +68,16 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
     @Override
     public int version() {
         return this.version;
+    }
+
+    @Override
+    public FieldCodecRegistry fieldCodecRegistry() {
+        return this.fieldCodecRegistry;
+    }
+
+    @Override
+    public BeanMetadataRegistry beanMetadataRegistry() {
+        return this.beanMetadataRegistry;
     }
 
     @Override

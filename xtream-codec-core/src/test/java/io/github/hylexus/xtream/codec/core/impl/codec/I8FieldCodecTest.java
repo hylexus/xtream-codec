@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -27,7 +28,7 @@ class I8FieldCodecTest extends BaseFieldCodecTest {
     @Test
     void test() {
         codec(
-                new I8FiledTestEntity()
+                XtreamField.DEFAULT_VERSION, new I8FiledTestEntity()
                         .setB1((byte) -127)
                         .setB2((byte) -128)
                         .setS1((short) -127)

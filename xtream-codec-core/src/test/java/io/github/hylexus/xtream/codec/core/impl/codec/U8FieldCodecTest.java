@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -47,7 +48,7 @@ class U8FieldCodecTest extends BaseFieldCodecTest {
     @Test
     void test() {
         this.codec(
-                new U8FiledTestEntity()
+                XtreamField.DEFAULT_VERSION, new U8FiledTestEntity()
                         .setS1((short) 0)
                         .setS2((short) 255)
                         .setI1(0)

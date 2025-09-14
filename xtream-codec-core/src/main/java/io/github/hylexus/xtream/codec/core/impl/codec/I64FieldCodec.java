@@ -20,7 +20,15 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @deprecated Use {@link I64FieldCodecs.I64FieldCodec} instead.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
 public class I64FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    /**
+     * @deprecated Use {@link I64FieldCodecs#LONG_INSTANCE}
+     */
+    @Deprecated
     public static final I64FieldCodec INSTANCE = new I64FieldCodec();
 
     private I64FieldCodec() {

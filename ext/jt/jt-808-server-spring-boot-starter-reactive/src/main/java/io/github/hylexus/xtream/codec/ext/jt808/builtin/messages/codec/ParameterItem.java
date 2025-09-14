@@ -19,10 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U32FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U8FieldCodec;
+import io.github.hylexus.xtream.codec.core.impl.codec.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -76,12 +73,11 @@ public class ParameterItem {
 
         public static ParameterType fromFieldCodec(FieldCodec<?> fieldCodec) {
             return switch (fieldCodec) {
-                case U8FieldCodec ignored -> BYTE;
-                case U16FieldCodec ignored -> WORD;
-                case U32FieldCodec ignored -> DWORD;
-                case StringFieldCodec.InternalHexStringFieldCodec ignored -> STRING_HEX;
-                case StringFieldCodec stringFieldCodec -> detectStringType(stringFieldCodec.getCharset());
-                case StringFieldCodec.InternalSimpleStringFieldCodec stringFieldCodec -> detectStringType(stringFieldCodec.getCharset().name());
+                case U8FieldCodecs.U8FieldCodec ignored -> BYTE;
+                case U16FieldCodecs.U16FieldCodec ignored -> WORD;
+                case U32FieldCodecs.U32FieldCodec ignored -> DWORD;
+                case StringFieldCodecs.HexStringFieldCodec ignored -> STRING_HEX;
+                case StringFieldCodecs.StringFieldCodec stringFieldCodec -> detectStringType(stringFieldCodec.charset().name());
                 default -> UNKNOWN;
             };
         }

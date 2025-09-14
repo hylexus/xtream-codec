@@ -18,9 +18,9 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.AbstractMapFieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U32FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U8FieldCodec;
+import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodecs;
+import io.github.hylexus.xtream.codec.core.impl.codec.U32FieldCodecs;
+import io.github.hylexus.xtream.codec.core.impl.codec.U8FieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,25 +77,25 @@ public class CodecDebugEntity02 {
     @Preset.JtStyle.Map(desc = "附加项列表", fieldCodec = LocationExtraItemFieldCodec.class)
     private Map<Short, Object> extraItems;
 
-    public static class LocationExtraItemFieldCodec extends AbstractMapFieldCodec<Short, U8FieldCodec> {
+    public static class LocationExtraItemFieldCodec extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec> {
         public LocationExtraItemFieldCodec() {
         }
 
         @Override
         protected FieldCodec<?> getKeyFieldCodec() {
-            return U8FieldCodec.INSTANCE;
+            return U8FieldCodecs.SHORT_INSTANCE;
         }
 
         @Override
-        protected U8FieldCodec getValueLengthFieldCodec() {
-            return U8FieldCodec.INSTANCE;
+        protected U8FieldCodecs.U8FieldCodec getValueLengthFieldCodec() {
+            return U8FieldCodecs.SHORT_INSTANCE;
         }
 
         @Override
         protected FieldCodec<?> getValueFieldCodec(Short key) {
             return switch (key) {
-                case 0x01 -> U32FieldCodec.INSTANCE;
-                case 0x02 -> U16FieldCodec.INSTANCE;
+                case 0x01 -> U32FieldCodecs.LONG_INSTANCE;
+                case 0x02 -> U16FieldCodecs.INTEGER_INSTANCE;
                 default -> throw new UnsupportedOperationException();
             };
         }

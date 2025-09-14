@@ -20,7 +20,15 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.type.ByteBufContainer;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @deprecated Use {@link BytesFieldCodecs.ByteBufContainerFieldCodec} instead.
+ */
+@Deprecated
 public class ByteBufContainerFieldCodec extends AbstractFieldCodec<ByteBufContainer> {
+    /**
+     * @deprecated Use {@link BytesFieldCodecs#INSTANCE_BYTE_BUF_CONTAINER}
+     */
+    @Deprecated
     public static final ByteBufContainerFieldCodec INSTANCE = new ByteBufContainerFieldCodec();
 
     private ByteBufContainerFieldCodec() {

@@ -23,10 +23,12 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.common.utils.XtreamUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.tracker.PrependLengthFieldSpan;
+import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import lombok.Setter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -51,6 +53,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     protected final XtreamField xtreamField;
     protected final int prependLengthFieldByteCounts;
     protected final PrependLengthFieldType prependLengthFieldType;
+    private final ContainerInstanceFactory containerInstanceFactory;
     @Setter
     private FieldCodec<?> fieldCodec;
 
@@ -70,6 +73,9 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         this.fieldConditionEvaluator = detectFieldConditionalEvaluator(this.xtreamField);
         this.prependLengthFieldByteCounts = this.detectPrependLengthFieldByteCounts(xtreamField);
         this.prependLengthFieldType = PrependLengthFieldType.from(this.prependLengthFieldByteCounts);
+        this.containerInstanceFactory = this.xtreamField.containerInstanceFactory() == ContainerInstanceFactory.PlaceholderContainerInstanceFactory.class
+                ? ContainerInstanceFactory.PLACEHOLDER
+                : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
     }
 
     protected int detectPrependLengthFieldByteCounts(XtreamField xtreamField) {
@@ -164,6 +170,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     @Override
     public XtreamField xtreamFieldAnnotation() {
         return this.xtreamField;
+    }
+
+    @Override
+    public ContainerInstanceFactory containerInstanceFactory() {
+        return this.containerInstanceFactory;
     }
 
     @Override

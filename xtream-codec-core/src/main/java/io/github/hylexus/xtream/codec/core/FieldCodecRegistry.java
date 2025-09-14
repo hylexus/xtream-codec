@@ -18,6 +18,8 @@ package io.github.hylexus.xtream.codec.core;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
+import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -26,6 +28,15 @@ public interface FieldCodecRegistry {
     Optional<FieldCodec<?>> getFieldCodec(BeanPropertyMetadata propertyMetadata);
 
     Optional<FieldCodec<?>> getFieldCodec(int sizeInBytes, NumberSignedness signedness, String charset, boolean littleEndian, Class<?> targetType);
+
+    @Nullable
+    FieldCodec<?> getOrCreateFieldCodec(
+            int version,
+            @Nullable BeanMetadataRegistry beanMetadataRegistry,
+            @Nullable XtreamDataType targetType,
+            @Nullable Class<? extends FieldCodec<?>> codecClass,
+            @Nullable String charset,
+            @Nullable Class<?> targetEntityClass);
 
     void register(FieldCodec<?> fieldCodec, Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian);
 

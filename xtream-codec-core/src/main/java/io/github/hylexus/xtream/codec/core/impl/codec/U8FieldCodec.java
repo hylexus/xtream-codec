@@ -22,10 +22,17 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.function.Function;
 
+/**
+ * @deprecated Use {@link U8FieldCodecs.U8FieldCodec} instead. Will be removed in 1.0.0.
+ *
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
 public class U8FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    /**
+     * @deprecated Use {@link U8FieldCodecs#SHORT_INSTANCE} instead.
+     */
+    @Deprecated
     public static final U8FieldCodec INSTANCE = new U8FieldCodec(Short.class, Function.identity());
-    public static final U8FieldCodec INTEGER_INSTANCE = new U8FieldCodec(Integer.class, Short::intValue);
-    public static final U8FieldCodec LONG_INSTANCE = new U8FieldCodec(Long.class, Short::longValue);
 
     private final Class<?> targetType;
     private final Function<Short, ? extends Number> converter;

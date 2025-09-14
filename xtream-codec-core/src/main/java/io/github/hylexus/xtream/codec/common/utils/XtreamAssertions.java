@@ -70,4 +70,12 @@ public abstract class XtreamAssertions {
         }
         return t;
     }
+
+    public static String assertNotBlank(String string, String error) {
+        if (string == null || string.isBlank()) {
+            throw new IllegalArgumentException(error);
+        }
+        return string;
+    }
+
 }

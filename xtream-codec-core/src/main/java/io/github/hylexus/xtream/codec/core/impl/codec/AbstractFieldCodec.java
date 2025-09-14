@@ -30,4 +30,10 @@ public abstract class AbstractFieldCodec<T> implements FieldCodec<T> {
     }
 
     protected abstract void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value);
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
 }

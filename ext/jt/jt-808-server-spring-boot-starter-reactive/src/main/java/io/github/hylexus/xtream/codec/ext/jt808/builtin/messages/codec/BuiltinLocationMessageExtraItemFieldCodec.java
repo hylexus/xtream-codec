@@ -26,7 +26,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.*;
 import io.netty.buffer.ByteBuf;
 
 public class BuiltinLocationMessageExtraItemFieldCodec
-        extends AbstractMapFieldCodec<Short, U8FieldCodec>
+        extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec>
         implements BeanMetadataRegistryAware {
 
     private EntityFieldCodec<LocationItem0x12> locationItem0x12FieldCodec;
@@ -41,24 +41,24 @@ public class BuiltinLocationMessageExtraItemFieldCodec
 
     @Override
     protected FieldCodec<?> getKeyFieldCodec() {
-        return U8FieldCodec.INSTANCE;
+        return U8FieldCodecs.SHORT_INSTANCE;
     }
 
     @Override
-    protected U8FieldCodec getValueLengthFieldCodec() {
-        return U8FieldCodec.INSTANCE;
+    protected U8FieldCodecs.U8FieldCodec getValueLengthFieldCodec() {
+        return U8FieldCodecs.SHORT_INSTANCE;
     }
 
     @Override
     protected FieldCodec<?> getValueFieldCodec(Short key) {
         return switch (key) {
             case null -> throw new NullPointerException("MapKey is null");
-            case 0x01, 0x25 -> U32FieldCodec.INSTANCE;
-            case 0x02, 0x03, 0x04, 0x2a, 0x2b -> U16FieldCodec.INSTANCE;
-            case 0x30, 0x31 -> U8FieldCodec.INSTANCE;
-            case 0x05 -> ByteArrayFieldCodec.INSTANCE;
+            case 0x01, 0x25 -> U32FieldCodecs.LONG_INSTANCE;
+            case 0x02, 0x03, 0x04, 0x2a, 0x2b -> U16FieldCodecs.INTEGER_INSTANCE;
+            case 0x30, 0x31 -> U8FieldCodecs.SHORT_INSTANCE;
+            case 0x05 -> BytesFieldCodecs.INSTANCE_BYTE_ARRAY;
             // -32767 ~ +32767
-            case 0x06 -> I16FieldCodec.INSTANCE;
+            case 0x06 -> I16FieldCodecs.SHORT_INSTANCE;
             // 0x11 的编解码也可以通过 EntityFieldCodec 来实现，这里使用自定义的 FieldCodec 作演示
             case 0x11 -> OverSpeedAlarmItemFieldCodec.INSTANCE;
             // 可以直接 new 一个 EntityFieldCodec<LocationItem0x12>() 实例，但是没必要(直接返回单例即可)

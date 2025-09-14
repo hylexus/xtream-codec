@@ -23,10 +23,12 @@ import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultDeserializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 
 import java.util.Objects;
 
 public class EntityDecoder {
+    protected final ByteBufAllocator bufferFactory = ByteBufAllocator.DEFAULT;
     protected final BeanMetadataRegistry beanMetadataRegistry;
     private final FieldCodecRegistry fieldCodecRegistry;
 
@@ -68,7 +70,7 @@ public class EntityDecoder {
     }
 
     public <T> T decode(int version, ByteBuf source, BeanMetadata beanMetadata, Object containerInstance) {
-        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this, containerInstance, version, null);
+        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this.bufferFactory, this, containerInstance, version, this.beanMetadataRegistry, null);
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
             if (propertyMetadata.conditionEvaluator().evaluate(context)) {
                 final Object fieldValue = propertyMetadata.decodePropertyValue(context, source);
@@ -119,7 +121,7 @@ public class EntityDecoder {
         if (tracker.getRootSpan().getEntityClass() == null) {
             tracker.getRootSpan().setEntityClass(beanMetadata.getRawType().getName());
         }
-        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this, containerInstance, version, tracker);
+        final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this.bufferFactory, this, containerInstance, version, this.beanMetadataRegistry, tracker);
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
             if (propertyMetadata.conditionEvaluator().evaluate(context)) {
                 final Object fieldValue = propertyMetadata.decodePropertyValueWithTracker(context, source);

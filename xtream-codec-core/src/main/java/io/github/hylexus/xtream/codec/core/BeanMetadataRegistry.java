@@ -19,6 +19,8 @@ package io.github.hylexus.xtream.codec.core;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import org.jspecify.annotations.Nullable;
 
 import java.beans.PropertyDescriptor;
 import java.util.function.Function;
@@ -41,5 +43,17 @@ public interface BeanMetadataRegistry {
     BeanMetadata getBeanMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator);
 
     FieldCodecRegistry getFieldCodecRegistry();
+
+    @Nullable
+    default FieldCodec<?> getOrCreateFieldCodec(
+            int version,
+            @Nullable XtreamDataType targetType,
+            @Nullable Class<? extends FieldCodec<?>> codecClass,
+            @Nullable String charset,
+            @Nullable Class<?> targetEntityClass) {
+
+        return this.getFieldCodecRegistry()
+                .getOrCreateFieldCodec(version, this, targetType, codecClass, charset, targetEntityClass);
+    }
 
 }
