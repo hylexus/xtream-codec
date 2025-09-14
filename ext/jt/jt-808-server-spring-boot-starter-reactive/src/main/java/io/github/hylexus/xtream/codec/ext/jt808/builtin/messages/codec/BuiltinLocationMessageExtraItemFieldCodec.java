@@ -19,24 +19,31 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
-import io.github.hylexus.xtream.codec.core.BeanMetadataRegistryAware;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.*;
 import io.netty.buffer.ByteBuf;
 
 public class BuiltinLocationMessageExtraItemFieldCodec
-        extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec>
-        implements BeanMetadataRegistryAware {
+        extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec> {
+    // implements BeanMetadataRegistryAware
 
-    private EntityFieldCodec<LocationItem0x12> locationItem0x12FieldCodec;
-    private EntityFieldCodec<LocationItem0x13> locationItem0x13FieldCodec;
-    private EntityFieldCodec<LocationItem0x64> locationItem0x64FieldCodec;
-    private EntityFieldCodec<LocationItem0x65> locationItem0x65FieldCodec;
-    private EntityFieldCodec<LocationItem0x66> locationItem0x66FieldCodec;
-    private EntityFieldCodec<LocationItem0x67> locationItem0x67FieldCodec;
 
-    public BuiltinLocationMessageExtraItemFieldCodec() {
+    private final EntityFieldCodec<LocationItem0x12> locationItem0x12FieldCodec;
+    private final EntityFieldCodec<LocationItem0x13> locationItem0x13FieldCodec;
+    private final EntityFieldCodec<LocationItem0x64> locationItem0x64FieldCodec;
+    private final EntityFieldCodec<LocationItem0x65> locationItem0x65FieldCodec;
+    private final EntityFieldCodec<LocationItem0x66> locationItem0x66FieldCodec;
+    private final EntityFieldCodec<LocationItem0x67> locationItem0x67FieldCodec;
+
+    @FieldCodecCreator
+    public BuiltinLocationMessageExtraItemFieldCodec(BeanMetadataRegistry registry, int version) {
+        this.locationItem0x12FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x12.class);
+        this.locationItem0x13FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x13.class);
+        this.locationItem0x64FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x64.class);
+        this.locationItem0x65FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x65.class);
+        this.locationItem0x66FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x66.class);
+        this.locationItem0x67FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x67.class);
     }
 
     @Override
@@ -72,15 +79,15 @@ public class BuiltinLocationMessageExtraItemFieldCodec
         };
     }
 
-    @Override
-    public void setBeanMetadataRegistry(int version, BeanMetadataRegistry registry) {
-        this.locationItem0x12FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x12.class);
-        this.locationItem0x13FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x13.class);
-        this.locationItem0x64FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x64.class);
-        this.locationItem0x65FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x65.class);
-        this.locationItem0x66FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x66.class);
-        this.locationItem0x67FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x67.class);
-    }
+    // @Override
+    // public void setBeanMetadataRegistry(int version, BeanMetadataRegistry registry) {
+    //     // this.locationItem0x12FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x12.class);
+    //     // this.locationItem0x13FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x13.class);
+    //     // this.locationItem0x64FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x64.class);
+    //     // this.locationItem0x65FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x65.class);
+    //     // this.locationItem0x66FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x66.class);
+    //     // this.locationItem0x67FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x67.class);
+    // }
 
     public static class OverSpeedAlarmItemFieldCodec implements FieldCodec<OverSpeedAlarmItem> {
         public static OverSpeedAlarmItemFieldCodec INSTANCE = new OverSpeedAlarmItemFieldCodec();

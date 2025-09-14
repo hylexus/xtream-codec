@@ -338,7 +338,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
             }
 
             Objects.requireNonNull(beanMetadataRegistry);
-            final FieldCodec<?> newInstance = BeanUtils.createFieldCodecInstance(codecClass, beanMetadataRegistry);
+            final FieldCodec<?> newInstance = BeanUtils.createFieldCodecInstance(codecClass, beanMetadataRegistry, version);
             if (newInstance instanceof BeanMetadataRegistryAware registryAware) {
                 registryAware.setBeanMetadataRegistry(version, beanMetadataRegistry);
             }

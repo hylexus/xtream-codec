@@ -160,7 +160,7 @@ public class BeanUtils {
         }
     }
 
-    public static <T extends FieldCodec<?>> T createFieldCodecInstance(Class<T> cls, BeanMetadataRegistry beanMetadataRegistry) {
+    public static <T extends FieldCodec<?>> T createFieldCodecInstance(Class<T> cls, BeanMetadataRegistry beanMetadataRegistry, int version) {
         final Constructor<?>[] constructors = cls.getDeclaredConstructors();
         if (constructors.length == 0) {
             throw new IllegalStateException(
@@ -168,11 +168,11 @@ public class BeanUtils {
                     + "\nNo Constructor found");
         }
         if (constructors.length == 1) {
-            return createFieldCodecInstance(cls, constructors[0], beanMetadataRegistry);
+            return createFieldCodecInstance(version, cls, constructors[0], beanMetadataRegistry);
         }
         final List<Constructor<?>> constructorList = Arrays.stream(constructors).filter(it -> it.getAnnotation(FieldCodec.FieldCodecCreator.class) != null).toList();
         if (constructorList.size() == 1) {
-            return createFieldCodecInstance(cls, constructorList.getFirst(), beanMetadataRegistry);
+            return createFieldCodecInstance(version, cls, constructorList.getFirst(), beanMetadataRegistry);
         }
         if (constructorList.isEmpty()) {
             throw new IllegalStateException(
@@ -185,7 +185,7 @@ public class BeanUtils {
                 + "\nMore than 1 @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " found.");
     }
 
-    private static <T extends FieldCodec<?>> T createFieldCodecInstance(Class<T> cls, Constructor<?> constructor, BeanMetadataRegistry beanMetadataRegistry) {
+    private static <T extends FieldCodec<?>> T createFieldCodecInstance(int version, Class<T> cls, Constructor<?> constructor, BeanMetadataRegistry beanMetadataRegistry) {
         final @Nullable Object[] args = new @Nullable Object[constructor.getParameterCount()];
         final boolean ignoreUnknownParameters = Optional.ofNullable(constructor.getAnnotation(FieldCodec.FieldCodecCreator.class)).map(FieldCodec.FieldCodecCreator::ignoreUnknownParameters).orElse(false);
         final Parameter[] parameters = constructor.getParameters();
@@ -195,6 +195,8 @@ public class BeanUtils {
                 args[i] = beanMetadataRegistry;
             } else if (FieldCodecRegistry.class.isAssignableFrom(parameter.getType())) {
                 args[i] = beanMetadataRegistry.getFieldCodecRegistry();
+            } else if (int.class == parameter.getType() || Integer.class == parameter.getType()) {
+                args[i] = version;
             } else {
                 if (ignoreUnknownParameters) {
                     args[i] = null;

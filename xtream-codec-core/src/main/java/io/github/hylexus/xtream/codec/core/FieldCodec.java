@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.common.exception.NotYetImplementedExceptio
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
+import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.springframework.expression.EvaluationContext;
@@ -136,6 +137,9 @@ public interface FieldCodec<T> {
         }
     }
 
+    /**
+     * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry, int)
+     */
     @Documented
     @Target({ElementType.CONSTRUCTOR})
     @Retention(RetentionPolicy.RUNTIME)
