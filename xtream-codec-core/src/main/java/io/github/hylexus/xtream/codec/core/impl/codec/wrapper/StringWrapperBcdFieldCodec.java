@@ -18,10 +18,20 @@ package io.github.hylexus.xtream.codec.core.impl.codec.wrapper;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.BcdOps;
+import io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes;
 import io.github.hylexus.xtream.codec.core.type.wrapper.StringWrapperBcd;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @deprecated Use {@link DataWrapperFieldCodes.StringWrapperBcd8421FieldCodec} instead.
+ */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true, since = "0.1.0")
 public class StringWrapperBcdFieldCodec extends BaseDataWrapperFieldCodec<StringWrapperBcd> {
+    /**
+     * @deprecated Use {@link DataWrapperFieldCodes#INSTANCE_STRING_BCD_8421} instead.
+     */
+    @Deprecated
     public static final StringWrapperBcdFieldCodec INSTANCE = new StringWrapperBcdFieldCodec();
 
     private StringWrapperBcdFieldCodec() {

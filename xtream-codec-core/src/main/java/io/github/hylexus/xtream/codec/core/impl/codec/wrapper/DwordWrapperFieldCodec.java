@@ -20,7 +20,17 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DwordWrapper;
 import io.netty.buffer.ByteBuf;
 
+
+/**
+ * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes.DwordWrapperFieldCodec} instead.
+ */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true, since = "0.1.0")
 public class DwordWrapperFieldCodec extends BaseDataWrapperFieldCodec<DwordWrapper> {
+    /**
+     * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes#INSTANCE_DWORD} instead.
+     */
+    @Deprecated
     public static final DwordWrapperFieldCodec INSTANCE = new DwordWrapperFieldCodec();
 
     private DwordWrapperFieldCodec() {

@@ -21,7 +21,16 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.type.wrapper.StringWrapperUtf8;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes.StringWrapperUtf8FieldCodec} instead.
+ */
+@SuppressWarnings("removal")
+@Deprecated
 public class StringWrapperUtf8FieldCodec extends BaseDataWrapperFieldCodec<StringWrapperUtf8> {
+    /**
+     * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes#INSTANCE_STRING_UTF_8} instead.
+     */
+    @Deprecated
     public static final StringWrapperUtf8FieldCodec INSTANCE = new StringWrapperUtf8FieldCodec();
 
     private StringWrapperUtf8FieldCodec() {

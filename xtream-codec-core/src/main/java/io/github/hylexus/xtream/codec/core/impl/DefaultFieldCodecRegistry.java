@@ -199,18 +199,31 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
 
         registry.register(DataWrapperFieldCodec.INSTANCE, DataWrapper.class, -1, "", false);
         registry.register(DataWrapperFieldCodec.INSTANCE, BytesDataWrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE, DataWrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE, BytesDataWrapper.class, -1, "", false);
 
         registry.register(I8WrapperFieldCodec.INSTANCE, I8Wrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_I8, I8Wrapper.class, -1, "", false);
         registry.register(U8WrapperFieldCodec.INSTANCE, U8Wrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_U8, U8Wrapper.class, -1, "", false);
         registry.register(I16WrapperFieldCodec.INSTANCE, I16Wrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_I16, I16Wrapper.class, -1, "", false);
         registry.register(U16WrapperFieldCodec.INSTANCE, U16Wrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_U16, U16Wrapper.class, -1, "", false);
         registry.register(I32WrapperFieldCodec.INSTANCE, I32Wrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_I32, I32Wrapper.class, -1, "", false);
         registry.register(U32WrapperFieldCodec.INSTANCE, U32Wrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_U32, U32Wrapper.class, -1, "", false);
         registry.register(DwordWrapperFieldCodec.INSTANCE, DwordWrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_DWORD, DwordWrapper.class, -1, "", false);
         registry.register(WordWrapperFieldCodec.INSTANCE, WordWrapper.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_WORD, WordWrapper.class, -1, "", false);
         registry.register(StringWrapperUtf8FieldCodec.INSTANCE, StringWrapperUtf8.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_STRING_UTF_8, StringWrapperUtf8.class, -1, "", false);
         registry.register(StringWrapperGbkFieldCodec.INSTANCE, StringWrapperGbk.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_STRING_GBK, StringWrapperGbk.class, -1, "", false);
         registry.register(StringWrapperBcdFieldCodec.INSTANCE, StringWrapperBcd.class, -1, "", false);
+        registry.register(DataWrapperFieldCodes.INSTANCE_STRING_BCD_8421, StringWrapperBcd.class, -1, "", false);
 
         registerDefaultStringCodec(registry);
 

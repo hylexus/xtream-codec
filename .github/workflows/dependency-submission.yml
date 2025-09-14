@@ -1,4 +1,4 @@
-name: DependencyGraph
+name: Dependency Graph
 
 # 只在推送新的 Tag 时触发
 on:

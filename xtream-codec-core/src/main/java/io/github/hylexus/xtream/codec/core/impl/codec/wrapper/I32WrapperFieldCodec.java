@@ -17,10 +17,20 @@
 package io.github.hylexus.xtream.codec.core.impl.codec.wrapper;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes;
 import io.github.hylexus.xtream.codec.core.type.wrapper.I32Wrapper;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @deprecated Use {@link DataWrapperFieldCodes.I32WrapperFieldCodec} instead.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
+@SuppressWarnings("removal")
 public class I32WrapperFieldCodec extends BaseDataWrapperFieldCodec<I32Wrapper> {
+    /**
+     * @deprecated Use {@link DataWrapperFieldCodes#INSTANCE_I32} instead.
+     */
+    @Deprecated
     public static final I32WrapperFieldCodec INSTANCE = new I32WrapperFieldCodec();
 
     private I32WrapperFieldCodec() {

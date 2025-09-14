@@ -21,6 +21,10 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DataWrapper;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes.BaseDataWrapperFieldCodec} instead.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
 public abstract class BaseDataWrapperFieldCodec<T extends DataWrapper<?>> implements FieldCodec<T> {
 
     @Override

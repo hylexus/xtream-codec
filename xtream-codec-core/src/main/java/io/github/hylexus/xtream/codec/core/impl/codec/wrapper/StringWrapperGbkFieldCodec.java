@@ -18,10 +18,20 @@ package io.github.hylexus.xtream.codec.core.impl.codec.wrapper;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes;
 import io.github.hylexus.xtream.codec.core.type.wrapper.StringWrapperGbk;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @deprecated Use {@link DataWrapperFieldCodes.StringWrapperGbkFieldCodec} instead.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
+@SuppressWarnings("removal")
 public class StringWrapperGbkFieldCodec extends BaseDataWrapperFieldCodec<StringWrapperGbk> {
+    /**
+     * @deprecated Use {@link DataWrapperFieldCodes#INSTANCE_STRING_GBK} instead.
+     */
+    @Deprecated
     public static final StringWrapperGbkFieldCodec INSTANCE = new StringWrapperGbkFieldCodec();
 
     private StringWrapperGbkFieldCodec() {
