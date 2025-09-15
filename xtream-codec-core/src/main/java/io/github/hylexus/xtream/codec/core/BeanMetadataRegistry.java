@@ -31,13 +31,13 @@ public interface BeanMetadataRegistry {
     }
 
     default BeanMetadata getBeanMetadata(Class<?> beanClass) {
-        return this.getBeanMetadata(beanClass, XtreamField.DEFAULT_VERSION);
+        return this.getBeanMetadata(beanClass, XtreamField.ALL_VERSION);
     }
 
     BeanMetadata getBeanMetadata(Class<?> beanClass, int version);
 
     default BeanMetadata getBeanMetadata(Class<?> beanClass, Function<PropertyInfo, BeanPropertyMetadata> creator) {
-        return this.getBeanMetadata(beanClass, XtreamField.DEFAULT_VERSION, creator);
+        return this.getBeanMetadata(beanClass, XtreamField.ALL_VERSION, creator);
     }
 
     BeanMetadata getBeanMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator);

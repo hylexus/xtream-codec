@@ -48,7 +48,7 @@ class U8FieldCodecTest extends BaseFieldCodecTest {
     @Test
     void test() {
         this.codec(
-                XtreamField.DEFAULT_VERSION, new U8FiledTestEntity()
+                XtreamField.ALL_VERSION, new U8FiledTestEntity()
                         .setS1((short) 0)
                         .setS2((short) 255)
                         .setI1(0)

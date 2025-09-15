@@ -197,7 +197,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         final CodecTracker headerTracker = new CodecTracker();
         final ByteBuf tempHeaderBuffer = allocator.buffer();
         try {
-            this.entityCodec.encode(describer.version().versionIdentifier(), header, tempHeaderBuffer, headerTracker);
+            this.entityCodec.encode(describer.version().versionValue(), header, tempHeaderBuffer, headerTracker);
         } finally {
             XtreamBytes.releaseBuf(tempHeaderBuffer);
         }
@@ -225,7 +225,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         }
         final ByteBuf buffer = allocator.buffer();
         try {
-            final int version = describer.version().versionIdentifier();
+            final int version = describer.version().versionValue();
             this.entityCodec.encode(version, entity, buffer, tracker);
         } catch (Throwable e) {
             XtreamBytes.releaseBuf(buffer);

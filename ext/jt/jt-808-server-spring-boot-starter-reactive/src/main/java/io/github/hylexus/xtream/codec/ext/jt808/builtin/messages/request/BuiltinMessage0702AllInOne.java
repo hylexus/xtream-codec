@@ -47,7 +47,7 @@ public class BuiltinMessage0702AllInOne {
      * <li>0x01：从业资格证IC卡插入（驾驶员上班）</li>
      * <li>0x02：从业资格证IC卡拔出（驾驶员下班）</li>
      */
-    @Preset.JtStyle.Byte(version = {0, 1}, desc = "状态(2013 || 2019)")
+    @Preset.JtStyle.Byte(version = {2013, 2019}, desc = "状态(2013 || 2019)")
     private Short status;
 
     /**
@@ -55,7 +55,7 @@ public class BuiltinMessage0702AllInOne {
      * <p>
      * 以下字段在状态为0x01时才有效并做填充。
      */
-    @Preset.JtStyle.BcdDateTime(version = {0, 1}, desc = "插卡/拔卡时间(2013 || 2019)")
+    @Preset.JtStyle.BcdDateTime(version = {2013, 2019}, desc = "插卡/拔卡时间(2013 || 2019)")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime time;
@@ -71,7 +71,7 @@ public class BuiltinMessage0702AllInOne {
      * <p>
      * 以下字段在IC 卡读取结果等于0x00时才有效。
      */
-    @Preset.JtStyle.Byte(version = {0, 1}, desc = "IC卡读取结果(2013 || 2019)")
+    @Preset.JtStyle.Byte(version = {2013, 2019}, desc = "IC卡读取结果(2013 || 2019)")
     private Short icCardReadResult;
 
     /**
@@ -81,23 +81,24 @@ public class BuiltinMessage0702AllInOne {
     @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8)
     private String driverName;
 
-    @Preset.JtStyle.Str(version = -1, length = 20, desc = "驾驶员身份证编码(2011)")
+    @Preset.JtStyle.Str(version = 2011, length = 20, desc = "驾驶员身份证编码(2011)")
     private String driverIdCardNo;
 
-    @Preset.JtStyle.Str(version = -1, length = 40, desc = "从业资格证编码")
-    @Preset.JtStyle.Str(version = {0, 1}, length = 20, paddingRight = @Padding(minEncodedLength = 20), desc = "从业资格证编码")
+    @Preset.JtStyle.Str(version = 2011, length = 40, desc = "从业资格证编码")
+    @Preset.JtStyle.Str(version = {2013, 2019}, length = 20, paddingRight = @Padding(minEncodedLength = 20), desc = "从业资格证编码")
     private String professionalLicenseNo;
 
     // prependLengthFieldType: 前置一个 u8类型的字段 表示 发证机构名称长度
     @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "发证机构名称")
     private String certificateAuthorityName;
 
-    @Preset.JtStyle.BcdDateTime(version = {0, 1}, length = 4, pattern = "yyyyMMdd", desc = "到期时间")
+    @Preset.JtStyle.BcdDateTime(version = {2013, 2019}, length = 4, pattern = "yyyyMMdd", desc = "到期时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate certificateExpiresDate;
 
-    @Preset.JtStyle.Str(version = 1, length = 20, desc = "驾驶员身份证编码")
+    // todo 合并为一个字段
+    @Preset.JtStyle.Str(version = 2019, length = 20, desc = "驾驶员身份证编码")
     private String driverIdCardNoV2019;
 
 }

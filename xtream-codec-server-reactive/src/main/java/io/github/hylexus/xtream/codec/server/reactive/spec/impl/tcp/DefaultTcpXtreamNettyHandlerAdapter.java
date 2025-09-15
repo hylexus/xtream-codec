@@ -86,7 +86,7 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
     }
 
     protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamRequest.Type type) {
-        return new DefaultXtreamRequest(XtreamField.DEFAULT_VERSION, this.generateRequestId(nettyInbound), allocator, nettyInbound, type, byteBuf, inboundInfo.channel(), inboundInfo.remoteAddress());
+        return new DefaultXtreamRequest(XtreamField.ALL_VERSION, this.generateRequestId(nettyInbound), allocator, nettyInbound, type, byteBuf, inboundInfo.channel(), inboundInfo.remoteAddress());
     }
 
     protected Mono<Void> doTcpExchange(XtreamExchange exchange) {

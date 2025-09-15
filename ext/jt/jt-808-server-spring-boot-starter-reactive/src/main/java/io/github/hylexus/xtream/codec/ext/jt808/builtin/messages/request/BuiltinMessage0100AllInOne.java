@@ -42,17 +42,17 @@ public class BuiltinMessage0100AllInOne {
     @Preset.JtStyle.Word(desc = "市域ID")
     private int cityId;
 
-    @Preset.JtStyle.Bytes(version = {-1, 0}, length = 5, desc = "制造商ID(2011 || 2013)")
-    @Preset.JtStyle.Bytes(version = 1, length = 11, desc = "制造商ID(2019)")
+    @Preset.JtStyle.Bytes(version = {2011, 2013}, length = 5, desc = "制造商ID(2011 || 2013)")
+    @Preset.JtStyle.Bytes(version = 2019, length = 11, desc = "制造商ID(2019)")
     private String manufacturerId;
 
-    @Preset.JtStyle.Bytes(version = -1, length = 8, desc = "终端型号(2011)")
-    @Preset.JtStyle.Bytes(version = 0, length = 20, desc = "终端型号(2013)")
-    @Preset.JtStyle.Bytes(version = 1, length = 30, desc = "终端型号(2019)")
+    @Preset.JtStyle.Bytes(version = 2011, length = 8, desc = "终端型号(2011)")
+    @Preset.JtStyle.Bytes(version = 2013, length = 20, desc = "终端型号(2013)")
+    @Preset.JtStyle.Bytes(version = 2019, length = 30, desc = "终端型号(2019)")
     private String terminalType;
 
-    @Preset.JtStyle.Bytes(version = {-1, 0}, length = 7, desc = "终端ID(2011 || 2013)")
-    @Preset.JtStyle.Bytes(version = 1, length = 30, desc = "终端ID(2019)")
+    @Preset.JtStyle.Bytes(version = {2011, 2013}, length = 7, desc = "终端ID(2011 || 2013)")
+    @Preset.JtStyle.Bytes(version = 2019, length = 30, desc = "终端ID(2019)")
     private String terminalId;
 
     @Preset.JtStyle.Byte(desc = "车牌颜色")

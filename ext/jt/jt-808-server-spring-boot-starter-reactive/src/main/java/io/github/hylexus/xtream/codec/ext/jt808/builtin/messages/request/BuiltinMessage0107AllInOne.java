@@ -49,16 +49,16 @@ public class BuiltinMessage0107AllInOne {
     @Preset.JtStyle.Word(desc = "终端类型")
     private int type;
 
-    @Preset.JtStyle.Bytes(version = 1, length = 11, desc = "制造商ID[11](2019)")
-    @Preset.JtStyle.Bytes(version = 0, length = 5, desc = "制造商ID[5](2013)")
+    @Preset.JtStyle.Bytes(version = 2019, length = 11, desc = "制造商ID[11](2019)")
+    @Preset.JtStyle.Bytes(version = 2013, length = 5, desc = "制造商ID[5](2013)")
     private String manufacturerId;
 
-    @Preset.JtStyle.Bytes(version = 1, length = 30, desc = "终端型号[30](2019)")
-    @Preset.JtStyle.Bytes(version = 0, length = 20, desc = "终端型号[20](2013)")
+    @Preset.JtStyle.Bytes(version = 2019, length = 30, desc = "终端型号[30](2019)")
+    @Preset.JtStyle.Bytes(version = 2013, length = 20, desc = "终端型号[20](2013)")
     private String terminalType;
 
-    @Preset.JtStyle.Bytes(version = 1, length = 30, desc = "终端ID[30](2019)")
-    @Preset.JtStyle.Bytes(version = 0, length = 7, desc = "终端ID[7](2013)")
+    @Preset.JtStyle.Bytes(version = 2019, length = 30, desc = "终端ID[30](2019)")
+    @Preset.JtStyle.Bytes(version = 2013, length = 7, desc = "终端ID[7](2013)")
     private String terminalId;
 
     @Preset.JtStyle.Bcd(length = 10, desc = "终端SIM卡ICCID[10](2019 || 2013)")
@@ -72,10 +72,10 @@ public class BuiltinMessage0107AllInOne {
     @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "终端固件版本号(2019 || 2013)")
     private String firmwareVersion;
 
-    @Preset.JtStyle.Byte(version = 1,desc = "GNSS 模块属性(2019)")
+    @Preset.JtStyle.Byte(version = 2019,desc = "GNSS 模块属性(2019)")
     private Short gnssModelProperty;
 
-    @Preset.JtStyle.Byte(version = 1, desc = "通信模块属性(2019)")
+    @Preset.JtStyle.Byte(version = 2019, desc = "通信模块属性(2019)")
     private Short communicationModelProperty;
 
 }

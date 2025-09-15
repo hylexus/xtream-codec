@@ -100,7 +100,7 @@ public class BaseCodecTest {
         try {
             jt808Request = this.decodeAsRequest(hex);
             final int version = protocolVersion != null
-                    ? protocolVersion.versionIdentifier()
+                    ? protocolVersion.versionValue()
                     : jt808Request.version();
             return entityCodec.decode(version, entityClass, jt808Request.payload().slice());
         } finally {

@@ -56,11 +56,11 @@ class EntityCodecTest {
                 .setName("无名氏")
                 .setAge(1024)
                 .setAddress("保密");
-        doEncode(XtreamField.DEFAULT_VERSION, userEntity, (buffer, entity) -> {
+        doEncode(XtreamField.ALL_VERSION, userEntity, (buffer, entity) -> {
             final String hexString = FormatUtils.toHexString(buffer);
             assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
         });
-        doEncode(XtreamField.DEFAULT_VERSION, userEntity, (buffer, entity) -> {
+        doEncode(XtreamField.ALL_VERSION, userEntity, (buffer, entity) -> {
             final String hexString = FormatUtils.toHexString(buffer);
             assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
         });
@@ -97,7 +97,7 @@ class EntityCodecTest {
     @Test
     void testDecode() {
         ByteBuf buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f040006e4bf9de5af86");
-        doDecode(XtreamField.DEFAULT_VERSION, UserEntity.class, buffer, EntityCodecTest::doCompare);
+        doDecode(XtreamField.ALL_VERSION, UserEntity.class, buffer, EntityCodecTest::doCompare);
 
         buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86");
         doDecode(1, UserEntity.class, buffer, EntityCodecTest::doCompare);

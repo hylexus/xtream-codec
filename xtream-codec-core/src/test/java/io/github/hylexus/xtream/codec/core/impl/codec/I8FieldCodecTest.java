@@ -28,7 +28,7 @@ class I8FieldCodecTest extends BaseFieldCodecTest {
     @Test
     void test() {
         codec(
-                XtreamField.DEFAULT_VERSION, new I8FiledTestEntity()
+                XtreamField.ALL_VERSION, new I8FiledTestEntity()
                         .setB1((byte) -127)
                         .setB2((byte) -128)
                         .setS1((short) -127)

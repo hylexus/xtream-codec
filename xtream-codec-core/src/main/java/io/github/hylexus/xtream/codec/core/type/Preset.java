@@ -42,7 +42,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -62,7 +62,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -82,7 +82,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -102,7 +102,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -122,7 +122,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -142,7 +142,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -162,7 +162,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -182,7 +182,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -202,7 +202,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -222,7 +222,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -242,7 +242,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -286,7 +286,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -321,7 +321,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -356,7 +356,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -394,7 +394,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -432,7 +432,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -469,7 +469,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "littleEndian")
             boolean littleEndian() default false;
@@ -492,7 +492,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "littleEndian")
             boolean littleEndian() default false;
@@ -514,7 +514,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -546,7 +546,7 @@ public @interface Preset {
         @interface BcdDateTime {
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamDateTimeField.class, attribute = "pattern")
             String pattern() default "yyMMddHHmmss";
@@ -580,7 +580,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
@@ -599,7 +599,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -634,7 +634,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -677,7 +677,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -711,7 +711,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -745,7 +745,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
@@ -789,7 +789,7 @@ public @interface Preset {
             int order() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
-            int[] version() default {XtreamField.DEFAULT_VERSION};
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;

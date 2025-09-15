@@ -36,7 +36,7 @@ public class DefaultJt1078Request extends DefaultXtreamRequest implements Jt1078
     public DefaultJt1078Request(
             String requestId, ByteBufAllocator allocator, NettyInbound nettyInbound, Type type, Channel channel, InetSocketAddress remoteAddress,
             Jt1078RequestHeader header, ByteBuf payload) {
-        super(XtreamField.DEFAULT_VERSION, requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
+        super(XtreamField.ALL_VERSION, requestId, allocator, nettyInbound, type, payload, channel, remoteAddress);
         this.header = header;
     }
 

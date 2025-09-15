@@ -37,14 +37,14 @@ public class BuiltinMessage0102AllInOne {
      * <p>
      * prependLengthFieldType: 前置一个 u8 字段表示鉴权码长度
      */
-    @Preset.JtStyle.Str(version = {-1, 0}, desc = "鉴权码(2011 || 2013)")
-    @Preset.JtStyle.Str(version = 1, prependLengthFieldType = PrependLengthFieldType.u8, desc = "鉴权码(2019)")
+    @Preset.JtStyle.Str(version = {2011, 2013}, desc = "鉴权码(2011 || 2013)")
+    @Preset.JtStyle.Str(version = 2019, prependLengthFieldType = PrependLengthFieldType.u8, desc = "鉴权码(2019)")
     private String authenticationCode;
 
     /**
      * byte[n+1,n+1+15)     BYTE[]  IMEI
      */
-    @Preset.JtStyle.Str(version = 1, length = 15, desc = "IMEI[15](2019)")
+    @Preset.JtStyle.Str(version = 2019, length = 15, desc = "IMEI[15](2019)")
     private String imei;
 
     /**
@@ -52,7 +52,7 @@ public class BuiltinMessage0102AllInOne {
      * <p>
      * 位数不足时后补 `0x00`
      */
-    @Preset.JtStyle.Str(version = 1, length = 20, desc = "软件版本号[20](2019)")
+    @Preset.JtStyle.Str(version = 2019, length = 20, desc = "软件版本号[20](2019)")
     private String softwareVersion;
 
     /**

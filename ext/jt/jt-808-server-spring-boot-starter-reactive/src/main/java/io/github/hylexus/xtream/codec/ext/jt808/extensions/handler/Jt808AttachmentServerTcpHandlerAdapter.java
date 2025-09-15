@@ -39,7 +39,6 @@ import reactor.core.publisher.Mono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
-import java.net.InetSocketAddress;
 import java.time.Instant;
 
 /**
@@ -91,9 +90,9 @@ public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNett
                 .terminalId(session.terminalId())
                 .flowId(0)
                 .build();
-        final byte version = session.protocolVersion().versionIdentifier();
+
         return new DefaultJt808Request(
-                version,
+                session.protocolVersion().versionValue(),
                 Jt808ServerType.ATTACHMENT_SERVER,
                 this.generateRequestId(nettyInbound),
                 Jt808RequestCombiner.randomTraceId(),

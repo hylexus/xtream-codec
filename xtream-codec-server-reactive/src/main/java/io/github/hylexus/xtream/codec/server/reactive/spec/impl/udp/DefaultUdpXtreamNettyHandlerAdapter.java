@@ -83,7 +83,7 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
     }
 
     protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InboundInfo inboundInfo) {
-        return new DefaultXtreamRequest(XtreamField.DEFAULT_VERSION, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.UDP, payload, inboundInfo.channel(), inboundInfo.remoteAddress());
+        return new DefaultXtreamRequest(XtreamField.ALL_VERSION, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.UDP, payload, inboundInfo.channel(), inboundInfo.remoteAddress());
     }
 
     protected Mono<Void> doUdpExchange(XtreamExchange exchange) {

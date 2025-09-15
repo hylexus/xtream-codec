@@ -39,7 +39,7 @@ public class EntityCodec {
     }
 
     public void encode(Object instance, ByteBuf target) {
-        this.encode(XtreamField.DEFAULT_VERSION, instance, target);
+        this.encode(XtreamField.ALL_VERSION, instance, target);
     }
 
     public void encode(int version, Object instance, ByteBuf target) {
@@ -47,7 +47,7 @@ public class EntityCodec {
     }
 
     public void encode(Object instance, ByteBuf target, CodecTracker tracker) {
-        this.encode(XtreamField.DEFAULT_VERSION, instance, target, tracker);
+        this.encode(XtreamField.ALL_VERSION, instance, target, tracker);
     }
 
     public void encode(int version, Object instance, ByteBuf target, @Nullable CodecTracker tracker) {
@@ -59,7 +59,7 @@ public class EntityCodec {
     }
 
     public <T> T decode(Class<T> entityClass, ByteBuf source) {
-        return this.decode(XtreamField.DEFAULT_VERSION, entityClass, source);
+        return this.decode(XtreamField.ALL_VERSION, entityClass, source);
     }
 
     public <T> T decode(int version, Class<T> entityClass, ByteBuf source) {
@@ -67,7 +67,7 @@ public class EntityCodec {
     }
 
     public <T> T decode(Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
-        return this.decode(XtreamField.DEFAULT_VERSION, entityClass, source, tracker);
+        return this.decode(XtreamField.ALL_VERSION, entityClass, source, tracker);
     }
 
     public <T> T decode(int version, Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
@@ -79,7 +79,7 @@ public class EntityCodec {
     }
 
     public <T> T decode(T instance, ByteBuf source) {
-        return this.decode(XtreamField.DEFAULT_VERSION, instance, source);
+        return this.decode(XtreamField.ALL_VERSION, instance, source);
     }
 
     public <T> T decode(int version, T instance, ByteBuf source) {
@@ -87,7 +87,7 @@ public class EntityCodec {
     }
 
     public <T> T decode(T instance, ByteBuf source, CodecTracker tracker) {
-        return this.decode(XtreamField.DEFAULT_VERSION, instance, source, tracker);
+        return this.decode(XtreamField.ALL_VERSION, instance, source, tracker);
     }
 
     public <T> T decode(int version, T instance, ByteBuf source, CodecTracker tracker) {

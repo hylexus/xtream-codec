@@ -36,7 +36,7 @@ public class EntityEncoder {
     }
 
     public void encode(Object instance, ByteBuf target) {
-        this.encode(XtreamField.DEFAULT_VERSION, instance, target);
+        this.encode(XtreamField.ALL_VERSION, instance, target);
     }
 
     public void encode(int version, Object instance, ByteBuf target) {
@@ -48,7 +48,7 @@ public class EntityEncoder {
     }
 
     public void encode(BeanMetadata beanMetadata, Object instance, ByteBuf target) {
-        this.encode(XtreamField.DEFAULT_VERSION, beanMetadata, instance, target);
+        this.encode(XtreamField.ALL_VERSION, beanMetadata, instance, target);
     }
 
     public void encode(int version, BeanMetadata beanMetadata, Object instance, ByteBuf target) {
@@ -70,7 +70,7 @@ public class EntityEncoder {
 
     // with tracker
     public void encodeWithTracker(Object instance, ByteBuf target, CodecTracker tracker) {
-        this.encodeWithTracker(XtreamField.DEFAULT_VERSION, instance, target, tracker);
+        this.encodeWithTracker(XtreamField.ALL_VERSION, instance, target, tracker);
     }
 
     public void encodeWithTracker(int version, Object instance, ByteBuf target, CodecTracker tracker) {
@@ -82,7 +82,7 @@ public class EntityEncoder {
     }
 
     public void encodeWithTracker(BeanMetadata beanMetadata, Object instance, ByteBuf target, CodecTracker tracker) {
-        this.encodeWithTracker(XtreamField.DEFAULT_VERSION, beanMetadata, instance, target, tracker);
+        this.encodeWithTracker(XtreamField.ALL_VERSION, beanMetadata, instance, target, tracker);
     }
 
     public void encodeWithTracker(int version, BeanMetadata beanMetadata, Object instance, ByteBuf target, CodecTracker tracker) {

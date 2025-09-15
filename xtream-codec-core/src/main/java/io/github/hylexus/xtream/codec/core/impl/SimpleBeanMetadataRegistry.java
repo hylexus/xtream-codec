@@ -168,7 +168,7 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
             if (v == targetVersion) {
                 // 一旦发现目标版本，立即成功
                 return true;
-            } else if (v == XtreamField.DEFAULT_VERSION) {
+            } else if (v == XtreamField.ALL_VERSION) {
                 // 仅记录默认版本存在
                 foundDefault = true;
             }

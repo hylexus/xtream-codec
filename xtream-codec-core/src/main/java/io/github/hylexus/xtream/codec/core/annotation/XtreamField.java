@@ -40,7 +40,8 @@ import java.lang.annotation.*;
 @Repeatable(XtreamFieldContainer.class)
 public @interface XtreamField {
 
-    int DEFAULT_VERSION = Integer.MIN_VALUE;
+    int ALL_VERSION = Integer.MIN_VALUE;
+
     int DEFAULT_ORDER = -1;
 
     /**
@@ -174,6 +175,9 @@ public @interface XtreamField {
      */
     String desc() default "";
 
-    int[] version() default {DEFAULT_VERSION};
+    /**
+     * @since 0.1.0
+     */
+    int[] version() default {ALL_VERSION};
 
 }

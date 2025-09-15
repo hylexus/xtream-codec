@@ -35,7 +35,7 @@ import java.lang.annotation.*;
 @XtreamField(fieldCodec = MapFieldCodec.class)
 public @interface XtreamMapField {
 
-    int ALL_VERSION = XtreamField.DEFAULT_VERSION;
+    int ALL_VERSION = XtreamField.ALL_VERSION;
 
     String DEFAULT_CHARSET = "utf-8";
 

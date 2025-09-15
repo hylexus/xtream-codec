@@ -38,7 +38,7 @@ public class EntityDecoder {
     }
 
     public <T> T decode(Class<T> entityClass, ByteBuf source) {
-        return this.decode(XtreamField.DEFAULT_VERSION, entityClass, source);
+        return this.decode(XtreamField.ALL_VERSION, entityClass, source);
     }
 
     public <T> T decode(int version, Class<T> entityClass, ByteBuf source) {
@@ -48,7 +48,7 @@ public class EntityDecoder {
     }
 
     public <T> T decode(BeanMetadata beanMetadata, ByteBuf source) {
-        return this.decode(XtreamField.DEFAULT_VERSION, beanMetadata, source);
+        return this.decode(XtreamField.ALL_VERSION, beanMetadata, source);
     }
 
     public <T> T decode(int version, BeanMetadata beanMetadata, ByteBuf source) {
@@ -57,7 +57,7 @@ public class EntityDecoder {
     }
 
     public <T> T decode(ByteBuf source, Object containerInstance) {
-        return this.decode(XtreamField.DEFAULT_VERSION, source, containerInstance);
+        return this.decode(XtreamField.ALL_VERSION, source, containerInstance);
     }
 
     public <T> T decode(int version, ByteBuf source, Object containerInstance) {
@@ -66,7 +66,7 @@ public class EntityDecoder {
     }
 
     public <T> T decode(ByteBuf source, BeanMetadata beanMetadata, Object containerInstance) {
-        return decode(XtreamField.DEFAULT_VERSION, source, beanMetadata, containerInstance);
+        return decode(XtreamField.ALL_VERSION, source, beanMetadata, containerInstance);
     }
 
     public <T> T decode(int version, ByteBuf source, BeanMetadata beanMetadata, Object containerInstance) {
@@ -84,7 +84,7 @@ public class EntityDecoder {
     // with tracker
     // with tracer
     public <T> T decodeWithTracker(Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
-        return this.decodeWithTracker(XtreamField.DEFAULT_VERSION, entityClass, source, tracker);
+        return this.decodeWithTracker(XtreamField.ALL_VERSION, entityClass, source, tracker);
     }
 
     public <T> T decodeWithTracker(int version, Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
@@ -94,7 +94,7 @@ public class EntityDecoder {
     }
 
     public <T> T decodeWithTracker(BeanMetadata beanMetadata, ByteBuf source, CodecTracker tracker) {
-        return this.decodeWithTracker(XtreamField.DEFAULT_VERSION, beanMetadata, source, tracker);
+        return this.decodeWithTracker(XtreamField.ALL_VERSION, beanMetadata, source, tracker);
     }
 
     public <T> T decodeWithTracker(int version, BeanMetadata beanMetadata, ByteBuf source, CodecTracker tracker) {
@@ -103,7 +103,7 @@ public class EntityDecoder {
     }
 
     public <T> T decodeWithTracker(ByteBuf source, Object containerInstance, CodecTracker tracker) {
-        return this.decodeWithTracker(XtreamField.DEFAULT_VERSION, source, containerInstance, tracker);
+        return this.decodeWithTracker(XtreamField.ALL_VERSION, source, containerInstance, tracker);
     }
 
     public <T> T decodeWithTracker(int version, ByteBuf source, Object containerInstance, CodecTracker tracker) {
@@ -112,7 +112,7 @@ public class EntityDecoder {
     }
 
     public <T> T decodeWithTracker(ByteBuf source, BeanMetadata beanMetadata, Object containerInstance, CodecTracker tracker) {
-        return decodeWithTracker(XtreamField.DEFAULT_VERSION, source, beanMetadata, containerInstance, tracker);
+        return decodeWithTracker(XtreamField.ALL_VERSION, source, beanMetadata, containerInstance, tracker);
     }
 
     public <T> T decodeWithTracker(int version, ByteBuf source, BeanMetadata beanMetadata, Object containerInstance, CodecTracker tracker) {

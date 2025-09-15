@@ -375,7 +375,7 @@ public class SimpleMapMetadataRegistry {
     }
 
     private static boolean isVersionMatched(int targetVersion, int versionCandidate) {
-        return targetVersion == versionCandidate || versionCandidate == XtreamField.DEFAULT_VERSION;
+        return targetVersion == versionCandidate || versionCandidate == XtreamField.ALL_VERSION;
     }
 
 
@@ -455,7 +455,7 @@ public class SimpleMapMetadataRegistry {
             return new VersionMatchResult<>(true, first.version(), mapper.apply(first));
         }
 
-        if (targetVersion == XtreamField.DEFAULT_VERSION) {
+        if (targetVersion == XtreamField.ALL_VERSION) {
             return new VersionMatchResult<>(false, 0, null);
         }
 

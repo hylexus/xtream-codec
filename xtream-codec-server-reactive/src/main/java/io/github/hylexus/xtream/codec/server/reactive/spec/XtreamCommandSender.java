@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 public interface XtreamCommandSender<S extends XtreamSession> extends InternalXtreamCommandSender<S> {
 
     default Mono<Void> sendObject(String sessionId, Publisher<Object> data) {
-        return this.sendObject(XtreamField.DEFAULT_VERSION, sessionId, data);
+        return this.sendObject(XtreamField.ALL_VERSION, sessionId, data);
     }
 
     Mono<Void> sendObject(int version, String sessionId, Publisher<Object> data);
