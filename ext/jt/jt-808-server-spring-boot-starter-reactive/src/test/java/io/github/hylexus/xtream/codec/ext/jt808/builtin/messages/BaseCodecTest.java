@@ -75,6 +75,25 @@ public class BaseCodecTest {
         when(nettyInbound.withConnection(any())).thenReturn(nettyInbound);
     }
 
+    protected interface CodecValidator<T> {
+        void accept(T expected, T actual, String hexString);
+    }
+
+    protected <T> void codec(Jt808ProtocolVersion version, String terminalId, T instance, CodecValidator<T> assertion) {
+        final ByteBuf buffer = allocator.buffer();
+        try {
+            final int versionValue = version.versionValue();
+            this.entityCodec.encode(versionValue, instance, buffer.retain());
+            final String hexString = this.encode(buffer.slice(), version, terminalId, 0x0200);
+            @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
+            final T decode = this.entityCodec.decode(versionValue, cls, buffer);
+            assertion.accept(instance, decode, hexString);
+        } finally {
+            XtreamBytes.releaseBuf(buffer);
+            Assertions.assertEquals(0, buffer.refCnt());
+        }
+    }
+
     protected Jt808Request decodeAsRequest(String hex) {
         final ByteBuf payload = XtreamBytes.byteBufFromHexString(allocator, hex);
         try {

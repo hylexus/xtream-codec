@@ -27,7 +27,7 @@ public enum CodecCharset {
     UNSUPPORTED(null) {
         @Override
         public String charsetName() {
-            throw new UnsupportedOperationException("CodecCharset.INVALID cannot be used to create a codec");
+            throw new UnsupportedOperationException("CodecCharset.UNSUPPORTED cannot be used to create a codec");
         }
     },
     DYNAMIC(null) {

@@ -25,7 +25,7 @@ import io.netty.buffer.ByteBuf;
 public class BytesFieldCodecs {
     public static BytesFieldCodecByteBuf INSTANCE_BYTE_BUF = new BytesFieldCodecByteBuf();
     public static BytesFieldCodecByteBufContainer INSTANCE_BYTE_BUF_CONTAINER = new BytesFieldCodecByteBufContainer();
-    public static ByteeFieldCodecByteArray INSTANCE_BYTE_ARRAY = new ByteeFieldCodecByteArray();
+    public static BytesFieldCodecByteArray INSTANCE_BYTE_ARRAY = new BytesFieldCodecByteArray();
     public static BytesFieldCodecByteArrayBoxed INSTANCE_BYTE_ARRAY_BOXED = new BytesFieldCodecByteArrayBoxed();
     public static BytesFieldCodecByteArrayContainer INSTANCE_BYTE_ARRAY_CONTAINER = new BytesFieldCodecByteArrayContainer();
 
@@ -33,10 +33,8 @@ public class BytesFieldCodecs {
         throw new UnsupportedOperationException();
     }
 
-    public static final class ByteeFieldCodecByteArray extends AbstractFieldCodec<byte[]> {
-        public static ByteeFieldCodecByteArray INSTANCE = new ByteeFieldCodecByteArray();
-
-        private ByteeFieldCodecByteArray() {
+    public static final class BytesFieldCodecByteArray extends AbstractFieldCodec<byte[]> {
+        private BytesFieldCodecByteArray() {
         }
 
         @Override
@@ -55,8 +53,6 @@ public class BytesFieldCodecs {
     }
 
     public static final class BytesFieldCodecByteArrayBoxed extends AbstractFieldCodec<Byte[]> {
-        public static final BytesFieldCodecByteArrayBoxed INSTANCE = new BytesFieldCodecByteArrayBoxed();
-
         private BytesFieldCodecByteArrayBoxed() {
         }
 

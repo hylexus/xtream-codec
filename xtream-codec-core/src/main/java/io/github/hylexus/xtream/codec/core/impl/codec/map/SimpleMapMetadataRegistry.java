@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
+import io.github.hylexus.xtream.codec.core.type.CodecCharset;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -176,7 +177,7 @@ public class SimpleMapMetadataRegistry {
         if (StringUtils.hasText(charset)) {
             return charset;
         }
-        return Objects.requireNonNull(fallbackCharset);
+        return requireNonNull(fallbackCharset);
     }
 
     @Nullable
@@ -204,11 +205,13 @@ public class SimpleMapMetadataRegistry {
             @Nullable String commonCharset) {
 
         if (!valueType.isPlaceholder()) {
-            return switch (valueType.codecCharset()) {
-                case null -> throw new IllegalArgumentException();
+            final CodecCharset codecCharset = valueType.codecCharset();
+            return switch (codecCharset) {
                 case DYNAMIC -> assertNotBlank(firstOr(charset, commonCharset), "charset is empty");
+                case UTF_8,
+                     GBK, GB_2312,
+                     BCD_8421, HEX -> codecCharset.charsetName();
                 case UNSUPPORTED -> null;
-                default -> valueType.codecCharset().charsetName();
             };
         }
 

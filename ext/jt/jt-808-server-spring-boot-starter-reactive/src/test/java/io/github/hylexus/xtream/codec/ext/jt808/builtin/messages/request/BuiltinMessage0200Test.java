@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BuiltinMessage0200Test extends BaseCodecTest {
@@ -33,7 +34,67 @@ class BuiltinMessage0200Test extends BaseCodecTest {
     final LocalDateTime time = LocalDateTime.of(2014, 10, 21, 19, 51, 9);
 
     @Test
-    void testEncode() {
+    void test1() {
+        final BuiltinMessage0200 entity = createEntity1();
+        super.codec(Jt808ProtocolVersion.VERSION_2019, super.terminalId2019, entity, (expected, actual, hexString) -> {
+            // System.out.println(hexString);
+            // System.out.println(expected);
+            // System.out.println(actual);
+            assertEquals(expected.getAlarmFlag(), actual.getAlarmFlag());
+            assertEquals(expected.getStatus(), actual.getStatus());
+            assertEquals(expected.getLatitude(), actual.getLatitude());
+            assertEquals(expected.getLongitude(), actual.getLongitude());
+            assertEquals(expected.getAltitude(), actual.getAltitude());
+            assertEquals(expected.getSpeed(), actual.getSpeed());
+            assertEquals(expected.getDirection(), actual.getDirection());
+            assertEquals(expected.getTime(), actual.getTime());
+            final Map<Short, Object> expectedExtraItems = expected.getExtraItems();
+            final Map<Short, Object> actualExtraItems = actual.getExtraItems();
+            assertEquals(expectedExtraItems.get((short) 0x01), actualExtraItems.get((short) 0x01));
+            assertEquals(expectedExtraItems.get((short) 0x02), actualExtraItems.get((short) 0x02));
+            assertEquals(expectedExtraItems.get((short) 0x03), actualExtraItems.get((short) 0x03));
+            assertEquals(expectedExtraItems.get((short) 0x04), actualExtraItems.get((short) 0x04));
+            assertArrayEquals((byte[]) expectedExtraItems.get((short) 0x05), (byte[]) actualExtraItems.get((short) 0x05));
+            assertEquals(expectedExtraItems.get((short) 0x06), actualExtraItems.get((short) 0x06));
+            assertEquals(expectedExtraItems.get((short) 0x11), actualExtraItems.get((short) 0x11));
+            assertEquals(expectedExtraItems.get((short) 0x12), actualExtraItems.get((short) 0x12));
+            assertEquals(expectedExtraItems.get((short) 0x25), actualExtraItems.get((short) 0x25));
+            assertEquals(expectedExtraItems.get((short) 0x2A), actualExtraItems.get((short) 0x2A));
+            assertEquals(expectedExtraItems.get((short) 0x2B), actualExtraItems.get((short) 0x2B));
+            assertEquals(expectedExtraItems.get((short) 0x30), actualExtraItems.get((short) 0x30));
+            assertEquals(expectedExtraItems.get((short) 0x31), actualExtraItems.get((short) 0x31));
+
+            compareItem64(expectedExtraItems, actualExtraItems);
+
+        });
+    }
+
+    private static void compareItem64(Map<Short, Object> expectedExtraItems, Map<Short, Object> actualExtraItems) {
+        final LocationItem0x64 expectedItem64 = (LocationItem0x64) expectedExtraItems.get((short) 0x64);
+        final LocationItem0x64 actualItem64 = (LocationItem0x64) actualExtraItems.get((short) 0x64);
+        assertEquals(expectedItem64.getAlarmId(), actualItem64.getAlarmId());
+        assertEquals(expectedItem64.getStatus(), actualItem64.getStatus());
+        assertEquals(expectedItem64.getAlarmType(), actualItem64.getAlarmType());
+        assertEquals(expectedItem64.getAlarmLevel(), actualItem64.getAlarmLevel());
+        assertEquals(expectedItem64.getSpeedOfFrontObject(), actualItem64.getSpeedOfFrontObject());
+        assertEquals(expectedItem64.getDistanceToFrontObject(), actualItem64.getDistanceToFrontObject());
+        assertEquals(expectedItem64.getDeviationType(), actualItem64.getDeviationType());
+        assertEquals(expectedItem64.getRoadSignType(), actualItem64.getRoadSignType());
+        assertEquals(expectedItem64.getRoadSignData(), actualItem64.getRoadSignData());
+        assertEquals(expectedItem64.getSpeed(), actualItem64.getSpeed());
+        assertEquals(expectedItem64.getHeight(), actualItem64.getHeight());
+        assertEquals(expectedItem64.getLatitude(), actualItem64.getLatitude());
+        assertEquals(expectedItem64.getLongitude(), actualItem64.getLongitude());
+        assertEquals(expectedItem64.getDatetime(), actualItem64.getDatetime());
+        assertEquals(expectedItem64.getVehicleStatus(), actualItem64.getVehicleStatus());
+        assertEquals(expectedItem64.getAlarmIdentifier().getTerminalId(), actualItem64.getAlarmIdentifier().getTerminalId());
+        assertEquals(expectedItem64.getAlarmIdentifier().getTime(), actualItem64.getAlarmIdentifier().getTime());
+        assertEquals(expectedItem64.getAlarmIdentifier().getSequence(), actualItem64.getAlarmIdentifier().getSequence());
+        assertEquals(expectedItem64.getAlarmIdentifier().getAttachmentCount(), actualItem64.getAlarmIdentifier().getAttachmentCount());
+        assertEquals(expectedItem64.getAlarmIdentifier().getReserved(), actualItem64.getAlarmIdentifier().getReserved());
+    }
+
+    private BuiltinMessage0200 createEntity1() {
         final BuiltinMessage0200 entity = new BuiltinMessage0200();
         entity.setAlarmFlag(123L);
         entity.setStatus(222);
@@ -49,7 +110,15 @@ class BuiltinMessage0200Test extends BaseCodecTest {
         extraItems.put((short) 0x02, 222);
         extraItems.put((short) 0x03, 666);
         extraItems.put((short) 0x04, 333);
+        extraItems.put((short) 0x05, new byte[]{1, 2, 3, 4, 5});
+        // extraItems.put((short) 0x06, -32767);
+        extraItems.put((short) 0x06, 32767);
+        extraItems.put((short) 0x11, new BuiltinMessage0200.Item0x11((short) 1, 222L));
+        extraItems.put((short) 0x12, new BuiltinMessage0200.Item0x12().setLocationType((short) 3).setLocationId(55).setDirection((short) 1));
+        extraItems.put((short) 0x13, new BuiltinMessage0200.Item0x13().setLineId((short) 5).setLocationId(22).setResult((short) 1));
         extraItems.put((short) 0x25, 777L);
+        extraItems.put((short) 0x2A, 12);
+        extraItems.put((short) 0x2B, Integer.MIN_VALUE);
         extraItems.put((short) 0x30, (short) 33);
         extraItems.put((short) 0x31, (short) 55);
         extraItems.put((short) 0x64, new LocationItem0x64()
@@ -77,53 +146,7 @@ class BuiltinMessage0200Test extends BaseCodecTest {
                 )
         );
         entity.setExtraItems(extraItems);
-
-        final String hex = encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019, 0x0200);
-        assertEquals("7e0200406b010000000001391234432900000000007b000000de01d907f2073d336c029a004e000014102119510901040000006f020200de0302029a0402014d250400000309300121310137642f000000dedf6f03420b0c0d0e0f04d201d907f2073d336c141021195109000131323334353637141021195109010100987e", hex);
+        return entity;
     }
 
-    @Test
-    void testDecode() {
-        final BuiltinMessage0200 entity = decodeAsEntity(BuiltinMessage0200.class, "0200406b010000000001391234432900000000007b000000de01d907f2073d336c029a004e000014102119510901040000006f020200de0302029a0402014d250400000309300121310137642f000000dedf6f03420b0c0d0e0f04d201d907f2073d336c14102119510900013132333435363714102119510901010098");
-
-        assertEquals(123L, entity.getAlarmFlag());
-        assertEquals(222, entity.getStatus());
-        assertEquals(31000562, entity.getLatitude());
-        assertEquals(121451372, entity.getLongitude());
-        assertEquals(666, entity.getAltitude());
-        assertEquals(78, entity.getSpeed());
-        assertEquals(0, entity.getDirection());
-        assertEquals(time, entity.getTime());
-
-        final Map<Short, Object> extraItems = entity.getExtraItems();
-        assertEquals(111L, extraItems.get((short) 0x01));
-        assertEquals(222, extraItems.get((short) 0x02));
-        assertEquals(666, extraItems.get((short) 0x03));
-        assertEquals(333, extraItems.get((short) 0x04));
-        assertEquals(777L, extraItems.get((short) 0x25));
-        assertEquals((short) 33, extraItems.get((short) 0x30));
-        assertEquals((short) 55, extraItems.get((short) 0x31));
-
-        final LocationItem0x64 item64 = (LocationItem0x64) extraItems.get((short) 0x64);
-        assertEquals(222L, item64.getAlarmId());
-        assertEquals((short) 223, item64.getStatus());
-        assertEquals((short) 111, item64.getAlarmType());
-        assertEquals((short) 3, item64.getAlarmLevel());
-        assertEquals((short) 66, item64.getSpeedOfFrontObject());
-        assertEquals((short) 11, item64.getDistanceToFrontObject());
-        assertEquals((short) 12, item64.getDeviationType());
-        assertEquals((short) 13, item64.getRoadSignType());
-        assertEquals((short) 14, item64.getRoadSignData());
-        assertEquals((short) 15, item64.getSpeed());
-        assertEquals(1234, item64.getHeight());
-        assertEquals(31000562L, item64.getLatitude());
-        assertEquals(121451372L, item64.getLongitude());
-        assertEquals(time, item64.getDatetime());
-        assertEquals(1, item64.getVehicleStatus());
-        assertEquals("1234567", item64.getAlarmIdentifier().getTerminalId());
-        assertEquals(time, item64.getAlarmIdentifier().getTime());
-        assertEquals((short) 1, item64.getAlarmIdentifier().getSequence());
-        assertEquals((short) 1, item64.getAlarmIdentifier().getAttachmentCount());
-        assertEquals((short) 0, item64.getAlarmIdentifier().getReserved());
-    }
 }

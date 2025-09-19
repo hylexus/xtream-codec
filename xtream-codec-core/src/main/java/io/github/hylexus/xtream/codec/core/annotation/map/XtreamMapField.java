@@ -49,6 +49,9 @@ public @interface XtreamMapField {
     @AliasFor(annotation = XtreamField.class, attribute = "containerInstanceFactory")
     Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
 
+    @AliasFor(annotation = XtreamField.class, attribute = "desc")
+    String desc() default "";
+
     @interface Key {
         int[] version() default {ALL_VERSION};
 
@@ -77,7 +80,7 @@ public @interface XtreamMapField {
 
         ValueMatcher[] matchers() default {};
 
-        FallbackValueMatcher[] fallbackMatchers() default {@FallbackValueMatcher(valueCodecClass = BytesFieldCodecs.ByteeFieldCodecByteArray.class)};
+        FallbackValueMatcher[] fallbackMatchers() default {@FallbackValueMatcher(valueCodecClass = BytesFieldCodecs.BytesFieldCodecByteArray.class)};
     }
 
     @interface ValueEncoder {
@@ -126,6 +129,8 @@ public @interface XtreamMapField {
         Class<? extends FieldCodec<?>> valueCodec() default FieldCodec.Placeholder.class;
 
         Class<?> valueEntity() default Object.class;
+
+        String desc() default "";
     }
 
     @interface FallbackValueMatcher {
