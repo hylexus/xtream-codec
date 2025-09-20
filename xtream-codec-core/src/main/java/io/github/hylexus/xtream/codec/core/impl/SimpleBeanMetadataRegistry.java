@@ -30,16 +30,10 @@ import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.RuntimeTypeFieldCodec;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
-import io.github.hylexus.xtream.codec.core.utils.ReflectionUtils;
+import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
 import org.springframework.core.annotation.MergedAnnotations;
 
-import java.beans.BeanDescriptor;
-import java.beans.BeanInfo;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -116,13 +110,20 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
 
     public BeanMetadata doGetMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator) {
         // final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> AnnotatedElementUtils.findMergedAnnotation(field, XtreamField.class) != null);
-        final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> MergedAnnotations.from(field).isPresent(XtreamField.class));
-        final BeanDescriptor beanDescriptor = beanInfo.getBeanDescriptor();
+        final BeanUtils.XtreamSimpleBeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> MergedAnnotations.from(field).isPresent(XtreamField.class));
         final ArrayList<BeanPropertyMetadata> pdList = new ArrayList<>();
-        for (final PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-            final BeanUtils.BasicPropertyDescriptor basicPropertyDescriptor = (BeanUtils.BasicPropertyDescriptor) pd;
-            final Field field = basicPropertyDescriptor.getField();
-            final List<XtreamField> xtreamFieldAnnotations = ReflectionUtils.findXtreamFieldAnnotations(field);
+        final boolean isRecordClass = beanInfo.isRecordClass();
+        for (final BeanUtils.BasicPropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+            final Field field = pd.getField();
+            final List<XtreamField> xtreamFieldAnnotations;
+            if (isRecordClass) {
+                final RecordComponent recordComponent = Objects.requireNonNull(pd.getRecordComponent());
+                xtreamFieldAnnotations = XtreamFieldUtils.getOrDefault(recordComponent);
+            } else {
+                // xtreamFieldAnnotations = ReflectionUtils.findXtreamFieldAnnotations(field);
+                xtreamFieldAnnotations = XtreamFieldUtils.getOrEmpty(field);
+            }
+
             for (final XtreamField xtreamFieldAnnotation : xtreamFieldAnnotations) {
                 final int[] allVersions = xtreamFieldAnnotation.version();
                 final boolean versionMatched = isVersionMatched(version, allVersions);
@@ -158,7 +159,7 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
             }
         }
         pdList.sort(Comparator.comparing(BeanPropertyMetadata::order));
-        return new BeanMetadata(beanInfo.getBeanDescriptor().getBeanClass(), BeanUtils.getConstructor(beanDescriptor), pdList);
+        return new BeanMetadata(beanInfo.getBeanDescriptor().getBeanClass(), BeanUtils.getConstructor(beanInfo), pdList);
     }
 
     protected boolean isVersionMatched(int targetVersion, int[] versionCandidates) {
@@ -195,6 +196,9 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     }
 
     public FieldCodec<?> detectFieldCodec(BasicBeanPropertyMetadata metadata) {
+        if (metadata.xtreamFieldAnnotation().codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            return null;
+        }
         return this.fieldCodecRegistry.getFieldCodec(metadata).orElseGet(() -> {
             // ...
             return switch (metadata.dataType()) {

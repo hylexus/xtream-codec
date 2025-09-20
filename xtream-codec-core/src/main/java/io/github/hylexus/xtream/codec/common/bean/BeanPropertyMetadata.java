@@ -41,6 +41,15 @@ public interface BeanPropertyMetadata {
 
     Class<?> rawClass();
 
+    /**
+     * @see Record
+     * @see java.lang.reflect.RecordComponent
+     */
+    @SuppressWarnings("unused")
+    default boolean recordComponent() {
+        return false;
+    }
+
     int version();
 
     FiledDataType dataType();

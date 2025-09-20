@@ -38,7 +38,17 @@ public class BeanMetadata {
         this.propertyMetadataList = propertyMetadataList;
     }
 
+    public <T> T createNewRecordInstance(Object[] filedValues) {
+        final Object newInstance = BeanUtils.createNewInstance(this.getConstructor(), filedValues);
+        @SuppressWarnings("unchecked") final T casted = (T) newInstance;
+        return casted;
+    }
+
     public Object createNewInstance() {
+        if (this.rawType.isRecord()) {
+            return null;
+        }
         return BeanUtils.createNewInstance(this.getConstructor(), (Object[]) null);
     }
+
 }

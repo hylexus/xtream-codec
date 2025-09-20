@@ -25,9 +25,17 @@ public interface FieldConditionEvaluator {
 
     boolean evaluate(FieldCodec.CodecContext context);
 
-    class AlwaysTrueFieldConditionEvaluator implements FieldConditionEvaluator {
+    enum AlwaysFalseFieldConditionEvaluator implements FieldConditionEvaluator {
+        INSTANCE;
 
-        public static AlwaysTrueFieldConditionEvaluator INSTANCE = new AlwaysTrueFieldConditionEvaluator();
+        @Override
+        public boolean evaluate(FieldCodec.CodecContext context) {
+            return false;
+        }
+    }
+
+    enum AlwaysTrueFieldConditionEvaluator implements FieldConditionEvaluator {
+        INSTANCE;
 
         @Override
         public boolean evaluate(FieldCodec.CodecContext context) {

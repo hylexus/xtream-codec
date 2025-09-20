@@ -56,6 +56,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     private final ContainerInstanceFactory containerInstanceFactory;
     @Setter
     private FieldCodec<?> fieldCodec;
+    protected final boolean recordComponent;
 
     public BasicBeanPropertyMetadata(BeanMetadataRegistry registry, String name, Class<?> type, int version, XtreamField xtreamField, Field field, PropertyGetter getter, PropertySetter setter) {
         this.beanMetadataRegistry = registry;
@@ -63,6 +64,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         this.type = type;
         this.version = version;
         this.field = field;
+        this.recordComponent = field.getDeclaringClass().isRecord();
         this.propertyGetter = getter;
         this.propertySetter = setter;
         this.order = initOrder();
@@ -73,12 +75,19 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         this.fieldConditionEvaluator = detectFieldConditionalEvaluator(this.xtreamField);
         this.prependLengthFieldByteCounts = this.detectPrependLengthFieldByteCounts(xtreamField);
         this.prependLengthFieldType = PrependLengthFieldType.from(this.prependLengthFieldByteCounts);
-        this.containerInstanceFactory = this.xtreamField.containerInstanceFactory() == ContainerInstanceFactory.PlaceholderContainerInstanceFactory.class
-                ? ContainerInstanceFactory.PLACEHOLDER
-                : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
+        if (this.xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            this.containerInstanceFactory = ContainerInstanceFactory.PLACEHOLDER;
+        } else {
+            this.containerInstanceFactory = this.xtreamField.containerInstanceFactory() == ContainerInstanceFactory.PlaceholderContainerInstanceFactory.class
+                    ? ContainerInstanceFactory.PLACEHOLDER
+                    : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
+        }
     }
 
     protected int detectPrependLengthFieldByteCounts(XtreamField xtreamField) {
+        if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            return PrependLengthFieldType.none.getByteCounts();
+        }
         if (xtreamField.prependLengthFieldType() != PrependLengthFieldType.none) {
             return xtreamField.prependLengthFieldType().getByteCounts();
         }
@@ -86,6 +95,9 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     private FieldConditionEvaluator detectFieldConditionalEvaluator(XtreamField xtreamField) {
+        if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            return FieldConditionEvaluator.AlwaysFalseFieldConditionEvaluator.INSTANCE;
+        }
         if (XtreamUtils.hasElement(xtreamField.condition())) {
             return new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(xtreamField.condition());
         }
@@ -136,6 +148,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
 
     private FieldLengthExtractor.PlaceholderFieldLengthExtractor placeholderFieldLengthExtractor() {
         return new FieldLengthExtractor.PlaceholderFieldLengthExtractor("Did you forget to specify length() / lengthExpression() for Field: [ " + this.field + " ]");
+    }
+
+    @Override
+    public boolean recordComponent() {
+        return this.recordComponent;
     }
 
     protected int initOrder() {

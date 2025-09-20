@@ -287,6 +287,9 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
     public Optional<FieldCodec<?>> getFieldCodec(BeanPropertyMetadata metadata) {
 
         final XtreamField xtreamField = metadata.xtreamFieldAnnotation();
+        if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            return Optional.of(FieldCodec.TransientRecordComponentFieldCodec.INSTANCE);
+        }
 
         if (xtreamField.fieldCodec() != FieldCodec.Placeholder.class) {
             final Class<? extends FieldCodec<?>> aClass = xtreamField.fieldCodec();

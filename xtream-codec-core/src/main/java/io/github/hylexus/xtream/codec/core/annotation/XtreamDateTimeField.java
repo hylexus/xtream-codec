@@ -26,7 +26,7 @@ import java.lang.annotation.*;
  * @author hylexus
  */
 @Documented
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.RECORD_COMPONENT})
 @Retention(RetentionPolicy.RUNTIME)
 @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, fieldCodec = XtreamDateTimeFieldCodec.class)
 public @interface XtreamDateTimeField {

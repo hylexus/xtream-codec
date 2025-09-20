@@ -32,7 +32,7 @@ public @interface Preset {
     @interface RustStyle {
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI8.class)
@@ -52,7 +52,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU8.class)
@@ -72,7 +72,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI16.class)
@@ -92,7 +92,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI16Le.class)
@@ -112,7 +112,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU16.class)
@@ -132,7 +132,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU16Le.class)
@@ -152,7 +152,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI32.class)
@@ -172,7 +172,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerI32Le.class)
@@ -192,7 +192,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU32.class)
@@ -212,7 +212,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerU32Le.class)
@@ -232,7 +232,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerStr.class)
@@ -276,7 +276,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerStruct.class)
@@ -311,7 +311,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerDyn.class)
@@ -346,7 +346,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerList.class)
@@ -384,7 +384,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerMap.class)
@@ -422,7 +422,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerByteArray.class)
@@ -455,10 +455,26 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
+
+        @Target(ElementType.RECORD_COMPONENT)
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerTransientRecordComponent.class)
+        @XtreamField(
+                dataType = BeanPropertyMetadata.FiledDataType.basic,
+                codecStrategy = XtreamField.CodecStrategy.TRANSIENT
+        )
+        @interface transient_record_component {
+            @AliasFor(annotation = XtreamField.class, attribute = "nulls")
+            XtreamField.Nulls nulls() default XtreamField.Nulls.AS_NULL;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+        }
     }
 
     @interface JtStyle {
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerWord.class)
@@ -481,7 +497,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerDword.class)
@@ -504,7 +520,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerBcd.class)
@@ -538,7 +554,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD, ElementType.METHOD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerBcdDateTime.class)
@@ -570,7 +586,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerByte.class)
@@ -589,7 +605,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerBytes.class)
@@ -624,7 +640,7 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerStr.class)
@@ -667,7 +683,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerObject.class)
@@ -701,7 +717,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerRuntimeType.class)
@@ -735,7 +751,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerList.class)
@@ -778,7 +794,7 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
         @Repeatable(PresetAliasContainers.JtStyleContainerMap.class)
@@ -815,5 +831,24 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
+
+        @Target(ElementType.RECORD_COMPONENT)
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerTransientRecordComponent.class)
+        @XtreamField(
+                dataType = BeanPropertyMetadata.FiledDataType.basic,
+                codecStrategy = XtreamField.CodecStrategy.TRANSIENT
+        )
+        @interface TransientRecordComponent {
+
+            @AliasFor(annotation = XtreamField.class, attribute = "nulls")
+            XtreamField.Nulls nulls() default XtreamField.Nulls.AS_NULL;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+        }
     }
+
 }

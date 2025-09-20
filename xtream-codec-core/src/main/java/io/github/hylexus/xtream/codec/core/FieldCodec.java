@@ -137,6 +137,20 @@ public interface FieldCodec<T> {
         }
     }
 
+    enum TransientRecordComponentFieldCodec implements FieldCodec<Object> {
+        INSTANCE;
+
+        @Override
+        public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     /**
      * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry, int)
      */

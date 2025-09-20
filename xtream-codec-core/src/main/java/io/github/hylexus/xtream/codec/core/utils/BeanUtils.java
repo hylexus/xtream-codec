@@ -36,37 +36,64 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class BeanUtils {
+public final class BeanUtils {
     public static final BasicPropertyDescriptor[] EMPTY_ARRAY = {};
 
-    private static final Map<Class<?>, BeanInfo> CACHE = new HashMap<>();
+    private static final Map<Class<?>, XtreamSimpleBeanInfo> CACHE = new HashMap<>();
 
-    public static BeanInfo getBeanInfo(Class<?> beanClass, XtreamCacheableClassPredicate cacheableClassPredicate, Predicate<Field> fieldPredicate) throws BeanIntrospectionException {
+    public static class XtreamSimpleBeanInfo extends SimpleBeanInfo {
+        private final Class<?> beanClass;
+        private final BeanDescriptor beanDescriptor;
+        private final BasicPropertyDescriptor[] propertyDescriptors;
+        private final boolean recordClass;
 
-        BeanInfo beanInfo;
+        public XtreamSimpleBeanInfo(Class<?> beanClass, BasicPropertyDescriptor[] propertyDescriptors) {
+            this.beanDescriptor = new BeanDescriptor(beanClass);
+            this.beanClass = beanClass;
+            this.propertyDescriptors = propertyDescriptors;
+            this.recordClass = beanClass.isRecord();
+        }
+
+        @SuppressWarnings({"redundent", "unused"})
+        public boolean isRecordClass() {
+            return this.recordClass;
+        }
+
+        @SuppressWarnings({"redundent", "unused"})
+        public Class<?> getBeanClass() {
+            return this.beanClass;
+        }
+
+        @Override
+        public BeanDescriptor getBeanDescriptor() {
+            return this.beanDescriptor;
+        }
+
+        @Override
+        public BasicPropertyDescriptor[] getPropertyDescriptors() {
+            return this.propertyDescriptors;
+        }
+
+        @Override
+        public MethodDescriptor[] getMethodDescriptors() {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+
+    public static XtreamSimpleBeanInfo getBeanInfo(Class<?> beanClass, XtreamCacheableClassPredicate cacheableClassPredicate, Predicate<AnnotatedElement> fieldPredicate) throws BeanIntrospectionException {
+
+        XtreamSimpleBeanInfo beanInfo;
         if ((beanInfo = CACHE.get(beanClass)) != null) {
             return beanInfo;
         }
 
-        final BasicPropertyDescriptor[] propertyDescriptors = determineBasicProperties(beanClass, fieldPredicate);
-
-        beanInfo = new SimpleBeanInfo() {
-            @Override
-            public BeanDescriptor getBeanDescriptor() {
-                return new BeanDescriptor(beanClass);
-            }
-
-            @Override
-            public BasicPropertyDescriptor[] getPropertyDescriptors() {
-                return propertyDescriptors;
-            }
-
-            @Override
-            public MethodDescriptor[] getMethodDescriptors() {
-                throw new UnsupportedOperationException();
-            }
-
-        };
+        if (beanClass.isRecord()) {
+            beanInfo = createRecordTypeBeanInfo(beanClass);
+        } else {
+            final BasicPropertyDescriptor[] propertyDescriptors = determineBasicProperties(beanClass, fieldPredicate);
+            beanInfo = new XtreamSimpleBeanInfo(beanClass, propertyDescriptors);
+        }
 
         if (cacheableClassPredicate.test(beanClass)) {
             CACHE.put(beanClass, beanInfo);
@@ -74,7 +101,22 @@ public class BeanUtils {
         return beanInfo;
     }
 
-    public static BasicPropertyDescriptor[] determineBasicProperties(Class<?> beanClass, Predicate<Field> fieldPredicate) {
+    private static XtreamSimpleBeanInfo createRecordTypeBeanInfo(Class<?> beanClass) {
+        XtreamSimpleBeanInfo beanInfo;
+        final Field[] declaredFields = beanClass.getDeclaredFields();
+        final BasicPropertyDescriptor[] pdList = new BasicPropertyDescriptor[declaredFields.length];
+        final RecordComponent[] recordComponents = beanClass.getRecordComponents();
+        for (int i = 0; i < recordComponents.length; i++) {
+            final RecordComponent recordComponent = recordComponents[i];
+            final Field field = declaredFields[i];
+            final BasicPropertyDescriptor pd = BasicPropertyDescriptor.ofRecord(field, recordComponent);
+            pdList[i] = pd;
+        }
+        beanInfo = new XtreamSimpleBeanInfo(beanClass, pdList);
+        return beanInfo;
+    }
+
+    public static BasicPropertyDescriptor[] determineBasicProperties(Class<?> beanClass, Predicate<AnnotatedElement> fieldPredicate) {
 
         final Map<String, BasicPropertyDescriptor> pdMap = new LinkedHashMap<>();
 
@@ -134,7 +176,6 @@ public class BeanUtils {
             }
         });
 
-
         return pdMap.values().toArray(EMPTY_ARRAY);
     }
 
@@ -152,9 +193,14 @@ public class BeanUtils {
         return new FiledPropertyGetter(pd.getField());
     }
 
-    public static Constructor<?> getConstructor(BeanDescriptor beanDescriptor) {
+    public static Constructor<?> getConstructor(BeanInfo beanInfo) {
         try {
-            return beanDescriptor.getBeanClass().getConstructor();
+            final Class<?> beanClass = beanInfo.getBeanDescriptor().getBeanClass();
+            if (beanClass.isRecord()) {
+                return XtreamRecordUtils.findCanonicalRecordConstructor(beanClass);
+            }
+
+            return beanClass.getConstructor();
         } catch (NoSuchMethodException e) {
             throw new BeanIntrospectionException(e);
         }
@@ -246,15 +292,30 @@ public class BeanUtils {
         @Nullable
         private Method writeMethod;
 
-        public BasicPropertyDescriptor(Field field, @Nullable Method readMethod, @Nullable Method writeMethod)
-                throws IntrospectionException {
+        @Nullable
+        private final RecordComponent recordComponent;
+
+        public BasicPropertyDescriptor(
+                Field field,
+                @Nullable Method readMethod,
+                @Nullable Method writeMethod,
+                @Nullable RecordComponent recordComponent) throws IntrospectionException {
             super(field.getName(), readMethod, writeMethod);
             this.field = field;
+            this.recordComponent = recordComponent;
         }
 
         public static BasicPropertyDescriptor of(Field field, @Nullable Method readMethod, @Nullable Method writeMethod) {
             try {
-                return new BasicPropertyDescriptor(field, readMethod, writeMethod);
+                return new BasicPropertyDescriptor(field, readMethod, writeMethod, null);
+            } catch (IntrospectionException e) {
+                throw new BeanIntrospectionException(e);
+            }
+        }
+
+        public static BasicPropertyDescriptor ofRecord(Field field, RecordComponent recordComponent) {
+            try {
+                return new BasicPropertyDescriptor(field, recordComponent.getAccessor(), null, recordComponent);
             } catch (IntrospectionException e) {
                 throw new BeanIntrospectionException(e);
             }
@@ -286,5 +347,11 @@ public class BeanUtils {
         public synchronized Class<?> getPropertyType() {
             return field.getType();
         }
+
+        @Nullable
+        public RecordComponent getRecordComponent() {
+            return this.recordComponent;
+        }
+
     }
 }

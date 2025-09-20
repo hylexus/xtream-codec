@@ -21,8 +21,10 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
 
 import java.lang.annotation.*;
+import java.lang.reflect.AnnotatedElement;
 
 /**
  * @author hylexus
@@ -179,5 +181,91 @@ public @interface XtreamField {
      * @since 0.1.0
      */
     int[] version() default {ALL_VERSION};
+
+    /**
+     * 仅仅对 {@link Record} 类型有效
+     *
+     * @since 0.1.0
+     */
+    CodecStrategy codecStrategy() default CodecStrategy.DEFAULT;
+
+    /**
+     * 仅仅对 {@link Record} 类型有效
+     *
+     * @see io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils#getOrDefault(AnnotatedElement)
+     * @see XtreamFieldUtils#createDefaultValueForNulls(Nulls, Class)
+     * @since 0.1.0
+     */
+    Nulls nulls() default Nulls.AS_NULL;
+
+    /**
+     * 这个定义参考 {@link com.fasterxml.jackson.annotation.Nulls jackson} 的处理逻辑
+     * <p>
+     * 字段默认值生成规则(备注: 下面表格借助ChatGPT生成)：
+     * <table style="border-collapse: collapse;">
+     *   <thead>
+     *     <tr>
+     *       <th style="border: 1px solid #777; padding: 4px;">字段类型</th>
+     *       <th style="border: 1px solid #777; padding: 4px;">AS_NULL 默认值</th>
+     *       <th style="border: 1px solid #777; padding: 4px;">AS_EMPTY 默认值</th>
+     *       <th style="border: 1px solid #777; padding: 4px;">说明</th>
+     *     </tr>
+     *   </thead>
+     *   <tbody>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">基础类型</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">0 / false / '\0'</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">0 / false / '\0'</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">零值，保证 Record 构造器合法</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">String</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">""</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">空字符串代替 null</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">List / Set</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">empty list / empty set</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">保证可操作空集合</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">Map</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">empty map</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">保证可操作空映射</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">数组</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">长度为 0 的空数组</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">保证可操作空数组</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">自定义对象类型</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">根据业务生成空实例或 null</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">保持可操作或 null，根据业务选择</td>
+     *     </tr>
+     *   </tbody>
+     * </table>
+     *
+     * @see com.fasterxml.jackson.annotation.Nulls
+     */
+    enum Nulls {
+        AS_EMPTY,
+        AS_NULL,
+        ;
+    }
+
+    enum CodecStrategy {
+        /**
+         * 忽略字段的 序列化 和 反序列化; 目前仅仅用于 {@link Record} 类型
+         */
+        TRANSIENT,
+        DEFAULT,
+        ;
+    }
 
 }

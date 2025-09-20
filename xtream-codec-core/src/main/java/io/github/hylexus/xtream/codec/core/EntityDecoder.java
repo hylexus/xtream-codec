@@ -22,9 +22,11 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultDeserializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
+import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 
+import java.util.List;
 import java.util.Objects;
 
 public class EntityDecoder {
@@ -71,14 +73,35 @@ public class EntityDecoder {
 
     public <T> T decode(int version, ByteBuf source, BeanMetadata beanMetadata, Object containerInstance) {
         final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this.bufferFactory, this, containerInstance, version, this.beanMetadataRegistry, null);
-        for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
-            if (propertyMetadata.conditionEvaluator().evaluate(context)) {
-                final Object fieldValue = propertyMetadata.decodePropertyValue(context, source);
-                propertyMetadata.setProperty(containerInstance, fieldValue);
+        if (beanMetadata.getRawType().isRecord()) {
+            final Object[] filedValues = new Object[beanMetadata.getPropertyMetadataList().size()];
+            final List<BeanPropertyMetadata> propertyMetadataList = beanMetadata.getPropertyMetadataList();
+            for (int i = 0; i < propertyMetadataList.size(); i++) {
+                final BeanPropertyMetadata propertyMetadata = propertyMetadataList.get(i);
+                if (propertyMetadata.conditionEvaluator().evaluate(context)) {
+                    final Object fieldValue = propertyMetadata.decodePropertyValue(context, source);
+                    filedValues[i] = fieldValue;
+                } else {
+                    final XtreamField fieldAnnotation = propertyMetadata.xtreamFieldAnnotation();
+                    if (fieldAnnotation instanceof XtreamFieldUtils.XtreamTransientFieldProxy proxy) {
+                        final Object defaultValue = proxy.defaultValueForNulls();
+                        filedValues[i] = defaultValue;
+                    } else {
+                        filedValues[i] = XtreamFieldUtils.createDefaultValueForNulls(fieldAnnotation.nulls(), propertyMetadata.rawClass());
+                    }
+                }
             }
+            return beanMetadata.createNewRecordInstance(filedValues);
+        } else {
+            for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
+                if (propertyMetadata.conditionEvaluator().evaluate(context)) {
+                    final Object fieldValue = propertyMetadata.decodePropertyValue(context, source);
+                    propertyMetadata.setProperty(containerInstance, fieldValue);
+                }
+            }
+            @SuppressWarnings("unchecked") final T casted = (T) containerInstance;
+            return casted;
         }
-        @SuppressWarnings("unchecked") final T instance1 = (T) containerInstance;
-        return instance1;
     }
 
     // with tracker

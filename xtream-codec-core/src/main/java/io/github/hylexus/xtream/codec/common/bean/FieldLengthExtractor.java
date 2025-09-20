@@ -36,6 +36,7 @@ public interface FieldLengthExtractor {
     }
 
     @ToString
+    @SuppressWarnings("ClassCanBeRecord")
     class ConstantFieldLengthExtractor implements FieldLengthExtractor {
         private final int length;
 
@@ -49,6 +50,7 @@ public interface FieldLengthExtractor {
         }
     }
 
+    @SuppressWarnings("ClassCanBeRecord")
     class PrependFieldLengthExtractor implements FieldLengthExtractor {
         private final PrependLengthFieldType prependLengthFieldType;
 
@@ -96,6 +98,7 @@ public interface FieldLengthExtractor {
         }
     }
 
+    @SuppressWarnings("ClassCanBeRecord")
     class PlaceholderFieldLengthExtractor implements FieldLengthExtractor {
         private final String msg;
 
