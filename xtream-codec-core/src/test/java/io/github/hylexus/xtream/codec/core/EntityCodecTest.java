@@ -97,16 +97,16 @@ class EntityCodecTest {
     @Test
     void testDecode() {
         ByteBuf buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f040006e4bf9de5af86");
-        doDecode(XtreamField.ALL_VERSION, UserEntity.class, buffer, EntityCodecTest::doCompare);
+        doDecode(XtreamField.ALL_VERSION, UserEntity.class, buffer, this::doCompare);
 
         buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86");
-        doDecode(1, UserEntity.class, buffer, EntityCodecTest::doCompare);
+        doDecode(1, UserEntity.class, buffer, this::doCompare);
 
         buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86");
-        doDecode(2, UserEntity.class, buffer, EntityCodecTest::doCompare);
+        doDecode(2, UserEntity.class, buffer, this::doCompare);
     }
 
-    private static void doCompare(UserEntity entity) {
+    private void doCompare(UserEntity entity) {
         assertEquals(100L, entity.getId());
         assertEquals("无名氏", entity.getName());
         assertEquals(1024, entity.getAge());

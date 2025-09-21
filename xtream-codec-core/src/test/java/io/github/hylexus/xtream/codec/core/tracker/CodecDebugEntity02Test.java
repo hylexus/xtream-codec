@@ -54,7 +54,7 @@ public class CodecDebugEntity02Test {
         }
     }
 
-    private static void doCompare(CodecTracker tracker, CodecDebugEntity02 original) {
+    private void doCompare(CodecTracker tracker, CodecDebugEntity02 original) {
         final RootSpan rootSpan = tracker.getRootSpan();
         assertEquals(9, rootSpan.getChildren().size());
         assertEquals(original.getAlarmFlag(), ((BasicFieldSpan) rootSpan.getChildren().get(0)).getValue());

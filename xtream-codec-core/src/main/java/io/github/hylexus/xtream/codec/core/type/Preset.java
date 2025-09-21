@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.*;
+import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -418,6 +419,47 @@ public @interface Preset {
             Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @XtreamMapField(key = {}, valueLength = {}, value = @XtreamMapField.Value())
+        @interface simple_map {
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "key")
+            XtreamMapField.Key[] key();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "valueLength")
+            XtreamMapField.ValueLength[] valueLength();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "value")
+            XtreamMapField.Value value();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "containerInstanceFactory")
+            Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "desc")
             String desc() default "";
         }
 
@@ -830,6 +872,46 @@ public @interface Preset {
             Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @XtreamMapField(key = {}, valueLength = {}, value = @XtreamMapField.Value())
+        @interface SimpleMap {
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "key")
+            XtreamMapField.Key[] key();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "valueLength")
+            XtreamMapField.ValueLength[] valueLength();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "value")
+            XtreamMapField.Value value();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "containerInstanceFactory")
+            Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "desc")
             String desc() default "";
         }
 

@@ -42,12 +42,35 @@ public interface BeanPropertyMetadata {
     Class<?> rawClass();
 
     /**
+     * 当前字段是 {@code Record} 类
+     * <li>当前字段本身就是 {@link Record} 类型</li>
+     * <li>
+     * 不管当前字段是一个 `普通类` 的成员, 还是 一个 {@link Record} 类的成员
+     * </li>
+     *
      * @see Record
      * @see java.lang.reflect.RecordComponent
+     * @see #isRecordComponent()
+     * @since 0.1.0
+     */
+    default boolean isRecordClass() {
+        return this.rawClass().isRecord();
+    }
+
+    /**
+     * 当前字段属于某个 {@code Record} 类
+     * <li>
+     * 即当前字段是某个 {@link Record} 类的成员变量</li>
+     * <li>不管当前字段的类型是 {@link Record} 类型, 还是其他类型</li>
+     *
+     * @see Record
+     * @see java.lang.reflect.RecordComponent
+     * @see #isRecordClass()
+     * @since 0.1.0
      */
     @SuppressWarnings("unused")
-    default boolean recordComponent() {
-        return false;
+    default boolean isRecordComponent() {
+        return this.field().getDeclaringClass().isRecord();
     }
 
     int version();

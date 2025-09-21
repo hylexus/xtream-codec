@@ -79,6 +79,14 @@ public final class BeanUtils {
             throw new UnsupportedOperationException();
         }
 
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", XtreamSimpleBeanInfo.class.getSimpleName() + "[", "]")
+                    .add("beanClass=" + beanClass.getSimpleName())
+                    .add("recordClass=" + recordClass)
+                    .add("propertyDescriptorsSize=" + propertyDescriptors.length)
+                    .toString();
+        }
     }
 
     public static XtreamSimpleBeanInfo getBeanInfo(Class<?> beanClass, XtreamCacheableClassPredicate cacheableClassPredicate, Predicate<AnnotatedElement> fieldPredicate) throws BeanIntrospectionException {

@@ -290,7 +290,10 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
             return Optional.of(FieldCodec.TransientRecordComponentFieldCodec.INSTANCE);
         }
-
+        if (metadata.isRecordClass()) {
+            final BeanMetadata beanMetadata = metadata.beanMetadataRegistry().getBeanMetadata(metadata.rawClass(), metadata.version());
+            return Optional.of(new DelegateBeanMetadataFieldCodec(beanMetadata));
+        }
         if (xtreamField.fieldCodec() != FieldCodec.Placeholder.class) {
             final Class<? extends FieldCodec<?>> aClass = xtreamField.fieldCodec();
             final FieldCodec<?> newInstance = this.getOrCreateFieldCodec(metadata.version(), metadata.beanMetadataRegistry(), null, aClass, xtreamField.charset(), null);

@@ -56,7 +56,8 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     private final ContainerInstanceFactory containerInstanceFactory;
     @Setter
     private FieldCodec<?> fieldCodec;
-    protected final boolean recordComponent;
+    protected final boolean isRecordClass;
+    protected final boolean isRecordComponent;
 
     public BasicBeanPropertyMetadata(BeanMetadataRegistry registry, String name, Class<?> type, int version, XtreamField xtreamField, Field field, PropertyGetter getter, PropertySetter setter) {
         this.beanMetadataRegistry = registry;
@@ -64,7 +65,8 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         this.type = type;
         this.version = version;
         this.field = field;
-        this.recordComponent = field.getDeclaringClass().isRecord();
+        this.isRecordComponent = field.getDeclaringClass().isRecord();
+        this.isRecordClass = type.isRecord();
         this.propertyGetter = getter;
         this.propertySetter = setter;
         this.order = initOrder();
@@ -151,8 +153,13 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
-    public boolean recordComponent() {
-        return this.recordComponent;
+    public boolean isRecordClass() {
+        return this.isRecordClass;
+    }
+
+    @Override
+    public boolean isRecordComponent() {
+        return this.isRecordComponent;
     }
 
     protected int initOrder() {

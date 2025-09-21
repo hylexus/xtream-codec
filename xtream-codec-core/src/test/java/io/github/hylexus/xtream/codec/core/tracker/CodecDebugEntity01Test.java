@@ -65,7 +65,7 @@ public class CodecDebugEntity01Test {
                 .setEndTime(endTime);
     }
 
-    private static void doCompare(CodecTracker tracker, CodecDebugEntity01 entity) {
+    private void doCompare(CodecTracker tracker, CodecDebugEntity01 entity) {
         final RootSpan rootSpan = tracker.getRootSpan();
         assertEquals(5, rootSpan.getChildren().size());
 

@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.annotation.map;
 
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.map.MapFieldCodec;
@@ -45,7 +46,24 @@ public @interface XtreamMapField {
 
     Value value();
 
-    @SuppressWarnings("unused")
+    @AliasFor(annotation = XtreamField.class, attribute = "order")
+    int order() default -1;
+
+    @AliasFor(annotation = XtreamField.class, attribute = "length")
+    int length() default -1;
+
+    @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
+    String lengthExpression() default "";
+
+    @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
+    int prependLengthFieldLength() default -1;
+
+    @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldType")
+    PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+    @AliasFor(annotation = XtreamField.class, attribute = "condition")
+    String condition() default "";
+
     @AliasFor(annotation = XtreamField.class, attribute = "containerInstanceFactory")
     Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
 
