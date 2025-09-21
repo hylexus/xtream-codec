@@ -57,6 +57,9 @@ public class EntityEncoder {
         }
         final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, null);
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
+            if (propertyMetadata.xtreamFieldAnnotation().codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+                continue;
+            }
             final Object value = propertyMetadata.getProperty(instance);
             if (value == null) {
                 continue;
@@ -68,7 +71,8 @@ public class EntityEncoder {
         }
     }
 
-    // with tracker
+    // region withTracker
+    @SuppressWarnings("unused")
     public void encodeWithTracker(Object instance, ByteBuf target, CodecTracker tracker) {
         this.encodeWithTracker(XtreamField.ALL_VERSION, instance, target, tracker);
     }
@@ -95,6 +99,9 @@ public class EntityEncoder {
             tracker.getRootSpan().setEntityClass(beanMetadata.getRawType().getName());
         }
         for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
+            if (propertyMetadata.xtreamFieldAnnotation().codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+                continue;
+            }
             final Object value = propertyMetadata.getProperty(instance);
             if (value == null) {
                 continue;
@@ -106,11 +113,14 @@ public class EntityEncoder {
         }
         tracker.getRootSpan().setHexString(FormatUtils.toHexString(target, indexBeforeWrite, target.writerIndex() - indexBeforeWrite));
     }
+    // endregion withTracker
 
+    @SuppressWarnings("redundent")
     public BeanMetadataRegistry getBeanMetadataRegistry() {
         return beanMetadataRegistry;
     }
 
+    @SuppressWarnings("redundent")
     public FieldCodecRegistry getFieldCodecRegistry() {
         return fieldCodecRegistry;
     }

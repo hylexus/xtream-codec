@@ -456,6 +456,7 @@ public @interface Preset {
             String desc() default "";
         }
 
+        @SuppressWarnings("checkstyle:TypeName")
         @Target(ElementType.RECORD_COMPONENT)
         @Retention(RetentionPolicy.RUNTIME)
         @Documented

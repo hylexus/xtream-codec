@@ -81,7 +81,7 @@ public class SimpleMapMetadataRegistry {
                 }
         );
         final EncoderCommonParam commonParam = matchResult.matched() ? matchResult.source() : new EncoderCommonParam(targetVersion, false, XtreamMapField.DEFAULT_CHARSET);
-        log.info("matchResult: {}", matchResult);
+        log.info("EncoderCommonParam: {}", matchResult);
         final List<ValueMatcherMeta> encoderValueMatchers = createValueMatcherMetaList(beanMetadataRegistry, targetVersion, keyMeta, value.encoder().matchers(), commonParam, null);
         return new EncoderValueMeta(commonParam, encoderValueMatchers);
     }
@@ -98,6 +98,7 @@ public class SimpleMapMetadataRegistry {
         final DecoderCommonParam commonParam = matchResult.matched()
                 ? matchResult.source()
                 : new DecoderCommonParam(targetVersion, XtreamMapField.DEFAULT_CHARSET);
+        log.info("DecoderCommonParam: {}", matchResult);
         final FallbackValueMatcherMeta fallbackValueMatcherMeta = createFallbackValueMatcherMeta(beanMetadataRegistry, targetVersion, value.decoder().fallbackMatchers(), commonParam);
         final List<ValueMatcherMeta> decoderValueMatchers = createValueMatcherMetaList(beanMetadataRegistry, targetVersion, keyType, value.decoder().matchers(), null, commonParam);
         return new DecoderValueMeta(commonParam, fallbackValueMatcherMeta, decoderValueMatchers);
@@ -156,7 +157,7 @@ public class SimpleMapMetadataRegistry {
             XtreamMapField.FallbackValueMatcher matcher) {
 
         return createValueCodec(beanMetadataRegistry, version,
-                matcher.valueType(), matcher.valueCodecClass(), null, actualCharset);
+                matcher.valueType(), matcher.valueCodec(), null, actualCharset);
     }
 
     @Nullable
@@ -182,7 +183,7 @@ public class SimpleMapMetadataRegistry {
 
     @Nullable
     static String detectCharset(XtreamMapField.FallbackValueMatcher matcher, String fallbackCharset) {
-        return detectCharset(matcher.valueType(), matcher.valueCodecClass(), matcher.charset(), fallbackCharset);
+        return detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
     }
 
     @Nullable

@@ -26,8 +26,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BuiltinMessage0200Test extends BaseCodecTest {
 
@@ -56,7 +55,14 @@ class BuiltinMessage0200Test extends BaseCodecTest {
             assertEquals(expectedExtraItems.get((short) 0x04), actualExtraItems.get((short) 0x04));
             assertArrayEquals((byte[]) expectedExtraItems.get((short) 0x05), (byte[]) actualExtraItems.get((short) 0x05));
             assertEquals(expectedExtraItems.get((short) 0x06), actualExtraItems.get((short) 0x06));
-            assertEquals(expectedExtraItems.get((short) 0x11), actualExtraItems.get((short) 0x11));
+            final BuiltinMessage0200.Item0x11 sourceItem11 = (BuiltinMessage0200.Item0x11) expectedExtraItems.get((short) 0x11);
+            final BuiltinMessage0200.Item0x11 targetItem11 = (BuiltinMessage0200.Item0x11) actualExtraItems.get((short) 0x11);
+            if (sourceItem11.locationType() == 0) {
+                assertEquals((short) 0, targetItem11.locationType());
+                assertNull(targetItem11.locationId());
+            } else {
+                assertEquals(expectedExtraItems.get((short) 0x11), actualExtraItems.get((short) 0x11));
+            }
             assertEquals(expectedExtraItems.get((short) 0x12), actualExtraItems.get((short) 0x12));
             assertEquals(expectedExtraItems.get((short) 0x25), actualExtraItems.get((short) 0x25));
             assertEquals(expectedExtraItems.get((short) 0x2A), actualExtraItems.get((short) 0x2A));
@@ -114,8 +120,8 @@ class BuiltinMessage0200Test extends BaseCodecTest {
         // extraItems.put((short) 0x06, -32767);
         extraItems.put((short) 0x06, 32767);
         extraItems.put((short) 0x11, new BuiltinMessage0200.Item0x11((short) 1, 222L));
-        extraItems.put((short) 0x12, new BuiltinMessage0200.Item0x12().setLocationType((short) 3).setLocationId(55).setDirection((short) 1));
-        extraItems.put((short) 0x13, new BuiltinMessage0200.Item0x13().setLineId((short) 5).setLocationId(22).setResult((short) 1));
+        extraItems.put((short) 0x12, new BuiltinMessage0200.Item0x12((short) 3, 55, (short) 1));
+        extraItems.put((short) 0x13, new BuiltinMessage0200.Item0x13((short) 5, 22, (short) 1));
         extraItems.put((short) 0x25, 777L);
         extraItems.put((short) 0x2A, 12);
         extraItems.put((short) 0x2B, Integer.MIN_VALUE);

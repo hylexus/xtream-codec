@@ -90,6 +90,7 @@ public class EntityDecoder {
                         filedValues[i] = XtreamFieldUtils.createDefaultValueForNulls(fieldAnnotation.nulls(), propertyMetadata.rawClass());
                     }
                 }
+                context.evaluationContext().setVariable(propertyMetadata.name(), filedValues[i]);
             }
             return beanMetadata.createNewRecordInstance(filedValues);
         } else {
@@ -104,8 +105,8 @@ public class EntityDecoder {
         }
     }
 
-    // with tracker
-    // with tracer
+    // region withTracker
+    @SuppressWarnings("unused")
     public <T> T decodeWithTracker(Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
         return this.decodeWithTracker(XtreamField.ALL_VERSION, entityClass, source, tracker);
     }
@@ -125,6 +126,7 @@ public class EntityDecoder {
         return decodeWithTracker(version, source, beanMetadata, containerInstance, tracker);
     }
 
+    @SuppressWarnings("unused")
     public <T> T decodeWithTracker(ByteBuf source, Object containerInstance, CodecTracker tracker) {
         return this.decodeWithTracker(XtreamField.ALL_VERSION, source, containerInstance, tracker);
     }
@@ -134,6 +136,7 @@ public class EntityDecoder {
         return decodeWithTracker(version, source, beanMetadata, containerInstance, tracker);
     }
 
+    @SuppressWarnings("unused")
     public <T> T decodeWithTracker(ByteBuf source, BeanMetadata beanMetadata, Object containerInstance, CodecTracker tracker) {
         return decodeWithTracker(XtreamField.ALL_VERSION, source, beanMetadata, containerInstance, tracker);
     }
@@ -145,21 +148,47 @@ public class EntityDecoder {
             tracker.getRootSpan().setEntityClass(beanMetadata.getRawType().getName());
         }
         final FieldCodec.DeserializeContext context = new DefaultDeserializeContext(this.bufferFactory, this, containerInstance, version, this.beanMetadataRegistry, tracker);
-        for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
-            if (propertyMetadata.conditionEvaluator().evaluate(context)) {
-                final Object fieldValue = propertyMetadata.decodePropertyValueWithTracker(context, source);
-                propertyMetadata.setProperty(containerInstance, fieldValue);
+        if (beanMetadata.getRawType().isRecord()) {
+            final Object[] filedValues = new Object[beanMetadata.getPropertyMetadataList().size()];
+            final List<BeanPropertyMetadata> propertyMetadataList = beanMetadata.getPropertyMetadataList();
+            for (int i = 0; i < propertyMetadataList.size(); i++) {
+                final BeanPropertyMetadata propertyMetadata = propertyMetadataList.get(i);
+                if (propertyMetadata.conditionEvaluator().evaluate(context)) {
+                    final Object fieldValue = propertyMetadata.decodePropertyValueWithTracker(context, source);
+                    filedValues[i] = fieldValue;
+                } else {
+                    final XtreamField fieldAnnotation = propertyMetadata.xtreamFieldAnnotation();
+                    if (fieldAnnotation instanceof XtreamFieldUtils.XtreamTransientFieldProxy proxy) {
+                        final Object defaultValue = proxy.defaultValueForNulls();
+                        filedValues[i] = defaultValue;
+                    } else {
+                        filedValues[i] = XtreamFieldUtils.createDefaultValueForNulls(fieldAnnotation.nulls(), propertyMetadata.rawClass());
+                    }
+                }
+                context.evaluationContext().setVariable(propertyMetadata.name(), filedValues[i]);
             }
+            tracker.getRootSpan().setHexString(FormatUtils.toHexString(source, indexBeforeRead, source.readerIndex() - indexBeforeRead));
+            return beanMetadata.createNewRecordInstance(filedValues);
+        } else {
+            for (final BeanPropertyMetadata propertyMetadata : beanMetadata.getPropertyMetadataList()) {
+                if (propertyMetadata.conditionEvaluator().evaluate(context)) {
+                    final Object fieldValue = propertyMetadata.decodePropertyValueWithTracker(context, source);
+                    propertyMetadata.setProperty(containerInstance, fieldValue);
+                }
+            }
+            tracker.getRootSpan().setHexString(FormatUtils.toHexString(source, indexBeforeRead, source.readerIndex() - indexBeforeRead));
+            @SuppressWarnings("unchecked") final T instance1 = (T) containerInstance;
+            return instance1;
         }
-        tracker.getRootSpan().setHexString(FormatUtils.toHexString(source, indexBeforeRead, source.readerIndex() - indexBeforeRead));
-        @SuppressWarnings("unchecked") final T instance1 = (T) containerInstance;
-        return instance1;
     }
+    // endregion withTracker
 
+    @SuppressWarnings("redundent")
     public BeanMetadataRegistry getBeanMetadataRegistry() {
         return beanMetadataRegistry;
     }
 
+    @SuppressWarnings("redundent")
     public FieldCodecRegistry getFieldCodecRegistry() {
         return fieldCodecRegistry;
     }

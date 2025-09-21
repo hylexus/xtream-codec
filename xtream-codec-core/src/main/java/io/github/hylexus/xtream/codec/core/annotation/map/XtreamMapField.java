@@ -80,7 +80,7 @@ public @interface XtreamMapField {
 
         ValueMatcher[] matchers() default {};
 
-        FallbackValueMatcher[] fallbackMatchers() default {@FallbackValueMatcher(valueCodecClass = BytesFieldCodecs.BytesFieldCodecByteArray.class)};
+        FallbackValueMatcher[] fallbackMatchers() default {@FallbackValueMatcher(valueCodec = BytesFieldCodecs.BytesFieldCodecByteArray.class)};
     }
 
     @interface ValueEncoder {
@@ -138,7 +138,7 @@ public @interface XtreamMapField {
 
         XtreamDataType valueType() default XtreamDataType.placeholder;
 
-        Class<? extends FieldCodec<?>> valueCodecClass() default FieldCodec.Placeholder.class;
+        Class<? extends FieldCodec<?>> valueCodec() default FieldCodec.Placeholder.class;
 
         String charset() default "";
     }

@@ -17,8 +17,6 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -27,8 +25,6 @@ import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.Lo
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x66;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x67;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import io.netty.buffer.ByteBuf;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -38,9 +34,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Objects;
 
 import static io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.*;
+import static io.github.hylexus.xtream.codec.core.type.Preset.JtStyle;
 import static io.github.hylexus.xtream.codec.core.type.XtreamDataType.*;
 
 /**
@@ -85,34 +81,31 @@ public class BuiltinMessage0200 {
      * @param locationType 位置类型
      * @param locationId   区域或路段ID; 若位置类型为0，无该字段
      */
-    public record Item0x11(short locationType, @Nullable Long locationId) {
+    public record Item0x11(
+            @JtStyle.Byte short locationType,
+            @JtStyle.Word(condition = "#locationType != 0") @Nullable Long locationId) {
     }
 
-    @Data
-    @Accessors(chain = true)
-    public static class Item0x12 {
-        @Preset.JtStyle.Byte(desc = "位置类型")
-        private short locationType;
-
-        @Preset.JtStyle.Dword(desc = "区域或路段ID")
-        private long locationId;
-
-        @Preset.JtStyle.Byte(desc = "方向；0：进；1：出")
-        private short direction;
-
+    /**
+     * @param locationType 位置类型
+     * @param locationId   区域或路段ID
+     * @param direction    方向；0：进；1：出
+     */
+    public record Item0x12(
+            @Preset.JtStyle.Byte short locationType,
+            @Preset.JtStyle.Dword long locationId,
+            @Preset.JtStyle.Byte short direction) {
     }
 
-    @Data
-    @Accessors(chain = true)
-    public static class Item0x13 {
-        @Preset.JtStyle.Dword(desc = "路线ID")
-        private long lineId;
-
-        @Preset.JtStyle.Word(desc = "路段行驶时间（秒）")
-        private int locationId;
-
-        @Preset.JtStyle.Byte(desc = "结果。0：不足；1：过长")
-        private short result;
+    /**
+     * @param lineId     路线ID
+     * @param locationId 路段行驶时间（秒）
+     * @param result     结果。0：不足；1：过长
+     */
+    public record Item0x13(
+            @Preset.JtStyle.Dword long lineId,
+            @Preset.JtStyle.Word int locationId,
+            @Preset.JtStyle.Byte short result) {
     }
 
     // 长度：消息体长度减去前面的 28 字节
@@ -130,7 +123,7 @@ public class BuiltinMessage0200 {
                                     @ValueMatcher(matchU8 = 0x04, valueType = u16, desc = "需要人工确认报警事件的 ID，WORD，从 1 始计数"),
                                     @ValueMatcher(matchU8 = 0x05, valueType = byte_array, desc = "胎压"),
                                     @ValueMatcher(matchU8 = 0x06, valueType = i16_as_int, desc = "车厢温度"),
-                                    @ValueMatcher(matchU8 = 0x11, valueCodec = Item0x11Codec.class, desc = "长度1或5；超速报警附加信息见 表 28"),
+                                    @ValueMatcher(matchU8 = 0x11, valueEntity = Item0x11.class, desc = "长度1或5；超速报警附加信息见 表 28"),
                                     @ValueMatcher(matchU8 = 0x25, valueType = u32, desc = "扩展车辆信号状态位，定义见 表 31"),
                                     @ValueMatcher(matchU8 = 0x2A, valueType = u16, desc = "IO 状态位，表 32"),
                                     @ValueMatcher(matchU8 = 0x2B, valueType = i32, desc = "模拟量，bit0-15,AD0,bit16-31,AD1"),
@@ -151,7 +144,7 @@ public class BuiltinMessage0200 {
                                     @ValueMatcher(matchU8 = 0x04, valueType = u16, desc = "需要人工确认报警事件的 ID，WORD，从 1 开始计数"),
                                     @ValueMatcher(matchU8 = 0x05, valueType = byte_array, desc = "胎压"),
                                     @ValueMatcher(matchU8 = 0x06, valueType = i16_as_int, desc = "车厢温度"),
-                                    @ValueMatcher(matchU8 = 0x11, valueCodec = Item0x11Codec.class, desc = "长度1或5；超速报警附加信息见 表 28"),
+                                    @ValueMatcher(matchU8 = 0x11, valueEntity = Item0x11.class, desc = "长度1或5；超速报警附加信息见 表 28"),
                                     @ValueMatcher(matchU8 = 0x12, valueEntity = Item0x12.class, desc = "进出区域/路线报警附加信息消息"),
                                     @ValueMatcher(matchU8 = 0x13, valueEntity = Item0x13.class, desc = "路线行驶时间不足/过长报警附加信息"),
                                     @ValueMatcher(matchU8 = 0x25, valueType = u32, desc = "扩展车辆信号状态位，定义见 表 31"),
@@ -165,50 +158,12 @@ public class BuiltinMessage0200 {
                                     @ValueMatcher(matchU8 = 0x67, valueEntity = LocationItem0x67.class, desc = "苏标: 盲区监测系统报警信息，定义见表 4-20"),
                             },
                             fallbackMatchers = {
-                                    @FallbackValueMatcher(valueCodecClass = StringFieldCodecs.StringFieldCodecHex.class)
+                                    @FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
                             }
                     )
             )
     )
     private Map<Short, Object> extraItems;
 
-    public static final class Item0x11Codec implements FieldCodec<Object> {
-
-        @Override
-        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
-            switch (value) {
-                case null -> {
-                }
-                case Item0x11(short locationType, @Nullable Long locationId) -> {
-                    // BYTE
-                    output.writeByte(locationType);
-                    // 若位置类型为0，无该字段
-                    if (locationType != 0) {
-                        // DWORD
-                        output.writeInt(Objects.requireNonNull(locationId, "区域或路段ID 为空").intValue());
-                    }
-                }
-                default -> throw new IllegalArgumentException("Invalid value");
-            }
-        }
-
-        @Override
-        public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-            return switch (length) {
-                // BYTE
-                case 1 -> {
-                    final short type = input.readUnsignedByte();
-                    yield new Item0x11(type, null);
-                }
-                // BYTE + DWORD
-                case 5 -> {
-                    final short type = input.readUnsignedByte();
-                    final long id = input.readUnsignedInt();
-                    yield new Item0x11(type, id);
-                }
-                default -> throw new IllegalArgumentException("Invalid length: " + length);
-            };
-        }
-    }
 
 }
