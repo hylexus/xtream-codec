@@ -341,7 +341,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
 
     @Override
     public String toString() {
-        return "SimpleBeanPropertyMetadata{"
+        return "BasicBeanPropertyMetadata{"
                + "name='" + name + '\''
                + ", type=" + type
                + ", filedValueType=" + filedValueType

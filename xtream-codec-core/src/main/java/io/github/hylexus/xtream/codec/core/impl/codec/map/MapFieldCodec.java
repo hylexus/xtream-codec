@@ -24,7 +24,6 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
-import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.AbstractFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.DelegateBeanMetadataFieldCodec;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
@@ -41,6 +40,8 @@ import static java.util.Objects.requireNonNull;
 
 public class MapFieldCodec extends AbstractFieldCodec<Object> {
     private static final Logger log = LoggerFactory.getLogger(MapFieldCodec.class);
+
+    @SuppressWarnings("all")
     private final BeanMetadataRegistry beanMetadataRegistry;
 
     @SuppressWarnings("unused")
@@ -63,8 +64,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         if (value == null) {
             return;
         }
-        final XtreamMapField xtreamMapField = propertyMetadata.findAnnotation(XtreamMapField.class).orElseThrow();
-        final SimpleMapMetadataRegistry.MapMeta mapMeta = createMapMetadata(this.beanMetadataRegistry, context.version(), propertyMetadata.field(), xtreamMapField);
+        final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
         @SuppressWarnings("unchecked") final Map<Object, Object> map = (Map<Object, Object>) value;
 
         final FieldCodec<Object> keyCodec = mapMeta.keyMeta().codec();
@@ -98,9 +98,8 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         final ByteBuf slice = length < 0
                 ? input // all remaining
                 : input.readSlice(length);
-        final XtreamMapField xtreamMapField = propertyMetadata.findAnnotation(XtreamMapField.class).orElseThrow();
         @SuppressWarnings({"unchecked"}) final Map<Object, Object> map = (Map<Object, Object>) propertyMetadata.containerInstanceFactory().create();
-        final SimpleMapMetadataRegistry.MapMeta mapMeta = createMapMetadata(this.beanMetadataRegistry, context.version(), propertyMetadata.field(), xtreamMapField);
+        final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context,propertyMetadata);
         final KeyMeta keyMeta = mapMeta.keyMeta();
         final int keyLength = mapMeta.keyMeta().sizeInBytes();
         final FieldCodec<Object> keyCodec = keyMeta.codec();

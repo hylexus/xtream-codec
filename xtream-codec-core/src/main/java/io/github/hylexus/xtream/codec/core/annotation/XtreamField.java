@@ -123,6 +123,8 @@ public @interface XtreamField {
 
     /**
      * 符号位(只对数字类型有效)
+     *
+     * @since 0.1.0
      */
     NumberSignedness signedness() default NumberSignedness.NONE;
 
@@ -201,7 +203,7 @@ public @interface XtreamField {
     /**
      * 这个定义参考 {@link com.fasterxml.jackson.annotation.Nulls jackson} 的处理逻辑
      * <p>
-     * 字段默认值生成规则(备注: 下面表格借助ChatGPT生成)：
+     * 字段默认值生成规则：
      * <table style="border-collapse: collapse;">
      *   <thead>
      *     <tr>
@@ -214,43 +216,38 @@ public @interface XtreamField {
      *   <tbody>
      *     <tr>
      *       <td style="border: 1px solid #777; padding: 4px;">基础类型</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">0 / false / '\0'</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">0 / false / '\0'</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code 0} / {@code false} / {@code '\0'}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code 0} / {@code false} / {@code '\0'}</td>
      *       <td style="border: 1px solid #777; padding: 4px;">零值，保证 Record 构造器合法</td>
      *     </tr>
      *     <tr>
-     *       <td style="border: 1px solid #777; padding: 4px;">String</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">""</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">空字符串代替 null</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code String}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code ""}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
      *     </tr>
      *     <tr>
-     *       <td style="border: 1px solid #777; padding: 4px;">List / Set</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">empty list / empty set</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">保证可操作空集合</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code List} / {@code Set}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code new ArrayList()} / {@code new HashSet()}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
      *     </tr>
      *     <tr>
-     *       <td style="border: 1px solid #777; padding: 4px;">Map</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">empty map</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">保证可操作空映射</td>
-     *     </tr>
-     *     <tr>
-     *       <td style="border: 1px solid #777; padding: 4px;">数组</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">长度为 0 的空数组</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">保证可操作空数组</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code Map}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code new HashMap()}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
      *     </tr>
      *     <tr>
      *       <td style="border: 1px solid #777; padding: 4px;">自定义对象类型</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">null</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">根据业务生成空实例或 null</td>
-     *       <td style="border: 1px solid #777; padding: 4px;">保持可操作或 null，根据业务选择</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;"> {@code new} 一个空实例</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
      *     </tr>
      *   </tbody>
      * </table>
      *
+     * @see XtreamFieldUtils#createDefaultValueForNulls(Nulls, Class)
      * @see com.fasterxml.jackson.annotation.Nulls
      */
     enum Nulls {

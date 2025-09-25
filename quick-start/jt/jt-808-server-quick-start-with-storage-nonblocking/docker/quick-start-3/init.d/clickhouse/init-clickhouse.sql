@@ -11,7 +11,7 @@ create table jt_808_request_trace_log
     trace_id              String comment '请求ID',
     terminal_id           String comment '终端手机号',
     message_id            Int32 comment '消息ID',
-    version               Enum16('unknown' = -2, 'v2011' = -1, 'v2013' = 0, 'v2019' = 1) comment '协议版本',
+    version               Enum16('unknown' = -2, 'v2011' = 2011, 'v2013' = 2013, 'v2019' = 2019) comment '协议版本',
     flow_id               Int32 comment '流水号',
     message_body_length   Int32 comment '消息体长度',
     message_body_property Int32 comment '消息体属性',

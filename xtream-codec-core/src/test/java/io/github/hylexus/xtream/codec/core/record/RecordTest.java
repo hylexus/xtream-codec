@@ -36,11 +36,24 @@ public class RecordTest {
             @Preset.JtStyle.TransientRecordComponent(nulls = XtreamField.Nulls.AS_NULL)
             String address,
             @Preset.RustStyle.transient_record_component(nulls = XtreamField.Nulls.AS_EMPTY)
-            List<String> add
-    ) {
+            List<String> add,
+            @Preset.JtStyle.Object NestedRecord1 nestedRecord1) {
         public Entity1(String name, Integer x, int age, String address) {
-            this(name, x, age, address, List.of("111"));
+            this(name, x, age, address, List.of("111"), new NestedRecord1("张三", 100, new NestedRecord2("张三1", 1100)));
         }
+    }
+
+    public record NestedRecord1(
+            @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8)
+            String name,
+            @Preset.JtStyle.Word int age,
+            @Preset.JtStyle.Object NestedRecord2 nestedRecord2) {
+    }
+
+    public record NestedRecord2(
+            @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8)
+            String name,
+            @Preset.JtStyle.Word int age) {
     }
 
     @Test

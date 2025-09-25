@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec.map;
 
+import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
@@ -47,14 +48,23 @@ public class SimpleMapMetadataRegistry {
     private static final Logger log = LoggerFactory.getLogger(SimpleMapMetadataRegistry.class);
     private static final ConcurrentMap<Integer, ConcurrentMap<Field, MapMeta>> CACHE = new ConcurrentHashMap<>();
 
-    static MapMeta createMapMetadata(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, Field field, XtreamMapField xtreamMapField) {
+    static MapMeta getOrCreateMapMetadata(FieldCodec.CodecContext codecContext, BeanPropertyMetadata propertyMetadata) {
+        final int targetVersion = codecContext.version();
+        final Field field = propertyMetadata.field();
         final ConcurrentMap<Field, MapMeta> map = CACHE.computeIfAbsent(targetVersion, k -> new ConcurrentHashMap<>());
         return map.computeIfAbsent(field, f -> {
-            final MapMeta mapMeta = doCreateMapMetadata(beanMetadataRegistry, targetVersion, xtreamMapField);
-            if (log.isDebugEnabled()) {
-                log.debug("Field:{}, MapMeta: {}", field.toGenericString(), mapMeta);
+            try {
+                final XtreamMapField xtreamMapField = propertyMetadata.findAnnotation(XtreamMapField.class).orElseThrow();
+                final BeanMetadataRegistry beanMetadataRegistry = codecContext.beanMetadataRegistry();
+                final MapMeta mapMeta = doCreateMapMetadata(beanMetadataRegistry, targetVersion, xtreamMapField);
+                if (log.isDebugEnabled()) {
+                    log.debug("Field:{}, MapMeta: {}", field.toGenericString(), mapMeta);
+                }
+                return mapMeta;
+            } catch (Exception e) {
+                log.error("Error while creating MapMeta\n===> Field: {}", field.toGenericString(), e);
+                throw e;
             }
-            return mapMeta;
         });
     }
 

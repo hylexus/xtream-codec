@@ -18,12 +18,12 @@ package io.github.hylexus.xtream.quickstart.ext.jt808.withstorage.blocking.domai
 
 /**
  * @author hylexus
- * @see io.github.hylexus.xtream.quickstart.ext.jt808.withstorage.mapper.adapter.Jt808VersionHandlerAdapter
+ * @see io.github.hylexus.xtream.quickstart.ext.jt808.withstorage.blocking.mapper.adapter.Jt808VersionHandlerAdapter
  */
 public enum Jt808Version {
-    V2011(-1),
-    V2013(0),
-    V2019(1),
+    V2011(2011),
+    V2013(2013),
+    V2019(2019),
     UNKNOWN(-2),
     ;
     private final int value;
@@ -34,9 +34,9 @@ public enum Jt808Version {
 
     public static Jt808Version fromValue(Integer result) {
         return switch (result) {
-            case -1 -> V2011;
-            case 0 -> V2013;
-            case 1 -> V2019;
+            case 2011 -> V2011;
+            case 2013 -> V2013;
+            case 2019 -> V2019;
             case -2 -> UNKNOWN;
             default -> throw new IllegalArgumentException("Invalid Jt808Version value: " + result);
         };
