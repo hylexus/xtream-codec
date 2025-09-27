@@ -74,7 +74,7 @@ public class CodecDebugEntity02 {
 
 
     // 长度：消息体长度减去前面的 28 字节
-    @Preset.JtStyle.Map(desc = "附加项列表", fieldCodec = LocationExtraItemFieldCodec.class)
+    @Preset.JtStyle.Object(desc = "附加项列表", fieldCodec = LocationExtraItemFieldCodec.class)
     private Map<Short, Object> extraItems;
 
     public static class LocationExtraItemFieldCodec extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec> {

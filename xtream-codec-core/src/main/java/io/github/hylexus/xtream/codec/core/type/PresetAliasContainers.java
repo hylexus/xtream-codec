@@ -126,6 +126,7 @@ final class PresetAliasContainers {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
     @Documented
+    @SuppressWarnings("removal")
     public @interface RustStyleContainerMap {
         Preset.RustStyle.map[] value();
     }
@@ -141,7 +142,7 @@ final class PresetAliasContainers {
     @Target({ElementType.RECORD_COMPONENT})
     @Documented
     public @interface RustStyleContainerTransientRecordComponent {
-        Preset.RustStyle.transient_record_component[] value();
+        Preset.RustStyle.transient_rc[] value();
     }
 
     // endregion RustStyle
@@ -220,6 +221,7 @@ final class PresetAliasContainers {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
     @Documented
+    @SuppressWarnings("removal")
     public @interface JtStyleContainerMap {
         Preset.JtStyle.Map[] value();
     }
@@ -228,7 +230,7 @@ final class PresetAliasContainers {
     @Target({ElementType.RECORD_COMPONENT})
     @Documented
     public @interface JtStyleContainerTransientRecordComponent {
-        Preset.JtStyle.TransientRecordComponent[] value();
+        Preset.JtStyle.TransientRc[] value();
     }
     // endregion JtStyle
 

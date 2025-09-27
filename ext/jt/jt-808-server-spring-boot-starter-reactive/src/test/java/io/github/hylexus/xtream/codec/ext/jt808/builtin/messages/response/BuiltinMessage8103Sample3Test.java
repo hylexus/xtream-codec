@@ -17,11 +17,10 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
-import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamFieldMapDescriptor;
+import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
+import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import io.github.hylexus.xtream.codec.core.type.wrapper.StringWrapperGbk;
 import io.github.hylexus.xtream.codec.core.type.wrapper.U16Wrapper;
 import io.github.hylexus.xtream.codec.core.type.wrapper.U32Wrapper;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BuiltinMessage8103Sample3Test extends BaseCodecTest {
@@ -54,7 +54,7 @@ class BuiltinMessage8103Sample3Test extends BaseCodecTest {
         // 车辆所在省域 ID
         parameterItemList.add(new BuiltinMessage8103Sample3.ParameterItem(0x0081, new U16Wrapper(62)));
         // 车辆所在市域 ID
-        parameterItemList.add(new BuiltinMessage8103Sample3.ParameterItem(0x0082, (short) 2, new U16Wrapper(103)));
+        parameterItemList.add(new BuiltinMessage8103Sample3.ParameterItem(0x0082, new U16Wrapper(103)));
         // 车牌颜色
         parameterItemList.add(new BuiltinMessage8103Sample3.ParameterItem(0x0084, ByteArrayContainer.ofU8((short) 1)));
 
@@ -88,9 +88,8 @@ class BuiltinMessage8103Sample3Test extends BaseCodecTest {
         // DataWrapper item0082 = (DataWrapper) extraItems.get(0x0082L);
         // assertEquals(103, item0082.asU16());
 
-        // 0x0082L示例 3：解析为 U16Wrapper
-        U16Wrapper item0082 = (U16Wrapper) extraItems.get(0x0082L);
-        assertEquals(103, item0082.asU16());
+        // 0x0082L示例 3：解析为 Int
+        assertEquals(103, extraItems.get(0x0082L));
 
         // 0x0082L示例 4：解析为 Integer
         // assertEquals(103, extraItems.get(0x0082L));
@@ -107,24 +106,21 @@ class BuiltinMessage8103Sample3Test extends BaseCodecTest {
         @Preset.JtStyle.Byte
         private short parameterCount;
 
-        @Preset.JtStyle.Map
-        @XtreamFieldMapDescriptor(
-                keyDescriptor = @XtreamFieldMapDescriptor.KeyDescriptor(type = XtreamFieldMapDescriptor.KeyType.u32),
-                valueLengthFieldDescriptor = @XtreamFieldMapDescriptor.ValueLengthFieldDescriptor(length = 1),
-                valueDecoderDescriptors = @XtreamFieldMapDescriptor.ValueDecoderDescriptors(
-                        defaultValueDecoderDescriptor = @XtreamFieldMapDescriptor.ValueDecoderDescriptor(javaType = byte[].class),
-                        valueDecoderDescriptors = {
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0001, config = @XtreamField(length = 4, signedness = NumberSignedness.UNSIGNED), javaType = Long.class, desc = "终端心跳发送间隔,单位为秒"),
-                                // 由于这里是个 Map, 所以多个相同 ID 的配置项会被覆盖(只剩下最后一个)
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0040, javaType = String.class, config = @XtreamField(charset = XtreamConstants.CHARSET_NAME_GBK), desc = "监控平台电话号码"),
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0081, config = @XtreamField(length = 2, signedness = NumberSignedness.UNSIGNED), javaType = Integer.class, desc = "车辆所在省域 ID"),
-                                // 和 0x0081 一样，0x0082 可以解析为 Integer、ByteArrayContainer、ByteBufContainer、U16Wrapper、DataWrapper 等类型
-                                // @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, config = @XtreamField, javaType = ByteArrayContainer.class, desc = "车辆所在市域 ID"),
-                                // @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, javaType = DataWrapper.class, desc = "车辆所在市域 ID"),
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, javaType = U16Wrapper.class, desc = "车辆所在市域 ID"),
-                                // @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0082, config = @XtreamField(length = 2), javaType = Integer.class, desc = "车辆所在市域 ID"),
-                                @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU32 = 0x0084, config = @XtreamField(length = 1, signedness = NumberSignedness.UNSIGNED), javaType = Short.class, desc = "车牌颜色"),
-                        }
+        @Preset.JtStyle.SimpleMap(
+                key = @Key(type = KeyType.u32),
+                valueLength = @ValueLength(type = ValueLengthType.u8),
+                value = @Value(
+                        decoder = @ValueDecoder(
+                                params = @DecoderParam(charset = XtreamConstants.CHARSET_NAME_GBK),
+                                matchers = {
+                                        @ValueMatcher(matchU32 = 0x0001, valueType = XtreamDataType.u32),
+                                        @ValueMatcher(matchU32 = 0x0040, valueType = XtreamDataType.string_gbk),
+                                        @ValueMatcher(matchU32 = 0x0081, valueType = XtreamDataType.u16),
+                                        @ValueMatcher(matchU32 = 0x0082, valueType = XtreamDataType.u16),
+                                        @ValueMatcher(matchU32 = 0x0084, valueType = XtreamDataType.u8),
+                                },
+                                fallbackMatchers = @FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
+                        )
                 )
         )
         private Map<Long, Object> extraItems;

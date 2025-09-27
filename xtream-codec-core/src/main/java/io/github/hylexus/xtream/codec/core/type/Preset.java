@@ -384,6 +384,10 @@ public @interface Preset {
             String desc() default "";
         }
 
+        /**
+         * @deprecated Use {@link simple_map} instead. Will be removed in 1.0.0.
+         */
+        @Deprecated(forRemoval = true, since = "0.1.0")
         @SuppressWarnings("checkstyle:TypeName")
         @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
@@ -498,6 +502,14 @@ public @interface Preset {
             String desc() default "";
         }
 
+        /**
+         * {@code transient_rc}: TransientRecordComponent
+         * <p>
+         * 只能用于 {@link Record} 的组件上
+         *
+         * @see Record
+         * @since 0.1.0
+         */
         @SuppressWarnings("checkstyle:TypeName")
         @Target(ElementType.RECORD_COMPONENT)
         @Retention(RetentionPolicy.RUNTIME)
@@ -507,7 +519,7 @@ public @interface Preset {
                 dataType = BeanPropertyMetadata.FiledDataType.basic,
                 codecStrategy = XtreamField.CodecStrategy.TRANSIENT
         )
-        @interface transient_record_component {
+        @interface transient_rc {
             @AliasFor(annotation = XtreamField.class, attribute = "nulls")
             XtreamField.Nulls nulls() default XtreamField.Nulls.AS_NULL;
 
@@ -837,6 +849,10 @@ public @interface Preset {
             String desc() default "";
         }
 
+        /**
+         * @deprecated Use {@link SimpleMap} instead. Will be removed in 1.0.0.
+         */
+        @Deprecated(forRemoval = true, since = "0.1.0")
         @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
@@ -915,6 +931,14 @@ public @interface Preset {
             String desc() default "";
         }
 
+        /**
+         * {@code TransientRc}: TransientRecordComponent
+         * <p>
+         * 只能用于 {@link Record} 的组件上
+         *
+         * @see Record
+         * @since 0.1.0
+         */
         @Target(ElementType.RECORD_COMPONENT)
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
@@ -923,7 +947,7 @@ public @interface Preset {
                 dataType = BeanPropertyMetadata.FiledDataType.basic,
                 codecStrategy = XtreamField.CodecStrategy.TRANSIENT
         )
-        @interface TransientRecordComponent {
+        @interface TransientRc {
 
             @AliasFor(annotation = XtreamField.class, attribute = "nulls")
             XtreamField.Nulls nulls() default XtreamField.Nulls.AS_NULL;

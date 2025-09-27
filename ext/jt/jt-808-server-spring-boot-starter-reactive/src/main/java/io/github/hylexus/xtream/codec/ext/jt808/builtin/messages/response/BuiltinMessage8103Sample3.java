@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
+import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DataWrapper;
@@ -49,30 +50,24 @@ public class BuiltinMessage8103Sample3 {
         @Preset.JtStyle.Dword
         private long parameterId;
 
-        @Preset.JtStyle.Byte
-        private short parameterLength;
-
-        @Preset.JtStyle.RuntimeType
+        @Preset.JtStyle.RuntimeType(prependLengthFieldType = PrependLengthFieldType.u8)
         private Object parameterValue;
 
         public ParameterItem() {
         }
 
-        public ParameterItem(long parameterId, short parameterLength, Object parameterValue) {
+        public ParameterItem(long parameterId, Object parameterValue) {
             this.parameterId = parameterId;
-            this.parameterLength = parameterLength;
             this.parameterValue = parameterValue;
         }
 
         public ParameterItem(long parameterId, DataWrapper<?> parameterValue) {
             this.parameterId = parameterId;
-            this.parameterLength = (short) parameterValue.length();
             this.parameterValue = parameterValue;
         }
 
         public ParameterItem(long parameterId, ByteArrayContainer container) {
             this.parameterId = parameterId;
-            this.parameterLength = (short) container.length();
             this.parameterValue = container;
         }
     }

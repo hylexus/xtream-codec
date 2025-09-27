@@ -79,16 +79,6 @@ public class BuiltinLocationMessageExtraItemFieldCodec
         };
     }
 
-    // @Override
-    // public void setBeanMetadataRegistry(int version, BeanMetadataRegistry registry) {
-    //     // this.locationItem0x12FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x12.class);
-    //     // this.locationItem0x13FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x13.class);
-    //     // this.locationItem0x64FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x64.class);
-    //     // this.locationItem0x65FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x65.class);
-    //     // this.locationItem0x66FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x66.class);
-    //     // this.locationItem0x67FieldCodec = new EntityFieldCodec<>(version, registry, LocationItem0x67.class);
-    // }
-
     public static class OverSpeedAlarmItemFieldCodec implements FieldCodec<OverSpeedAlarmItem> {
         public static OverSpeedAlarmItemFieldCodec INSTANCE = new OverSpeedAlarmItemFieldCodec();
 

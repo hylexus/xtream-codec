@@ -16,10 +16,9 @@
 
 package io.github.hylexus.xtream.debug.codec.core.demo03;
 
-import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamFieldMapDescriptor;
+import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
+import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,20 +36,19 @@ public class RustStyleDebugEntity03ForEncode {
     @Preset.RustStyle.u16
     private int msgId;
 
-    @Preset.RustStyle.map
-    @XtreamFieldMapDescriptor(
-            keyDescriptor = @XtreamFieldMapDescriptor.KeyDescriptor(type = XtreamFieldMapDescriptor.KeyType.u16),
-            valueLengthFieldDescriptor = @XtreamFieldMapDescriptor.ValueLengthFieldDescriptor(length = 1, littleEndian = false),
-            valueEncoderDescriptors = @XtreamFieldMapDescriptor.ValueEncoderDescriptors(
-                    defaultValueEncoderDescriptor = @XtreamFieldMapDescriptor.ValueEncoderDescriptor(
-                            config = @XtreamField(charset = "utf-8", signedness = NumberSignedness.NONE)
-                    ),
-                    valueEncoderDescriptors = {
-                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 1, javaType = String.class),
-                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 2, javaType = String.class, config = @XtreamField(), valueLengthFieldSize = 2),
-                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 3, javaType = Integer.class, config = @XtreamField(signedness = NumberSignedness.UNSIGNED, length = 2), valueLengthFieldSize = 2),
-                            @XtreamFieldMapDescriptor.ValueCodecConfig(whenKeyIsU16 = 4, javaType = String.class),
-                    }
+    @Preset.RustStyle.simple_map(
+            key = @XtreamMapField.Key(type = XtreamMapField.KeyType.u16),
+            valueLength = @XtreamMapField.ValueLength(type = XtreamMapField.ValueLengthType.u8),
+            value = @XtreamMapField.Value(
+                    encoder = @XtreamMapField.ValueEncoder(
+                            params = @XtreamMapField.EncoderParam(charset = "utf-8"),
+                            matchers = {
+                                    @XtreamMapField.ValueMatcher(matchU16 = 1, valueType = XtreamDataType.string),
+                                    @XtreamMapField.ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string),
+                                    @XtreamMapField.ValueMatcher(matchU16 = 3, valueType = XtreamDataType.u16),
+                                    @XtreamMapField.ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string_gbk)
+                            }
+                    )
             )
     )
     private Map<Integer, Object> attr;

@@ -34,8 +34,8 @@ public class RecordTest {
             @Preset.JtStyle.Str(desc = "姓名", prependLengthFieldType = PrependLengthFieldType.u8) String name,
             Integer x,
             @Preset.JtStyle.Word(desc = "年龄") int age,
-            @Preset.JtStyle.TransientRecordComponent(nulls = XtreamField.Nulls.AS_NULL) String address,
-            @Preset.RustStyle.transient_record_component(nulls = XtreamField.Nulls.AS_EMPTY)
+            @Preset.JtStyle.TransientRc(nulls = XtreamField.Nulls.AS_NULL) String address,
+            @Preset.RustStyle.transient_rc(nulls = XtreamField.Nulls.AS_EMPTY)
             List<String> add,
             @Preset.JtStyle.Object NestedRecord1 nestedRecord1,
             @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8) String desc) {
