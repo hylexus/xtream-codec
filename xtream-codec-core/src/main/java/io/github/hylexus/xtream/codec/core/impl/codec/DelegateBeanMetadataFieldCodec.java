@@ -18,7 +18,10 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.netty.buffer.ByteBuf;
 
 /**
@@ -46,7 +49,20 @@ public class DelegateBeanMetadataFieldCodec implements FieldCodec<Object> {
 
     @Override
     public Object deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, context.codecTracker());
+        if (XtreamTypes.isBasicType(propertyMetadata.rawClass())) {
+            return context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, context.codecTracker());
+        } else {
+            final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(propertyMetadata, this.getClass().getSimpleName(), null);
+            final Object instance;
+            try {
+                final int indexBeforeRead = input.readerIndex();
+                instance = context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, context.codecTracker());
+                nestedFieldSpan.setHexString(FormatUtils.toHexString(input, indexBeforeRead, input.readerIndex() - indexBeforeRead));
+            } finally {
+                context.codecTracker().finishCurrentSpan();
+            }
+            return instance;
+        }
     }
 
     @Override
@@ -56,7 +72,18 @@ public class DelegateBeanMetadataFieldCodec implements FieldCodec<Object> {
 
     @Override
     public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
-        context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, context.codecTracker());
+        if (XtreamTypes.isBasicType(propertyMetadata.rawClass())) {
+            context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, context.codecTracker());
+        } else {
+            final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(propertyMetadata, this.getClass().getSimpleName(), null);
+            try {
+                final int indexBeforeWrite = output.writerIndex();
+                context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, context.codecTracker());
+                nestedFieldSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
+            } finally {
+                context.codecTracker().finishCurrentSpan();
+            }
+        }
     }
 
 }

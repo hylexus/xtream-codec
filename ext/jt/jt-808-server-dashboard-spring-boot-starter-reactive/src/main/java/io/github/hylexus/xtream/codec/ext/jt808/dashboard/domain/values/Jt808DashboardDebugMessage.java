@@ -38,7 +38,7 @@ public class Jt808DashboardDebugMessage implements RuntimeTypeSupplier {
 
     // 校验码
     @Preset.JtStyle.Byte(desc = "校验码")
-    private byte checkSum;
+    private short checkSum;
 
     public RootSpan getBodyDetails() {
         return bodyDetails;
@@ -67,11 +67,11 @@ public class Jt808DashboardDebugMessage implements RuntimeTypeSupplier {
         return this;
     }
 
-    public byte getCheckSum() {
+    public short getCheckSum() {
         return checkSum;
     }
 
-    public Jt808DashboardDebugMessage setCheckSum(byte checkSum) {
+    public Jt808DashboardDebugMessage setCheckSum(short checkSum) {
         this.checkSum = checkSum;
         return this;
     }

@@ -138,7 +138,7 @@ public class CodecTracker {
     public void visit() {
         this.visit((level, span) -> {
             // ...
-            System.out.println("\t".repeat(level) + span);
+            System.out.println(("\t".repeat(level)) + "[==> " + level + "] " + span);
         });
     }
 

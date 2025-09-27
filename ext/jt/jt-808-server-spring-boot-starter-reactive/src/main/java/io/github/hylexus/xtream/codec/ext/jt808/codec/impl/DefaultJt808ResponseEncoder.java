@@ -253,6 +253,9 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
     }
 
     public static class Header {
+        @SuppressWarnings("unused")
+        public Header() {
+        }
 
         public Header(Jt808RequestHeader header) {
             this.messageId = header.messageId();

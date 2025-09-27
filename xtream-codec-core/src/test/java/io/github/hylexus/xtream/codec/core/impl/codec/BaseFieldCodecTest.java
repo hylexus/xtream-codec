@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.junit.jupiter.api.Assertions;
@@ -32,10 +33,14 @@ class BaseFieldCodecTest {
     <T> void codec(int version, T instance, BiConsumer<T, T> assertion) {
         final ByteBuf buffer = allocator.buffer();
         try {
-            this.entityCodec.encode(version, instance, buffer);
+            final CodecTracker encodeTracker = new CodecTracker();
+            this.entityCodec.encode(version, instance, buffer, encodeTracker);
+            encodeTracker.visit();
             System.out.println(FormatUtils.toHexString(buffer));
             @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
-            final T decode = this.entityCodec.decode(version, cls, buffer);
+            final CodecTracker decodeTracker = new CodecTracker();
+            final T decode = this.entityCodec.decode(version, cls, buffer, decodeTracker);
+            decodeTracker.visit();
             assertion.accept(instance, decode);
         } finally {
             XtreamBytes.releaseBuf(buffer);
