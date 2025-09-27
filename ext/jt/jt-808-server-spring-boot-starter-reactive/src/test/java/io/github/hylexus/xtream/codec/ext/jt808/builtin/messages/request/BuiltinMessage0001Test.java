@@ -25,23 +25,41 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BuiltinMessage0001Test extends BaseCodecTest {
 
     @Test
-    void testEncode() {
-        final BuiltinMessage0001 entity = new BuiltinMessage0001()
-                .setServerFlowId(123)
-                .setServerMessageId(0x0200)
-                .setResult((short) 1);
-        final String hex = encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019);
-
-        assertEquals("7e0001400501000000000139123443290000007b020001497e", hex);
+    void testV2011() {
+        codecTestV2011(0x0001, createSource(), (expected, actual, hexString) -> {
+            assertEquals(Jt808ProtocolVersion.VERSION_2013, actual.header().version());
+            doCompare(expected, actual);
+        });
     }
 
     @Test
-    void testDecode() {
-        final String hex = "0001400501000000000139123443290000007b02000149";
-        final BuiltinMessage0001 entity = decodeAsEntity(BuiltinMessage0001.class, hex);
-        assertEquals(123, entity.getServerFlowId());
-        assertEquals(0x0200, entity.getServerMessageId());
-        assertEquals(1, entity.getResult());
+    void testV2013() {
+        codecTestV2013(0x0001, createSource(), (expected, actual, hexString) -> {
+            assertEquals(Jt808ProtocolVersion.VERSION_2013, actual.header().version());
+            doCompare(expected, actual);
+        });
+    }
+
+    @Test
+    void testV2019() {
+        codecTestV2019(0x0001, createSource(), (expected, actual, hexString) -> {
+            assertEquals(Jt808ProtocolVersion.VERSION_2019, actual.header().version());
+            doCompare(expected, actual);
+        });
+    }
+
+    private void doCompare(BuiltinMessage0001 expected, Jt808MessageForTest<BuiltinMessage0001> actual) {
+        final BuiltinMessage0001 body = actual.body();
+        assertEquals(expected.getServerFlowId(), body.getServerFlowId());
+        assertEquals(expected.getServerMessageId(), body.getServerMessageId());
+        assertEquals(expected.getResult(), body.getResult());
+    }
+
+    private static BuiltinMessage0001 createSource() {
+        return new BuiltinMessage0001()
+                .setServerFlowId(123)
+                .setServerMessageId(0x0200)
+                .setResult((short) 1);
     }
 
 }
