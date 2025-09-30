@@ -79,6 +79,15 @@
         - [https://sample-videos.com/index.php#sample-flv-video](https://sample-videos.com/index.php#sample-flv-video)
         - ...
 
+## Compatibility
+
+参考 : [https://start.spring.io/actuator/info](https://start.spring.io/actuator/info)
+
+| xtream-version | spring-boot | spring-cloud |
+|----------------|-------------|--------------|
+| **0.1.x**      | **3.5.6 +** | **2025.0.0** |
+| **0.0.x**      | **3.2.x +** | **2023.0.3** |
+
 ## Modules
 
 ```shell

@@ -1,3 +1,18 @@
+## 0.1.0
+
+### 🔨 Dependency Upgrades
+
+- `spring-boot` 升级到 **3.5.6**
+- `spring-cloud` 升级到 **2025.0.0**
+
+### ⭐ New Features
+
+- todo
+
+### ⚠️ Deprecations
+
+- todo
+
 ## 0.0.1(2025-09-07)
 
 **0.0.1** 封版
