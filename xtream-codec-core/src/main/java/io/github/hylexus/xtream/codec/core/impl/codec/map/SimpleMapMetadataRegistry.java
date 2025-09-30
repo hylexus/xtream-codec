@@ -92,7 +92,7 @@ public class SimpleMapMetadataRegistry {
                 }
         );
         final EncoderCommonParam commonParam = matchResult.matched() ? matchResult.source() : new EncoderCommonParam(targetVersion, false, XtreamMapField.DEFAULT_CHARSET);
-        log.info("EncoderCommonParam: {}", matchResult);
+        log.debug("EncoderCommonParam: {}", matchResult);
         final List<ValueMatcherMeta> encoderValueMatchers = createValueMatcherMetaList(beanMetadataRegistry, targetVersion, keyMeta, value.encoder().matchers(), commonParam, null);
         return new EncoderValueMeta(commonParam, encoderValueMatchers);
     }
@@ -109,7 +109,7 @@ public class SimpleMapMetadataRegistry {
         final DecoderCommonParam commonParam = matchResult.matched()
                 ? matchResult.source()
                 : new DecoderCommonParam(targetVersion, XtreamMapField.DEFAULT_CHARSET);
-        log.info("DecoderCommonParam: {}", matchResult);
+        log.debug("DecoderCommonParam: {}", matchResult);
         final FallbackValueMatcherMeta fallbackValueMatcherMeta = createFallbackValueMatcherMeta(beanMetadataRegistry, targetVersion, value.decoder().fallbackMatchers(), commonParam);
         final List<ValueMatcherMeta> decoderValueMatchers = createValueMatcherMetaList(beanMetadataRegistry, targetVersion, keyType, value.decoder().matchers(), null, commonParam);
         return new DecoderValueMeta(commonParam, fallbackValueMatcherMeta, decoderValueMatchers);
@@ -138,7 +138,7 @@ public class SimpleMapMetadataRegistry {
                 Arrays.stream(matchers).map(it -> new HasVersions<>(it.version(), it)),
                 HasVersion::data
         );
-        log.info("Fallback targetVersion={}, {}", targetVersion, matchResult);
+        log.debug("Fallback targetVersion={}, {}", targetVersion, matchResult);
         if (!matchResult.matched()) {
             throw new IllegalArgumentException("No fallbackValueMatcher found");
         }
@@ -369,7 +369,7 @@ public class SimpleMapMetadataRegistry {
                 Arrays.stream(xtreamMapField.key()).map(it -> new HasVersions<>(it.version(), it)),
                 HasVersion::data
         );
-        log.info("KEY: targetVersion={}, {}", targetVersion, matchResult);
+        log.debug("KEY: targetVersion={}, {}", targetVersion, matchResult);
         if (matchResult.matched()) {
             final XtreamMapField.Key key = requireNonNull(matchResult.source());
 
@@ -393,7 +393,7 @@ public class SimpleMapMetadataRegistry {
                 Arrays.stream(xtreamMapField.valueLength()).map(it -> new HasVersions<>(it.version(), it)),
                 HasVersion::data);
 
-        log.info("ValueLength: targetVersion={}, {}", targetVersion, matchResult);
+        log.debug("ValueLength: targetVersion={}, {}", targetVersion, matchResult);
         if (matchResult.matched()) {
             final XtreamMapField.ValueLength valueLengthType = matchResult.source();
             return new ValueLengthMeta(targetVersion, valueLengthType.type());
