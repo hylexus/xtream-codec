@@ -73,17 +73,47 @@ public @interface XtreamMapField {
     @interface Key {
         int[] version() default {ALL_VERSION};
 
+        /**
+         * {@link java.util.Map} 中 {@code Key} 的类型
+         */
         KeyType type() default KeyType.u8;
 
+        /**
+         * 仅仅 {@link String} 类型的 {@code Key} 用到
+         */
         int sizeInBytes() default -1;
 
-        // todo string 类型支持 padding
+        /**
+         * 仅仅 {@link String} 类型的 {@code Key} 用到
+         */
         String charset() default DEFAULT_CHARSET;
+
+        /**
+         * 仅仅 {@link String} 类型的 {@code Key} 用到
+         */
+        PaddingType paddingType() default PaddingType.NONE;
+
+        /**
+         * 仅仅 {@link String} 类型的 {@code Key} 用到
+         * <p>
+         * {@code 0x30(48) == "0".getBytes()[0];}
+         */
+        byte paddingElement() default 0x30;
+
+    }
+
+    enum PaddingType {
+        LEFT,
+        RIGHT,
+        NONE
     }
 
     @interface ValueLength {
         int[] version() default {ALL_VERSION};
 
+        /**
+         * 用来描述 {@link java.util.Map} 中 {@code Value} 的长度的类型
+         */
         ValueLengthType type();
     }
 
@@ -94,7 +124,7 @@ public @interface XtreamMapField {
     }
 
     @interface ValueDecoder {
-        DecoderParam[] params() default {};
+        DecoderParam[] params() default {@DecoderParam};
 
         ValueMatcher[] matchers() default {};
 
@@ -102,7 +132,7 @@ public @interface XtreamMapField {
     }
 
     @interface ValueEncoder {
-        EncoderParam[] params() default {@EncoderParam(version = ALL_VERSION, charset = DEFAULT_CHARSET)};
+        EncoderParam[] params() default {@EncoderParam};
 
         ValueMatcher[] matchers() default {};
     }

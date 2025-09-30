@@ -87,7 +87,8 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
             assertEquals(instanceMap.get("配置项11"), assertionMap.get("配置项11"));
             assertEquals(instanceMap.get("配置项12"), assertionMap.get("配置项12"));
             assertEquals(instanceMap.get("配置项13"), assertionMap.get("配置项13"));
-            assertEquals(instanceMap.get("配置项14"), assertionMap.get("配置项14"));
+            // 下面这个 `x` 是自动 `paddingType = PaddingType.LEFT, paddingElement = 'x'` 添加的
+            assertEquals(instanceMap.get("配置14"), assertionMap.get("xx配置14"));
             assertNotEquals(instanceMap.get("配置项05"), assertionMap.get("配置项05"));
             assertEquals("010203", assertionMap.get("配置项05"));
             assertEquals(instanceMap.get("配置项61"), assertionMap.get("配置项61"));
@@ -121,7 +122,7 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
         map.put("配置项11", (byte) 127);
         map.put("配置项12", (1 << 16) - 1);
         map.put("配置项13", (1L << 32) - 1);
-        map.put("配置项14", 1L);
+        map.put("配置14", 1L);
         map.put("配置项61", "张三");
         map.put("配置项62", "李四");
         map.put("配置项63", "王五");

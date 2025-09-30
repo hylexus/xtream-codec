@@ -41,7 +41,7 @@ public class MapFieldEntity {
             key = {
                     @XtreamMapField.Key(version = 0, type = u16),
                     @XtreamMapField.Key(version = {1}, type = u32),
-                    @XtreamMapField.Key(version = 2, type = str_gbk, sizeInBytes = 8),
+                    @XtreamMapField.Key(version = 2, type = str_gbk, sizeInBytes = 8, paddingType = PaddingType.LEFT, paddingElement = 'x'),
                     // @XtreamMapField.Key(version = 2, type = str, sizeInBytes = 11,charset = "UTF-8"),
                     // @XtreamMapField.Key(version = 2, type = str, sizeInBytes = 8,charset = "gb2312"),
             },
@@ -75,7 +75,7 @@ public class MapFieldEntity {
                                     @ValueMatcher(version = 2, matchString = "配置项63", valueCodec = StringFieldCodecs.StringFieldCodecGb2312.class),
                                     @ValueMatcher(version = 2, matchString = "配置项12", valueType = XtreamDataType.u16_le),
                                     @ValueMatcher(version = 2, matchString = "配置项13", valueType = XtreamDataType.u32),
-                                    @ValueMatcher(version = 2, matchString = "配置项14", valueType = XtreamDataType.u32),
+                                    @ValueMatcher(version = 2, matchString = "配置14", valueType = XtreamDataType.u32),
                             }
                     ),
                     // 解码(反序列化)配置
@@ -108,7 +108,8 @@ public class MapFieldEntity {
                                     @ValueMatcher(version = 2, matchString = "配置项11", valueType = XtreamDataType.i8),
                                     @ValueMatcher(version = 2, matchString = "配置项12", valueType = XtreamDataType.u16_le),
                                     @ValueMatcher(version = 2, matchString = "配置项13", valueType = XtreamDataType.u32),
-                                    @ValueMatcher(version = 2, matchString = "配置项14", valueCodec = U32FieldCodecs.U32FieldCodec.class),
+                                    // 下面这个 `x` 是自动 `paddingType = PaddingType.LEFT, paddingElement = 'x'` 添加的
+                                    @ValueMatcher(version = 2, matchString = "xx配置14", valueCodec = U32FieldCodecs.U32FieldCodec.class),
                                     @ValueMatcher(version = 2, matchString = "配置项61", valueType = XtreamDataType.string_utf8),
                                     @ValueMatcher(version = 2, matchString = "配置项62", valueType = XtreamDataType.string, charset = "GBK"),
                                     @ValueMatcher(version = 2, matchString = "配置项63", valueCodec = StringFieldCodecs.StringFieldCodecGb2312.class),

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -351,6 +352,17 @@ public class SimpleMapMetadataRegistry {
         return duplicates;
     }
 
+    static String parseKeyCharset(XtreamMapField.Key key) {
+        final XtreamMapField.KeyType type = key.type();
+        return switch (type) {
+            case str_gb_2312 -> XtreamConstants.CHARSET_NAME_GB_2312;
+            case str_gbk -> XtreamConstants.CHARSET_NAME_GBK;
+            case str_utf8 -> XtreamConstants.CHARSET_NAME_UTF8;
+            case str -> key.charset();
+            default -> XtreamMapField.DEFAULT_CHARSET;
+        };
+    }
+
     private static KeyMeta createKeyMeta(int targetVersion, XtreamMapField xtreamMapField) {
         final VersionMatchResult<XtreamMapField.Key> matchResult = matchVersion(
                 targetVersion,
@@ -368,7 +380,8 @@ public class SimpleMapMetadataRegistry {
                 throw new IllegalArgumentException("Invalid sizeInBytes: " + sizeInBytes);
             }
             final FieldCodec<Object> keyCodec = createKeyCodec(key);
-            return new KeyMeta(targetVersion, key.type(), sizeInBytes, key.charset(), keyCodec);
+            final String keyCharset = parseKeyCharset(key);
+            return new KeyMeta(targetVersion, key.type(), sizeInBytes, keyCharset, key.paddingType(), key.paddingElement(), keyCodec);
         }
 
         throw new IllegalArgumentException("No `[" + XtreamMapField.Key.class.getName() + "]` found for target version " + targetVersion);
@@ -496,10 +509,13 @@ public class SimpleMapMetadataRegistry {
             XtreamMapField.KeyType type,
             int sizeInBytes,
             String charset,
+            Charset resolvedCharset,
+            XtreamMapField.PaddingType paddingType,
+            byte paddingElement,
             FieldCodec<Object> codec
     ) {
-        @SuppressWarnings("redundent")
-        KeyMeta {
+        public KeyMeta(int version, XtreamMapField.KeyType type, int sizeInBytes, String charset, XtreamMapField.PaddingType paddingType, byte paddingElement, FieldCodec<Object> codec) {
+            this(version, type, sizeInBytes, charset, Charset.forName(charset), paddingType, paddingElement, codec);
         }
     }
 

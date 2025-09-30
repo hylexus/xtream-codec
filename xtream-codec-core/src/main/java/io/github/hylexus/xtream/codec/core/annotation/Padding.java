@@ -31,7 +31,7 @@ public @interface Padding {
     /**
      * 表示字符串编码后的字节数。
      * <p>
-     * - 如果字符串编码后的字节数小于 {@code minEncodedLength}，则填充 {@link  #paddingElement} 直到编码后的字节数等于 {@code minEncodedLength}
+     * - 如果字符串编码后的字节数小于 {@code minEncodedLength}，则填充 {@link #paddingElement} 直到编码后的字节数等于 {@code minEncodedLength}
      * <p>
      * - 否则不填充
      */

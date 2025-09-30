@@ -20,11 +20,13 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.exception.NotYetImplementedException;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamAssertions;
+import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
+import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.AbstractFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.DelegateBeanMetadataFieldCodec;
 import io.github.hylexus.xtream.codec.core.tracker.BaseSpan;
@@ -72,7 +74,8 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
         @SuppressWarnings("unchecked") final Map<Object, Object> map = (Map<Object, Object>) value;
 
-        final FieldCodec<Object> keyCodec = mapMeta.keyMeta().codec();
+        final KeyMeta keyMeta = mapMeta.keyMeta();
+        final FieldCodec<Object> keyCodec = keyMeta.codec();
         final FieldCodec<Object> valueLengthCodec = mapMeta.valueLengthMeta().codec();
         final SimpleMapMetadataRegistry.EncoderValueMeta encoder = mapMeta.valueMeta().encoder();
         final ByteBuf temp = context.bufferFactory().buffer();
@@ -81,7 +84,13 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
                 final Object mapKey = entry.getKey();
                 final Object mapValue = entry.getValue();
                 // 1. key
-                keyCodec.serialize(propertyMetadata, context, output, mapKey);
+                final XtreamMapField.PaddingType paddingType = keyMeta.paddingType();
+                switch (paddingType) {
+                    case NONE -> keyCodec.serialize(propertyMetadata, context, output, mapKey);
+                    case LEFT -> XtreamBytes.writeCharSequenceWithLeftPadding(output, (CharSequence) mapKey, keyMeta.resolvedCharset(), keyMeta.sizeInBytes(), keyMeta.paddingElement());
+                    case RIGHT -> XtreamBytes.writeCharSequenceWithRightPadding(output, (CharSequence) mapKey, keyMeta.resolvedCharset(), keyMeta.sizeInBytes(), keyMeta.paddingElement());
+                    default -> throw new IllegalStateException("PaddingType: " + paddingType);
+                }
 
                 // 3. value
                 final FieldCodec<Object> valueCodec = this.getValueEncoder(context, encoder, mapKey, mapValue);
@@ -99,7 +108,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
     }
 
     @Override
-    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object value) {
         if (value == null) {
             return;
         }
@@ -114,6 +123,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         final FieldCodec<Object> valueLengthCodec = mapMeta.valueLengthMeta().codec();
         final SimpleMapMetadataRegistry.EncoderValueMeta encoder = mapMeta.valueMeta().encoder();
         final ByteBuf temp = context.bufferFactory().buffer();
+        final KeyMeta keyMeta = mapMeta.keyMeta();
         int sequence = 0;
         try {
             for (final Map.Entry<Object, Object> entry : map.entrySet()) {
@@ -122,7 +132,20 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
                 // 1. key
                 final Object mapKey = entry.getKey();
                 context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.KEY);
-                keyCodec.serializeWithTracker(propertyMetadata, context, output, mapKey);
+                final XtreamMapField.PaddingType paddingType = keyMeta.paddingType();
+                if (paddingType == XtreamMapField.PaddingType.NONE) {
+                    keyCodec.serializeWithTracker(propertyMetadata, context, output, mapKey);
+                } else {
+                    final int indexBeforeWrite = output.writerIndex();
+                    final String str = (String) mapKey;
+                    if (paddingType == XtreamMapField.PaddingType.LEFT) {
+                        XtreamBytes.writeCharSequenceWithLeftPadding(output, str, keyMeta.resolvedCharset(), keyMeta.sizeInBytes(), keyMeta.paddingElement());
+                    } else {
+                        XtreamBytes.writeCharSequenceWithRightPadding(output, str, keyMeta.resolvedCharset(), keyMeta.sizeInBytes(), keyMeta.paddingElement());
+                    }
+                    final String hexString = FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite);
+                    context.codecTracker().addFieldSpan(context.codecTracker().getCurrentSpan(), propertyMetadata.name(), str, hexString, this, "");
+                }
 
                 // 3. value
                 final Object mapValue = entry.getValue();
