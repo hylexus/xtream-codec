@@ -36,7 +36,7 @@ tag:
 <dependency>
     <groupId>io.github.hylexus.xtream</groupId>
     <artifactId>jt-808-server-spring-boot-starter-reactive</artifactId>
-    <version>0.0.1</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ tag:
 
 ```groovy
 
-api("io.github.hylexus.xtream:jt-808-server-spring-boot-starter-reactive:0.0.1")
+api("io.github.hylexus.xtream:jt-808-server-spring-boot-starter-reactive:0.1.0")
 ```
 
 :::
@@ -61,24 +61,24 @@ jt808-server:
   instruction-server:
     ## 指令服务器-TCP
     tcp-server:
-      # 绑定所有网卡(不只是127.0.0.1)
+      # 绑定所有网卡(不只是127.0.1.0)
       host: 0.0.0.0
       port: 3927
     ## 指令服务器-UDP
     udp-server:
-      # 绑定所有网卡(不只是127.0.0.1)
+      # 绑定所有网卡(不只是127.0.1.0)
       host: 0.0.0.0
       port: 3721
   ## 附件服务器(苏标扩展)
   attachment-server:
     ## 附件服务器-TCP
     tcp-server:
-      # 绑定所有网卡(不只是127.0.0.1)
+      # 绑定所有网卡(不只是127.0.1.0)
       host: 0.0.0.0
       port: 3824
     ## 附件服务器-UDP
     udp-server:
-      # 绑定所有网卡(不只是127.0.0.1)
+      # 绑定所有网卡(不只是127.0.1.0)
       host: 0.0.0.0
       port: 3618
 ```

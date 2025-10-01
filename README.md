@@ -119,8 +119,8 @@
 
 ## Docs
 
+- 国内站点: https://iotplanet.top/xtream-codec/
 - Github: https://hylexus.github.io/xtream-codec/
-- ~~Gitee: https://hylexus.gitee.io/xtream-codec/~~ (Gitee 暂停 Pages 服务，尚不确定后续能否恢复服务)
 
 ## QuickStart
 
@@ -128,11 +128,11 @@
     - 非阻塞版 [jt-808-server-quick-start-with-storage-nonblocking](quick-start/jt/jt-808-server-quick-start-with-storage-nonblocking/README.md)
     - 阻塞版 [jt-808-server-quick-start-with-storage-blocking](quick-start/jt/jt-808-server-quick-start-with-storage-blocking/README.md)
 - **自定义** 协议示例
-    - Github: https://hylexus.github.io/xtream-codec/core/samples/custom-protocol-sample-01/
-    - ~~Gitee: https://hylexus.gitee.io/xtream-codec/core/samples/custom-protocol-sample-01/~~  (Gitee 暂停 Pages 服务，尚不确定后续能否恢复服务)
+    - 国内站点: https://iotplanet.top/xtream-codec/guide/core/samples/custom-protocol-sample-01/protocol.html
+    - Github: https://hylexus.github.io/xtream-codec/guide/core/samples/custom-protocol-sample-01/protocol.html
 - **JT/T 808** 协议示例
-    - Github: https://hylexus.github.io/xtream-codec/core/samples/custom-protocol-sample-02/
-    - ~~Gitee: https://hylexus.gitee.io/xtream-codec/core/samples/custom-protocol-sample-02/~~  (Gitee 暂停 Pages 服务，尚不确定后续能否恢复服务)
+    - 国内站点:https://iotplanet.top/xtream-codec/guide/core/samples/custom-protocol-sample-02/protocol.html
+    - Github: https://hylexus.github.io/xtream-codec/guide/core/samples/custom-protocol-sample-02/protocol.html
 
 ## License
 

@@ -30,7 +30,7 @@ article: false
 <dependency>
     <groupId>io.github.hylexus.xtream</groupId>
     <artifactId>jt-808-server-dashboard-spring-boot-starter-reactive</artifactId>
-    <version>0.0.1</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 
@@ -38,7 +38,7 @@ article: false
 
 ```groovy
 
-api("io.github.hylexus.xtream:jt-808-server-dashboard-spring-boot-starter-reactive:0.0.1")
+api("io.github.hylexus.xtream:jt-808-server-dashboard-spring-boot-starter-reactive:0.1.0")
 ```
 
 :::

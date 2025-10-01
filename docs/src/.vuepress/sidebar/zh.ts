@@ -196,4 +196,9 @@ export const zhSidebar = sidebar({
         '/frequently-asked-questions/building-from-source.md',
         '/frequently-asked-questions/code-analysis.md',
     ],
+    "/release-notes": [
+        {text: 'Latest', link: '/release-notes/latest.md', icon: 'code-branch'},
+        {text: 'v-0.1.x(Latest)', link: '/release-notes/0.1.x.md', icon: 'code-branch'},
+        '/release-notes/0.0.x.md',
+    ],
 });
