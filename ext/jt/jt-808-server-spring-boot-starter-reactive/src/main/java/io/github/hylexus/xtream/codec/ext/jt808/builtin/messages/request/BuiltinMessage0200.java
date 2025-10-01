@@ -17,7 +17,6 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x64;
@@ -108,8 +107,8 @@ public class BuiltinMessage0200 {
             @Preset.JtStyle.Byte short result) {
     }
 
-    // 长度：消息体长度减去前面的 28 字节
-    @XtreamMapField(
+    // 长度：消息体长度减去前面的 28 字节(未指定长度时读取后续所有字节)
+    @Preset.JtStyle.SimpleMap(
             desc = "附加项列表",
             key = @Key(type = KeyType.u8),
             valueLength = @ValueLength(type = ValueLengthType.u8),
