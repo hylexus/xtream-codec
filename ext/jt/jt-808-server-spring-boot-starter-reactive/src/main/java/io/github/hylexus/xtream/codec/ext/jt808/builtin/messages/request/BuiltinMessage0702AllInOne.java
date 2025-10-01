@@ -81,24 +81,21 @@ public class BuiltinMessage0702AllInOne {
     @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8)
     private String driverName;
 
-    @Preset.JtStyle.Str(version = 2011, length = 20, desc = "驾驶员身份证编码(2011)")
+    @Preset.JtStyle.Str(order = 10, version = 2011, length = 20, desc = "驾驶员身份证编码(2011)")
+    @Preset.JtStyle.Str(order = 50, version = 2019, length = 20, desc = "驾驶员身份证编码(2019)")
     private String driverIdCardNo;
 
-    @Preset.JtStyle.Str(version = 2011, length = 40, desc = "从业资格证编码")
-    @Preset.JtStyle.Str(version = {2013, 2019}, length = 20, paddingRight = @Padding(minEncodedLength = 20), desc = "从业资格证编码")
+    @Preset.JtStyle.Str(order = 20, version = 2011, length = 40, desc = "从业资格证编码")
+    @Preset.JtStyle.Str(order = 20, version = {2013, 2019}, length = 20, paddingRight = @Padding(minEncodedLength = 20), desc = "从业资格证编码")
     private String professionalLicenseNo;
 
     // prependLengthFieldType: 前置一个 u8类型的字段 表示 发证机构名称长度
-    @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "发证机构名称")
+    @Preset.JtStyle.Str(order = 30, prependLengthFieldType = PrependLengthFieldType.u8, desc = "发证机构名称")
     private String certificateAuthorityName;
 
-    @Preset.JtStyle.BcdDateTime(version = {2013, 2019}, length = 4, pattern = "yyyyMMdd", desc = "到期时间")
+    @Preset.JtStyle.BcdDateTime(order = 40, version = {2013, 2019}, length = 4, pattern = "yyyyMMdd", desc = "到期时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate certificateExpiresDate;
-
-    // todo 合并为一个字段
-    @Preset.JtStyle.Str(version = 2019, length = 20, desc = "驾驶员身份证编码")
-    private String driverIdCardNoV2019;
 
 }

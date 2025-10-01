@@ -73,8 +73,7 @@ class BuiltinMessage0702AllInOneTest extends BaseCodecTest {
         assertEquals(sourceEntity.getProfessionalLicenseNo(), decodeEntity.getProfessionalLicenseNo());
         assertEquals(sourceEntity.getCertificateAuthorityName(), decodeEntity.getCertificateAuthorityName());
         assertEquals(sourceEntity.getCertificateExpiresDate(), decodeEntity.getCertificateExpiresDate());
-        assertEquals(sourceEntity.getDriverIdCardNoV2019(), decodeEntity.getDriverIdCardNoV2019());
-        assertNull(sourceEntity.getDriverIdCardNo());
+        assertEquals(sourceEntity.getDriverIdCardNo(), decodeEntity.getDriverIdCardNo());
     }
 
     private BuiltinMessage0702AllInOne createEntityV2019() {
@@ -86,13 +85,13 @@ class BuiltinMessage0702AllInOneTest extends BaseCodecTest {
                 .setProfessionalLicenseNo("12345678901234567890")
                 .setCertificateAuthorityName("不知道名字啊")
                 .setCertificateExpiresDate(certificateExpiresDate)
-                .setDriverIdCardNoV2019("12345678901234567890")
+                .setDriverIdCardNo("12345678901234567890")
                 ;
     }
 
     private void doCompareV2013(BuiltinMessage0702AllInOne sourceEntity, BuiltinMessage0702AllInOne targetEntity) {
         assertEquals(sourceEntity.getDriverName(), targetEntity.getDriverName());
-        assertEquals(sourceEntity.getDriverIdCardNoV2019(), targetEntity.getDriverIdCardNoV2019());
+        assertEquals(sourceEntity.getDriverIdCardNo(), targetEntity.getDriverIdCardNo());
         assertEquals(sourceEntity.getProfessionalLicenseNo(), targetEntity.getProfessionalLicenseNo());
         assertEquals(sourceEntity.getCertificateAuthorityName(), targetEntity.getCertificateAuthorityName());
     }
@@ -118,7 +117,6 @@ class BuiltinMessage0702AllInOneTest extends BaseCodecTest {
         assertNull(sourceEntity.getTime());
         assertNull(sourceEntity.getIcCardReadResult());
         assertNull(sourceEntity.getCertificateExpiresDate());
-        assertNull(sourceEntity.getDriverIdCardNoV2019());
     }
 
     static BuiltinMessage0702AllInOne createEntityV2011() {
