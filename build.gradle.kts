@@ -40,6 +40,7 @@ configure(subprojects) {
     }
     tasks.withType<JavaCompile> {
         options.compilerArgs.add("-parameters")
+        options.release.set(getJavaVersion().toInt())
     }
 
     apply(plugin = "io.spring.dependency-management")
@@ -179,9 +180,8 @@ configure(subprojects) {
             manifest.attributes["Implementation-Title"] = project.name
             manifest.attributes["Implementation-Version"] = getProjectVersion()
             manifest.attributes["Automatic-Module-Name"] = project.name.replace('-', '.')
-            manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
-            // manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.vendor")})"
-            manifest.attributes["Minimum-Jdk-Version"] = getJavaVersion()
+            manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.vendor")})"
+            manifest.attributes["X-Requires-Java-Version"] = getJavaVersion().toInt()
         }
 
         from(rootProject.projectDir) {
