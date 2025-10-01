@@ -82,7 +82,7 @@ public class BuiltinMessage0200 {
      */
     public record Item0x11(
             @JtStyle.Byte short locationType,
-            @JtStyle.Word(condition = "#locationType != 0") @Nullable Long locationId) {
+            @JtStyle.Dword(condition = "#locationType != 0") @Nullable Long locationId) {
     }
 
     /**
