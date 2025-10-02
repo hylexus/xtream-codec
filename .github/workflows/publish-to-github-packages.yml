@@ -109,15 +109,18 @@ jobs:
           # 执行发布
           $GRADLE_CMD
 
-      - name: Publish Status
+      - name: ❌ Build Failed
+        if: ${{ failure() }}
+        run: |
+          echo "🚨 The publish job failed. Check logs above."
+
+      - name: ✅ Build Succeeded
+        if: ${{ success() }}
+        run: |
+          echo "🎉 Successfully published to GitHub Packages!"
+          echo "📦 Location: https://github.com/${{ github.repository }}/packages"
+
+      - name: 📦 Build Finished
         if: always()
         run: |
-          echo "🏁 Publish Job Finished"
-          if [ ${{ failure() }} -eq 1 ]; then
-            echo "❌ Status: FAILED"
-          elif [ ${{ success() }} -eq 1 ]; then
-            echo "✅ Status: SUCCESS"
-          else
-            echo "🟡 Status: UNKNOWN"
-          fi
-          echo "📦 Package URL: https://github.com/${{ github.repository }}/packages"
+          echo "📦 Finished."
