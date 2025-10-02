@@ -326,8 +326,8 @@ configure(subprojects) {
                                 name = "GitHubPackages"
                                 url = uri(mavenRepoConfig.getProperty("github-pkg.url"))
                                 credentials {
-                                    username = mavenRepoConfig.getProperty("github-pkg.username") ?: System.getenv("GITHUB_ACTOR")
-                                    password = mavenRepoConfig.getProperty("github-pkg.password") ?: System.getenv("GITHUB_TOKEN")
+                                    username = System.getenv("GITHUB_ACTOR") ?: mavenRepoConfig.getProperty("github-pkg.username")
+                                    password = System.getenv("GITHUB_TOKEN") ?: mavenRepoConfig.getProperty("github-pkg.password")
                                 }
                             }
                         }
