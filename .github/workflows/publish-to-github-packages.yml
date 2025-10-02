@@ -90,8 +90,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 基础命令
-          GRADLE_CMD="./gradlew clean build publishMavenPublicationToGitHubPackagesRepository -P xtream.maven.publications.github.enabled=true -P buildJt808DashboardUi=true -P xtream.skip.checkstyle=false"
+          GRADLE_CMD="./gradlew clean build publishMavenPublicationToGitHubPackagesRepository"
+          GRADLE_CMD="$GRADLE_CMD -D gpr.user=${{ github.actor }}"
+          GRADLE_CMD="$GRADLE_CMD -D gpr.key=${{ secrets.GITHUB_TOKEN }}"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.maven.publications.github.enabled=true"
+          GRADLE_CMD="$GRADLE_CMD -P buildJt808DashboardUi=true"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.skip.checkstyle=false"
 
           # 处理跳过测试
           if ${{ 
@@ -108,5 +112,12 @@ jobs:
       - name: Publish Status
         if: always()
         run: |
-          echo "✅ Published to GitHub Packages!"
+          echo "🏁 Publish Job Finished"
+          if [ ${{ failure() }} -eq 1 ]; then
+            echo "❌ Status: FAILED"
+          elif [ ${{ success() }} -eq 1 ]; then
+            echo "✅ Status: SUCCESS"
+          else
+            echo "🟡 Status: UNKNOWN"
+          fi
           echo "📦 Package URL: https://github.com/${{ github.repository }}/packages"
