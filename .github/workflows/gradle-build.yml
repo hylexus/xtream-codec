@@ -9,9 +9,9 @@ name: Gradle Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "pre-release", "release-candidate" ]
 
 jobs:
   build:
