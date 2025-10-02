@@ -51,13 +51,21 @@ tasks.register<Exec>("buildJt808DashboardUi") {
 tasks.register<Copy>("copyJt808DashboardUiDist") {
     onlyIf { buildJt808DashboardUi }
     group = jt808DashboardUiGroup
-    description = "复制jt808-dashboard-ui构建输出"
+    description = "复制 jt808-dashboard-ui 构建输出"
+
     from("${dashboardUiDir}/dist")
     into("src/main/resources/static/dashboard/808/")
     include("**/*")
 
     doFirst {
+        // 删除旧文件
         delete("src/main/resources/static/dashboard/808/")
+
+        // 确保父目录存在
+        val targetDir = file("src/main/resources/static/dashboard/808/")
+        if (!targetDir.exists()) {
+            targetDir.mkdirs()
+        }
     }
 
     // 始终重新执行任务

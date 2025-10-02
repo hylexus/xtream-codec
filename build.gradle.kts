@@ -246,8 +246,8 @@ configure(subprojects) {
             project.extensions.findByType<io.gitee.pkmer.extension.PkmerBootPluginExtension>()?.apply {
                 sonatypeMavenCentral {
                     stagingRepository.set(file(stagingRepositoryPath))
-                    username.set(mavenRepoConfig.getProperty("sonatype-staging.username"))
-                    password.set(mavenRepoConfig.getProperty("sonatype-staging.password"))
+                    username.set(mavenRepoConfig.getProperty("maven-central-portal.username"))
+                    password.set(mavenRepoConfig.getProperty("maven-central-portal.password"))
                     publishingType.set(io.gitee.pkmer.enums.PublishingType.USER_MANAGED)
                 }
             }
@@ -321,8 +321,18 @@ configure(subprojects) {
                                 }
                             }
                         }
-
-                        // 2. 发布到 Maven 中央仓库
+                        if (getConfigAsBoolean("xtream.maven.publications.github.enabled")) {
+                            maven {
+                                name = "GitHubPackages"
+                                url = uri(mavenRepoConfig.getProperty("github-pkg.url"))
+                                credentials {
+                                    username = mavenRepoConfig.getProperty("github-pkg.username") ?: System.getenv("GITHUB_ACTOR")
+                                    password = mavenRepoConfig.getProperty("github-pkg.password") ?: System.getenv("GITHUB_TOKEN")
+                                }
+                            }
+                        }
+                        // 发布到 Maven 中央仓库
+                        // 已废弃: 新版中央仓库发版参考 io.gitee.pkmer.pkmerboot-central-publisher
 //                        maven {
 //                            name = "centralPortal"
 //                            url = uri(mavenRepoConfig.getProperty("sonatype-staging.url"))
