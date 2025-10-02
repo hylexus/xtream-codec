@@ -414,7 +414,34 @@ fun getConfigAsString(key: String) = project.ext.get(key) as String
 
 fun getConfigAsBoolean(key: String) = project.ext.get(key)?.toString()?.toBoolean() ?: false
 
-fun getProjectVersion() = getConfigAsString("projectVersion")
+fun getProjectVersion(): String {
+    val baseVersion = getConfigAsString("projectVersion")
+
+    // 判断是否是预发布版本（alpha, beta, rc）
+    val isPrerelease = listOf("alpha", "beta", "rc").any { baseVersion.contains(it, ignoreCase = true) }
+
+    // 如果不是预发布，直接返回原版本
+    if (!isPrerelease) {
+        return baseVersion
+    }
+
+    // 检查是否在 GitHub Actions 环境
+    val isRunningInCI = System.getenv("GITHUB_ACTIONS") == "true"
+    val ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")
+    val gitSha = System.getenv("GITHUB_SHA")?.take(7)
+
+    return if (isRunningInCI && !ciRunNumber.isNullOrBlank() && !gitSha.isNullOrBlank()) {
+        // CI 环境：生成带 run_number 和 git hash 的版本
+        // 例如：baseVersion = "0.1.1-alpha.0"
+        // dropLastWhile { it != '.' } ==> "0.1.1-alpha."
+        // dropLast(1) ==> "0.1.1-alpha"
+        // 最终 → "0.1.1-alpha.123+git.abc1234"
+        "${baseVersion.dropLastWhile { it != '.' }.dropLast(1)}.$ciRunNumber+git.$gitSha"
+    } else {
+        // 本地构建：直接使用原版本号（不加 git hash）
+        baseVersion
+    }
+}
 
 fun getJavaVersion() = getConfigAsString("defaultJavaVersion")
 
