@@ -397,7 +397,13 @@ fun isMavenPublications(project: Project): Boolean {
     return mavenPublications.contains(project.name)
 }
 
-fun needSign() = !rootProject.version.toString().lowercase().endsWith("snapshot")
+fun needSign(): Boolean {
+    val version = rootProject.version.toString().lowercase()
+    return !version.endsWith("-snapshot")
+            && !version.contains("-alpha")
+            && !version.contains("-beta")
+            && !version.contains("-rc")
+}
 
 fun getConfigAsString(key: String) = project.ext.get(key) as String
 
