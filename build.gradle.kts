@@ -435,8 +435,8 @@ fun getProjectVersion(): String {
         // 例如：baseVersion = "0.1.1-alpha.0"
         // dropLastWhile { it != '.' } ==> "0.1.1-alpha."
         // dropLast(1) ==> "0.1.1-alpha"
-        // 最终 → "0.1.1-alpha.123+git.abc1234"
-        "${baseVersion.dropLastWhile { it != '.' }.dropLast(1)}.$ciRunNumber+git.$gitSha"
+        // 最终 → "0.1.1-alpha.123.git.abc1234"
+        "${baseVersion.dropLastWhile { it != '.' }.dropLast(1)}.$ciRunNumber.git.$gitSha"
     } else {
         // 本地构建：直接使用原版本号（不加 git hash）
         baseVersion
