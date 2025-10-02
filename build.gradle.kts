@@ -398,7 +398,7 @@ fun isMavenPublications(project: Project): Boolean {
 }
 
 fun needSign(): Boolean {
-    val version = rootProject.version.toString().lowercase()
+    val version = getProjectVersion().lowercase()
     return !version.endsWith("-snapshot")
             && !version.contains("-alpha")
             && !version.contains("-beta")
