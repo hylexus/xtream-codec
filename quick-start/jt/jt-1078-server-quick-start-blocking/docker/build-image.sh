@@ -9,7 +9,7 @@ echo "SUBPROJECT_ROOT_DIR      : ${SUBPROJECT_ROOT_DIR}"
 
 cd ${XTREAM_PROJECT_ROOT_DIR}
 
-./gradlew -P buildJt1078QuickstartUiBlocking=true \
+./gradlew -P xtream.frontend.build.jt1078-quickstart-ui.blocking.enabled=true \
 -P xtream.skip.fatjar=false \
 -P xtream.skip.checkstyle=false \
 :quick-start:jt:jt-1078-server-quick-start-blocking:clean \

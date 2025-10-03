@@ -55,9 +55,9 @@ jt808-server:
     ### Dashboard 配置
     dashboard:
       ### 是否启用 Dashboard
-      enabled: true
+      enabled: false
       # 将 `/` 307 到 `/dashboard-ui/`
-      redirect-root-to-base-path: true
+      redirect-root-to-base-path: false
       # 将 `base-path` 开头的 404 请求转发到 `index.html`
       # 如果不开启这个配置，刷新 dashboard 页面时会出现404(也就是说只能刷新 `base-path` 根路由，其他子路由刷新会是 404)
       forward-not-found-to-index: true

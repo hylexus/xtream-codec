@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@SuppressWarnings("removal")
 @Endpoint(id = "jt808", enableByDefault = false)
 public class BuiltinJt808ServerEndpoint {
 

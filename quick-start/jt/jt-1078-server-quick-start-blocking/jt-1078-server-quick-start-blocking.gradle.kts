@@ -1,10 +1,9 @@
 import io.github.hylexus.xtream.codec.gradle.plugins.XtreamCodecFastModePlugin
-import org.cadixdev.gradle.licenser.LicenseExtension
 
 plugins {
     id("org.springframework.boot")
     application
-    // id("xtream-codec-fast-mode-plugin")
+    id("xtream-codec-frontend-build-plugin")
 }
 
 application {
@@ -26,62 +25,20 @@ dependencies {
 
     implementation("jakarta.annotation:jakarta.annotation-api")
 }
-val quickStartUiStaticDir = project.file("src/main/resources/static")
-// 前端打包生成的文件 不检测 License
-extensions.configure(LicenseExtension::class.java) {
-    exclude {
-        it.file.startsWith(quickStartUiStaticDir)
-    }
-}
 
-// ./gradlew clean build -P buildJt1078QuickstartUiBlocking=true
-val buildJt1078QuickstartUiBlocking = getConfigAsBoolean("buildJt1078QuickstartUiBlocking") || project.findProperty("buildJt1078QuickstartUiBlocking") == "true"
-val quickstartUiDir = file("../jt-1078-server-quick-start-ui")
-val quickstartUiGroup = "jt1078-quickstart"
-
-tasks.register<Exec>("buildJt1078QuickstartUiBlocking") {
-    onlyIf { buildJt1078QuickstartUiBlocking }
-    group = quickstartUiGroup
-    description = "构建 jt-1078-server-quick-start-ui"
-    workingDir = file(quickstartUiDir)
-    commandLine(
-        "sh", "-c",
-        """
-        echo "===> 开始构建 jt-1078-server-quick-start-ui"
-        pnpm install --registry https://registry.npmmirror.com
-        pnpm run build
-        echo "===> 构建 jt-1078-server-quick-start-ui 成功"
+// ./gradlew clean build -P xtream.frontend.build.jt1078-quickstart-ui.blocking.enabled=true
+xtreamCodecFrontendBuild {
+    enabled.set(xtreamConfig.buildJt1078QuickstartUiBlocking)
+    group.set("jt1078-quickstart")
+    description.set("jt1078-quickstart-ui")
+    frontendProjectDir.set(layout.projectDirectory.dir("../jt-1078-server-quick-start-ui"))
+    frontendDistDir.set(layout.projectDirectory.dir("../jt-1078-server-quick-start-ui/dist"))
+    frontendBasePath.set("/")
+    buildCommand = """
+        pnpm install --registry https://registry.npmmirror.com \
+        && pnpm run build
         """.trimIndent()
-    )
+    backendStaticDir.set(layout.projectDirectory.dir("src/main/resources/static/quickstart-ui/"))
+    cleanBackendStaticDir.set(true)
+    createBackendStaticDirIfMissing.set(true)
 }
-
-tasks.register<Copy>("copyJt1078QuickstartUiDistBlocking") {
-    onlyIf { buildJt1078QuickstartUiBlocking }
-    group = quickstartUiGroup
-    description = "复制 quickstart-ui 构建输出"
-    from("${quickstartUiDir}/dist")
-    into("src/main/resources/static/quickstart-ui/")
-    include("**/*")
-
-    doFirst {
-        delete("src/main/resources/static/quickstart-ui/")
-    }
-
-    // 始终重新执行任务
-    outputs.upToDateWhen { false }
-}
-
-tasks.named("processResources").configure {
-    if (buildJt1078QuickstartUiBlocking) {
-        dependsOn(tasks.named("copyJt1078QuickstartUiDistBlocking"))
-    }
-}
-
-tasks.named("build").configure {
-    if (buildJt1078QuickstartUiBlocking) {
-        dependsOn(tasks.named("buildJt1078QuickstartUiBlocking"))
-        dependsOn(tasks.named("copyJt1078QuickstartUiDistBlocking"))
-    }
-}
-
-fun getConfigAsBoolean(key: String) = project.ext.get(key)?.toString()?.toBoolean() ?: false

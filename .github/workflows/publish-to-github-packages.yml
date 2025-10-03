@@ -89,11 +89,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          GRADLE_CMD="./gradlew clean build publishMavenPublicationToGitHubPackagesRepository"
+          GRADLE_CMD="./gradlew clean build publishMavenPublicationToGitHubPackagesRepository publishMavenBomPublicationToGitHubPackagesRepository"
           GRADLE_CMD="$GRADLE_CMD -D gpr.user=${{ github.actor }}"
           GRADLE_CMD="$GRADLE_CMD -D gpr.key=${{ secrets.GITHUB_TOKEN }}"
-          GRADLE_CMD="$GRADLE_CMD -P xtream.maven.publications.github.enabled=true"
-          GRADLE_CMD="$GRADLE_CMD -P buildJt808DashboardUi=true"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.maven.publications.signing=off"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.maven.repo.github.enabled=true"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.frontend.build.jt808-dashboard-ui.enabled=true"
           GRADLE_CMD="$GRADLE_CMD -P xtream.skip.checkstyle=false"
 
           # 处理跳过测试

@@ -29,6 +29,7 @@ pluginManagement {
 }
 
 rootProject.name = "xtream-codec"
+include("xtream-codec-dependencies")
 include("xtream-codec-base")
 include("xtream-codec-core")
 include("xtream-codec-server-reactive")
