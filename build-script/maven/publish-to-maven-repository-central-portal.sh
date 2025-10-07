@@ -17,6 +17,6 @@ rm -rf /tmp/gradle/maven-tmp1
 ./gradlew clean build publishToMavenCentralPortal \
 -P xtream.maven.repo.central-portal.enabled=true \
 -P xtream.maven.publications.signing=on \
--P xtream.frontend.build.jt808-dashboard-ui.enabled=true \
--P xtream.skip.checkstyle=false \
--P xtream.skip.fatjar=true
+-P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true \
+-P xtream.backend.build.checkstyle.enabled=true \
+-P xtream.backend.build.debug-module-fatjar.enabled=false

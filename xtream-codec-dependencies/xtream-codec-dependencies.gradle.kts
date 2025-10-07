@@ -12,16 +12,24 @@ javaPlatform {
 }
 
 version = xtreamConfig.projectVersion
-val mavenRepoConfig = xtreamConfig.mavenRepoConfig
+
+private fun DependencyConstraintHandlerScope.apiBom(module: String) {
+    val group = xtreamConfig.projectGroupId
+    val versionProp = "\${xtream-codec.version}"
+    api("$group:$module:$versionProp")
+}
+
 dependencies {
     constraints {
-        api(project(":xtream-codec-core"))
-        api(project(":xtream-codec-server-reactive"))
-        api(project(":ext:jt:jt-808-server-spring-boot-starter-reactive"))
-        api(project(":ext:jt:jt-808-server-dashboard-spring-boot-starter-reactive"))
+        apiBom("xtream-codec-base")
+        apiBom("xtream-codec-core")
+        apiBom("xtream-codec-server-reactive")
+        apiBom("jt-808-server-spring-boot-starter-reactive")
+        apiBom("jt-808-server-dashboard-spring-boot-starter-reactive")
     }
 }
 
+val mavenRepoConfig = xtreamConfig.mavenRepoConfig
 val stagingRepositoryPath = "/tmp/gradle/maven-tmp1"
 if (xtreamConfig.centalPortalMavenRepoEnabled) {
     apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
@@ -41,16 +49,40 @@ if (xtreamConfig.centalPortalMavenRepoEnabled) {
 publishing {
     publications {
         create<MavenPublication>("mavenBom") {
-            from(components["javaPlatform"])  // 关键点，发布 BOM
+            from(components["javaPlatform"])
 
             groupId = xtreamConfig.projectGroupId
             artifactId = project.name
             version = version
 
+            pom.withXml {
+                val root = asNode()
+                // 1. 添加 <properties> 节点
+                val propsNode = root.appendNode("properties")
+                propsNode.appendNode("xtream-codec.version", version)
+
+                // 2. 找到 <dependencyManagement> 节点
+                val dmNode = (root.get("dependencyManagement") as? List<*>)?.firstOrNull() as? groovy.util.Node
+
+                // 3. 把 properties 节点移到 dependencyManagement 前面
+                if (dmNode != null) {
+                    root.remove(propsNode)
+                    @Suppress("UNCHECKED_CAST")
+                    val children = root.children() as MutableList<Any>
+                    val dmIndex = children.indexOf(dmNode)
+                    if (dmIndex >= 0) {
+                        children.add(dmIndex, propsNode)
+                    } else {
+                        // fallback：如果没找到就重新 append 回去
+                        root.append(propsNode)
+                    }
+                }
+            }
+
             pom {
                 name.set(project.name)
                 url.set(xtreamConfig.projectHomePage)
-                description.set("BOM for all xtream-codec submodules")
+                description.set("xtream-codec Dependencies")
                 licenses {
                     license {
                         name.set(xtreamConfig.projectLicenseName)

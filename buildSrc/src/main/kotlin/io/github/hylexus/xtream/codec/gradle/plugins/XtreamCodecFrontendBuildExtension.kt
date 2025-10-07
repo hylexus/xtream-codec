@@ -15,6 +15,12 @@ open class XtreamCodecFrontendBuildExtension @Inject constructor(objects: Object
     /** 是否启用前端构建 */
     val enabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
+    /** 分组 */
+    val group: Property<String> = objects.property(String::class.java).convention("frontend")
+
+    /** 描述信息 */
+    val description: Property<String> = objects.property(String::class.java).convention("构建前端项目")
+
     /** 前端项目所在目录（package.json 所在目录） */
     val frontendProjectDir: DirectoryProperty = objects.directoryProperty()
 
@@ -29,24 +35,24 @@ open class XtreamCodecFrontendBuildExtension @Inject constructor(objects: Object
     /** Vite base path，例如 `/dashboard-ui/` */
     val frontendBasePath: Property<String> = objects.property(String::class.java).convention("/")
 
+    /** 前端项目短名称(仅仅用于日志输出) */
+    val shortName: Property<String> = objects.property(String::class.java).convention(
+        frontendProjectDir.map { it.asFile.name }
+    )
+
     /** 构建命令，可以自定义（默认 pnpm） */
     val buildCommand: Property<String> = objects.property(String::class.java).convention(
         """
-        pnpm install --registry https://registry.npmmirror.com \
-        && pnpm run build --mode production
+        set -e
+        pnpm install --registry https://registry.npmmirror.com
+        pnpm run build --mode production
         """.trimIndent()
     )
 
     /** 复制前是否清空目标目录 */
-    val cleanBackendStaticDir: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
+    val cleanBackendStaticDir: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
     /** 如果目标目录不存在，是否自动创建 */
     val createBackendStaticDirIfMissing: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
-
-    /** 分组 */
-    val group: Property<String> = objects.property(String::class.java).convention("frontend")
-
-    /** 描述信息 */
-    val description: Property<String> = objects.property(String::class.java).convention("构建前端项目")
 
 }

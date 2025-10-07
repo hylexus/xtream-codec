@@ -14,6 +14,6 @@ echo "Working-Directory        : ${XTREAM_PROJECT_ROOT_DIR}"
 ./gradlew publishMavenPublicationToGitHubPackagesRepository publishMavenBomPublicationToGitHubPackagesRepository \
 -D org.gradle.parallel=false \
 -P xtream.maven.repo.github.enabled=true \
--P xtream.frontend.build.jt808-dashboard-ui.enabled=true \
--P xtream.skip.checkstyle=false \
--P xtream.skip.fatjar=true
+-P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true \
+-P xtream.backend.build.checkstyle.enabled=true \
+-P xtream.backend.build.debug-module-fatjar.enabled=false

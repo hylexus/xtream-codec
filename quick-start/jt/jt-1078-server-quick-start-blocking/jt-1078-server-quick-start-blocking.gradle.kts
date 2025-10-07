@@ -28,17 +28,9 @@ dependencies {
 
 // ./gradlew clean build -P xtream.frontend.build.jt1078-quickstart-ui.blocking.enabled=true
 xtreamCodecFrontendBuild {
-    enabled.set(xtreamConfig.buildJt1078QuickstartUiBlocking)
+    enabled.set(xtreamConfig.buildJt1078QuickstartUi)
     group.set("jt1078-quickstart")
     description.set("jt1078-quickstart-ui")
     frontendProjectDir.set(layout.projectDirectory.dir("../jt-1078-server-quick-start-ui"))
-    frontendDistDir.set(layout.projectDirectory.dir("../jt-1078-server-quick-start-ui/dist"))
-    frontendBasePath.set("/")
-    buildCommand = """
-        pnpm install --registry https://registry.npmmirror.com \
-        && pnpm run build
-        """.trimIndent()
     backendStaticDir.set(layout.projectDirectory.dir("src/main/resources/static/quickstart-ui/"))
-    cleanBackendStaticDir.set(true)
-    createBackendStaticDirIfMissing.set(true)
 }

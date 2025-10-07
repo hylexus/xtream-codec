@@ -39,19 +39,11 @@ dependencies {
     api("io.minio:minio")
 }
 
-// ./gradlew clean build -P xtream.frontend.build.jt808-quickstart-ui.non-blocking.enabled=true
+// ./gradlew clean build -P xtream.frontend.build.jt-808-server-quick-start-with-storage-ui.enabled=true
 xtreamCodecFrontendBuild {
-    enabled.set(xtreamConfig.buildJt808QuickstartUiNonblocking)
+    enabled.set(xtreamConfig.buildJt808QuickstartUi)
     group.set("jt808-quickstart")
     description.set("jt808-quickstart-ui")
     frontendProjectDir.set(layout.projectDirectory.dir("../jt-808-server-quick-start-with-storage-ui"))
-    frontendDistDir.set(layout.projectDirectory.dir("../jt-808-server-quick-start-with-storage-ui/dist"))
-    frontendBasePath.set("/")
-    buildCommand = """
-        pnpm install --registry https://registry.npmmirror.com \
-        && pnpm run build
-        """.trimIndent()
     backendStaticDir.set(layout.projectDirectory.dir("src/main/resources/static/quickstart-ui/"))
-    cleanBackendStaticDir.set(true)
-    createBackendStaticDirIfMissing.set(true)
 }

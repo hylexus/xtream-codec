@@ -141,17 +141,14 @@ object XtreamConfig {
         val defaultSpringCloudBomVersion: String get() = getOrLoadConfigAsString("defaultSpringCloudBomVersion")
 
         // frontend
-        val buildJt808DashboardUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt808-dashboard-ui.enabled")
-        val buildJt808DebugUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt808-debug-ui.enabled")
-        val buildJt808QuickstartUiNonblocking: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt808-quickstart-ui.non-blocking.enabled")
-        val buildJt808QuickstartUiBlocking: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt808-quickstart-ui.blocking.enabled")
-        val buildJt1078QuickstartUiNonblocking: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt1078-quickstart-ui.non-blocking.enabled")
-        val buildJt1078QuickstartUiBlocking: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt1078-quickstart-ui.blocking.enabled")
+        val buildJt808DashboardUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt-808-server-dashboard-ui.enabled")
+        val buildJt808DebugUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt-808-server-spring-boot-starter-debug-ui.enabled")
+        val buildJt808QuickstartUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt-808-server-quick-start-with-storage-ui.enabled")
+        val buildJt1078QuickstartUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt-1078-server-quick-start-ui.enabled")
 
         // build
-        val skipLoggingEnabled: Boolean get() = getOrLoadConfigAsBoolean("xtream.skip.logging.enabled", true)
-        val skipFatJar: Boolean get() = getOrLoadConfigAsBoolean("xtream.skip.fatjar", false)
-        val skipCheckStyle: Boolean get() = getOrLoadConfigAsBoolean("xtream.skip.checkstyle", false)
+        val skipFatJar: Boolean get() = !getOrLoadConfigAsBoolean("xtream.backend.build.debug-module-fatjar.enabled", true)
+        val skipCheckStyle: Boolean get() = !getOrLoadConfigAsBoolean("xtream.backend.build.checkstyle.enabled", true)
 
         // Maven
         val mavenRepoConfig: Properties

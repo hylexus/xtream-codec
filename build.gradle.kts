@@ -111,8 +111,8 @@ configure(subprojects) {
         // 严重影响构建时间
         onlyIf {
             val skip = xtreamConfig.skipCheckStyle
-            if (skip && xtreamConfig.skipLoggingEnabled) {
-                logTip("Disabling task: checkstyle in project [${project.name}](xtream.skip.checkstyle==true)")
+            if (skip) {
+                logTip("Disabling task [checkstyle] in project [${project.name}] (xtream.backend.build.checkstyle.enabled == false)")
             }
             return@onlyIf !skip
         }

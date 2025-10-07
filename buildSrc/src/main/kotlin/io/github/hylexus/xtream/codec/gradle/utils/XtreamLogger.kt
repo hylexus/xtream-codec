@@ -11,7 +11,7 @@ import org.gradle.api.Project
  * - 支持图标 + ANSI 颜色
  */
 object XtreamLoggerConfig {
-    private const val PREFIX = "xtream.log."
+    private const val PREFIX = "xtream.backend.build.log."
 
     private val defaultEnabled = mapOf(
         "success" to true,
@@ -28,7 +28,7 @@ object XtreamLoggerConfig {
                 ?: System.getProperty(key))?.toBoolean()
             prop ?: defaultEnabled[level] ?: false
         } catch (_: Exception) {
-            defaultEnabled[level] ?: false
+            return defaultEnabled[level] ?: false
         }
     }
 }
@@ -36,6 +36,7 @@ object XtreamLoggerConfig {
 private object XtreamLoggerIcons {
     const val SUCCESS = "[✅ XTREAM-SUCCESS]"
     const val SUCCESS_2 = "[\uD83D\uDE80 XTREAM-SUCCESS]"
+    const val SUCCESS_3 = "[🟢 XTREAM-SUCCESS]"
     const val INFO = "[ℹ️ XTREAM-INFO]"
     const val INFO_2 = "[\uD83D\uDCA1 XTREAM-INFO]"
     const val INFO_3 = "[\uD83D\uDCA1 XTREAM-TIP]"
@@ -65,6 +66,11 @@ fun Project.logSuccess(msg: String) {
 @Suppress("unused")
 fun Project.logSuccess2(msg: String) {
     if (isLogEnabled("success")) logger.lifecycle("${XtreamLoggerColors.GREEN}${XtreamLoggerIcons.SUCCESS_2} $msg${XtreamLoggerColors.RESET}")
+}
+
+@Suppress("unused")
+fun Project.logSuccess3(msg: String) {
+    if (isLogEnabled("success")) logger.lifecycle("${XtreamLoggerColors.GREEN}${XtreamLoggerIcons.SUCCESS_3} $msg${XtreamLoggerColors.RESET}")
 }
 
 fun Project.logInfo(msg: String) {

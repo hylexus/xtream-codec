@@ -9,10 +9,10 @@ echo "SUBPROJECT_ROOT_DIR      : ${SUBPROJECT_ROOT_DIR}"
 
 cd ${XTREAM_PROJECT_ROOT_DIR}
 
-./gradlew -P xtream.frontend.build.jt808-dashboard-ui.enabled=true \
--P xtream.frontend.build.jt808-quickstart-ui.non-blocking.enabled=true \
--P xtream.skip.fatjar=false \
--P xtream.skip.checkstyle=false \
+./gradlew -P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true \
+-P xtream.frontend.build.jt-808-server-quick-start-with-storage-ui.enabled=true \
+-P xtream.backend.build.debug-module-fatjar.enabled=true \
+-P xtream.backend.build.checkstyle.enabled=true \
 :quick-start:jt:jt-808-server-quick-start-with-storage-nonblocking:clean \
 :quick-start:jt:jt-808-server-quick-start-with-storage-nonblocking:build \
 

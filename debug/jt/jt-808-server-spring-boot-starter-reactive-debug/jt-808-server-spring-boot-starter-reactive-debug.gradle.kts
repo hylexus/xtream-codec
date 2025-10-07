@@ -31,19 +31,11 @@ dependencies {
 
 }
 
-// ./gradlew clean build -P xtream.frontend.build.jt808-debug-ui.enabled=true
+// ./gradlew clean build -P xtream.frontend.build.jt-808-server-spring-boot-starter-debug-ui.enabled=true
 xtreamCodecFrontendBuild {
     enabled.set(xtreamConfig.buildJt808DebugUi)
     group.set("jt808-debug-ui")
     description.set("jt808-debug-ui")
     frontendProjectDir.set(layout.projectDirectory.dir("../jt-808-server-spring-boot-starter-debug-ui"))
-    frontendDistDir.set(layout.projectDirectory.dir("../jt-808-server-spring-boot-starter-debug-ui/dist"))
-    frontendBasePath.set("/")
-    buildCommand = """
-        pnpm install --registry https://registry.npmmirror.com \
-        && pnpm run build --mode production
-        """.trimIndent()
     backendStaticDir.set(layout.projectDirectory.dir("src/main/resources/static"))
-    cleanBackendStaticDir.set(true)
-    createBackendStaticDirIfMissing.set(true)
 }

@@ -94,8 +94,8 @@ jobs:
           GRADLE_CMD="$GRADLE_CMD -D gpr.key=${{ secrets.GITHUB_TOKEN }}"
           GRADLE_CMD="$GRADLE_CMD -P xtream.maven.publications.signing=off"
           GRADLE_CMD="$GRADLE_CMD -P xtream.maven.repo.github.enabled=true"
-          GRADLE_CMD="$GRADLE_CMD -P xtream.frontend.build.jt808-dashboard-ui.enabled=true"
-          GRADLE_CMD="$GRADLE_CMD -P xtream.skip.checkstyle=false"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.backend.build.checkstyle.enabled=true"
 
           # 处理跳过测试
           if ${{ 

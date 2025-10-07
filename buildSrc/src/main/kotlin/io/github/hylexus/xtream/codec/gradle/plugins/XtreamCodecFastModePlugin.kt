@@ -1,4 +1,5 @@
 package io.github.hylexus.xtream.codec.gradle.plugins
+
 import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
 import io.github.hylexus.xtream.codec.gradle.utils.logTip
 import org.gradle.api.Plugin
@@ -24,7 +25,6 @@ class XtreamCodecFastModePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val skipFatJar = project.xtreamConfig.skipFatJar
-        val skipLoggingEnabled = project.xtreamConfig.skipLoggingEnabled
         val disabledTaskNames = kotlin.collections.HashSet<String>()
         if (skipFatJar) {
             disabledTasks.forEach { taskName ->
@@ -33,9 +33,7 @@ class XtreamCodecFastModePlugin : Plugin<Project> {
                     disabledTaskNames.add(taskName)
                 }
             }
-            if (skipLoggingEnabled) {
-                project.logTip("Disabling task: $disabledTaskNames in project [${project.name}](xtream.skip.fatjar==true)")
-            }
+            project.logTip("Disabling task: $disabledTaskNames in project [${project.name}] (xtream.backend.build.debug-module-fatjar.enabled == false)")
         }
     }
 

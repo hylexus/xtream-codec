@@ -21,19 +21,12 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
 }
 
-// ./gradlew clean build -P xtream.frontend.build.jt808-dashboard-ui.enabled=true
+// ./gradlew clean build -P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true
 xtreamCodecFrontendBuild {
     enabled.set(xtreamConfig.buildJt808DashboardUi)
     group.set("jt808-dashboard-ui")
     description.set("jt808-dashboard-ui")
     frontendProjectDir.set(layout.projectDirectory.dir("../jt-808-server-dashboard-ui"))
-    // frontendDistDir.set(layout.projectDirectory.dir("../jt-808-server-dashboard-ui/dist"))
     frontendBasePath.set("/dashboard-ui/")
-    buildCommand = """
-        pnpm install --registry https://registry.npmmirror.com \
-        && pnpm run build --mode production
-        """.trimIndent()
     backendStaticDir.set(layout.projectDirectory.dir("src/main/resources/static/dashboard/808"))
-    cleanBackendStaticDir.set(true)
-    createBackendStaticDirIfMissing.set(true)
 }
