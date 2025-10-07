@@ -11,7 +11,7 @@ plugins {
     id("io.gitee.pkmer.pkmerboot-central-publisher") apply false
     id("signing")
     id("checkstyle")
-    id("com.github.joschi.licenser")
+    id("net.minecraftforge.licenser")
     id("com.github.jk1.dependency-license-report")
     id("com.namics.oss.gradle.license-enforce-plugin")
 }
@@ -119,9 +119,9 @@ configure(subprojects) {
     }
 
     // 本项目开源协议头
-    apply(plugin = "com.github.joschi.licenser")
-    license {
-        header = rootProject.file("build-script/license/license-header")
+    apply(plugin = "net.minecraftforge.licenser")
+    configure<net.minecraftforge.licenser.LicenseExtension> {
+        setHeader( rootProject.file("build-script/license/license-header"))
         skipExistingHeaders = false
         exclude("**/spring.factories")
         exclude("**/org.springframework.boot.autoconfigure.AutoConfiguration.imports")

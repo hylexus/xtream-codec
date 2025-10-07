@@ -1,7 +1,7 @@
 package io.github.hylexus.xtream.codec.gradle.plugins
 
 import io.github.hylexus.xtream.codec.gradle.utils.*
-import org.cadixdev.gradle.licenser.LicenseExtension
+import net.minecraftforge.licenser.LicenseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -125,7 +125,7 @@ class XtreamCodecFrontendBuildPlugin : Plugin<Project> {
         }
 
         // 4. License 插件集成
-        project.plugins.withId("com.github.joschi.licenser") {
+        project.plugins.withId("net.minecraftforge.licenser") {
             project.afterEvaluate {
                 val staticDir = extension.backendStaticDir.get().asFile
                 project.logInfo("Excluding frontend build output from License checks: ${project.relativePath(staticDir)}(${project.name})")

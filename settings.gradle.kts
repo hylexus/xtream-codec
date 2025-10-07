@@ -3,7 +3,7 @@ pluginManagement {
     plugins {
         id("io.spring.dependency-management") version "1.1.7" apply false
         id("org.springframework.boot") version defaultSpringBootBomVersion apply false
-        id("com.github.joschi.licenser") version "0.6.0" apply false
+        id("net.minecraftforge.licenser") version "1.2.0" apply false
         id("com.github.jk1.dependency-license-report") version "2.9" apply false
         id("com.namics.oss.gradle.license-enforce-plugin") version "1.7.0" apply false
         id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1" apply false

@@ -1,4 +1,4 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
+import net.minecraftforge.licenser.LicenseExtension
 
 dependencies {
 

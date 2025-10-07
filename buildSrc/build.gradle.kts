@@ -1,6 +1,5 @@
 plugins {
     `kotlin-dsl`
-    id("com.github.joschi.licenser") version "0.6.0" apply false
 }
 repositories {
     maven {
@@ -20,7 +19,6 @@ repositories {
 }
 
 dependencies {
-//    compileOnly("com.github.joschi.licenser:com.github.joschi.licenser.gradle.plugin:0.6.1")
-    implementation("com.github.joschi.licenser:com.github.joschi.licenser.gradle.plugin:0.6.1")
+    implementation("net.minecraftforge.licenser:net.minecraftforge.licenser.gradle.plugin:1.2.0")
 }
 
