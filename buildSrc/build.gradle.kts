@@ -2,15 +2,19 @@ plugins {
     `kotlin-dsl`
 }
 repositories {
-    maven {
-        url = uri("https://maven.aliyun.com/repository/public")
-        url = uri("https://mirrors.cloud.tencent.com/nexus/repository/maven-public")
-        url = uri("https://repo.huaweicloud.com/repository/maven")
-        url = uri("https://maven.aliyun.com/repository/gradle-plugin")
-        name = "aliyunGradlePlugin"
-        content {
-            // 404
-            excludeGroup("net.minecraftforge.licenser")
+    listOf(
+        "https://maven.aliyun.com/repository/public",
+        "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
+        "https://repo.huaweicloud.com/repository/maven",
+        "https://maven.aliyun.com/repository/gradle-plugin",
+    ).map {
+        maven {
+            url = uri(it)
+            name = it
+            content {
+                // 上面几个镜像都没这个依赖
+                excludeGroup("net.minecraftforge.licenser")
+            }
         }
     }
     gradlePluginPortal()
