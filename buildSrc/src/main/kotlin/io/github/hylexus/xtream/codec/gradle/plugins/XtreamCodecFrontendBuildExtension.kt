@@ -1,8 +1,11 @@
 package io.github.hylexus.xtream.codec.gradle.plugins
 
+import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.property
+import org.gradle.process.ExecSpec
 import javax.inject.Inject
 
 /**
@@ -43,11 +46,64 @@ open class XtreamCodecFrontendBuildExtension @Inject constructor(objects: Object
     /** 构建命令，可以自定义（默认 pnpm） */
     val buildCommand: Property<String> = objects.property(String::class.java).convention(
         """
-        set -e
-        pnpm install --registry https://registry.npmmirror.com
-        pnpm run build --mode production
-        """.trimIndent()
+        |pnpm install --registry https://registry.npmmirror.com
+        |pnpm run build --mode production
+        """.trimMargin()
     )
+
+    /**
+     * 自定义前端构建命令执行逻辑。
+     * 用户可以通过 DSL 自己配置 ExecSpec，比如使用 WSL、PowerShell、cmd 等。
+     */
+    val commandLineConfigurer: Property<Action<ExecSpec>> = objects.property()
+
+    /**
+     * Kotlin DSL 便捷方法，允许用户用 lambda 配置 commandLineConfigurer。
+     *
+     * 例如：
+     *
+     * - Shell:
+     *
+     * ```sh
+     * xtreamCodecFrontendBuild {
+     *     commandLineConfigurer {
+     *         commandLine(
+     *             "sh", "-c",
+     *             """
+     *             set -e
+     *             pnpm install --registry https://registry.npmmirror.com
+     *             pnpm run build --mode production
+     *             """.trimIndent()
+     *         )
+     *     }
+     * }
+     * ```
+     *
+     * - WSL：
+     *
+     * ```kotlin
+     * xtreamCodecFrontendBuild {
+     *     commandLineConfigurer {
+     *         commandLine("wsl", "bash", "-c", "echo Hello")
+     *     }
+     * }
+     * ```
+     * - PowerShell：
+     * ```kotlin
+     * xtreamCodecFrontendBuild {
+     *     commandLineConfigurer {
+     *         commandLine("powershell", "-Command", """
+     *             $ErrorActionPreference = 'Stop'
+     *             pnpm install
+     *             pnpm run build
+     *         """.trimIndent())
+     *      }
+     * }
+     * ```
+     */
+    fun commandLineConfigurer(configure: ExecSpec.() -> Unit) {
+        commandLineConfigurer.set(Action(configure))
+    }
 
     /** 复制前是否清空目标目录 */
     val cleanBackendStaticDir: Property<Boolean> = objects.property(Boolean::class.java).convention(false)

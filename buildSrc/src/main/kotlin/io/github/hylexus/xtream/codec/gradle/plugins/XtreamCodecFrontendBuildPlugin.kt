@@ -52,7 +52,14 @@ class XtreamCodecFrontendBuildPlugin : Plugin<Project> {
 
                     workingDir = projectDir
                     environment("VITE_BASE_PATH", extension.frontendBasePath.get())
-                    commandLine("sh", "-c", extension.buildCommand.get())
+                    if (extension.commandLineConfigurer.isPresent) {
+                        extension.commandLineConfigurer.get().execute(this)
+                    } else {
+                        // 用户命令
+                        val userCommand = extension.buildCommand.get().trimIndent()
+                        val finalCommand = FrontendShellResolver.constructBuildCommand(userCommand)
+                        commandLine(finalCommand)
+                    }
 
                     // 前端项目发生变化才执行
                     inputs.dir(projectDir.resolve("src"))
@@ -65,14 +72,14 @@ class XtreamCodecFrontendBuildPlugin : Plugin<Project> {
                         project.logSuccess3("Building frontend: $desc")
                         project.logTip("Working Directory : $workingDir")
                         project.logTip("Output Directory  : ${outputs.files.singleFile}")
-                        project.logTip("Build Command     : ${extension.buildCommand.get()}")
+                        project.logTip("Build Command     : ${commandLine.joinToString(" ")}")
                     }
 
                     doLast {
                         val desc = extension.shortName.get()
                         if (distDir.exists() && distDir.isDirectory && distDir.listFiles().isNotEmpty()) {
                             val fileCount = distDir.walk().count { it.isFile }
-                            project.logSuccess2("Frontend build succeeded: $desc. Output: ${distDir.name}/ (${fileCount} files)")
+                            project.logSuccess2("Frontend build succeeded: $desc. Output: ${distDir.name}/ ($fileCount files)")
                         }
                     }
                 }
@@ -84,7 +91,9 @@ class XtreamCodecFrontendBuildPlugin : Plugin<Project> {
         // 注意这个任务 **并不是** 注册在 rootProject 下的
         val copyTask = project.tasks.register<Copy>("copyFrontendDist") {
             group = extension.group.get()
-            description = "复制前端构建产物: ${project.relativePath(extension.frontendDistDir.get())} --> ${project.relativePath(extension.backendStaticDir.get().asFile)}"
+            description = "复制前端构建产物: ${project.relativePath(extension.frontendDistDir.get())} --> ${
+                project.relativePath(extension.backendStaticDir.get().asFile)
+            }"
             onlyIf { extension.enabled.get() }
 
             val distDir = extension.frontendDistDir.get().asFile
@@ -138,4 +147,64 @@ class XtreamCodecFrontendBuildPlugin : Plugin<Project> {
             }
         }
     }
+
+    enum class ShellType { SH, PWSH, POWERSHELL, CMD }
+
+    object FrontendShellResolver {
+
+        fun detectShell(): Triple<String, List<String>, ShellType> {
+            val isWindows = System.getProperty("os.name").lowercase().contains("windows")
+
+            fun hasExecutable(name: String) = try {
+                val cmd = if (isWindows) arrayOf("where", name) else arrayOf("which", name)
+                ProcessBuilder(*cmd).start().waitFor() == 0
+            } catch (_: Exception) {
+                false
+            }
+
+            return when {
+                !isWindows -> Triple("sh", listOf("-c"), ShellType.SH)
+                hasExecutable("pwsh") -> Triple(
+                    "pwsh",
+                    listOf("-ExecutionPolicy", "Bypass", "-Command"),
+                    ShellType.PWSH
+                )
+
+                hasExecutable("powershell") -> Triple(
+                    "powershell",
+                    listOf("-ExecutionPolicy", "Bypass", "-Command"),
+                    ShellType.POWERSHELL
+                )
+
+                hasExecutable("sh") -> Triple("sh", listOf("-c"), ShellType.SH)
+                else -> Triple("cmd", listOf("/c"), ShellType.CMD)
+            }
+        }
+
+        fun constructBuildCommand(userCommand: String): Iterable<String> {
+            val (exec, argsPrefix, shellType) = detectShell()
+            val finalCommand = when (shellType) {
+                // shell(Mac, Linux, Windows-WSL, Windows-GitBash, ...)
+                ShellType.SH -> """
+                        |set -e
+                        |$userCommand
+                        """.trimMargin()
+                // Windows powershell
+                ShellType.PWSH, ShellType.POWERSHELL -> $$"""
+                        |$ErrorActionPreference = 'Stop'
+                        |try {
+                        |    $$userCommand
+                        |} catch {
+                        |    Write-Error $_
+                        |    exit 1
+                        |}
+                        """.trimMargin()
+                // Windows CMD
+                ShellType.CMD -> userCommand
+            }
+
+            return listOf(exec) + argsPrefix + listOf(finalCommand)
+        }
+    }
+
 }

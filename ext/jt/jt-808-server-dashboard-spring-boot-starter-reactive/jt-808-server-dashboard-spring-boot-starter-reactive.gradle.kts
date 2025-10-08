@@ -29,4 +29,16 @@ xtreamCodecFrontendBuild {
     frontendProjectDir.set(layout.projectDirectory.dir("../jt-808-server-dashboard-ui"))
     frontendBasePath.set("/dashboard-ui/")
     backendStaticDir.set(layout.projectDirectory.dir("src/main/resources/static/dashboard/808"))
+//    commandLineConfigurer {
+////        commandLine("wsl", "bash", "-c", "echo Hello")
+////        commandLine("sh", "-c", "echo Hello111111111111111111")
+//        commandLine(
+//            "sh", "-c",
+//            """
+//            set -e
+//            pnpm install --registry https://registry.npmmirror.com
+//            pnpm run build --mode production
+//            """.trimIndent()
+//        )
+//    }
 }
