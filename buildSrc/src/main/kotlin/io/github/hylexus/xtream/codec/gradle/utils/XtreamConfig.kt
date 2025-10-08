@@ -168,7 +168,25 @@ object XtreamConfig {
             }
         val privateMavenRepoEnabled: Boolean get() = getOrLoadConfigAsBoolean("xtream.maven.repo.private.enabled")
         val githubMavenRepoEnabled: Boolean get() = getOrLoadConfigAsBoolean("xtream.maven.repo.github.enabled")
-        val centalPortalMavenRepoEnabled: Boolean get() = getOrLoadConfigAsBoolean("xtream.maven.repo.central-portal.enabled")
+        val centralPortalMavenRepoEnabled: Boolean get() = getOrLoadConfigAsBoolean("xtream.maven.repo.central-portal.enabled")
+        val centralPortalArtifactsTempDir: String
+            get() {
+                val key = "xtream.maven.repo.central-portal.artifacts.temp-dir"
+                return getOrLoadConfig(key) {
+                    val result = loadConfigAsString(key, null)
+                    file(result).mkdirs()
+                    result
+                }
+            }
+        val centralPortalBomTempDir: String
+            get() {
+                val key = "xtream.maven.repo.central-portal.bom.temp-dir"
+                return getOrLoadConfig(key) {
+                    val result = loadConfigAsString(key, null)
+                    file(result).mkdirs()
+                    result
+                }
+            }
         val needSign: Boolean
             get() {
                 val key = "xtream.maven.publications.signing"

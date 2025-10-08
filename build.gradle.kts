@@ -258,9 +258,9 @@ configure(subprojects) {
     }
 
     apply(plugin = "maven-publish")
-    val stagingRepositoryPath = "/tmp/gradle/maven-tmp"
+    val stagingRepositoryPath = xtreamConfig.centralPortalArtifactsTempDir
     if (isMavenPublications(project)) {
-        if (xtreamConfig.centalPortalMavenRepoEnabled) {
+        if (xtreamConfig.centralPortalMavenRepoEnabled) {
             apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
             tasks.withType<io.gitee.pkmer.tasks.BundleTask>().configureEach {
                 dependsOn(tasks.test, tasks.checkstyleTest, tasks.checkstyleMain)
@@ -372,7 +372,7 @@ configure(subprojects) {
 //                        }
 
                         maven {
-                            name = "localTmp"
+                            name = "centralPortalLocalArtifacts"
                             // Specify the local staging repo path in the configuration.
                             url = uri(stagingRepositoryPath)
                         }

@@ -8,8 +8,10 @@ echo "DASHBOARD_808_PROJECT_DIR: ${DASHBOARD_808_PROJECT_DIR}"
 cd ${XTREAM_PROJECT_ROOT_DIR}
 echo "Working-Directory        : ${XTREAM_PROJECT_ROOT_DIR}"
 
-rm -rf /tmp/gradle/maven-tmp
-rm -rf /tmp/gradle/maven-tmp1
+# @see xtream.maven.repo.central-portal.artifacts.temp-dir
+# @see xtream.maven.repo.central-portal.bom.temp-dir
+rm -rf /tmp/xtream-codec/temp-artifacts
+rm -rf /tmp/xtream-codec/temp-bom
 
 # org.gradle.parallel=false @see https://stackoverflow.com/questions/72664149/gradle-maven-publish-sonatype-creates-multiple-repositories-that-cant-be-clos
 # https://central.sonatype.org/publish/publish-portal-api/

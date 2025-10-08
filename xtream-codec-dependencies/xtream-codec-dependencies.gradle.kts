@@ -30,8 +30,8 @@ dependencies {
 }
 
 val mavenRepoConfig = xtreamConfig.mavenRepoConfig
-val stagingRepositoryPath = "/tmp/gradle/maven-tmp1"
-if (xtreamConfig.centalPortalMavenRepoEnabled) {
+val stagingRepositoryPath = xtreamConfig.centralPortalBomTempDir
+if (xtreamConfig.centralPortalMavenRepoEnabled) {
     apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
     // 延迟配置，在插件完全应用后再执行
     afterEvaluate {
@@ -147,7 +147,7 @@ publishing {
 //                        }
 
                 maven {
-                    name = "localTmp1"
+                    name = "centralPortalLocalBom"
                     // Specify the local staging repo path in the configuration.
                     url = uri(stagingRepositoryPath)
                 }
