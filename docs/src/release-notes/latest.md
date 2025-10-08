@@ -5,6 +5,12 @@ article: false
 
 # v-0.1.x
 
+## 0.1.1(2025-10-08)
+
+### 🐞 Bug Fixes
+
+- `BuiltinMessage0200.Item0x11#locationId` 类型标记错误
+
 ## 0.1.0(2025-10-01)
 
 ### 🔨 Dependency Upgrades
