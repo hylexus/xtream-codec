@@ -20,16 +20,16 @@ on:
     # 2.1 tag（以 v 开头）
     tags:
       - 'v*'
-    # 2.2 特定分支
-    branches:
-      # xxx-alpha.0, xxx-beta.1
-      - pre-release
-      # xxx-rc.0, xxx-rc.1
-      - release-candidate
-  # 3. PR 合并到目标分支
-  pull_request:
-    types: [ closed ]
-    branches: [ pre-release, release-candidate ]
+#    # 2.2 特定分支
+#    branches:
+#      # xxx-alpha.0, xxx-beta.1
+#      - pre-release
+#      # xxx-rc.0, xxx-rc.1
+#      - release-candidate
+#  # 3. PR 合并到目标分支
+#  pull_request:
+#    types: [ closed ]
+#    branches: [ pre-release, release-candidate ]
 
 jobs:
   publish:

@@ -2,6 +2,14 @@ name: Dependency Graph
 
 # 只在推送新的 Tag 时触发
 on:
+  # 1. 手动触发
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        type: boolean
+        description: 'Skip unit tests?'
+        default: false
+  # 2. 推送
   push:
     tags:
       # - '**' # 匹配所有 tag，例如 v1.0.0, 1.2.3, release-abc 等

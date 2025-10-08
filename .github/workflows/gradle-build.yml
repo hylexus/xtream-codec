@@ -8,8 +8,17 @@
 name: Gradle Build
 
 on:
+  # 1. 手动触发
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        type: boolean
+        description: 'Skip unit tests?'
+        default: false
+  # 2. 推送
   push:
     branches: [ "develop" ]
+  # 3. PR 合并到目标分支
   pull_request:
     branches: [ "main", "pre-release", "release-candidate" ]
 
