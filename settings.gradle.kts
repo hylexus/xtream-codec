@@ -1,9 +1,12 @@
+import org.gradle.kotlin.dsl.maven
+
 pluginManagement {
     val defaultSpringBootBomVersion: String by settings
     plugins {
         id("io.spring.dependency-management") version "1.1.7" apply false
         id("org.springframework.boot") version defaultSpringBootBomVersion apply false
         id("net.minecraftforge.licenser") version "1.2.0" apply false
+        // @see https://github.com/jk1/Gradle-License-Report/issues/339
         id("com.github.jk1.dependency-license-report") version "2.9" apply false
         id("com.namics.oss.gradle.license-enforce-plugin") version "1.7.0" apply false
         id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1" apply false
@@ -11,14 +14,14 @@ pluginManagement {
 
     repositories {
         maven {
+            url = uri("https://maven.aliyun.com/repository/public")
+            url = uri("https://mirrors.cloud.tencent.com/nexus/repository/maven-public")
+            url = uri("https://repo.huaweicloud.com/repository/maven")
             url = uri("https://maven.aliyun.com/repository/gradle-plugin")
-            //url = uri("https://maven.aliyun.com/repository/public")
-            //url = uri("https://mirrors.cloud.tencent.com/nexus/repository/maven-public")
-            //url = uri("https://repo.huaweicloud.com/repository/maven")
             name = "aliyunGradlePlugin"
             content {
-                // 404: https://maven.aliyun.com/repository/gradle-plugin/gradle/plugin/com/github/joschi/licenser/licenser/0.6.0/licenser-0.6.0.jar
-                excludeGroup("gradle.plugin.com.github.joschi.licenser")
+                // 404
+                excludeGroup("net.minecraftforge.licenser")
             }
         }
         gradlePluginPortal()

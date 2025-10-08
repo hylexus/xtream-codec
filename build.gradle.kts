@@ -107,6 +107,11 @@ configure(subprojects) {
         toolVersion = "10.23.0"
         configDirectory.set(rootProject.file("build-script/checkstyle/"))
     }
+    tasks.withType<Checkstyle>().configureEach {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(xtreamConfig.javaVersion))
+        }
+    }
     tasks.withType<Checkstyle> {
         // 严重影响构建时间
         onlyIf {
@@ -120,11 +125,16 @@ configure(subprojects) {
 
     // 本项目开源协议头
     apply(plugin = "net.minecraftforge.licenser")
+    val creationYear = DateTimeFormatter.ofPattern("yyyy").format(LocalDate.now())
     configure<net.minecraftforge.licenser.LicenseExtension> {
-        setHeader( rootProject.file("build-script/license/license-header"))
-        skipExistingHeaders = false
+        // setHeader(rootProject.file("build-script/license/license-header"))
+        header.set(rootProject.resources.text.fromFile("build-script/license/license-header"))
+        skipExistingHeaders.set(false)
         exclude("**/spring.factories")
         exclude("**/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
+        properties {
+            set("creationYear", creationYear)
+        }
     }
 
     apply(plugin = "com.github.jk1.dependency-license-report")
