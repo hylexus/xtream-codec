@@ -22,24 +22,25 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public class DefaultSerializeContext implements FieldCodec.SerializeContext {
     private final ByteBufAllocator bufferFactory;
     private final EntityEncoder entityEncoder;
-    private final Object containerInstance;
+    private final @Nullable Object containerInstance;
     private final EvaluationContext evaluationContext;
     private final FieldCodecRegistry fieldCodecRegistry;
     private final BeanMetadataRegistry beanMetadataRegistry;
     private final int version;
-    private final CodecTracker codecTracker;
+    private final @Nullable CodecTracker codecTracker;
 
-    public DefaultSerializeContext(FieldCodec.SerializeContext another, Object containerInstance) {
+    public DefaultSerializeContext(FieldCodec.SerializeContext another, @Nullable Object containerInstance) {
         this(another.bufferFactory(), another.entityEncoder(), containerInstance, another.version(), another.beanMetadataRegistry(), another.codecTracker());
     }
 
-    public DefaultSerializeContext(ByteBufAllocator bufferFactory, EntityEncoder entityEncoder, Object containerInstance, int version, BeanMetadataRegistry beanMetadataRegistry, CodecTracker codecTracker) {
+    public DefaultSerializeContext(ByteBufAllocator bufferFactory, EntityEncoder entityEncoder, @Nullable Object containerInstance, int version, BeanMetadataRegistry beanMetadataRegistry, @Nullable CodecTracker codecTracker) {
         this.bufferFactory = bufferFactory;
         this.entityEncoder = entityEncoder;
         this.containerInstance = containerInstance;
@@ -61,7 +62,7 @@ public class DefaultSerializeContext implements FieldCodec.SerializeContext {
     }
 
     @Override
-    public Object containerInstance() {
+    public @Nullable Object containerInstance() {
         return this.containerInstance;
     }
 
@@ -86,7 +87,7 @@ public class DefaultSerializeContext implements FieldCodec.SerializeContext {
     }
 
     @Override
-    public CodecTracker codecTracker() {
+    public @Nullable CodecTracker codecTracker() {
         return this.codecTracker;
     }
 

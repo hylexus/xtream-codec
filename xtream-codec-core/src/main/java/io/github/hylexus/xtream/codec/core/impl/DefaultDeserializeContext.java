@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -33,13 +34,13 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
     private final FieldCodecRegistry fieldCodecRegistry;
     private final BeanMetadataRegistry beanMetadataRegistry;
     private final int version;
-    private final CodecTracker codecTracker;
+    private final @Nullable CodecTracker codecTracker;
 
     public DefaultDeserializeContext(FieldCodec.DeserializeContext another, Object containerInstance) {
         this(another.bufferFactory(), another.entityDecoder(), containerInstance, another.version(), another.beanMetadataRegistry(), another.codecTracker());
     }
 
-    public DefaultDeserializeContext(ByteBufAllocator bufferFactory, EntityDecoder entityDecoder, Object containerInstance, int version, BeanMetadataRegistry beanMetadataRegistry, CodecTracker tracker) {
+    public DefaultDeserializeContext(ByteBufAllocator bufferFactory, EntityDecoder entityDecoder, Object containerInstance, int version, BeanMetadataRegistry beanMetadataRegistry, @Nullable CodecTracker tracker) {
         this.bufferFactory = bufferFactory;
         this.entityDecoder = entityDecoder;
         this.containerInstance = containerInstance;
@@ -56,7 +57,7 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
     }
 
     @Override
-    public Object containerInstance() {
+    public @Nullable Object containerInstance() {
         return this.containerInstance;
     }
 
@@ -86,7 +87,7 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
     }
 
     @Override
-    public CodecTracker codecTracker() {
+    public @Nullable CodecTracker codecTracker() {
         return this.codecTracker;
     }
 

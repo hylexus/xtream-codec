@@ -28,18 +28,17 @@ import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamFieldMapDescriptor;
 import io.github.hylexus.xtream.codec.core.impl.codec.DelegateBeanMetadataFieldCodec;
-import io.github.hylexus.xtream.codec.core.tracker.BaseSpan;
-import io.github.hylexus.xtream.codec.core.tracker.MapEntryItemSpan;
-import io.github.hylexus.xtream.codec.core.tracker.MapEntrySpan;
-import io.github.hylexus.xtream.codec.core.tracker.MapFieldSpan;
+import io.github.hylexus.xtream.codec.core.tracker.*;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -83,7 +82,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     }
 
     @Override
-    public Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
+    public @Nullable Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
         final int length = delegate.fieldLengthExtractor().extractFieldLength(context, context.evaluationContext(), input);
         final ByteBuf slice = length < 0
                 ? input // all remaining
@@ -115,47 +114,45 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     }
 
     @Override
-    public Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
+    public @Nullable Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
         final int length = delegate.fieldLengthExtractor().extractFieldLength(context, context.evaluationContext(), input);
         final ByteBuf slice = length < 0
                 ? input // all remaining
                 : input.readSlice(length);
         final int parentIndexBeforeRead = input.readerIndex();
-        final MapFieldSpan mapFieldSpan = context.codecTracker().startNewMapFieldSpan(this, this.getClass().getSimpleName());
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(this, this.getClass().getSimpleName());
         @SuppressWarnings({"unchecked"}) final Map<Object, Object> map = (Map<Object, Object>) this.containerInstanceFactory().create();
         int sequence = 0;
         while (slice.isReadable()) {
             final int indexBeforeRead = input.readerIndex();
-            final MapEntrySpan mapEntrySpan = context.codecTracker().startNewMapEntrySpan(mapFieldSpan, this.name(), sequence++);
+            final MapEntrySpan mapEntrySpan = codecTracker.startNewMapEntrySpan(mapFieldSpan, this.name(), sequence++);
             // 1. key(i8,u8,i16,u16,i32,u32,i64,string)
-            context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.KEY);
+            codecTracker.updateTrackerHints(MapEntryItemSpan.Type.KEY);
             final Object key = this.keyFieldCodec.deserializeWithTracker(this, context, slice, this.xtreamFieldMapDescriptor.keyDescriptor().length());
 
             // 2. valueLength(int)
             final FieldCodec<?> valueLengthFieldCodec = this.getValueLengthFieldDecoder(key);
-            context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
+            codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
             final int valueLength = ((Number) valueLengthFieldCodec.deserializeWithTracker(this, context, slice, -1)).intValue();
 
             // 3. value(dynamic)
             final ByteBuf byteBuf = slice.readSlice(valueLength);
             final FieldCodec<?> valueFieldCodec = this.getValueDecoder(key);
 
-            context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE);
+            codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE);
             final Object value = valueFieldCodec.deserializeWithTracker(this, context, byteBuf, valueLength);
             mapEntrySpan.setHexString(FormatUtils.toHexString(input, indexBeforeRead, input.readerIndex() - indexBeforeRead));
             map.put(key, value);
-            context.codecTracker().finishCurrentSpan();
+            codecTracker.finishCurrentSpan();
         }
         mapFieldSpan.setHexString(FormatUtils.toHexString(input, parentIndexBeforeRead, input.readerIndex() - parentIndexBeforeRead));
-        context.codecTracker().finishCurrentSpan();
+        codecTracker.finishCurrentSpan();
         return map;
     }
 
     @Override
     public void doEncode(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
-        if (value == null) {
-            return;
-        }
         final ByteBuf temp = ByteBufAllocator.DEFAULT.buffer();
         try {
             @SuppressWarnings("unchecked") final Map<Object, Object> map = (Map<Object, Object>) value;
@@ -194,43 +191,41 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
 
     @Override
     protected void doEncodeWithTracker(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
-        if (value == null) {
-            return;
-        }
         final ByteBuf temp = ByteBufAllocator.DEFAULT.buffer();
         try {
             int sequence = 0;
             @SuppressWarnings("unchecked") final Map<Object, Object> map = (Map<Object, Object>) value;
-            final MapFieldSpan mapFieldSpan = context.codecTracker().startNewMapFieldSpan(this, this.getClass().getSimpleName());
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(this, this.getClass().getSimpleName());
             final int parenIndexBeforeWrite = output.writerIndex();
-            final BaseSpan parent = context.codecTracker().getCurrentSpan();
+            final BaseSpan parent = codecTracker.getCurrentSpan();
             for (final Map.Entry<Object, Object> entry : map.entrySet()) {
-                final MapEntrySpan mapEntrySpan = context.codecTracker().startNewMapEntrySpan(parent, this.name(), sequence++);
+                final MapEntrySpan mapEntrySpan = codecTracker.startNewMapEntrySpan(parent, this.name(), sequence++);
                 final int writerIndex = output.writerIndex();
                 // 1. key(i8,u8,i16,u16,i32,u32,i64,string)
                 final Object key = entry.getKey();
-                context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.KEY);
+                codecTracker.updateTrackerHints(MapEntryItemSpan.Type.KEY);
                 this.keyFieldCodec.serializeWithTracker(this, context, output, key);
 
                 // 3. value(dynamic)(tmp)
                 final Object data = entry.getValue();
                 final FieldCodec<Object> valueFieldCodec = this.getValueEncoder(context.version(), key, data);
-                context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE);
+                codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE);
                 valueFieldCodec.serializeWithTracker(this, context, temp, data);
 
                 // 2. valueLength(int)
                 final int valueLength = temp.readableBytes();
                 final FieldCodec<Object> valueLengthFieldCodec = this.getValueLengthFieldEncoder(key);
-                context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
+                codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
                 valueLengthFieldCodec.serializeWithTracker(this, context, output, castType(valueLengthFieldCodec.underlyingJavaType(), valueLength));
                 // 3. value(dynamic)
                 output.writeBytes(temp);
                 mapEntrySpan.setHexString(FormatUtils.toHexString(output, writerIndex, output.writerIndex() - writerIndex));
                 temp.clear();
-                context.codecTracker().finishCurrentSpan();
+                codecTracker.finishCurrentSpan();
             }
             mapFieldSpan.setHexString(FormatUtils.toHexString(output, parenIndexBeforeWrite, output.writerIndex() - parenIndexBeforeWrite));
-            context.codecTracker().finishCurrentSpan();
+            codecTracker.finishCurrentSpan();
         } finally {
             temp.release();
         }

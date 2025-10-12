@@ -25,9 +25,13 @@ import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.DefaultDeserializeContext;
 import io.github.hylexus.xtream.codec.core.impl.DefaultSerializeContext;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     final BeanPropertyMetadata delegate;
@@ -39,18 +43,20 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         super(beanMetadataRegistry, pm.name(), pm.rawClass(), pm.version(), pm.xtreamFieldAnnotation(), pm.field(), pm.propertyGetter(), pm.propertySetter());
         this.nestedBeanMetadata = nestedBeanMetadata;
         this.delegate = pm;
-        this.fieldLengthExtractor = fieldLengthExtractor == null
-                ? delegate.fieldLengthExtractor()
-                : fieldLengthExtractor;
+        // this.fieldLengthExtractor = fieldLengthExtractor == null
+        //         ? delegate.fieldLengthExtractor()
+        //         : fieldLengthExtractor;
+        this.fieldLengthExtractor = fieldLengthExtractor;
         this.containerInstanceFactory = this.delegate.containerInstanceFactory().getClass() == ContainerInstanceFactory.PlaceholderContainerInstanceFactory.class
-                ? () -> BeanUtils.createNewInstance(nestedBeanMetadata.getConstructor(), (Object[]) null)
+                // ? () -> BeanUtils.createNewInstance(nestedBeanMetadata.getConstructor(), (Object[]) null)
+                ? nestedBeanMetadata::createNewInstanceWithNoArgsConstructor
                 : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
     }
 
     @Override
-    public Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
-        final Object instance = BeanUtils.createNewInstance(nestedBeanMetadata.getConstructor());
-        // final Object instance = this.containerInstanceFactory().create();
+    public @Nullable Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
+        final Object instance = nestedBeanMetadata.createNewInstanceWithNoArgsConstructor();
+        // final Object instance = BeanUtils.createNewInstance(nestedBeanMetadata.getConstructor());
         final int length = this.fieldLengthExtractor().extractFieldLength(context, context.evaluationContext(), input);
 
         final ByteBuf slice = length < 0
@@ -69,15 +75,16 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     }
 
     @Override
-    public Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
-        final Object instance = BeanUtils.createNewInstance(nestedBeanMetadata.getConstructor());
-        // final Object instance = this.containerInstanceFactory().create();
+    public @Nullable Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
+        final Object instance = nestedBeanMetadata.createNewInstanceWithNoArgsConstructor();
+        // final Object instance = BeanUtils.createNewInstance(nestedBeanMetadata.getConstructor());
         final int length = this.fieldLengthExtractor().extractFieldLengthWithTracker(context, context.evaluationContext(), input);
 
         final ByteBuf slice = length < 0
                 ? input // all remaining
                 : input.readSlice(length);
-        final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(this, this.getClass().getSimpleName(), null);
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(this, this.getClass().getSimpleName(), null);
         final int indexBeforeRead = slice.readerIndex();
         final FieldCodec.DeserializeContext deserializeContext = new DefaultDeserializeContext(context, instance);
         for (final BeanPropertyMetadata pm : this.nestedBeanMetadata.getPropertyMetadataList()) {
@@ -88,7 +95,7 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
             pm.setProperty(instance, value);
         }
         nestedFieldSpan.setHexString(FormatUtils.toHexString(slice, indexBeforeRead, slice.readerIndex() - indexBeforeRead));
-        context.codecTracker().finishCurrentSpan();
+        codecTracker.finishCurrentSpan();
         return instance;
     }
 
@@ -107,7 +114,8 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     @Override
     protected void doEncodeWithTracker(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
         final DefaultSerializeContext serializeContext = new DefaultSerializeContext(context, value);
-        final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(this, this.getClass().getSimpleName(), null);
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(this, this.getClass().getSimpleName(), null);
         final int indexBeforeWrite = output.writerIndex();
         for (final BeanPropertyMetadata pm : this.nestedBeanMetadata.getPropertyMetadataList()) {
             if (!pm.conditionEvaluator().evaluate(serializeContext)) {
@@ -117,7 +125,7 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
             pm.encodePropertyValueWithTracker(serializeContext, output, nestedValue);
         }
         nestedFieldSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
-        context.codecTracker().finishCurrentSpan();
+        codecTracker.finishCurrentSpan();
     }
 
     @Override

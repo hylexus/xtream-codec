@@ -111,7 +111,7 @@ public class Jt808DashboardCodecServiceImpl implements Jt808DashboardCodecServic
             final DecodedMessageMetadata parsed = this.parse(dto.getHexString().getFirst());
             final ByteBuf source = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, parsed.getDecryptedHexString() != null ? parsed.getDecryptedHexString() : parsed.getEscapedHexString());
             try {
-                this.entityCodec.decode(entityInstance, source.slice(), tracker);
+                this.entityCodec.decode(parsed.getHeader().version().versionValue(), entityInstance, source.slice(), tracker);
                 tracker.getRootSpan().setHexString("7e" + tracker.getRootSpan().getHexString() + "7e");
                 return new DecodedMessageVo(new DecodedMessageVo.Single()
                         .setRawHexString("7e" + parsed.getOriginalHexString() + "7e")
@@ -144,7 +144,7 @@ public class Jt808DashboardCodecServiceImpl implements Jt808DashboardCodecServic
                     .addComponent(true, bodyBytes)
                     .addComponent(true, ByteBufAllocator.DEFAULT.buffer().writeByte(0));
 
-            this.entityCodec.decode(entityInstance, source.slice(), tracker);
+            this.entityCodec.decode(newHeader.version().versionValue(), entityInstance, source.slice(), tracker);
             tracker.getRootSpan().setHexString("7e" + tracker.getRootSpan().getHexString() + "7e");
             final List<DecodedMessageVo.SubPackageMetadata> headerList = tempList.stream().map(it -> {
                 final Jt808MessageHeaderMetadata headerMetadata = new Jt808MessageHeaderMetadata();

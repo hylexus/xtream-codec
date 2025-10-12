@@ -208,7 +208,9 @@ public final class BeanUtils {
                 return XtreamRecordUtils.findCanonicalRecordConstructor(beanClass);
             }
 
-            return beanClass.getConstructor();
+            final Constructor<?> constructor = beanClass.getConstructor();
+            constructor.setAccessible(true);
+            return constructor;
         } catch (NoSuchMethodException e) {
             throw new BeanIntrospectionException(e);
         }

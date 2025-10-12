@@ -25,9 +25,11 @@ import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import org.springframework.expression.EvaluationContext;
 
 import java.lang.annotation.*;
+import java.util.Objects;
 
 public interface FieldCodec<T> {
 
@@ -57,11 +59,12 @@ public interface FieldCodec<T> {
         final int indexBeforeRead = input.readerIndex();
         final T value = this.deserialize(propertyMetadata, context, input, length);
         final String hexString = FormatUtils.toHexString(input, indexBeforeRead, input.readerIndex() - indexBeforeRead);
-        context.codecTracker().addFieldSpan(context.codecTracker().getCurrentSpan(), propertyMetadata.name(), value, hexString, this, propertyMetadata.xtreamFieldAnnotation().desc());
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), propertyMetadata.name(), value, hexString, this, propertyMetadata.xtreamFieldAnnotation().desc());
         return value;
     }
 
-    void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value);
+    void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable T value);
 
     /**
      * 带编码器埋点的序列化方法
@@ -78,7 +81,8 @@ public interface FieldCodec<T> {
         final int indexBeforeWrite = output.writerIndex();
         this.serialize(propertyMetadata, context, output, value);
         final String hexString = FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite);
-        context.codecTracker().addFieldSpan(context.codecTracker().getCurrentSpan(), propertyMetadata.name(), value, hexString, this, propertyMetadata.xtreamFieldAnnotation().desc());
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), propertyMetadata.name(), value, hexString, this, propertyMetadata.xtreamFieldAnnotation().desc());
     }
 
     default Class<?> underlyingJavaType() {
@@ -88,7 +92,10 @@ public interface FieldCodec<T> {
     interface CodecContext {
         ByteBufAllocator bufferFactory();
 
-        Object containerInstance();
+        /**
+         * 如果正在被编解码的类型是 {@link Record} 类型，该方法返回 {@code null}。
+         */
+        @Nullable Object containerInstance();
 
         EvaluationContext evaluationContext();
 
@@ -98,7 +105,11 @@ public interface FieldCodec<T> {
 
         BeanMetadataRegistry beanMetadataRegistry();
 
-        CodecTracker codecTracker();
+        /**
+         * @see FieldCodec#deserializeWithTracker(BeanPropertyMetadata, DeserializeContext, ByteBuf, int)
+         * @see FieldCodec#serializeWithTracker(BeanPropertyMetadata, SerializeContext, ByteBuf, Object)
+         */
+        @Nullable CodecTracker codecTracker();
     }
 
     interface DeserializeContext extends CodecContext {
@@ -113,7 +124,7 @@ public interface FieldCodec<T> {
         public static final Placeholder INSTANCE = new Placeholder();
 
         public static <T> FieldCodec<T> createForInternalUse(String errorMessage) {
-            return new FieldCodec<T>() {
+            return new FieldCodec<>() {
                 @Override
                 public T deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
                     throw new UnsupportedOperationException(errorMessage);
@@ -161,4 +172,18 @@ public interface FieldCodec<T> {
         boolean ignoreUnknownParameters() default false;
     }
 
+    enum NullFieldCodec implements FieldCodec<Object> {
+        INSTANCE;
+
+        @Override
+        public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+            throw new UnsupportedOperationException();
+        }
+
+    }
 }

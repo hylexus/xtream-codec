@@ -27,14 +27,17 @@ import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.impl.codec.RuntimeTypeFieldCodec;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.PrependLengthFieldSpan;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
-import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Optional;
 
 public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
@@ -54,8 +57,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     protected final int prependLengthFieldByteCounts;
     protected final PrependLengthFieldType prependLengthFieldType;
     private final ContainerInstanceFactory containerInstanceFactory;
-    @Setter
-    private FieldCodec<?> fieldCodec;
+    private final FieldCodec<?> fieldCodec;
     protected final boolean isRecordClass;
     protected final boolean isRecordComponent;
 
@@ -84,6 +86,21 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
                     ? ContainerInstanceFactory.PLACEHOLDER
                     : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
         }
+        this.fieldCodec = this.detectFieldCodec();
+    }
+
+    private FieldCodec<?> detectFieldCodec() {
+        if (this.xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            return FieldCodec.NullFieldCodec.INSTANCE;
+        }
+        return this.beanMetadataRegistry.getFieldCodecRegistry().getFieldCodec(this).orElseGet(() -> {
+            // ...
+            return switch (this.filedValueType) {
+                case struct, sequence, map -> FieldCodec.NullFieldCodec.INSTANCE;
+                case dynamic -> RuntimeTypeFieldCodec.INSTANCE;
+                default -> throw new IllegalStateException("Cannot determine FieldCodec for Field [" + this.field() + "]");
+            };
+        });
     }
 
     protected int detectPrependLengthFieldByteCounts(XtreamField xtreamField) {
@@ -238,7 +255,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         return Optional.ofNullable(mergedAnnotation);
     }
 
-    public Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
+    public @Nullable Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
         int rb = input.readableBytes();
         if (rb == 0) {
             return null;
@@ -252,17 +269,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
-    public void setProperty(Object instance, Object value) {
-        if (value != null) {
-            BeanPropertyMetadata.super.setProperty(instance, value);
-        }
-    }
-
-    @Override
-    public Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
+    public @Nullable Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
         if (this.fieldLengthExtractor instanceof FieldLengthExtractor.PrependFieldLengthExtractor) {
-            final PrependLengthFieldSpan prependLengthFieldSpan = context.codecTracker().addPrependLengthFieldSpan(
-                    context.codecTracker().getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final PrependLengthFieldSpan prependLengthFieldSpan = codecTracker.addPrependLengthFieldSpan(
+                    codecTracker.getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
             );
             final int indexBeforeRead = input.readerIndex();
             final int length = this.fieldLengthExtractor.extractFieldLength(context, context.evaluationContext(), input);
@@ -276,7 +287,10 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
-    public void encodePropertyValue(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
+    public void encodePropertyValue(FieldCodec.SerializeContext context, ByteBuf output, @Nullable Object value) {
+        if (value == null) {
+            return;
+        }
         if (this.prependLengthFieldByteCounts <= 0) {
             this.doEncode(context, output, value);
         } else {
@@ -298,12 +312,16 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
-    public void encodePropertyValueWithTracker(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
+    public void encodePropertyValueWithTracker(FieldCodec.SerializeContext context, ByteBuf output, @Nullable Object value) {
+        if (value == null) {
+            return;
+        }
         if (this.prependLengthFieldByteCounts <= 0) {
             this.doEncodeWithTracker(context, output, value);
         } else {
-            final PrependLengthFieldSpan prependLengthFieldSpan = context.codecTracker().addPrependLengthFieldSpan(
-                    context.codecTracker().getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final PrependLengthFieldSpan prependLengthFieldSpan = codecTracker.addPrependLengthFieldSpan(
+                    codecTracker.getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
             );
             final int lengthFieldWriterIndex = output.writerIndex();
             // 写入长度字段占位符

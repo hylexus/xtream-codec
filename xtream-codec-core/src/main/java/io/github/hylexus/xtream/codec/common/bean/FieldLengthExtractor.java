@@ -21,11 +21,14 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.tracker.BaseSpan;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
 import lombok.ToString;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+
+import java.util.Objects;
 
 public interface FieldLengthExtractor {
 
@@ -71,9 +74,10 @@ public interface FieldLengthExtractor {
         public int extractFieldLengthWithTracker(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext, ByteBuf input) {
             final int indexBeforeRead = input.readerIndex();
             final int value = this.prependLengthFieldType.readFrom(input);
-            final BaseSpan currentSpan = context.codecTracker().getCurrentSpan();
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final BaseSpan currentSpan = codecTracker.getCurrentSpan();
             final String hexString = FormatUtils.toHexString(input, indexBeforeRead, input.readerIndex() - indexBeforeRead);
-            context.codecTracker().addPrependLengthFieldSpan(currentSpan, "prependLengthField", value, hexString, this.prependLengthFieldType.name(), "前置长度字段");
+            codecTracker.addPrependLengthFieldSpan(currentSpan, "prependLengthField", value, hexString, this.prependLengthFieldType.name(), "前置长度字段");
             return value;
         }
     }

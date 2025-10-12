@@ -25,10 +25,12 @@ import io.github.hylexus.xtream.codec.core.EntityEncoder;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.RuntimeTypeSupplier;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.netty.buffer.ByteBuf;
 import org.springframework.util.ClassUtils;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -89,12 +91,13 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
                     : input.readSlice(length);
             final BeanMetadata beanMetadata = entityDecoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
             final int parentIndexBeforeRead = slice.readerIndex();
-            final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(propertyMetadata, this, targetClass.getTypeName());
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(propertyMetadata, this, targetClass.getTypeName());
 
-            final Object value = entityDecoder.decodeWithTracker(beanMetadata, slice, context.codecTracker());
+            final Object value = entityDecoder.decodeWithTracker(beanMetadata, slice, codecTracker);
 
             nestedFieldSpan.setHexString(FormatUtils.toHexString(slice, parentIndexBeforeRead, slice.readerIndex() - parentIndexBeforeRead));
-            context.codecTracker().finishCurrentSpan();
+            codecTracker.finishCurrentSpan();
 
             return value;
         }
@@ -138,13 +141,14 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
             @SuppressWarnings("unchecked") final FieldCodec<Object> codec = (FieldCodec<Object>) fieldCodec.get();
             codec.serializeWithTracker(propertyMetadata, context, output, value);
         } else {
-            final NestedFieldSpan nestedFieldSpan = context.codecTracker().startNewNestedFieldSpan(propertyMetadata, this, targetClass.getTypeName());
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(propertyMetadata, this, targetClass.getTypeName());
 
             final BeanMetadata beanMetadata = entityEncoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
-            entityEncoder.encodeWithTracker(beanMetadata, value, output, context.codecTracker());
+            entityEncoder.encodeWithTracker(beanMetadata, value, output, codecTracker);
 
             nestedFieldSpan.setHexString(FormatUtils.toHexString(output, parentIndexBeforeWrite, output.writerIndex() - parentIndexBeforeWrite));
-            context.codecTracker().finishCurrentSpan();
+            codecTracker.finishCurrentSpan();
         }
     }
 

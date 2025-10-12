@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
@@ -99,28 +100,33 @@ public interface BeanPropertyMetadata {
 
     int order();
 
+    @Nullable
     Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input);
 
     /**
      * @see FieldCodec#deserializeWithTracker(BeanPropertyMetadata, FieldCodec.DeserializeContext, ByteBuf, int)
      */
+    @Nullable
     default Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
         return this.decodePropertyValue(context, input);
     }
 
-    void encodePropertyValue(FieldCodec.SerializeContext context, ByteBuf output, Object value);
+    void encodePropertyValue(FieldCodec.SerializeContext context, ByteBuf output, @Nullable Object value);
 
     /**
      * @see FieldCodec#serializeWithTracker(BeanPropertyMetadata, FieldCodec.SerializeContext, ByteBuf, Object)
      */
-    default void encodePropertyValueWithTracker(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
+    default void encodePropertyValueWithTracker(FieldCodec.SerializeContext context, ByteBuf output, @Nullable Object value) {
         this.encodePropertyValue(context, output, value);
     }
 
-    default void setProperty(Object instance, Object value) {
-        this.propertySetter().setProperty(this, instance, value);
+    default void setProperty(Object instance, @Nullable Object value) {
+        if (value != null) {
+            this.propertySetter().setProperty(this, instance, value);
+        }
     }
 
+    @Nullable
     default Object getProperty(Object instance) {
         return this.propertyGetter().getProperty(this, instance);
     }
@@ -155,11 +161,11 @@ public interface BeanPropertyMetadata {
     }
 
     interface PropertySetter {
-        void setProperty(BeanPropertyMetadata metadata, Object instance, Object value);
+        void setProperty(BeanPropertyMetadata metadata, Object instance, @Nullable Object value);
     }
 
     interface PropertyGetter {
-        Object getProperty(BeanPropertyMetadata metadata, Object instance);
+        @Nullable Object getProperty(BeanPropertyMetadata metadata, Object instance);
     }
 
 }

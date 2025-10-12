@@ -45,7 +45,7 @@ public class EntityDecoder {
 
     public <T> T decode(int version, Class<T> entityClass, ByteBuf source) {
         final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass, version);
-        final Object containerInstance = beanMetadata.createNewInstance();
+        final Object containerInstance = beanMetadata.createNewInstanceWithNoArgsConstructor();
         return this.decode(version, source, beanMetadata, containerInstance);
     }
 
@@ -54,7 +54,7 @@ public class EntityDecoder {
     }
 
     public <T> T decode(int version, BeanMetadata beanMetadata, ByteBuf source) {
-        final Object containerInstance = beanMetadata.createNewInstance();
+        final Object containerInstance = beanMetadata.createNewInstanceWithNoArgsConstructor();
         return decode(version, source, beanMetadata, containerInstance);
     }
 
@@ -113,7 +113,7 @@ public class EntityDecoder {
 
     public <T> T decodeWithTracker(int version, Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
         final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass, version);
-        final Object containerInstance = beanMetadata.createNewInstance();
+        final Object containerInstance = beanMetadata.createNewInstanceWithNoArgsConstructor();
         return this.decodeWithTracker(version, source, beanMetadata, containerInstance, tracker);
     }
 
@@ -122,7 +122,7 @@ public class EntityDecoder {
     }
 
     public <T> T decodeWithTracker(int version, BeanMetadata beanMetadata, ByteBuf source, CodecTracker tracker) {
-        final Object containerInstance = beanMetadata.createNewInstance();
+        final Object containerInstance = beanMetadata.createNewInstanceWithNoArgsConstructor();
         return decodeWithTracker(version, source, beanMetadata, containerInstance, tracker);
     }
 

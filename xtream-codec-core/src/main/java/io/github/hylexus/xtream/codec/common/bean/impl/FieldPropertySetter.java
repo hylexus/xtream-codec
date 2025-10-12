@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.common.bean.impl;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -33,7 +34,8 @@ public class FieldPropertySetter implements BeanPropertyMetadata.PropertySetter 
     }
 
     @Override
-    public void setProperty(BeanPropertyMetadata metadata, Object instance, Object value) {
+    public void setProperty(BeanPropertyMetadata metadata, Object instance, @Nullable Object value) {
         ReflectionUtils.setField(field, instance, value);
     }
+
 }

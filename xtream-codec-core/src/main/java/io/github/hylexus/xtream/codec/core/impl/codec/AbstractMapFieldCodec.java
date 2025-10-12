@@ -19,15 +19,13 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.tracker.BaseSpan;
-import io.github.hylexus.xtream.codec.core.tracker.MapEntryItemSpan;
-import io.github.hylexus.xtream.codec.core.tracker.MapEntrySpan;
-import io.github.hylexus.xtream.codec.core.tracker.MapFieldSpan;
+import io.github.hylexus.xtream.codec.core.tracker.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @param <K>    {@link Map.Entry#getKey()}
@@ -69,28 +67,29 @@ public abstract class AbstractMapFieldCodec<
                 : input.readSlice(length);
         final Map<Object, Object> result = new LinkedHashMap<>();
         final int parentIndexBeforeRead = slice.readerIndex();
-        final MapFieldSpan mapFieldSpan = context.codecTracker().startNewMapFieldSpan(propertyMetadata, this.getClass().getSimpleName());
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(propertyMetadata, this.getClass().getSimpleName());
         int sequence = 0;
         while (slice.isReadable()) {
             final int indexBeforeRead = slice.readerIndex();
-            final MapEntrySpan mapEntrySpan = context.codecTracker().startNewMapEntrySpan(mapFieldSpan, propertyMetadata.name(), sequence++);
+            final MapEntrySpan mapEntrySpan = codecTracker.startNewMapEntrySpan(mapFieldSpan, propertyMetadata.name(), sequence++);
 
-            context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.KEY);
+            codecTracker.updateTrackerHints(MapEntryItemSpan.Type.KEY);
             final Object key = this.getKeyFieldCodec().deserializeWithTracker(propertyMetadata, context, slice, length);
 
-            context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
+            codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
             final int valueLength = this.getValueLengthFieldCodec().deserializeWithTracker(propertyMetadata, context, slice, length).intValue();
 
             final FieldCodec<?> valueFieldCodec = this.getValueFieldCodec((K) key);
-            context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE);
+            codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE);
             final Object value = valueFieldCodec.deserializeWithTracker(propertyMetadata, context, slice, valueLength);
 
             mapEntrySpan.setHexString(FormatUtils.toHexString(slice, indexBeforeRead, slice.readerIndex() - indexBeforeRead));
-            context.codecTracker().finishCurrentSpan();
+            codecTracker.finishCurrentSpan();
             result.put(key, value);
         }
         mapFieldSpan.setHexString(FormatUtils.toHexString(slice, parentIndexBeforeRead, slice.readerIndex() - parentIndexBeforeRead));
-        context.codecTracker().finishCurrentSpan();
+        codecTracker.finishCurrentSpan();
         return result;
     }
 
@@ -129,34 +128,35 @@ public abstract class AbstractMapFieldCodec<
         }
         final Map<Object, Object> map = (Map<Object, Object>) value;
         final ByteBuf temp = ByteBufAllocator.DEFAULT.buffer();
-        final MapFieldSpan mapFieldSpan = context.codecTracker().startNewMapFieldSpan(propertyMetadata, this.getClass().getSimpleName());
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(propertyMetadata, this.getClass().getSimpleName());
         final int parenIndexBeforeWrite = output.writerIndex();
-        final BaseSpan parent = context.codecTracker().getCurrentSpan();
+        final BaseSpan parent = codecTracker.getCurrentSpan();
         int sequence = 0;
         try {
             for (final Map.Entry<Object, Object> entry : map.entrySet()) {
                 final Object mapKey = entry.getKey();
                 final Object mapValue = entry.getValue();
 
-                final MapEntrySpan mapEntrySpan = context.codecTracker().startNewMapEntrySpan(parent, propertyMetadata.name(), sequence++);
+                final MapEntrySpan mapEntrySpan = codecTracker.startNewMapEntrySpan(parent, propertyMetadata.name(), sequence++);
                 final int writerIndex = output.writerIndex();
-                context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.KEY);
+                codecTracker.updateTrackerHints(MapEntryItemSpan.Type.KEY);
                 this.getKeyFieldCodec().serializeWithTracker(propertyMetadata, context, output, mapKey);
 
                 final FieldCodec valueFieldCodec = this.getValueFieldCodec((K) mapKey);
-                context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE);
+                codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE);
                 valueFieldCodec.serializeWithTracker(propertyMetadata, context, temp, mapValue);
 
                 final int valueLength = temp.writerIndex();
-                context.codecTracker().updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
+                codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
                 this.getValueLengthFieldCodec().serializeWithTracker(propertyMetadata, context, output, valueLength);
                 output.writeBytes(temp);
                 mapEntrySpan.setHexString(FormatUtils.toHexString(output, writerIndex, output.writerIndex() - writerIndex));
                 temp.clear();
-                context.codecTracker().finishCurrentSpan();
+                codecTracker.finishCurrentSpan();
             }
             mapFieldSpan.setHexString(FormatUtils.toHexString(output, parenIndexBeforeWrite, output.writerIndex() - parenIndexBeforeWrite));
-            context.codecTracker().finishCurrentSpan();
+            codecTracker.finishCurrentSpan();
         } finally {
             temp.release();
         }

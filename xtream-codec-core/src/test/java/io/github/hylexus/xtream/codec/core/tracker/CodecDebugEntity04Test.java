@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ public class CodecDebugEntity04Test {
             doCompare(encodeTracker, original);
 
             final CodecTracker decodeTracker = new CodecTracker();
-            final CodecDebugEntity04 decoded = entityCodec.decode(new CodecDebugEntity04().setRuntimeClass(CodecDebugEntity02.class), buffer, decodeTracker);
+            final CodecDebugEntity04 decoded = entityCodec.decode(XtreamField.ALL_VERSION, new CodecDebugEntity04().setRuntimeClass(CodecDebugEntity02.class), buffer, decodeTracker);
             // decodeTracker.visit();
             doCompare(decodeTracker, original);
             doCompare(decodeTracker, decoded);
