@@ -17,10 +17,8 @@
 package io.github.hylexus.xtream.codec.core.utils;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.common.bean.impl.FieldPropertySetter;
-import io.github.hylexus.xtream.codec.common.bean.impl.FiledPropertyGetter;
-import io.github.hylexus.xtream.codec.common.bean.impl.MethodPropertyGetter;
-import io.github.hylexus.xtream.codec.common.bean.impl.MethodPropertySetter;
+import io.github.hylexus.xtream.codec.common.bean.PropertyGetters;
+import io.github.hylexus.xtream.codec.common.bean.PropertySetters;
 import io.github.hylexus.xtream.codec.common.exception.BeanIntrospectionException;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
@@ -189,16 +187,20 @@ public final class BeanUtils {
 
     public static BeanPropertyMetadata.PropertySetter createSetter(BeanUtils.BasicPropertyDescriptor pd) {
         if (pd.getWriteMethod() != null) {
-            return new MethodPropertySetter(pd.getWriteMethod());
+            // return new MethodPropertySetter(pd.getWriteMethod());
+            return PropertySetters.forMethodViaReflection(pd.getWriteMethod());
         }
-        return new FieldPropertySetter(pd.getField());
+        // return new FieldPropertySetter(pd.getField());
+        return PropertySetters.forFieldViaReflection(pd.getField());
     }
 
     public static BeanPropertyMetadata.PropertyGetter createGetter(BeanUtils.BasicPropertyDescriptor pd) {
         if (pd.getReadMethod() != null) {
-            return new MethodPropertyGetter(pd.getReadMethod());
+            // return new MethodPropertyGetter(pd.getReadMethod());
+            return PropertyGetters.forMethodViaReflection(pd.getReadMethod());
         }
-        return new FiledPropertyGetter(pd.getField());
+        // return new FiledPropertyGetter(pd.getField());
+        return PropertyGetters.forFieldViaReflection(pd.getField());
     }
 
     public static Constructor<?> getConstructor(BeanInfo beanInfo) {

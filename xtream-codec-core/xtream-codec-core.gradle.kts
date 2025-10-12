@@ -1,3 +1,7 @@
+plugins {
+    id("me.champeau.jmh")
+}
+
 dependencies {
     api("org.springframework:spring-expression")
     api("io.netty:netty-buffer")

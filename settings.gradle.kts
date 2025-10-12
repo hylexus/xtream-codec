@@ -8,6 +8,8 @@ pluginManagement {
         id("com.github.jk1.dependency-license-report") version "2.9" apply false
         id("com.namics.oss.gradle.license-enforce-plugin") version "1.7.0" apply false
         id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1" apply false
+        // https://github.com/melix/jmh-gradle-plugin
+        id("me.champeau.jmh") version "0.7.3" apply false
     }
 
     repositories {
