@@ -16,63 +16,187 @@
 
 package io.github.hylexus.xtream.codec.core.record;
 
-import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
-import io.github.hylexus.xtream.codec.core.EntityCodec;
+import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class RecordTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class RecordTest extends BaseEntityCodecTest {
 
     public record Entity1(
+            @Preset.RustStyle.str(version = XtreamField.ALL_VERSION, prependLengthFieldType = PrependLengthFieldType.u8, charset = "UTF-8")
+            @Preset.RustStyle.str(version = 1, prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+            String name,
+            @Preset.RustStyle.u8 Short level,
+            @Preset.RustStyle.u32(version = 1, condition = "level == 2")
+            @Preset.RustStyle.u32(version = 2, condition = "#level == 2")
+            @Preset.RustStyle.u32(version = 3, condition = "#self.level == 2")
+            Long age) {
+    }
+
+    @Test
+    void testEntity1() {
+        doCodecTest(
+                XtreamField.ALL_VERSION,
+                new Entity1("张三李四王五", (short) 1, 1000L),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    assertTrue(encodedHexString.contains(hexStringForUtf8(sourceEntity.name())));
+                    doCompareEntity1(sourceEntity, decodedEntity);
+                    assertNull(decodedEntity.age());
+                },
+                false
+        );
+
+        doCodecTest(
+                1,
+                new Entity1("张三李四王五", (short) 1, 1000L),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    assertTrue(encodedHexString.contains(hexStringForGbk(sourceEntity.name())));
+                    doCompareEntity1(sourceEntity, decodedEntity);
+                    assertNull(decodedEntity.age());
+                },
+                false
+        );
+
+        doCodecTest(
+                1,
+                new Entity1("张三李四王五", (short) 2, 1000L),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    assertTrue(encodedHexString.contains(hexStringForGbk(sourceEntity.name())));
+                    doCompareEntity1(sourceEntity, decodedEntity);
+                    assertEquals(sourceEntity.age(), decodedEntity.age());
+                },
+                false
+        );
+
+        doCodecTest(
+                2,
+                new Entity1("张三李四王五", (short) 2, 1000L),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    assertTrue(encodedHexString.contains(hexStringForUtf8(sourceEntity.name())));
+                    doCompareEntity1(sourceEntity, decodedEntity);
+                    assertEquals(sourceEntity.age(), decodedEntity.age());
+                },
+                false
+        );
+
+        doCodecTest(
+                3,
+                new Entity1("张三李四王五", (short) 2, 1000L),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    assertTrue(encodedHexString.contains(hexStringForUtf8(sourceEntity.name())));
+                    doCompareEntity1(sourceEntity, decodedEntity);
+                    assertEquals(sourceEntity.age(), decodedEntity.age());
+                },
+                false
+        );
+
+        doCodecTest(
+                1111,
+                new Entity1("张三李四王五", (short) 2, 1000L),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    assertTrue(encodedHexString.contains(hexStringForUtf8(sourceEntity.name())));
+                    doCompareEntity1(sourceEntity, decodedEntity);
+                    assertNull(decodedEntity.age());
+                },
+                false
+        );
+
+        doCodecTest(
+                3,
+                new Entity1("张三李四王五", (short) 1, 1000L),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    assertTrue(encodedHexString.contains(hexStringForUtf8(sourceEntity.name())));
+                    doCompareEntity1(sourceEntity, decodedEntity);
+                    assertNull(decodedEntity.age());
+                },
+                false
+        );
+    }
+
+    public record Entity2(
             @Preset.JtStyle.Str(desc = "姓名", prependLengthFieldType = PrependLengthFieldType.u8) String name,
             Integer x,
             @Preset.JtStyle.Word(desc = "年龄") int age,
-            @Preset.JtStyle.TransientRc(nulls = XtreamField.Nulls.AS_NULL) String address,
-            @Preset.RustStyle.transient_rc(nulls = XtreamField.Nulls.AS_EMPTY)
+            @Preset.JtStyle.TransientRc(version = 1, nulls = XtreamField.Nulls.AS_NULL)
+            @Preset.JtStyle.TransientRc(version = 2, nulls = XtreamField.Nulls.AS_EMPTY)
+            String address,
+            @Preset.RustStyle.transient_rc(version = 1, nulls = XtreamField.Nulls.AS_EMPTY)
+            @Preset.RustStyle.transient_rc(version = 2, nulls = XtreamField.Nulls.AS_NULL)
             List<String> add,
             @Preset.JtStyle.Object NestedRecord1 nestedRecord1,
             @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8) String desc) {
-        public Entity1(String name, Integer x, int age, String address) {
+        public Entity2(String name, Integer x, int age, String address) {
             this(name, x, age, address, List.of("111"), new NestedRecord1("张三", 100, new NestedRecord2("张三1", 1100, "desc2"), "desc1"), "...");
         }
     }
 
     public record NestedRecord1(
-            @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8)
-            String name1,
+            @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8) String name1,
             @Preset.JtStyle.Word int age1,
             @Preset.JtStyle.Object NestedRecord2 nestedRecord2,
             @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8) String desc1) {
     }
 
     public record NestedRecord2(
-            @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8)
-            String name2,
+            @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8) String name2,
             @Preset.JtStyle.Word int age2,
             @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8) String des2) {
     }
 
     @Test
-    void test1() {
-        EntityCodec entityCodec = EntityCodec.DEFAULT;
-        final ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
-        final Entity1 sourceEntity = new Entity1("张三李四王五", 0, 18, "t");
-        final CodecTracker tracker = new CodecTracker();
-        entityCodec.encode(sourceEntity, buffer, tracker);
-        tracker.visit();
-        System.out.println(FormatUtils.toHexString(buffer));
-        final CodecTracker decodeTracker = new CodecTracker();
-        final Entity1 decode = entityCodec.decode(Entity1.class, buffer,decodeTracker);
-        System.out.println(sourceEntity);
-        System.out.println(decode);
-        decodeTracker.visit();
+    void testEntity2() {
+        doCodecTest(
+                XtreamField.ALL_VERSION,
+                new Entity2("张三李四王五", 0, 18, "t"),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    doCompareEntity2(sourceEntity, decodedEntity);
+                    assertNull(decodedEntity.x());
+                },
+                false
+        );
+
+        doCodecTest(
+                1,
+                new Entity2("张三李四王五", 0, 18, "t"),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    doCompareEntity2(sourceEntity, decodedEntity);
+                    assertNull(decodedEntity.x());
+                    assertNull(decodedEntity.address());
+                    assertNotNull(decodedEntity.add());
+                    assertTrue(decodedEntity.add().isEmpty());
+                },
+                false
+        );
+        doCodecTest(
+                2,
+                new Entity2("张三李四王五", 0, 18, "t"),
+                (sourceEntity, encodedHexString, decodedEntity) -> {
+                    doCompareEntity2(sourceEntity, decodedEntity);
+                    assertNull(decodedEntity.x());
+                    assertNotNull(decodedEntity.address());
+                    assertTrue(decodedEntity.address().isEmpty());
+                    assertNull(decodedEntity.add());
+                },
+                false
+        );
+    }
+
+    private void doCompareEntity1(Entity1 sourceEntity, Entity1 decodedEntity) {
+        assertEquals(sourceEntity.name(), decodedEntity.name());
+        assertEquals(sourceEntity.level(), decodedEntity.level());
+    }
+
+    private void doCompareEntity2(Entity2 sourceEntity, Entity2 decodedEntity) {
+        assertEquals(sourceEntity.name(), decodedEntity.name());
+        assertEquals(sourceEntity.age(), decodedEntity.age());
+        assertEquals(sourceEntity.nestedRecord1(), decodedEntity.nestedRecord1());
+        assertEquals(sourceEntity.desc(), decodedEntity.desc());
     }
 
 }

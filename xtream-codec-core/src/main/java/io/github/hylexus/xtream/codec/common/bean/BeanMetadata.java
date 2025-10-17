@@ -16,7 +16,9 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
+import io.github.hylexus.xtream.codec.core.utils.XtreamRecordUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Getter
@@ -54,7 +57,7 @@ public class BeanMetadata {
     }
 
     /**
-     * @deprecated Use {@link #createNewInstanceWithNoArgsConstructor()} instead.
+     * @deprecated Use {@link #createNewInstanceForDecoding()} instead.
      */
     @Deprecated(since = "0.2.0", forRemoval = true)
     @Nullable
@@ -65,9 +68,22 @@ public class BeanMetadata {
         return BeanUtils.createNewInstance(this.getConstructor(), (Object[]) null);
     }
 
-    public Object createNewInstanceWithNoArgsConstructor() {
+    /**
+     * 解码时创建实体类实例
+     * <h3 color="red">注意</h3>
+     * 对于 {@link Record} 类型的实体类:
+     * <li>解码过程中无法直接创建实例，临时使用 {@link java.util.Map} 作为容器类，用于临时存储属性值，以便在 {@code SpEL} 中读取属性值</li>
+     * <li>各个属性都解码完成后，使用 {@code Canonical 构造器} 创建实例</li>
+     *
+     * @see XtreamField#condition()
+     * @see XtreamField#lengthExpression()
+     * @see XtreamField#iterationTimesExpression()
+     * @see XtreamRecordUtils#findCanonicalRecordConstructor(Class)
+     * @since 0.2.0
+     */
+    public Object createNewInstanceForDecoding() {
         if (this.rawType.isRecord()) {
-            return null;
+            return new LinkedHashMap<String, Object>();
         }
         return this.instantiator.newInstanceIgnoreException((Object[]) null);
     }

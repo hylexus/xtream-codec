@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.exception.NotYetImplementedException;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
@@ -93,9 +94,13 @@ public interface FieldCodec<T> {
         ByteBufAllocator bufferFactory();
 
         /**
-         * 如果正在被编解码的类型是 {@link Record} 类型，该方法返回 {@code null}。
+         * 如果正在被解码的实体类型是 {@link Record} 类型，该方法返回 {@link java.util.Map}。
+         *
+         * @see BeanMetadata#createNewInstanceForDecoding()
+         * @see EntityDecoder#decode(int, ByteBuf, BeanMetadata, Object)
+         * @see EntityDecoder#decodeWithTracker(int, ByteBuf, BeanMetadata, Object, CodecTracker)
          */
-        @Nullable Object containerInstance();
+        Object containerInstance();
 
         EvaluationContext evaluationContext();
 

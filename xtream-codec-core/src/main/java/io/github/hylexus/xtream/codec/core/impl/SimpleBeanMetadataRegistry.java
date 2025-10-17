@@ -30,6 +30,7 @@ import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.MergedAnnotations;
 
 import java.lang.reflect.*;
@@ -120,61 +121,46 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
                 // xtreamFieldAnnotations = ReflectionUtils.findXtreamFieldAnnotations(field);
                 xtreamFieldAnnotations = XtreamFieldUtils.getOrEmpty(field);
             }
-
-            for (final XtreamField xtreamFieldAnnotation : xtreamFieldAnnotations) {
-                final int[] allVersions = xtreamFieldAnnotation.version();
-                final boolean versionMatched = isVersionMatched(version, allVersions);
-                if (!versionMatched) {
-                    continue;
-                }
-                final BeanPropertyMetadata basicPropertyMetadata = creator.apply(new PropertyInfo(pd, xtreamFieldAnnotation, version));
-                if (basicPropertyMetadata.fieldCodec() != FieldCodec.NullFieldCodec.INSTANCE) {
-                    // 用户自定义 FieldCodec
-                    pdList.add(basicPropertyMetadata);
-                    continue;
-                }
-                if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.basic) {
-                    pdList.add(basicPropertyMetadata);
-                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.struct) {
-                    final BeanMetadata nestedMetadata = doGetMetadata(pd.getPropertyType(), version, creator);
-                    // final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, null);
-                    final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, basicPropertyMetadata.fieldLengthExtractor());
-                    pdList.add(metadata);
-                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.sequence) {
-                    final List<Class<?>> genericClass = getGenericClass(basicPropertyMetadata.field());
-                    final BeanMetadata valueMetadata = doGetMetadata(genericClass.getFirst(), version, creator);
-                    final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, valueMetadata, basicPropertyMetadata, new FieldLengthExtractor.ConstantFieldLengthExtractor(-2));
-                    final SequenceBeanPropertyMetadata seqMetadata = new SequenceBeanPropertyMetadata(this, basicPropertyMetadata, metadata);
-                    pdList.add(seqMetadata);
-                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.map) {
-                    final MapBeanPropertyMetadata mapMedata = new MapBeanPropertyMetadata(basicPropertyMetadata, fieldCodecRegistry, this);
-                    pdList.add(mapMedata);
-                } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.dynamic) {
-                    pdList.add(basicPropertyMetadata);
-                } else {
-                    throw new IllegalStateException("Cannot determine dataType for " + basicPropertyMetadata.field());
-                }
+            final XtreamField xtreamFieldAnnotation = matchVersion(version, xtreamFieldAnnotations);
+            if (xtreamFieldAnnotation == null) {
+                continue;
             }
+
+            final BeanPropertyMetadata basicPropertyMetadata = creator.apply(new PropertyInfo(pd, xtreamFieldAnnotation, version));
+            if (basicPropertyMetadata.fieldCodec() != FieldCodec.NullFieldCodec.INSTANCE) {
+                // 用户自定义 FieldCodec
+                pdList.add(basicPropertyMetadata);
+                continue;
+            }
+            if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.basic) {
+                pdList.add(basicPropertyMetadata);
+            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.struct) {
+                final BeanMetadata nestedMetadata = doGetMetadata(pd.getPropertyType(), version, creator);
+                // final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, null);
+                final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, basicPropertyMetadata.fieldLengthExtractor());
+                pdList.add(metadata);
+            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.sequence) {
+                final List<Class<?>> genericClass = getGenericClass(basicPropertyMetadata.field());
+                final BeanMetadata valueMetadata = doGetMetadata(genericClass.getFirst(), version, creator);
+                final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, valueMetadata, basicPropertyMetadata, new FieldLengthExtractor.ConstantFieldLengthExtractor(-2));
+                final SequenceBeanPropertyMetadata seqMetadata = new SequenceBeanPropertyMetadata(this, basicPropertyMetadata, metadata);
+                pdList.add(seqMetadata);
+            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.map) {
+                final MapBeanPropertyMetadata mapMedata = new MapBeanPropertyMetadata(basicPropertyMetadata, fieldCodecRegistry, this);
+                pdList.add(mapMedata);
+            } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.dynamic) {
+                pdList.add(basicPropertyMetadata);
+            } else {
+                throw new IllegalStateException("Cannot determine dataType for " + basicPropertyMetadata.field());
+            }
+
         }
         pdList.sort(Comparator.comparing(BeanPropertyMetadata::order));
         return new BeanMetadata(beanInfo.getBeanDescriptor().getBeanClass(), BeanUtils.getConstructor(beanInfo), pdList);
     }
 
-    protected boolean isVersionMatched(int targetVersion, int[] versionCandidates) {
-        boolean foundDefault = false;
-
-        for (int v : versionCandidates) {
-            if (v == targetVersion) {
-                // 一旦发现目标版本，立即成功
-                return true;
-            } else if (v == XtreamField.ALL_VERSION) {
-                // 仅记录默认版本存在
-                foundDefault = true;
-            }
-        }
-
-        // 无目标版本时，依赖默认版本兜底
-        return foundDefault;
+    protected @Nullable XtreamField matchVersion(int targetVersion, List<XtreamField> xtreamFieldAnnotations) {
+        return XtreamFieldUtils.matchVersion(targetVersion, xtreamFieldAnnotations);
     }
 
     private List<Class<?>> getGenericClass(Field field) {

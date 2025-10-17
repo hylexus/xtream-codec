@@ -40,6 +40,8 @@ public final class XtreamFieldUtils {
 
     /**
      * 获取 XtreamField 注解列表，如果没有注解则返回包含默认代理实例的列表
+     * <p>
+     * 注意：这个方法是 {@link Record} 类型专用的
      */
     public static List<XtreamField> getOrDefault(AnnotatedElement element) {
         return CACHE.computeIfAbsent(element, e -> {
@@ -47,7 +49,23 @@ public final class XtreamFieldUtils {
             if (fields.isEmpty()) {
                 return List.of(generateTransientFieldProxyInstance(element));
             }
-            return fields;
+
+            final boolean hasDefaultVersion = fields.stream().anyMatch(annotation -> {
+                for (final int version : annotation.version()) {
+                    if (version == XtreamField.ALL_VERSION) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            if (hasDefaultVersion) {
+                return fields;
+            }
+            // 没有默认版本 ==> 添加一个默认版本
+            final ArrayList<XtreamField> newList = new ArrayList<>(fields);
+            newList.add(generateTransientFieldProxyInstance(element));
+            return Collections.unmodifiableList(newList);
         });
     }
 
@@ -69,8 +87,7 @@ public final class XtreamFieldUtils {
 
         if (annotations.isPresent(XtreamField.class)) {
             final List<XtreamField> resultList = new ArrayList<>();
-            final List<MergedAnnotation<XtreamField>> list =
-                    annotations.stream(XtreamField.class).toList();
+            final List<MergedAnnotation<XtreamField>> list = annotations.stream(XtreamField.class).toList();
             for (MergedAnnotation<XtreamField> ann : list) {
                 resultList.add(ann.synthesize());
             }
@@ -277,4 +294,43 @@ public final class XtreamFieldUtils {
             return null;
         }
     }
+
+    public static @Nullable XtreamField matchVersion(int targetVersion, List<XtreamField> xtreamFieldAnnotations) {
+        XtreamField defaultVersion = null;
+
+        for (final XtreamField annotation : xtreamFieldAnnotations) {
+            for (final int version : annotation.version()) {
+                if (version == targetVersion) {
+                    // 一旦发现目标版本，立即成功
+                    return annotation;
+                } else if (version == XtreamField.ALL_VERSION) {
+                    // 记录遇到的 "第一个" 默认版本
+                    if (defaultVersion == null) {
+                        defaultVersion = annotation;
+                    }
+                }
+            }
+        }
+        // 无目标版本时，依赖默认版本兜底
+        return defaultVersion;
+    }
+
+
+    public static boolean isVersionMatched(int targetVersion, int[] versionCandidates) {
+        boolean foundDefault = false;
+
+        for (int v : versionCandidates) {
+            if (v == targetVersion) {
+                // 一旦发现目标版本，立即成功
+                return true;
+            } else if (v == XtreamField.ALL_VERSION) {
+                // 仅记录默认版本存在
+                foundDefault = true;
+            }
+        }
+
+        // 无目标版本时，依赖默认版本兜底
+        return foundDefault;
+    }
+
 }

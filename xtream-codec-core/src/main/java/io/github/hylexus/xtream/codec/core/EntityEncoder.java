@@ -61,6 +61,8 @@ public class EntityEncoder {
                 continue;
             }
             final Object value = propertyMetadata.getProperty(instance);
+            context.evaluationContext().setVariable(propertyMetadata.name(), value);
+
             if (value == null) {
                 continue;
             }
@@ -103,6 +105,8 @@ public class EntityEncoder {
                 continue;
             }
             final Object value = propertyMetadata.getProperty(instance);
+            context.evaluationContext().setVariable(propertyMetadata.name(), value);
+
             if (value == null) {
                 continue;
             }

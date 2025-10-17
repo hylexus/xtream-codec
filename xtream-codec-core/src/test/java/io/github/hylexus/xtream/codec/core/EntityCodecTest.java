@@ -16,101 +16,83 @@
 
 package io.github.hylexus.xtream.codec.core;
 
-import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
-import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
+import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class EntityCodecTest {
+class EntityCodecTest extends BaseEntityCodecTest {
 
-    EntityCodec entityCodec = EntityCodec.DEFAULT;
+    UserEntity userEntity;
 
-    void doEncode(int version, UserEntity userEntity, BiConsumer<ByteBuf, UserEntity> consumer) {
-        final ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
-        try {
-            this.entityCodec.encode(version, userEntity, buffer);
-            consumer.accept(buffer, userEntity);
-        } finally {
-            assertEquals(1, buffer.refCnt());
-        }
-    }
-
-    @Test
-    void testEncode() {
-        final UserEntity userEntity = new UserEntity()
+    @BeforeEach
+    void setUp() {
+        userEntity = new UserEntity()
                 .setId(100L)
                 .setName("无名氏")
                 .setAge(1024)
                 .setAddress("保密");
-        doEncode(XtreamField.ALL_VERSION, userEntity, (buffer, entity) -> {
-            final String hexString = FormatUtils.toHexString(buffer);
-            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
-        });
-        doEncode(XtreamField.ALL_VERSION, userEntity, (buffer, entity) -> {
-            final String hexString = FormatUtils.toHexString(buffer);
-            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
-        });
-
-        doEncode(1, userEntity, (buffer, entity) -> {
-            final String hexString = FormatUtils.toHexString(buffer);
-            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
-        });
-        doEncode(1, userEntity, (buffer, entity) -> {
-            final String hexString = FormatUtils.toHexString(buffer);
-            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
-        });
-
-        doEncode(2, userEntity, (buffer, entity) -> {
-            final String hexString = FormatUtils.toHexString(buffer);
-            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
-        });
-        doEncode(2, userEntity, (buffer, entity) -> {
-            final String hexString = FormatUtils.toHexString(buffer);
-            assertEquals("0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86", hexString);
-        });
-    }
-
-    <T> void doDecode(int version, Class<T> type, ByteBuf buffer, Consumer<T> consumer) {
-        try {
-            final T entity = this.entityCodec.decode(version, type, buffer);
-            consumer.accept(entity);
-        } finally {
-            buffer.release();
-            assertEquals(0, buffer.refCnt());
-        }
     }
 
     @Test
-    void testDecode() {
-        ByteBuf buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f040006e4bf9de5af86");
-        doDecode(XtreamField.ALL_VERSION, UserEntity.class, buffer, this::doCompare);
+    void testVersion2() {
+        doCodecTest(2, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+        }, false);
 
-        buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86");
-        doDecode(1, UserEntity.class, buffer, this::doCompare);
-
-        buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f06cedec3fbcacf040006e4bf9de5af86");
-        doDecode(2, UserEntity.class, buffer, this::doCompare);
+        doCodecTest(2, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+        }, true);
     }
 
-    private void doCompare(UserEntity entity) {
-        assertEquals(100L, entity.getId());
-        assertEquals("无名氏", entity.getName());
-        assertEquals(1024, entity.getAge());
-        assertEquals("保密", entity.getAddress());
+    @Test
+    void testVersion1() {
+        doCodecTest(1, userEntity, (source, hexString, decoded) -> {
+            doCompare(userEntity, decoded);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+        }, false);
+        doCodecTest(1, userEntity, (source, hexString, decoded) -> {
+            doCompare(userEntity, decoded);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+        }, true);
+    }
+
+    @Test
+    void testVersionDefault() {
+        doCodecTest(XtreamField.ALL_VERSION, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertTrue(hexString.contains(hexStringForUtf8(userEntity.getName())));
+            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
+        }, false);
+
+        doCodecTest(XtreamField.ALL_VERSION, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertTrue(hexString.contains(hexStringForUtf8(userEntity.getName())));
+            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
+        }, true);
+    }
+
+    private void doCompare(UserEntity expected, UserEntity actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getAge(), actual.getAge());
+        assertEquals(expected.getAddress(), actual.getAddress());
     }
 
     @Getter
