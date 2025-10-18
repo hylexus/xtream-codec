@@ -264,6 +264,8 @@ configure(subprojects) {
             apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
             tasks.withType<io.gitee.pkmer.tasks.BundleTask>().configureEach {
                 dependsOn(tasks.test, tasks.checkstyleTest, tasks.checkstyleMain)
+                // 只有部分模块有这两个任务
+                dependsOn(tasks.matching { it.name in setOf("compileJmhJava", "checkstyleJmh") })
             }
             // 延迟配置，在插件完全应用后再执行
             afterEvaluate {
