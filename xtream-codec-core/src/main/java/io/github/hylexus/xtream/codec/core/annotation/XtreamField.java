@@ -33,7 +33,7 @@ import java.lang.reflect.AnnotatedElement;
  * @see io.github.hylexus.xtream.codec.core.EntityCodec
  * @see io.github.hylexus.xtream.codec.core.type.Preset.RustStyle
  * @see io.github.hylexus.xtream.codec.core.type.Preset.JtStyle
- * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+ * @see <a href="https://docs.spring.io/spring-framework/reference/core/expressions.html">SpEL 官方文档</a>
  * @see <a href="https://stackoverflow.com/questions/5001172/java-reflection-getting-fields-and-methods-in-declaration-order">java-reflection-getting-fields-and-methods-in-declaration-order</a>
  */
 @Documented

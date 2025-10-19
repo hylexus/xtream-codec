@@ -20,6 +20,11 @@ object XtreamConfig {
                 ?: Config(this).also { extensions.add("xtreamConfig", it) }
         }
 
+    private val thirdpartyDependencies: List<ThirdPartyDependency> = listOf(
+        ThirdPartyDependency("com.googlecode.aviator:aviator", "5.4.3", "com.googlecode.aviator.version"),
+        ThirdPartyDependency("org.mvel:mvel2", "2.5.2.Final", "org.mvel.mvel2.version"),
+    )
+
     /**
      * 配置容器类
      */
@@ -33,6 +38,8 @@ object XtreamConfig {
                 @Suppress("UNCHECKED_CAST")
                 extra.get(CACHE_KEY) as MutableMap<String, Any>
             }
+
+        fun thirdpartyDependencies(): List<ThirdPartyDependency> = thirdpartyDependencies
 
         /** 通用缓存读取方法 */
         fun <T> getOrLoadConfig(key: String, loader: Project.() -> T): T {
@@ -223,4 +230,8 @@ object XtreamConfig {
             ) "******" else value
     }
 
+}
+
+data class ThirdPartyDependency(val name: String, val version: String, val versionPropertyName: String) {
+    fun toIdentifier(): String = "$name:$version"
 }

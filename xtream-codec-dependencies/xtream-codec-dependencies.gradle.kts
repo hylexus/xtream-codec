@@ -15,7 +15,7 @@ version = xtreamConfig.projectVersion
 
 private fun DependencyConstraintHandlerScope.apiBom(module: String) {
     val group = xtreamConfig.projectGroupId
-    val versionProp = "\${xtream-codec.version}"
+    val versionProp = $$"${xtream-codec.version}"
     api("$group:$module:$versionProp")
 }
 
@@ -26,6 +26,9 @@ dependencies {
         apiBom("xtream-codec-server-reactive")
         apiBom("jt-808-server-spring-boot-starter-reactive")
         apiBom("jt-808-server-dashboard-spring-boot-starter-reactive")
+        xtreamConfig.thirdpartyDependencies().forEach { dep->
+            api($$"$${dep.name}:${$${dep.versionPropertyName}}")
+        }
     }
 }
 
@@ -60,6 +63,9 @@ publishing {
                 // 1. 添加 <properties> 节点
                 val propsNode = root.appendNode("properties")
                 propsNode.appendNode("xtream-codec.version", version)
+                xtreamConfig.thirdpartyDependencies().forEach { dep ->
+                    propsNode.appendNode(dep.versionPropertyName, dep.version)
+                }
 
                 // 2. 找到 <dependencyManagement> 节点
                 val dmNode = (root.get("dependencyManagement") as? List<*>)?.firstOrNull() as? groovy.util.Node

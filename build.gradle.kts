@@ -84,6 +84,9 @@ configure(subprojects) {
             dependency("io.minio:minio:8.5.14")
             dependency("com.lmax:disruptor:4.0.0")
             dependency("org.jspecify:jspecify:1.0.0")
+            xtreamConfig.thirdpartyDependencies().forEach {
+                dependency(it.toIdentifier())
+            }
         }
 
         group = "xtream-codec"
