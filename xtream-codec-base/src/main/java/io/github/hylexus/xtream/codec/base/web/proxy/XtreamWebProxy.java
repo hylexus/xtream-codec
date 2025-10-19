@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.base.web.proxy;
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpCallException;
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpErrorDetails;
 import io.netty.handler.timeout.ReadTimeoutException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -44,6 +45,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 import static org.springframework.http.HttpMethod.*;
 
 /**
@@ -109,7 +112,7 @@ public class XtreamWebProxy {
             }
             if (cause instanceof IOException) {
                 log.error("Proxy-Request for BACKEND {} with URL '{}' errored", backend, request.uri, cause);
-                final XtreamHttpErrorDetails.ProxyErrorDetails errorDetails = XtreamHttpErrorDetails.ProxyErrorDetails.of(request.uri.toString(), backend.getBaseUrl(), cause.getMessage());
+                final XtreamHttpErrorDetails.ProxyErrorDetails errorDetails = XtreamHttpErrorDetails.ProxyErrorDetails.of(request.uri.toString(), backend.getBaseUrl(), requireNonNull(cause.getMessage(), "ProxyError"));
                 final XtreamHttpCallException error = new XtreamHttpCallException(cause, HttpStatus.BAD_GATEWAY, "001:502", "Failed to proxy request to downstream service " + backend.getBaseUrl(), List.of(errorDetails));
                 return Mono.error(error);
             }
@@ -148,9 +151,9 @@ public class XtreamWebProxy {
     }
 
     public static final class Builder {
-        private DataBufferFactory bufferFactory;
-        private WebClient webClient;
-        private XtreamWebProxyHttpHeaderFilter xtreamWebProxyHttpHeaderFilter;
+        private @Nullable DataBufferFactory bufferFactory;
+        private @Nullable WebClient webClient;
+        private @Nullable XtreamWebProxyHttpHeaderFilter xtreamWebProxyHttpHeaderFilter;
         private final List<XtreamWebProxyExchangeFilter> filterFunctions = new ArrayList<>();
 
         public Builder bufferFactory(DataBufferFactory bufferFactory) {
@@ -180,13 +183,12 @@ public class XtreamWebProxy {
 
         public XtreamWebProxy build() {
             return new XtreamWebProxy(
-                    this.bufferFactory == null ? new DefaultDataBufferFactory() : this.bufferFactory,
-                    Objects.requireNonNull(this.webClient, "webClient is null"),
-                    this.xtreamWebProxyHttpHeaderFilter == null ? new XtreamWebProxyHttpHeaderFilter(Collections.emptySet()) : this.xtreamWebProxyHttpHeaderFilter,
+                    requireNonNullElse(this.bufferFactory, new DefaultDataBufferFactory()),
+                    requireNonNull(this.webClient, "webClient is null"),
+                    requireNonNullElse(this.xtreamWebProxyHttpHeaderFilter, new XtreamWebProxyHttpHeaderFilter(Collections.emptySet())),
                     filterFunctions
             );
         }
-
     }
 
 }

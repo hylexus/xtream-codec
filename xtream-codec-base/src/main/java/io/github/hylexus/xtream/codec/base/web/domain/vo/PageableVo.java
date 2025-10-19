@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
+@SuppressWarnings("NullAway")
 public class PageableVo<T> {
     private long total;
     private List<T> data;

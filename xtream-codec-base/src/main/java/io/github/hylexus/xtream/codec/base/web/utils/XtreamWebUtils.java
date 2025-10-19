@@ -18,9 +18,9 @@ package io.github.hylexus.xtream.codec.base.web.utils;
 
 
 import io.github.hylexus.xtream.codec.base.web.annotation.ClientIp;
-import io.micrometer.common.util.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.springframework.util.StringUtils;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -63,7 +63,7 @@ public final class XtreamWebUtils {
     public static Optional<String> getClientIp(HttpRequestHeaderProvider headerProvider) {
         for (String headerName : IP_HEADER_NAMES) {
             String ip = headerProvider.get(headerName);
-            if (StringUtils.isNotEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            if (StringUtils.hasText(ip) && !"unknown".equalsIgnoreCase(ip)) {
                 int index = ip.indexOf(',');
                 if (index != -1) {
                     ip = ip.substring(0, index);

@@ -36,7 +36,7 @@ import java.net.URI;
 @NullMarked
 public final class XtreamWebProxyBuiltinFilters {
     private static final String ATTR_KEY_BACKEND_SERVER = "__BACKEND_SERVER_INSTANCE__";
-    private static final Logger log = LoggerFactory.getLogger(XtreamWebProxyBuiltinFilters.class);
+    // private static final Logger log = LoggerFactory.getLogger(XtreamWebProxyBuiltinFilters.class);
 
     private XtreamWebProxyBuiltinFilters() {
         throw new UnsupportedOperationException();

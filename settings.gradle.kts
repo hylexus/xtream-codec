@@ -10,6 +10,8 @@ pluginManagement {
         id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1" apply false
         // https://github.com/melix/jmh-gradle-plugin
         id("me.champeau.jmh") version "0.7.3" apply false
+        // https://github.com/tbroyer/gradle-errorprone-plugin
+        id("net.ltgt.errorprone") version "4.3.0" apply false
     }
 
     repositories {

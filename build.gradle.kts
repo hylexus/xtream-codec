@@ -1,8 +1,10 @@
 import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
 import io.github.hylexus.xtream.codec.gradle.utils.logInfo2
 import io.github.hylexus.xtream.codec.gradle.utils.logTip
+import net.ltgt.gradle.errorprone.errorprone
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 plugins {
     id("java-library")
@@ -14,6 +16,7 @@ plugins {
     id("net.minecraftforge.licenser")
     id("com.github.jk1.dependency-license-report")
     id("com.namics.oss.gradle.license-enforce-plugin")
+    id("net.ltgt.errorprone") apply false
 }
 
 val mavenPublications = setOf(
@@ -23,7 +26,7 @@ val mavenPublications = setOf(
     "jt-808-server-spring-boot-starter-reactive",
     "jt-808-server-dashboard-spring-boot-starter-reactive",
 )
-
+val errorpronePluginEnabledProjects = setOf("xtream-codec-base")
 version = xtreamConfig.projectVersion
 run {
     xtreamConfig.javaVersion
@@ -44,6 +47,9 @@ configure(subprojects) {
     logInfo2("configuring project: ${project.name}")
 
     apply(plugin = "java-library")
+    if (project.errorPronePluginEnabled()) {
+        apply(plugin = "net.ltgt.errorprone")
+    }
     java {
         sourceCompatibility = JavaVersion.toVersion(xtreamConfig.javaVersion)
         targetCompatibility = JavaVersion.toVersion(xtreamConfig.javaVersion)
@@ -54,6 +60,25 @@ configure(subprojects) {
     tasks.withType<JavaCompile> {
         options.compilerArgs.add("-parameters")
         options.release.set(xtreamConfig.javaVersion.toInt())
+
+        if (project.errorPronePluginEnabled()) {
+            options.errorprone {
+                check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
+                option("NullAway:AnnotatedPackages", "io.github.hylexus.xtream.codec")
+
+                disable(
+                    "MissingSummary",
+                    "StringCaseLocaleUsage",
+                )
+
+                // Include to disable NullAway on test code
+                if (name.lowercase(Locale.getDefault()).contains("test")) {
+                    options.errorprone {
+                        disable("NullAway")
+                    }
+                }
+            }
+        }
     }
 
     apply(plugin = "io.spring.dependency-management")
@@ -102,6 +127,12 @@ configure(subprojects) {
         testImplementation("org.junit.jupiter:junit-jupiter")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         api("org.jspecify:jspecify")
+        if (project.errorPronePluginEnabled()) {
+            val errorprone = configurations.getByName("errorprone")
+            errorprone("com.uber.nullaway:nullaway:0.12.10")
+            errorprone("com.google.errorprone:error_prone_core:2.42.0")
+        }
+
         // common end
     }
 
@@ -262,7 +293,7 @@ configure(subprojects) {
 
     apply(plugin = "maven-publish")
     val stagingRepositoryPath = xtreamConfig.centralPortalArtifactsTempDir
-    if (isMavenPublications(project)) {
+    if (isMavenPublications()) {
         if (xtreamConfig.centralPortalMavenRepoEnabled) {
             apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
             tasks.withType<io.gitee.pkmer.tasks.BundleTask>().configureEach {
@@ -424,6 +455,8 @@ fun isJavaProject(project: Project): Boolean {
 }
 
 
-fun isMavenPublications(project: Project): Boolean {
+fun Project.isMavenPublications(): Boolean {
     return mavenPublications.contains(project.name)
 }
+
+private fun Project.errorPronePluginEnabled() = project.name in errorpronePluginEnabledProjects

@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.base.web.domain.values;
 
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpErrorDetails;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URI;
 import java.util.List;
@@ -26,21 +27,22 @@ public class DefaultXtreamApiProblemDetails implements XtreamApiProblemDetails, 
     private URI type;
     private String title;
     private int status;
-    private String detail;
-    private URI instance;
-    protected Throwable cause;
+    private @Nullable String detail;
+    private @Nullable URI instance;
+    protected @Nullable Throwable cause;
     private String errorCode;
-    private List<? extends XtreamHttpErrorDetails> errorDetails;
+    private @Nullable List<? extends XtreamHttpErrorDetails> errorDetails;
 
+    @SuppressWarnings("NullAway")
     public DefaultXtreamApiProblemDetails() {
         this.type = BLANK_TYPE;
     }
 
-    public DefaultXtreamApiProblemDetails(XtreamApiErrorCode errorCode, String detail, List<? extends XtreamHttpErrorDetails> errorDetails) {
+    public DefaultXtreamApiProblemDetails(XtreamApiErrorCode errorCode, @Nullable String detail, @Nullable List<? extends XtreamHttpErrorDetails> errorDetails) {
         this(errorCode.getStatus(), errorCode.getTitle(), errorCode.getErrorCode(), detail, errorDetails);
     }
 
-    public DefaultXtreamApiProblemDetails(int status, String title, String errorCode, String detail, List<? extends XtreamHttpErrorDetails> errorDetails) {
+    public DefaultXtreamApiProblemDetails(int status, String title, String errorCode, @Nullable String detail, @Nullable List<? extends XtreamHttpErrorDetails> errorDetails) {
         this.type = BLANK_TYPE;
         this.status = status;
         this.title = title;
@@ -65,12 +67,12 @@ public class DefaultXtreamApiProblemDetails implements XtreamApiProblemDetails, 
     }
 
     @Override
-    public String getDetail() {
+    public @Nullable String getDetail() {
         return this.detail;
     }
 
     @Override
-    public URI getInstance() {
+    public @Nullable URI getInstance() {
         return this.instance;
     }
 
@@ -80,7 +82,7 @@ public class DefaultXtreamApiProblemDetails implements XtreamApiProblemDetails, 
     }
 
     @Override
-    public List<? extends XtreamHttpErrorDetails> getErrorDetails() {
+    public @Nullable List<? extends XtreamHttpErrorDetails> getErrorDetails() {
         return this.errorDetails;
     }
 
@@ -109,7 +111,7 @@ public class DefaultXtreamApiProblemDetails implements XtreamApiProblemDetails, 
     }
 
     @Override
-    public XtreamApiProblemDetailsBuilder instance(URI instance) {
+    public XtreamApiProblemDetailsBuilder instance(@Nullable URI instance) {
         this.instance = instance;
         return this;
     }

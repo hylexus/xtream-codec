@@ -64,7 +64,7 @@ public class XtreamHttpException extends RuntimeException implements XtreamApiPr
     }
 
     @Override
-    public String getDetail() {
+    public @Nullable String getDetail() {
         return this.getMessage();
     }
 
@@ -80,8 +80,7 @@ public class XtreamHttpException extends RuntimeException implements XtreamApiPr
     }
 
     @Override
-    @Nullable
-    public List<? extends XtreamHttpErrorDetails> getErrorDetails() {
+    public @Nullable List<? extends XtreamHttpErrorDetails> getErrorDetails() {
         return this.errorDetails;
     }
 

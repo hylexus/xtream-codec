@@ -48,7 +48,7 @@ class XtreamExpressionEngineTest {
         ctx.setVariable("a", 200);
         assertEquals(101, doEvaluate(aviator.createExpression("self + 1"), ctx, Number.class).intValue());
         assertEquals(201, doEvaluate(aviator.createExpression("a + 1"), ctx, Number.class).intValue());
-        assertEquals(201L, doEvaluate(aviator.createExpression("a + 1"), ctx, Long.class).intValue());
+        assertEquals(201L, doEvaluate(aviator.createExpression("a + 1"), ctx, Long.class));
         // 注意这里是 nil 不是 null
         assertNull(doEvaluate(aviator.createExpression("a > 0 ? nil : 111"), ctx, Object.class));
     }
