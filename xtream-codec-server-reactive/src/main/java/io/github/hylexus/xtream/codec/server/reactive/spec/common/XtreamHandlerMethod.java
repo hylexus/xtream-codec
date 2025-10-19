@@ -30,6 +30,8 @@ import java.lang.reflect.Method;
  *
  * @author hylexus
  */
+// todo: NullAway 重构
+@SuppressWarnings("NullAway")
 public abstract class XtreamHandlerMethod {
 
     protected final Class<?> containerClass;

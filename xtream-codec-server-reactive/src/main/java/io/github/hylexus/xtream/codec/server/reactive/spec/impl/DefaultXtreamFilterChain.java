@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamFilter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamFilterChain;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -34,12 +35,13 @@ import java.util.ListIterator;
  * @author hylexus
  */
 public class DefaultXtreamFilterChain implements XtreamFilterChain {
+    @SuppressWarnings("unused")
     private final List<XtreamFilter> allFilters;
     private final XtreamHandler handler;
 
-    private final XtreamFilter currentFilter;
+    private final @Nullable XtreamFilter currentFilter;
 
-    private final DefaultXtreamFilterChain chain;
+    private final @Nullable DefaultXtreamFilterChain chain;
 
     public DefaultXtreamFilterChain(XtreamHandler handler, List<XtreamFilter> filters) {
         this.allFilters = filters;
@@ -50,7 +52,7 @@ public class DefaultXtreamFilterChain implements XtreamFilterChain {
         this.chain = chain.chain;
     }
 
-    public DefaultXtreamFilterChain(List<XtreamFilter> filters, XtreamHandler handler, XtreamFilter currentFilter, DefaultXtreamFilterChain chain) {
+    public DefaultXtreamFilterChain(List<XtreamFilter> filters, XtreamHandler handler, @Nullable XtreamFilter currentFilter, @Nullable DefaultXtreamFilterChain chain) {
         this.allFilters = filters;
         this.handler = handler;
         this.currentFilter = currentFilter;

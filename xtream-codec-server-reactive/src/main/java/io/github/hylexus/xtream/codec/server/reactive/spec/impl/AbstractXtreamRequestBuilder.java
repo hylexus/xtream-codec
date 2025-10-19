@@ -70,6 +70,7 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
         return self();
     }
 
+    @Override
     public abstract R build();
 
 }

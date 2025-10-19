@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamOutbound;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
@@ -35,9 +36,9 @@ public abstract class AbstractXtreamOutbound implements XtreamOutbound {
     protected final NettyOutbound delegate;
     protected final ByteBufAllocator byteBufAllocator;
     protected final InetSocketAddress remoteAddress;
-    protected final XtreamRequest.Type type;
+    protected final XtreamInbound.Type type;
 
-    public AbstractXtreamOutbound(ByteBufAllocator byteBufAllocator, NettyOutbound delegate, XtreamRequest.Type type, InetSocketAddress remoteAddress) {
+    public AbstractXtreamOutbound(ByteBufAllocator byteBufAllocator, NettyOutbound delegate, XtreamInbound.Type type, InetSocketAddress remoteAddress) {
         this.delegate = delegate;
         this.byteBufAllocator = byteBufAllocator;
         this.remoteAddress = remoteAddress;
@@ -45,7 +46,7 @@ public abstract class AbstractXtreamOutbound implements XtreamOutbound {
     }
 
     @Override
-    public XtreamRequest.Type type() {
+    public XtreamInbound.Type type() {
         return this.type;
     }
 

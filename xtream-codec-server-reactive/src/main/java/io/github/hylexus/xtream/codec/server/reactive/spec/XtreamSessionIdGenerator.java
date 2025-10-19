@@ -55,12 +55,13 @@ public interface XtreamSessionIdGenerator {
             final int port = remoteAddress.getPort();
 
             // IP地址部分
-            for (char c : address.toCharArray()) {
+            for (int i = 0; i < address.length(); i++) {
+                final char c = address.charAt(i);
                 if (c == '.') {
                     // 小数点映射为 'X'
                     result.append('X');
                 } else if (Character.isDigit(c)) {
-                    int digit = Character.getNumericValue(c);
+                    final int digit = Character.digit(c, 10);
                     // 数字映射为字母
                     result.append(DIGIT_MAP[digit]);
                 } else {
@@ -75,7 +76,7 @@ public interface XtreamSessionIdGenerator {
             // 端口号部分
             for (char c : String.valueOf(port).toCharArray()) {
                 if (Character.isDigit(c)) {
-                    int digit = Character.getNumericValue(c);
+                    final int digit = Character.digit(c, 10);
                     // 数字映射为字母
                     result.append(DIGIT_MAP[digit]);
                 }

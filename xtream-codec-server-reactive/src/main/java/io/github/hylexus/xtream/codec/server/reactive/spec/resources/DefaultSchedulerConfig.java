@@ -17,9 +17,11 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.resources;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistry;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -30,7 +32,7 @@ public record DefaultSchedulerConfig(
         boolean rejectBlocking,
         boolean metricsEnabled,
         String metricsPrefix,
-        String remark,
+        @Nullable String remark,
         Map<String, Serializable> metadata) implements XtreamSchedulerRegistry.SchedulerConfig {
 
     @Override
@@ -44,13 +46,13 @@ public record DefaultSchedulerConfig(
     }
 
     public static class DefaultSchedulerConfigBuilder implements XtreamSchedulerRegistry.SchedulerConfigBuilder {
-        private String name;
+        private @Nullable String name;
         private boolean virtualThread;
         private boolean rejectBlocking;
         private boolean metricsEnabled;
-        private String metricsPrefix;
-        private String remark;
-        private Map<String, Serializable> metadata;
+        private @Nullable String metricsPrefix;
+        private @Nullable String remark;
+        private @Nullable Map<String, Serializable> metadata;
 
         @Override
         public DefaultSchedulerConfigBuilder name(String name) {
@@ -106,9 +108,9 @@ public record DefaultSchedulerConfig(
                     virtualThread,
                     rejectBlocking,
                     metricsEnabled,
-                    metricsPrefix,
+                    Objects.requireNonNullElse(metricsPrefix, ""),
                     remark,
-                    metadata
+                    Objects.requireNonNullElse(metadata, new LinkedHashMap<>())
             );
         }
     }

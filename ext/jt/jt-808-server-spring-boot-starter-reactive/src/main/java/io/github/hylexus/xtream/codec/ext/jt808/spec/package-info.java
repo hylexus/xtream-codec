@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.server.reactive.spec.event.builtin.disruptor;
+@NullMarked
+package io.github.hylexus.xtream.codec.ext.jt808.spec;
 
-import io.github.hylexus.xtream.codec.server.reactive.spec.event.XtreamEvent;
-import org.jspecify.annotations.Nullable;
-
-public class XtreamEventDisruptorHolder {
-    private @Nullable XtreamEvent event;
-
-    public void setEvent(XtreamEvent event) {
-        this.event = event;
-    }
-
-    public @Nullable XtreamEvent getEvent() {
-        return event;
-    }
-
-}
+import org.jspecify.annotations.NullMarked;

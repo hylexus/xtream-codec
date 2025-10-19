@@ -20,6 +20,8 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.AbstractXtreamHandlerAdapterBuilder;
 import io.netty.buffer.ByteBufAllocator;
 
+import java.util.Objects;
+
 public abstract class AbstractXtreamHandlerAdapterBuilderTcp<C extends AbstractXtreamHandlerAdapterBuilderTcp<C>>
         extends AbstractXtreamHandlerAdapterBuilder<C> {
 
@@ -27,9 +29,10 @@ public abstract class AbstractXtreamHandlerAdapterBuilderTcp<C extends AbstractX
         super(allocator);
     }
 
+    @Override
     public DefaultTcpXtreamNettyHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new DefaultTcpXtreamNettyHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler);
+        return new DefaultTcpXtreamNettyHandlerAdapter(super.byteBufAllocator, Objects.requireNonNull(super.sessionManager), exceptionHandlingHandler);
     }
 
 }

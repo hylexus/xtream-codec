@@ -125,8 +125,8 @@ public class XtreamMethodParameter {
         return !this.genericType.isEmpty();
     }
 
-    public @Nullable Class<?> getParameterType() {
-        return parameterType;
+    public Class<?> getParameterType() {
+        return Objects.requireNonNull(parameterType);
     }
 
     public Class<?> getContainerClass() {
@@ -147,8 +147,8 @@ public class XtreamMethodParameter {
         }
 
         return index == that.index
-                && containerClass == that.containerClass
-                && method.equals(that.method);
+               && containerClass == that.containerClass
+               && method.equals(that.method);
     }
 
     @Override

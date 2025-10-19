@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandler
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerResultHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -56,7 +57,7 @@ public class XtreamResponseBodyHandlerResultHandler implements XtreamHandlerResu
         return BUILTIN_COMPONENT_PRECEDENCE;
     }
 
-    public Flux<ByteBuf> encode(ByteBufAllocator allocator, int version, Object data) {
+    public Flux<ByteBuf> encode(ByteBufAllocator allocator, int version, @Nullable Object data) {
         return switch (data) {
             case null -> Flux.error(new IllegalArgumentException("message is null"));
             case Mono<?> mono -> mono.map(msg -> this.doEncode(version, msg, allocator)).flux();
@@ -79,7 +80,7 @@ public class XtreamResponseBodyHandlerResultHandler implements XtreamHandlerResu
         return buffer;
     }
 
-    protected XtreamResponseBody getXtreamResponseBodyAnnotation(XtreamHandlerResult handlerResult) {
+    protected @Nullable XtreamResponseBody getXtreamResponseBodyAnnotation(XtreamHandlerResult handlerResult) {
         // 处理器方法所在类上的注解
         final XtreamResponseBody classLevelAnnotation = handlerResult.getReturnType().getContainerClass().getAnnotation(XtreamResponseBody.class);
         if (classLevelAnnotation != null) {

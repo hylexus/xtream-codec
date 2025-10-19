@@ -17,7 +17,7 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 
 
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSession;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionEventListener;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionManager;
@@ -40,7 +40,7 @@ public class DefaultXtreamSession extends AbstractXtreamOutbound implements Xtre
     private final Instant creationTime;
     private volatile Instant lastCommunicateTime;
 
-    public DefaultXtreamSession(String id, XtreamRequest.Type type, NettyOutbound outbound, InetSocketAddress remoteAddress, XtreamSessionManager<XtreamSession> sessionManager) {
+    public DefaultXtreamSession(String id, XtreamInbound.Type type, NettyOutbound outbound, InetSocketAddress remoteAddress, XtreamSessionManager<XtreamSession> sessionManager) {
         super(ByteBufAllocator.DEFAULT, outbound, type, remoteAddress);
         this.id = id;
         this.sessionManager = sessionManager;

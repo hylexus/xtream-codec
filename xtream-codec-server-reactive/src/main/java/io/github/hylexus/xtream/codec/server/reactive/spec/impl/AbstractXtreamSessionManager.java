@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.common.XtreamIntervalChecker;
 import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.UdpSessionIdleStateCheckerProps;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -48,7 +49,7 @@ public abstract class AbstractXtreamSessionManager<S extends XtreamSession> impl
     protected final ConcurrentMap<String, S> sessions = new ConcurrentHashMap<>();
     protected final AtomicLong tcpSessionCount = new AtomicLong(0);
     protected final AtomicLong udpSessionCount = new AtomicLong(0);
-    protected final XtreamIntervalChecker checker;
+    protected final @Nullable XtreamIntervalChecker checker;
     protected final Duration maxIdleTime;
     protected final Clock clock = Clock.system(ZoneId.of("Asia/Shanghai"));
     protected final Lock lock = new ReentrantLock();

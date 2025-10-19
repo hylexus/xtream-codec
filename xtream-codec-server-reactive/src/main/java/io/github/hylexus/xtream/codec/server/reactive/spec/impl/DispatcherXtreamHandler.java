@@ -85,10 +85,11 @@ public class DispatcherXtreamHandler implements XtreamHandler {
         }
         return resultMono.flatMap(result -> {
             Mono<Void> voidMono = handleResult(exchange, result, "Handler " + result.getHandler());
-            if (result.getExceptionHandler() != null) {
+            final XtreamDispatchExceptionHandler exceptionHandler = result.getExceptionHandler();
+            if (exceptionHandler != null) {
                 voidMono = voidMono.onErrorResume(ex -> {
                     final Throwable cause = XtreamWrappedRuntimeException.unwrapIfNecessary(ex);
-                    return result.getExceptionHandler().handleError(exchange, cause).flatMap(result2 ->
+                    return exceptionHandler.handleError(exchange, cause).flatMap(result2 ->
                             handleResult(exchange, result2, "Exception handler "
                                                             + result2.getHandler() + ", error=\"" + cause.getMessage() + "\""));
                 });

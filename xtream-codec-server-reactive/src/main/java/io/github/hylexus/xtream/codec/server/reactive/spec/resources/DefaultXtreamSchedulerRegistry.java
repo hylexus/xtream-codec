@@ -18,7 +18,7 @@ package io.github.hylexus.xtream.codec.server.reactive.spec.resources;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistry;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistryCustomizer;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import reactor.core.scheduler.Scheduler;
 
 import java.util.Collections;
@@ -31,10 +31,10 @@ import java.util.function.BiFunction;
 /**
  * @author hylexus
  */
+@SuppressWarnings("NullAway")
 public class DefaultXtreamSchedulerRegistry implements XtreamSchedulerRegistry {
 
-    @Nullable
-    protected final Scheduler requestDispatcherScheduler;
+    protected final @Nullable Scheduler requestDispatcherScheduler;
     protected final Scheduler defaultNonBlockingScheduler;
     protected final Scheduler defaultBlockingScheduler;
     protected final Scheduler eventPublisherScheduler;
@@ -51,7 +51,6 @@ public class DefaultXtreamSchedulerRegistry implements XtreamSchedulerRegistry {
         this.defaultNonBlockingScheduler = this.getScheduler(SCHEDULER_NAME_NON_BLOCKING).orElse(null);
         this.defaultBlockingScheduler = this.getScheduler(SCHEDULER_NAME_BLOCKING).orElse(null);
         this.eventPublisherScheduler = this.getScheduler(SCHEDULER_NAME_EVENT_PUBLISHER).orElse(null);
-
         this.afterInit();
     }
 
@@ -76,6 +75,7 @@ public class DefaultXtreamSchedulerRegistry implements XtreamSchedulerRegistry {
         this.afterInit();
     }
 
+    @SuppressWarnings("ReturnValueIgnored")
     protected void afterInit() {
         this.getScheduler(SCHEDULER_NAME_NON_BLOCKING)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot determine default non-blocking scheduler"));
@@ -86,8 +86,7 @@ public class DefaultXtreamSchedulerRegistry implements XtreamSchedulerRegistry {
     }
 
     @Override
-    @Nullable
-    public Scheduler requestDispatcherScheduler() {
+    public @Nullable Scheduler requestDispatcherScheduler() {
         return this.requestDispatcherScheduler;
     }
 

@@ -29,6 +29,7 @@ public class DefaultXtreamRequestBuilder
         this.remoteAddress = delegate.remoteAddress();
     }
 
+    @Override
     public XtreamRequest build() {
         return new DefaultXtreamRequest(
                 this.delegateRequest.version(),

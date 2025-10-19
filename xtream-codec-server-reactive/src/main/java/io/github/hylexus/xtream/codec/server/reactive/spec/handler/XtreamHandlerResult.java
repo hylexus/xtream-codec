@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.handler;
 
 import io.github.hylexus.xtream.codec.common.bean.XtreamMethodParameter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 当前类是从 `org.springframework.web.reactive.HandlerResult` 复制过来修改的。
@@ -29,12 +30,12 @@ public class XtreamHandlerResult {
 
     private final Object handler;
 
-    private final Object returnValue;
+    private final @Nullable Object returnValue;
     private final XtreamMethodParameter returnType;
 
-    private XtreamDispatchExceptionHandler exceptionHandler;
+    private @Nullable XtreamDispatchExceptionHandler exceptionHandler;
 
-    public XtreamHandlerResult(Object handler, Object returnValue, XtreamMethodParameter returnType) {
+    public XtreamHandlerResult(Object handler, @Nullable Object returnValue, XtreamMethodParameter returnType) {
         this.handler = handler;
         this.returnValue = returnValue;
         this.returnType = returnType;
@@ -44,7 +45,7 @@ public class XtreamHandlerResult {
         return this.handler;
     }
 
-    public Object getReturnValue() {
+    public @Nullable Object getReturnValue() {
         return returnValue;
     }
 
@@ -52,16 +53,16 @@ public class XtreamHandlerResult {
         return returnType;
     }
 
-    public XtreamDispatchExceptionHandler getExceptionHandler() {
+    public @Nullable XtreamDispatchExceptionHandler getExceptionHandler() {
         return exceptionHandler;
     }
 
     @Override
     public String toString() {
         return "XtreamHandlerResult{"
-                + "handler=" + handler
-                + ", returnValue=" + returnValue
-                + ", returnType=" + returnType
-                + '}';
+               + "handler=" + handler
+               + ", returnValue=" + returnValue
+               + ", returnType=" + returnType
+               + '}';
     }
 }

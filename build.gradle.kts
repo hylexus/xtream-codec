@@ -26,7 +26,7 @@ val mavenPublications = setOf(
     "jt-808-server-spring-boot-starter-reactive",
     "jt-808-server-dashboard-spring-boot-starter-reactive",
 )
-val errorpronePluginEnabledProjects = setOf("xtream-codec-base", "xtream-codec-core")
+val errorpronePluginEnabledProjects = setOf("xtream-codec-base", "xtream-codec-core", "xtream-codec-server-reactive")
 version = xtreamConfig.projectVersion
 run {
     xtreamConfig.javaVersion

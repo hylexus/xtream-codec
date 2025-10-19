@@ -36,7 +36,7 @@ import java.util.List;
  * @author hylexus
  */
 public class ExceptionHandlingXtreamHandler implements XtreamHandler {
-    private static final Logger log = LoggerFactory.getLogger(ExceptionHandlingXtreamHandler.class);
+    // private static final Logger log = LoggerFactory.getLogger(ExceptionHandlingXtreamHandler.class);
     private final XtreamHandler delegateHandler;
     private final List<XtreamRequestExceptionHandler> exceptionHandlers;
 
