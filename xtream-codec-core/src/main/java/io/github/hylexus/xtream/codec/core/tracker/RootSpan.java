@@ -16,16 +16,18 @@
 
 package io.github.hylexus.xtream.codec.core.tracker;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.StringJoiner;
 
 public class RootSpan extends BaseSpan {
-    private String entityClass;
+    private @Nullable String entityClass;
 
     public RootSpan() {
         super(null);
     }
 
-    public String getEntityClass() {
+    public @Nullable String getEntityClass() {
         return entityClass;
     }
 

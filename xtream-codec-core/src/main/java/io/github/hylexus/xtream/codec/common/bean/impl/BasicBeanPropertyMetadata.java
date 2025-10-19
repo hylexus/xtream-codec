@@ -255,6 +255,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         return Optional.ofNullable(mergedAnnotation);
     }
 
+    @Override
     public @Nullable Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
         int rb = input.readableBytes();
         if (rb == 0) {

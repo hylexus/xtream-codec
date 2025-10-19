@@ -18,14 +18,16 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
+@SuppressWarnings("NullAway")
 public class CodecSpan extends BaseSpan {
     protected String fieldCodec;
 
     @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
-    protected Object value;
+    protected @Nullable Object value;
 
     public CodecSpan(BaseSpan parent) {
         super(parent);
@@ -40,11 +42,11 @@ public class CodecSpan extends BaseSpan {
         return this;
     }
 
-    public Object getValue() {
+    public @Nullable Object getValue() {
         return value;
     }
 
-    public CodecSpan setValue(Object value) {
+    public CodecSpan setValue(@Nullable Object value) {
         this.value = value;
         return this;
     }

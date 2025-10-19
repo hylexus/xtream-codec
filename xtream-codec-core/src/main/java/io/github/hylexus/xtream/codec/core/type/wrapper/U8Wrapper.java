@@ -18,23 +18,29 @@ package io.github.hylexus.xtream.codec.core.type.wrapper;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
+
+import static java.util.Objects.requireNonNull;
 
 public class U8Wrapper implements DataWrapper<Short> {
 
     @Preset.RustStyle.u8
-    private Short value;
+    private @Nullable Short value;
 
     public U8Wrapper() {
     }
 
-    public U8Wrapper(Short value) {
+    public U8Wrapper(@Nullable Short value) {
         this.value = value;
     }
 
     @Override
     public void writeTo(ByteBuf output) {
+        if (value == null) {
+            return;
+        }
         output.writeByte(value);
     }
 
@@ -44,27 +50,33 @@ public class U8Wrapper implements DataWrapper<Short> {
     }
 
     @Override
-    public byte[] asBytes() {
+    public byte @Nullable [] asBytes() {
+        if (value == null) {
+            return null;
+        }
         return new byte[]{value.byteValue()};
     }
 
     @Override
     public byte asI8() {
-        return value.byteValue();
+        return requireNonNull(value).byteValue();
     }
 
     @Override
     public short asI16() {
-        return value;
+        return requireNonNull(value);
     }
 
     @Override
     public int asI32() {
-        return value;
+        return requireNonNull(value);
     }
 
     @Override
-    public String asString() {
+    public @Nullable String asString() {
+        if (value == null) {
+            return null;
+        }
         return String.valueOf(value);
     }
 

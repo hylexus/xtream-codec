@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -70,12 +71,12 @@ public class DelegateBeanMetadataFieldCodec implements FieldCodec<Object> {
     }
 
     @Override
-    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
+    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
         context.entityEncoder().encode(context.version(), this.beanMetadata, instance, output);
     }
 
     @Override
-    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
+    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         if (XtreamTypes.isBasicType(propertyMetadata.rawClass())) {
             context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, codecTracker);

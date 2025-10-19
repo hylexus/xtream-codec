@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.core.impl.DefaultSerializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 
 public class EntityEncoder {
     protected final ByteBufAllocator bufferFactory = ByteBufAllocator.DEFAULT;
@@ -51,7 +52,7 @@ public class EntityEncoder {
         this.encode(XtreamField.ALL_VERSION, beanMetadata, instance, target);
     }
 
-    public void encode(int version, BeanMetadata beanMetadata, Object instance, ByteBuf target) {
+    public void encode(int version, BeanMetadata beanMetadata, @Nullable Object instance, ByteBuf target) {
         if (instance == null) {
             return;
         }
@@ -87,11 +88,11 @@ public class EntityEncoder {
         this.encodeWithTracker(version, beanMetadata, instance, target, tracker);
     }
 
-    public void encodeWithTracker(BeanMetadata beanMetadata, Object instance, ByteBuf target, CodecTracker tracker) {
+    public void encodeWithTracker(BeanMetadata beanMetadata, @Nullable Object instance, ByteBuf target, CodecTracker tracker) {
         this.encodeWithTracker(XtreamField.ALL_VERSION, beanMetadata, instance, target, tracker);
     }
 
-    public void encodeWithTracker(int version, BeanMetadata beanMetadata, Object instance, ByteBuf target, CodecTracker tracker) {
+    public void encodeWithTracker(int version, BeanMetadata beanMetadata, @Nullable Object instance, ByteBuf target, CodecTracker tracker) {
         if (instance == null) {
             return;
         }

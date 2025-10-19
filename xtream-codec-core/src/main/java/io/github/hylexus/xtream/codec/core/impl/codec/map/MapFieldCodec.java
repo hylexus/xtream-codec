@@ -173,7 +173,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         final ByteBuf slice = length < 0
                 ? input // all remaining
                 : input.readSlice(length);
-        @SuppressWarnings({"unchecked"}) final Map<Object, Object> map = (Map<Object, Object>) propertyMetadata.containerInstanceFactory().create();
+        @SuppressWarnings({"unchecked"}) final Map<Object, @Nullable Object> map = (Map<Object, Object>) propertyMetadata.containerInstanceFactory().create();
         final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
         final KeyMeta keyMeta = mapMeta.keyMeta();
         final int keyLength = mapMeta.keyMeta().sizeInBytes();
@@ -182,9 +182,10 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         while (slice.isReadable()) {
             // 1. key(i8,u8,i16,u16,i32,u32,i64,string)
             final Object key = keyCodec.deserialize(propertyMetadata, context, slice, keyLength);
+            Objects.requireNonNull(key);
 
             // 2. valueLength(int)
-            final int valueLength = ((Number) valueLengthCodec.deserialize(propertyMetadata, context, slice, length)).intValue();
+            final int valueLength = Objects.requireNonNull(((Number) valueLengthCodec.deserialize(propertyMetadata, context, slice, length))).intValue();
 
             // 3. value(dynamic)
             final ByteBuf byteBuf = slice.readSlice(valueLength);
@@ -206,7 +207,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         final int parentIndexBeforeRead = input.readerIndex();
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(propertyMetadata, this.getClass().getSimpleName());
-        @SuppressWarnings({"unchecked"}) final Map<Object, Object> map = (Map<Object, Object>) propertyMetadata.containerInstanceFactory().create();
+        @SuppressWarnings({"unchecked"}) final Map<Object, @Nullable Object> map = (Map<Object, Object>) propertyMetadata.containerInstanceFactory().create();
         final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
         int sequence = 0;
         final KeyMeta keyMeta = mapMeta.keyMeta();
@@ -222,11 +223,11 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
 
             // 2. valueLength(int)
             codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
-            final int valueLength = ((Number) valueLengthCodec.deserializeWithTracker(propertyMetadata, context, slice, length)).intValue();
+            final int valueLength = requireNonNull(((Number) valueLengthCodec.deserializeWithTracker(propertyMetadata, context, slice, length))).intValue();
 
             // 3. value(dynamic)
             final ByteBuf byteBuf = slice.readSlice(valueLength);
-            final FieldCodec<?> valueFieldCodec = this.getValueDecoder(mapMeta, key);
+            final FieldCodec<?> valueFieldCodec = this.getValueDecoder(mapMeta, requireNonNull(key));
             if (log.isDebugEnabled()) {
                 log.debug("MapValueDecoder: key={}, valueFieldCodec={}", key, valueFieldCodec);
             }

@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import java.util.StringJoiner;
 
+@SuppressWarnings("NullAway")
 public class VirtualEntitySpan extends BaseSpan {
     private String entityClass;
     private final String fieldName;

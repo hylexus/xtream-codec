@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.github.hylexus.xtream.codec.common.utils.BcdOps;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 
@@ -33,7 +34,7 @@ public interface DataWrapper<T> {
 
     int length();
 
-    byte[] asBytes();
+    byte @Nullable [] asBytes();
 
     byte asI8();
 
@@ -65,13 +66,17 @@ public interface DataWrapper<T> {
         return this.asI32() & 0xFFFFFFFFL;
     }
 
-    default String asBcd() {
-        return BcdOps.decodeBcd8421AsString(this.asBytes(), 0, this.length());
+    default @Nullable String asBcd() {
+        final byte[] bytes = this.asBytes();
+        if (bytes == null) {
+            return null;
+        }
+        return BcdOps.decodeBcd8421AsString(bytes, 0, this.length());
     }
 
-    String asString();
+    @Nullable String asString();
 
-    default String asString(Charset charset) {
+    default @Nullable String asString(Charset charset) {
         return asString();
     }
 

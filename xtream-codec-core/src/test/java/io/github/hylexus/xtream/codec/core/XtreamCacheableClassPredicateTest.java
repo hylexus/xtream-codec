@@ -38,6 +38,7 @@ public class XtreamCacheableClassPredicateTest {
     static class SomeStaticClass {
     }
 
+    @SuppressWarnings("ClassCanBeStatic")
     class SomeNonStaticClass {
     }
 

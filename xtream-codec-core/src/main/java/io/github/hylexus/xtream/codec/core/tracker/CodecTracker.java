@@ -18,20 +18,22 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.function.BiConsumer;
 
+@SuppressWarnings("NullAway")
 public class CodecTracker {
     private final RootSpan root;
     private BaseSpan current;
-    private MapEntryItemSpan.Type tempMapItemType;
+    private MapEntryItemSpan.@Nullable Type tempMapItemType;
 
     public CodecTracker() {
         final RootSpan rootSpan = new RootSpan();
-        this.current = rootSpan;
         this.root = rootSpan;
+        this.current = rootSpan;
     }
 
     public RootSpan getRootSpan() {
@@ -49,7 +51,7 @@ public class CodecTracker {
         return this.startNewNestedFieldSpan(metadata, fieldCodecString, fieldType);
     }
 
-    public NestedFieldSpan startNewNestedFieldSpan(BeanPropertyMetadata metadata, String fieldCodec, String fieldType) {
+    public NestedFieldSpan startNewNestedFieldSpan(BeanPropertyMetadata metadata, @Nullable String fieldCodec, @Nullable String fieldType) {
         final NestedFieldSpan span = new NestedFieldSpan(
                 this.current,
                 metadata.name(), metadata.xtreamFieldAnnotation().desc(),
@@ -92,7 +94,7 @@ public class CodecTracker {
         this.current = this.current.getParent();
     }
 
-    public PrependLengthFieldSpan addPrependLengthFieldSpan(BaseSpan parent, String fieldName, Object value, String hexString, String fieldCodec, String fieldDesc) {
+    public PrependLengthFieldSpan addPrependLengthFieldSpan(BaseSpan parent, String fieldName, @Nullable Object value, @Nullable String hexString, String fieldCodec, String fieldDesc) {
         final PrependLengthFieldSpan span = new PrependLengthFieldSpan(parent, fieldName, fieldCodec, value, hexString, fieldDesc);
         this.current.addChild(span);
         this.current = parent;
@@ -107,7 +109,7 @@ public class CodecTracker {
         return span;
     }
 
-    public void addFieldSpan(BaseSpan parent, String fieldName, Object value, String hexString, FieldCodec<?> fieldCodec, String fieldDesc) {
+    public void addFieldSpan(BaseSpan parent, String fieldName, @Nullable Object value, String hexString, FieldCodec<?> fieldCodec, String fieldDesc) {
         final BaseSpan trackerItem;
         if (parent instanceof MapEntrySpan) {
             trackerItem = new MapEntryItemSpan(parent, this.tempMapItemType)

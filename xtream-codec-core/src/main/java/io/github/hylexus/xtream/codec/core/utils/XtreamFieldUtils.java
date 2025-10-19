@@ -98,10 +98,10 @@ public final class XtreamFieldUtils {
 
     private static XtreamField generateTransientFieldProxyInstance(AnnotatedElement element) {
         final Class<?> type;
-        if (element instanceof Field) {
-            type = ((Field) element).getType();
-        } else if (element instanceof RecordComponent) {
-            type = ((RecordComponent) element).getType();
+        if (element instanceof Field field) {
+            type = field.getType();
+        } else if (element instanceof RecordComponent recordComponent) {
+            type = recordComponent.getType();
         } else {
             type = Object.class;
         }

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.hylexus.xtream.codec.core.type.wrapper.*;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -48,7 +49,10 @@ public class XtreamCodecDebugJsonSerializer extends JsonSerializer<Object> {
         }
     }
 
-    private static void writeJsonArray(byte[] array, JsonGenerator jsonGenerator) throws IOException {
+    private static void writeJsonArray(byte @Nullable [] array, JsonGenerator jsonGenerator) throws IOException {
+        if (array == null) {
+            return;
+        }
         jsonGenerator.writeStartArray();
         for (byte b : array) {
             jsonGenerator.writeNumber(b);

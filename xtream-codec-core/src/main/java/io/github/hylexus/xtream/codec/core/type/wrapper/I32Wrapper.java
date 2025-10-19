@@ -18,23 +18,29 @@ package io.github.hylexus.xtream.codec.core.type.wrapper;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
+
+import static java.util.Objects.requireNonNull;
 
 public class I32Wrapper implements DataWrapper<Integer> {
     static final int MASK = 0xFF;
     @Preset.RustStyle.i32
-    private Integer value;
+    private @Nullable Integer value;
 
     public I32Wrapper() {
     }
 
-    public I32Wrapper(Integer value) {
+    public I32Wrapper(@Nullable Integer value) {
         this.value = value;
     }
 
     @Override
     public void writeTo(ByteBuf output) {
+        if (value == null) {
+            return;
+        }
         output.writeInt(value);
     }
 
@@ -44,7 +50,10 @@ public class I32Wrapper implements DataWrapper<Integer> {
     }
 
     @Override
-    public byte[] asBytes() {
+    public byte @Nullable [] asBytes() {
+        if (value == null) {
+            return null;
+        }
         return new byte[]{
                 (byte) ((value >>> 24) & MASK),
                 (byte) ((value >>> 16) & MASK),
@@ -55,21 +64,24 @@ public class I32Wrapper implements DataWrapper<Integer> {
 
     @Override
     public byte asI8() {
-        return value.byteValue();
+        return requireNonNull(value).byteValue();
     }
 
     @Override
     public short asI16() {
-        return value.shortValue();
+        return requireNonNull(value).shortValue();
     }
 
     @Override
     public int asI32() {
-        return value;
+        return requireNonNull(value);
     }
 
     @Override
-    public String asString() {
+    public @Nullable String asString() {
+        if (value == null) {
+            return null;
+        }
         return String.valueOf(value);
     }
 

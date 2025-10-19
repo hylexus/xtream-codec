@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("JavaUtilDate")
 class MapFieldCodecTest extends BaseFieldCodecTest {
 
     @Test

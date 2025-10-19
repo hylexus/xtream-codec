@@ -290,6 +290,7 @@ public final class PropertySetters {
         }
 
         @Override
+        @SuppressWarnings("ReturnValueIgnored")
         public void setProperty(BeanPropertyMetadata metadata, Object instance, @Nullable Object value) {
             this.setter.apply(instance, value);
         }

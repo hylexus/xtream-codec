@@ -65,6 +65,7 @@ public interface ContainerInstanceFactory {
         }
     }
 
+    @SuppressWarnings("JdkObsolete")
     class LinkedListContainerInstanceFactory implements ContainerInstanceFactory {
 
         @Override

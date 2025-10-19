@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DataWrapper;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes.BaseDataWrapperFieldCodec} instead.
@@ -28,7 +29,7 @@ import io.netty.buffer.ByteBuf;
 public abstract class BaseDataWrapperFieldCodec<T extends DataWrapper<?>> implements FieldCodec<T> {
 
     @Override
-    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value) {
+    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable T value) {
         if (value != null) {
             value.writeTo(output);
         }

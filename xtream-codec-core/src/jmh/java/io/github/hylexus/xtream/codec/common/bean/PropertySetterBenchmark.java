@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 // 测试类实例在整个 benchmark 过程中共享
 // @State(Scope.Benchmark)
 @State(Scope.Thread)
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "NullAway"})
 public class PropertySetterBenchmark {
     Person beanInstance;
 

@@ -16,15 +16,17 @@
 
 package io.github.hylexus.xtream.codec.core.tracker;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.StringJoiner;
 
 public class NestedFieldSpan extends BaseSpan {
     private String fieldName;
     private final String fieldDesc;
     private String fieldType;
-    private final String fieldCodec;
+    private final @Nullable String fieldCodec;
 
-    public NestedFieldSpan(BaseSpan parent, String fieldName, String fieldDesc, String fieldType, String fieldCodec) {
+    public NestedFieldSpan(BaseSpan parent, String fieldName, String fieldDesc, String fieldType, @Nullable String fieldCodec) {
         super(parent);
         this.fieldName = fieldName;
         this.fieldDesc = fieldDesc;
@@ -54,7 +56,7 @@ public class NestedFieldSpan extends BaseSpan {
         return fieldDesc;
     }
 
-    public String getFieldCodec() {
+    public @Nullable String getFieldCodec() {
         return fieldCodec;
     }
 

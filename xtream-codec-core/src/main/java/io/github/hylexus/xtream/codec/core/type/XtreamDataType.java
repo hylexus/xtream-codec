@@ -25,6 +25,7 @@ import java.util.Set;
 
 import static java.util.Set.of;
 
+@SuppressWarnings("BadImport")
 @Getter
 @Accessors(fluent = true)
 public enum XtreamDataType {

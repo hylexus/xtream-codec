@@ -49,6 +49,8 @@ public class BeanMetadata {
         this.instantiator = createInstantiator(rawType, constructor);
     }
 
+    // todo: TypeParameterUnusedInFormals
+    @SuppressWarnings("TypeParameterUnusedInFormals")
     public <T> T createNewRecordInstance(Object[] filedValues) {
         final Object newInstance = this.instantiator.newInstanceIgnoreException(filedValues);
         // final Object newInstance = BeanUtils.createNewInstance(this.getConstructor(), filedValues);

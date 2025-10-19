@@ -110,6 +110,7 @@ public class AnnotationTest {
         int[] version() default {666666};
     }
 
+    @SuppressWarnings("UnusedVariable")
     public static class Person {
         private String field0;
 

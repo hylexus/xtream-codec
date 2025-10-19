@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
+@NullMarked
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
-import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.netty.buffer.ByteBuf;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
-public interface CharSequenceFieldCodec<T extends CharSequence> extends FieldCodec<T> {
-
-    @Override
-    default void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable T value) {
-        if (value != null) {
-            this.doSerialize(propertyMetadata, context, output, value);
-        }
-    }
-
-    void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value);
-
-}

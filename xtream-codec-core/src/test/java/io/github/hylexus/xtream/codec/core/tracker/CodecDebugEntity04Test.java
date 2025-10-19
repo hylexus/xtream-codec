@@ -116,6 +116,7 @@ public class CodecDebugEntity04Test {
                 .setCheckSum((byte) 111);
     }
 
+    @SuppressWarnings("ErroneousBitwiseExpression")
     static int generateMsgBodyPropsForJt808(int msgBodySize, int encryptionType, boolean isSubPackage, int reversedBit15) {
         // [ 0-9 ] 0000,0011,1111,1111(3FF)(消息体长度)
         int props = (msgBodySize & 0x3FF)

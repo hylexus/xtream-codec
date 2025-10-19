@@ -24,13 +24,13 @@ public enum CodecCharset {
     GB_2312(XtreamConstants.CHARSET_NAME_GB_2312),
     BCD_8421(XtreamConstants.CHARSET_NAME_BCD_8421),
     HEX(XtreamConstants.CHARSET_NAME_HEX),
-    UNSUPPORTED(null) {
+    UNSUPPORTED("NULL") {
         @Override
         public String charsetName() {
             throw new UnsupportedOperationException("CodecCharset.UNSUPPORTED cannot be used to create a codec");
         }
     },
-    DYNAMIC(null) {
+    DYNAMIC("NULL") {
         @Override
         public String charsetName() {
             throw new IllegalStateException("CodecCharset.DYNAMIC cannot be used to create a codec");

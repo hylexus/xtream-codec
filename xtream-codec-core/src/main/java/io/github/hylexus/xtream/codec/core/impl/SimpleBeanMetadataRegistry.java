@@ -166,8 +166,8 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     private List<Class<?>> getGenericClass(Field field) {
         final Type genericType = field.getGenericType();
         final List<Class<?>> list = new ArrayList<>();
-        if (genericType instanceof ParameterizedType) {
-            for (Type actualTypeArgument : ((ParameterizedType) genericType).getActualTypeArguments()) {
+        if (genericType instanceof ParameterizedType parameterizedType) {
+            for (Type actualTypeArgument : parameterizedType.getActualTypeArguments()) {
                 // ignore WildcardType
                 // ?, ? extends Number, or ? super Integer
                 if (actualTypeArgument instanceof WildcardType) {

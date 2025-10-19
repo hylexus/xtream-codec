@@ -16,14 +16,16 @@
 
 package io.github.hylexus.xtream.codec.core.tracker;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.StringJoiner;
 
 public class CollectionItemSpan extends BaseSpan {
     private final String fieldName;
     private final int offset;
-    private final String fieldType;
+    private final @Nullable String fieldType;
 
-    public CollectionItemSpan(BaseSpan parent, String fieldName, int offset, String fieldType) {
+    public CollectionItemSpan(BaseSpan parent, String fieldName, int offset, @Nullable String fieldType) {
         super(parent);
         this.fieldName = fieldName;
         this.offset = offset;
@@ -38,7 +40,7 @@ public class CollectionItemSpan extends BaseSpan {
         return offset;
     }
 
-    public String getFieldType() {
+    public @Nullable String getFieldType() {
         return fieldType;
     }
 

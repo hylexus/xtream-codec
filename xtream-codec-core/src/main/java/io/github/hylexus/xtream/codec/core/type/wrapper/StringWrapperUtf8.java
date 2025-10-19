@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.type.wrapper;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +30,7 @@ public class StringWrapperUtf8 implements DataWrapper<String> {
     public static final Charset UTF_8 = StandardCharsets.UTF_8;
 
     @Preset.RustStyle.str
-    protected String value;
+    protected @Nullable String value;
     protected int length;
 
     public StringWrapperUtf8() {
@@ -51,7 +52,10 @@ public class StringWrapperUtf8 implements DataWrapper<String> {
     }
 
     @Override
-    public byte[] asBytes() {
+    public byte @Nullable [] asBytes() {
+        if (value == null) {
+            return null;
+        }
         return value.getBytes(XtreamConstants.CHARSET_UTF8);
     }
 
@@ -71,7 +75,7 @@ public class StringWrapperUtf8 implements DataWrapper<String> {
     }
 
     @Override
-    public String asString() {
+    public @Nullable String asString() {
         return value;
     }
 

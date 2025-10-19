@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.type.wrapper;
 
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public class BytesDataWrapper implements DataWrapper<byte[]> {
     }
 
     @Override
-    public byte[] asBytes() {
+    public byte @Nullable [] asBytes() {
         return value;
     }
 
@@ -53,27 +54,33 @@ public class BytesDataWrapper implements DataWrapper<byte[]> {
 
     @Override
     public short asI16() {
-        return (short) ((value[0] & 0xff) << 8 | value[1] & 0xff);
+        return (short) ((value[0] & 0xff) << 8 | (value[1] & 0xff));
     }
 
     @Override
     public int asI32() {
         return ((value[0] & MASK) << 24)
-                |
-                ((value[1] & MASK) << 16)
-                |
-                ((value[2] & MASK) << 8)
-                |
-                ((value[3] & MASK));
+               |
+               ((value[1] & MASK) << 16)
+               |
+               ((value[2] & MASK) << 8)
+               |
+               ((value[3] & MASK));
     }
 
     @Override
-    public String asString() {
+    public @Nullable String asString() {
+        if (value == null) {
+            return null;
+        }
         return new String(value);
     }
 
     @Override
-    public String asString(Charset charset) {
+    public @Nullable String asString(Charset charset) {
+        if (value == null) {
+            return null;
+        }
         return new String(value, charset);
     }
 

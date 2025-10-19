@@ -43,7 +43,7 @@ public interface FieldCodec<T> {
         return NumberSignedness.NONE;
     }
 
-    T deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length);
+    @Nullable T deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length);
 
     /**
      * 带解码器埋点的反序列化方法
@@ -56,7 +56,7 @@ public interface FieldCodec<T> {
      * @see #deserialize(BeanPropertyMetadata, DeserializeContext, ByteBuf, int)
      * @see CodecTracker
      */
-    default T deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+    default @Nullable T deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
         final int indexBeforeRead = input.readerIndex();
         final T value = this.deserialize(propertyMetadata, context, input, length);
         final String hexString = FormatUtils.toHexString(input, indexBeforeRead, input.readerIndex() - indexBeforeRead);
@@ -78,7 +78,7 @@ public interface FieldCodec<T> {
      * @see #serialize(BeanPropertyMetadata, SerializeContext, ByteBuf, Object)
      * @see CodecTracker
      */
-    default void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value) {
+    default void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable T value) {
         final int indexBeforeWrite = output.writerIndex();
         this.serialize(propertyMetadata, context, output, value);
         final String hexString = FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite);
@@ -136,7 +136,7 @@ public interface FieldCodec<T> {
                 }
 
                 @Override
-                public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value) {
+                public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable T value) {
                     throw new UnsupportedOperationException(errorMessage);
                 }
             };
@@ -148,7 +148,7 @@ public interface FieldCodec<T> {
         }
 
         @Override
-        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object value) {
             throw new UnsupportedOperationException();
         }
     }
@@ -162,7 +162,7 @@ public interface FieldCodec<T> {
         }
 
         @Override
-        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object value) {
             throw new UnsupportedOperationException();
         }
     }
@@ -186,7 +186,7 @@ public interface FieldCodec<T> {
         }
 
         @Override
-        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object value) {
             throw new UnsupportedOperationException();
         }
 

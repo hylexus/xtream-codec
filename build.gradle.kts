@@ -26,7 +26,7 @@ val mavenPublications = setOf(
     "jt-808-server-spring-boot-starter-reactive",
     "jt-808-server-dashboard-spring-boot-starter-reactive",
 )
-val errorpronePluginEnabledProjects = setOf("xtream-codec-base")
+val errorpronePluginEnabledProjects = setOf("xtream-codec-base", "xtream-codec-core")
 version = xtreamConfig.projectVersion
 run {
     xtreamConfig.javaVersion
@@ -69,13 +69,19 @@ configure(subprojects) {
                 disable(
                     "MissingSummary",
                     "StringCaseLocaleUsage",
+                    "UnnecessaryParentheses",
+                    "ImmutableEnumChecker",
+                    "DefaultCharset",
+                    // todo: 有几个注解名和jdk类名冲突 后期考虑提供一个别名?
+                    "JavaLangClash",
+                    "ArrayRecordComponent",
                 )
+            }
 
-                // Include to disable NullAway on test code
-                if (name.lowercase(Locale.getDefault()).contains("test")) {
-                    options.errorprone {
-                        disable("NullAway")
-                    }
+            // Include to disable NullAway on test code
+            if (name.lowercase(Locale.getDefault()).contains("test")) {
+                options.errorprone {
+                    disable("NullAway")
                 }
             }
         }

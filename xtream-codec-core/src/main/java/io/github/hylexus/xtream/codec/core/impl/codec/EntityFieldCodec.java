@@ -26,6 +26,7 @@ import io.github.hylexus.xtream.codec.core.tracker.MapEntryItemSpan;
 import io.github.hylexus.xtream.codec.core.tracker.MapEntrySpan;
 import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -73,12 +74,12 @@ public class EntityFieldCodec<E> implements FieldCodec<Object> {
     }
 
     @Override
-    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
+    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
         context.entityEncoder().encode(context.version(), this.beanMetadata, instance, output);
     }
 
     @Override
-    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
+    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
         final int indexBeforeWrite = output.writerIndex();
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         if (codecTracker.getCurrentSpan() instanceof MapEntrySpan) {

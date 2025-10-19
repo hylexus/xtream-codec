@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class XtreamUtils {
     public static final ByteBufAllocator DEFAULT_BUFFER_FACTORY = ByteBufAllocator.DEFAULT;
-    private static final Logger log = LoggerFactory.getLogger(XtreamUtils.class);
+    // private static final Logger log = LoggerFactory.getLogger(XtreamUtils.class);
 
     public static boolean hasElement(String str) {
         return str != null && !str.isEmpty();

@@ -335,23 +335,23 @@ public final class BeanUtils {
 
         @Override
         @Nullable
-        public Method getReadMethod() {
+        public synchronized Method getReadMethod() {
             return this.readMethod;
         }
 
         @Override
-        public void setReadMethod(Method readMethod) {
+        public synchronized void setReadMethod(Method readMethod) {
             this.readMethod = readMethod;
         }
 
         @Override
         @Nullable
-        public Method getWriteMethod() {
+        public synchronized Method getWriteMethod() {
             return this.writeMethod;
         }
 
         @Override
-        public void setWriteMethod(Method writeMethod) {
+        public synchronized void setWriteMethod(Method writeMethod) {
             this.writeMethod = writeMethod;
         }
 

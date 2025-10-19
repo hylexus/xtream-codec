@@ -20,7 +20,6 @@ import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
-import io.github.hylexus.xtream.codec.common.utils.XtreamUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistryAware;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
@@ -37,8 +36,7 @@ import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -46,7 +44,7 @@ import java.util.*;
 @NullMarked
 public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultFieldCodecRegistry.class);
+    // private static final Logger log = LoggerFactory.getLogger(DefaultFieldCodecRegistry.class);
     private final Map<String, FieldCodec<?>> mapping = new LinkedHashMap<>();
     @SuppressWarnings("rawtypes")
     private final Map<Class<? extends FieldCodec>, FieldCodec<?>> instanceMapping = new LinkedHashMap<>();
@@ -266,7 +264,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         this.instanceMapping.put(fieldCodec.getClass(), fieldCodec);
     }
 
-    protected String generateKey(NumberSignedness signedness, Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian) {
+    protected String generateKey(NumberSignedness signedness, Class<?> targetType, int sizeInBytes, @Nullable String charset, boolean littleEndian) {
         if (String.class == targetType) {
             return key(NumberSignedness.NONE, targetType, -1, charset, false);
         } else if (byte[].class == targetType || Byte[].class == targetType) {
@@ -307,7 +305,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
     }
 
     @Override
-    public Optional<FieldCodec<?>> getFieldCodec(int sizeInBytes, NumberSignedness signedness, String charset, boolean littleEndian, Class<?> targetType) {
+    public Optional<FieldCodec<?>> getFieldCodec(int sizeInBytes, NumberSignedness signedness, @Nullable String charset, boolean littleEndian, Class<?> targetType) {
         final String key = generateKey(signedness, targetType, sizeInBytes, charset, littleEndian);
         final FieldCodec<?> value = mapping.get(key);
         // log.info("getFieldCodec: targetType={}, key={}, value={}", targetType, key, value);
@@ -371,14 +369,14 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         return XtreamTypes.getDefaultSizeInBytes(rawClassType).orElseGet(xtreamField::length);
     }
 
-    String key(NumberSignedness signedness, Class<?> targetType, int length, String charset, boolean littleEndian) {
+    String key(NumberSignedness signedness, Class<?> targetType, int length, @Nullable String charset, boolean littleEndian) {
         final String numberTips = (targetType != byte.class && targetType != Byte.class && XtreamTypes.isNumberType(targetType))
                 ? (littleEndian ? "(LE)" : "(BE)")
                 : "";
         final String signednessTips = signedness == NumberSignedness.NONE
                 ? ""
                 : "[" + signedness.value() + "]";
-        if (XtreamUtils.hasElement(charset)) {
+        if (StringUtils.hasText(charset)) {
             return "byte[" + (length <= 0 ? "n" : length) + "] (" + (charset.toLowerCase()) + ") <--> " + targetType.getName() + numberTips + signednessTips;
         }
         return "byte[" + (length <= 0 ? "n" : length) + "] <--> " + targetType.getName() + numberTips + signednessTips;

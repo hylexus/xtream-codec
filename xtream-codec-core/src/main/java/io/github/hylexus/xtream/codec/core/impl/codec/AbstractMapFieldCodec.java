@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.tracker.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -49,10 +50,10 @@ public abstract class AbstractMapFieldCodec<
         final ByteBuf slice = length < 0
                 ? input // all remaining
                 : input.readSlice(length);
-        final Map<Object, Object> result = new LinkedHashMap<>();
+        final Map<Object, @Nullable Object> result = new LinkedHashMap<>();
         while (slice.isReadable()) {
-            final Object key = this.getKeyFieldCodec().deserialize(propertyMetadata, context, slice, length);
-            final int valueLength = this.getValueLengthFieldCodec().deserialize(propertyMetadata, context, slice, length).intValue();
+            final Object key = Objects.requireNonNull(this.getKeyFieldCodec().deserialize(propertyMetadata, context, slice, length));
+            final int valueLength = Objects.requireNonNull(this.getValueLengthFieldCodec().deserialize(propertyMetadata, context, slice, length)).intValue();
             final FieldCodec<?> valueFieldCodec = this.getValueFieldCodec((K) key);
             final Object value = valueFieldCodec.deserialize(propertyMetadata, context, slice, valueLength);
             result.put(key, value);
@@ -65,7 +66,7 @@ public abstract class AbstractMapFieldCodec<
         final ByteBuf slice = length < 0
                 ? input // all remaining
                 : input.readSlice(length);
-        final Map<Object, Object> result = new LinkedHashMap<>();
+        final Map<Object, @Nullable Object> result = new LinkedHashMap<>();
         final int parentIndexBeforeRead = slice.readerIndex();
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(propertyMetadata, this.getClass().getSimpleName());
@@ -75,10 +76,10 @@ public abstract class AbstractMapFieldCodec<
             final MapEntrySpan mapEntrySpan = codecTracker.startNewMapEntrySpan(mapFieldSpan, propertyMetadata.name(), sequence++);
 
             codecTracker.updateTrackerHints(MapEntryItemSpan.Type.KEY);
-            final Object key = this.getKeyFieldCodec().deserializeWithTracker(propertyMetadata, context, slice, length);
+            final Object key = Objects.requireNonNull(this.getKeyFieldCodec().deserializeWithTracker(propertyMetadata, context, slice, length));
 
             codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
-            final int valueLength = this.getValueLengthFieldCodec().deserializeWithTracker(propertyMetadata, context, slice, length).intValue();
+            final int valueLength = Objects.requireNonNull(this.getValueLengthFieldCodec().deserializeWithTracker(propertyMetadata, context, slice, length)).intValue();
 
             final FieldCodec<?> valueFieldCodec = this.getValueFieldCodec((K) key);
             codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE);
@@ -94,7 +95,7 @@ public abstract class AbstractMapFieldCodec<
     }
 
     @Override
-    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object value) {
         if (value == null) {
             return;
         }
@@ -122,7 +123,7 @@ public abstract class AbstractMapFieldCodec<
     }
 
     @Override
-    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object value) {
         if (value == null) {
             return;
         }

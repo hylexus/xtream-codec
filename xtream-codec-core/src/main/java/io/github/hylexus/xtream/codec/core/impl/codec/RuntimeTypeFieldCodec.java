@@ -28,6 +28,7 @@ import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ClassUtils;
 
 import java.util.Objects;
@@ -48,7 +49,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
     }
 
     @Override
-    public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+    public @Nullable Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
         if (!(context.containerInstance() instanceof RuntimeTypeSupplier supplier)) {
             throw new UnsupportedOperationException();
         }
@@ -71,7 +72,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
     }
 
     @Override
-    public Object deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+    public @Nullable Object deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
         if (!(context.containerInstance() instanceof RuntimeTypeSupplier supplier)) {
             throw new UnsupportedOperationException();
         }
@@ -123,7 +124,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
     }
 
     @Override
-    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object value) {
+    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object value) {
         if (value == null) {
             return;
         }

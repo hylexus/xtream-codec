@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+// todo: TypeParameterUnusedInFormals
+@SuppressWarnings("TypeParameterUnusedInFormals")
 public class EntityDecoder {
     protected final ByteBufAllocator bufferFactory = ByteBufAllocator.DEFAULT;
     protected final BeanMetadataRegistry beanMetadataRegistry;

@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.core.tracker;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.StringJoiner;
 
 public class MapEntryItemSpan extends CodecSpan {
@@ -23,14 +25,14 @@ public class MapEntryItemSpan extends CodecSpan {
         KEY, VALUE, VALUE_LENGTH
     }
 
-    private final Type type;
+    private final @Nullable Type type;
 
-    public MapEntryItemSpan(BaseSpan parent, Type type) {
+    public MapEntryItemSpan(BaseSpan parent, @Nullable Type type) {
         super(parent);
         this.type = type;
     }
 
-    public Type getType() {
+    public @Nullable Type getType() {
         return type;
     }
 

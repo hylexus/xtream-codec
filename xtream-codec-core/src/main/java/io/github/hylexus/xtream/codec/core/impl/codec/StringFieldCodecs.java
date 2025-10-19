@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.Padding;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 
@@ -119,7 +120,7 @@ public final class StringFieldCodecs {
         }
 
         @Override
-        public String deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+        public @Nullable String deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
             final int finalLength = length < 0
                     ? input.readableBytes() // all remaining
                     : length;

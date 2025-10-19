@@ -38,8 +38,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author hylexus
@@ -87,17 +88,17 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         final ByteBuf slice = length < 0
                 ? input // all remaining
                 : input.readSlice(length);
-        @SuppressWarnings({"unchecked"}) final Map<Object, Object> map = (Map<Object, Object>) this.containerInstanceFactory().create();
+        @SuppressWarnings({"unchecked"}) final Map<Object, @Nullable Object> map = (Map<Object, Object>) this.containerInstanceFactory().create();
         while (slice.isReadable()) {
             // 1. key(i8,u8,i16,u16,i32,u32,i64,string)
-            final Object key = this.keyFieldCodec.deserialize(this, context, slice, this.xtreamFieldMapDescriptor.keyDescriptor().length());
+            final Object key = requireNonNull(this.keyFieldCodec.deserialize(this, context, slice, this.xtreamFieldMapDescriptor.keyDescriptor().length()));
             if (logger.isDebugEnabled()) {
                 logger.debug("MapKeyDecoder: key={}, keyFieldCodec={}", key, keyFieldCodec);
             }
 
             // 2. valueLength(int)
             final FieldCodec<?> valueLengthFieldCodec = this.getValueLengthFieldDecoder(key);
-            final int valueLength = ((Number) valueLengthFieldCodec.deserialize(this, context, slice, -1)).intValue();
+            final int valueLength = requireNonNull(((Number) valueLengthFieldCodec.deserialize(this, context, slice, -1))).intValue();
             if (logger.isDebugEnabled()) {
                 logger.debug("MapValueLengthDecoder: key={}, keyFieldCodec={}, length={}", key, keyFieldCodec, valueLength);
             }
@@ -120,21 +121,21 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
                 ? input // all remaining
                 : input.readSlice(length);
         final int parentIndexBeforeRead = input.readerIndex();
-        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        final CodecTracker codecTracker = requireNonNull(context.codecTracker());
         final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(this, this.getClass().getSimpleName());
-        @SuppressWarnings({"unchecked"}) final Map<Object, Object> map = (Map<Object, Object>) this.containerInstanceFactory().create();
+        @SuppressWarnings({"unchecked"}) final Map<Object, @Nullable Object> map = (Map<Object, Object>) this.containerInstanceFactory().create();
         int sequence = 0;
         while (slice.isReadable()) {
             final int indexBeforeRead = input.readerIndex();
             final MapEntrySpan mapEntrySpan = codecTracker.startNewMapEntrySpan(mapFieldSpan, this.name(), sequence++);
             // 1. key(i8,u8,i16,u16,i32,u32,i64,string)
             codecTracker.updateTrackerHints(MapEntryItemSpan.Type.KEY);
-            final Object key = this.keyFieldCodec.deserializeWithTracker(this, context, slice, this.xtreamFieldMapDescriptor.keyDescriptor().length());
+            final Object key = requireNonNull(this.keyFieldCodec.deserializeWithTracker(this, context, slice, this.xtreamFieldMapDescriptor.keyDescriptor().length()));
 
             // 2. valueLength(int)
             final FieldCodec<?> valueLengthFieldCodec = this.getValueLengthFieldDecoder(key);
             codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
-            final int valueLength = ((Number) valueLengthFieldCodec.deserializeWithTracker(this, context, slice, -1)).intValue();
+            final int valueLength = requireNonNull(((Number) valueLengthFieldCodec.deserializeWithTracker(this, context, slice, -1))).intValue();
 
             // 3. value(dynamic)
             final ByteBuf byteBuf = slice.readSlice(valueLength);
@@ -195,7 +196,7 @@ public class MapBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         try {
             int sequence = 0;
             @SuppressWarnings("unchecked") final Map<Object, Object> map = (Map<Object, Object>) value;
-            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final CodecTracker codecTracker = requireNonNull(context.codecTracker());
             final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(this, this.getClass().getSimpleName());
             final int parenIndexBeforeWrite = output.writerIndex();
             final BaseSpan parent = codecTracker.getCurrentSpan();
