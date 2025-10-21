@@ -35,7 +35,7 @@ import java.time.Duration;
 @RestController
 @RequestMapping("/dashboard-api/jt808/v1/metrics")
 public class BuiltinJt808DashboardMetricsController {
-    private static final Logger log = LoggerFactory.getLogger(BuiltinJt808DashboardMetricsController.class);
+    // private static final Logger log = LoggerFactory.getLogger(BuiltinJt808DashboardMetricsController.class);
 
     private final Jt808DashboardMetricsService jt808DashboardMetricsService;
     private final Jt808DashboardMetricsServiceWithMicroMeter jt808DashboardMetricsServiceWithMicroMeter;

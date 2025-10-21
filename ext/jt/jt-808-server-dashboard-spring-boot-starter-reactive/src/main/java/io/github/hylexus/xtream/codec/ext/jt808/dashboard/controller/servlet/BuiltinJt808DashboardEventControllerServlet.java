@@ -32,7 +32,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/dashboard-api/jt808/v1/event")
 public class BuiltinJt808DashboardEventControllerServlet {
-    private static final Logger log = LoggerFactory.getLogger(BuiltinJt808DashboardEventControllerServlet.class);
+    // private static final Logger log = LoggerFactory.getLogger(BuiltinJt808DashboardEventControllerServlet.class);
     private final Jt808DashboardEventService dashboardEventService;
 
     public BuiltinJt808DashboardEventControllerServlet(Jt808DashboardEventService dashboardEventService) {

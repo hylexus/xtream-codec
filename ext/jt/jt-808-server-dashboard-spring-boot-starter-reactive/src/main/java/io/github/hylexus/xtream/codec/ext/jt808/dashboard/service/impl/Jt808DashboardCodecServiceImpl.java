@@ -93,7 +93,7 @@ public class Jt808DashboardCodecServiceImpl implements Jt808DashboardCodecServic
                 .encryptionType(dto.getEncryptionType());
         final ByteBuf encoded = this.responseEncoder.encode(body, describer);
         try {
-            return describer.trackers();
+            return Objects.requireNonNull(describer.trackers(), "enableTracker() called");
         } finally {
             XtreamBytes.releaseBuf(encoded);
         }
@@ -259,7 +259,7 @@ public class Jt808DashboardCodecServiceImpl implements Jt808DashboardCodecServic
         }
     }
 
-    private ByteBuf decryptBody(Jt808RequestHeader header, ByteBuf body) {
+    private ByteBuf decryptBody(Jt808RequestHeader ignored, ByteBuf body) {
         return body.retain();
     }
 

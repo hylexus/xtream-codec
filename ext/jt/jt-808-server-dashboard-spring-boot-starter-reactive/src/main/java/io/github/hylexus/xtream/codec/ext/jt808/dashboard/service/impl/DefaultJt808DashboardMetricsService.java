@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.values.XtreamSe
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.vo.SimpleMetricsVo;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.service.Jt808DashboardMetricsService;
 import io.github.hylexus.xtream.codec.server.reactive.spec.event.XtreamEventPublisher;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -131,7 +132,7 @@ public class DefaultJt808DashboardMetricsService implements Jt808DashboardMetric
     }
 
     @SuppressWarnings("deprecation")
-    private String getThreadNamePrefix(XtreamServerSchedulerProperties schedulerProperties) {
+    private @Nullable String getThreadNamePrefix(XtreamServerSchedulerProperties schedulerProperties) {
         return switch (schedulerProperties.getType()) {
             case PARALLEL -> schedulerProperties.getParallel().getThreadNamePrefix();
             case BOUNDED_ELASTIC -> schedulerProperties.getBoundedElastic().getThreadNamePrefix();
@@ -165,25 +166,25 @@ public class DefaultJt808DashboardMetricsService implements Jt808DashboardMetric
             mapping.put(threadNamePrefix, ThreadGroup.XTREAM_EVENT_PUBLISHER.group);
         }
 
-        Optional.ofNullable(serverProperties.getInstructionServer())
+        Optional.of(serverProperties.getInstructionServer())
                 .map(XtreamJt808ServerProperties.InstructionServerProps::getTcpServer)
                 .map(XtreamJt808ServerProperties.TcpServerProps::getLoopResources)
                 .map(XtreamJt808ServerProperties.TcpLoopResourcesProperty::getThreadNamePrefix)
                 .ifPresent(prefix -> mapping.put(prefix, ThreadGroup.REACTOR_LOOP_RESOURCES_INSTRUCTION_TCP.group));
 
-        Optional.ofNullable(serverProperties.getInstructionServer())
+        Optional.of(serverProperties.getInstructionServer())
                 .map(XtreamJt808ServerProperties.InstructionServerProps::getUdpServer)
                 .map(XtreamJt808ServerProperties.UdpServerProps::getLoopResources)
                 .map(XtreamJt808ServerProperties.UdpLoopResourcesProperty::getThreadNamePrefix)
                 .ifPresent(prefix -> mapping.put(prefix, ThreadGroup.REACTOR_LOOP_RESOURCES_INSTRUCTION_UDP.group));
 
-        Optional.ofNullable(serverProperties.getAttachmentServer())
+        Optional.of(serverProperties.getAttachmentServer())
                 .map(XtreamJt808ServerProperties.AttachmentServerProps::getTcpServer)
                 .map(XtreamJt808ServerProperties.TcpAttachmentServerProps::getLoopResources)
                 .map(XtreamJt808ServerProperties.TcpLoopResourcesProperty::getThreadNamePrefix)
                 .ifPresent(prefix -> mapping.put(prefix, ThreadGroup.REACTOR_LOOP_RESOURCES_ATTACHMENT_TCP.group));
 
-        Optional.ofNullable(serverProperties.getAttachmentServer())
+        Optional.of(serverProperties.getAttachmentServer())
                 .map(XtreamJt808ServerProperties.AttachmentServerProps::getUdpServer)
                 .map(XtreamJt808ServerProperties.UdpAttachmentServerProps::getLoopResources)
                 .map(XtreamJt808ServerProperties.UdpLoopResourcesProperty::getThreadNamePrefix)

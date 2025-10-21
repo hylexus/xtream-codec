@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.tracker.RootSpan;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808RequestHeader;
 
+@SuppressWarnings("NullAway")
 public class Jt808DashboardDebugMessage implements RuntimeTypeSupplier {
 
     @JsonIgnore

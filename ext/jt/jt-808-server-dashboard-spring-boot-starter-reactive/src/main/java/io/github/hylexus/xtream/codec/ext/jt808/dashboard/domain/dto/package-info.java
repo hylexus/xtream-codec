@@ -14,22 +14,7 @@
  * limitations under the License.
  */
 
+@NullMarked
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto;
 
-import io.github.hylexus.xtream.codec.base.web.domain.dto.PageableDto;
-import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
-import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ServerType;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
-@Getter
-@Setter
-@ToString
-public class Jt808SessionQueryDto extends PageableDto {
-    private String terminalId;
-    private Jt808ServerType serverType;
-    private Jt808ProtocolVersion protocolVersion;
-    private XtreamInbound.Type protocolType;
-}
+import org.jspecify.annotations.NullMarked;

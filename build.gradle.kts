@@ -31,6 +31,7 @@ val errorpronePluginEnabledProjects = setOf(
     "xtream-codec-core",
     "xtream-codec-server-reactive",
     "jt-808-server-spring-boot-starter-reactive",
+    "jt-808-server-dashboard-spring-boot-starter-reactive",
 )
 
 version = xtreamConfig.projectVersion
@@ -75,6 +76,8 @@ configure(subprojects) {
                     "NullAway:ExcludedClasses",
                     listOf(
                         "io.github.hylexus.xtream.codec.ext.jt808.builtin.messages",
+                        "io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto",
+                        "io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.vo",
                     ).joinToString(separator = ",")
                 )
                 disable(
@@ -86,6 +89,7 @@ configure(subprojects) {
                     // todo: 有几个注解名和jdk类名冲突 后期考虑提供一个别名?
                     "JavaLangClash",
                     "ArrayRecordComponent",
+                    "JavaTimeDefaultTimeZone",
                 )
             }
 
