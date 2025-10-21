@@ -37,6 +37,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 import static java.util.Objects.requireNonNull;
 
 public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
@@ -89,9 +91,8 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
     }
 
     private Jt808FlowIdGenerator getFlowIdGenerator(Jt808MessageDescriber describer) {
-        return describer.flowIdGenerator() == null
-                ? this.flowIdGenerator
-                : describer.flowIdGenerator();
+        final Jt808FlowIdGenerator generator = describer.flowIdGenerator();
+        return generator != null ? generator : this.flowIdGenerator;
     }
 
     protected ByteBuf doBuild(Jt808MessageDescriber describer, ByteBuf body, @Nullable CodecTracker tracker) {
@@ -151,13 +152,13 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         }
         final boolean needTracker = tracker != null;
         if (needTracker) {
-            this.updateTracker(describer, totalSubPackageCount, currentPackageNo, tracker, compositeByteBuf, jt808RequestHeader, body, checkSum);
+            this.updateTracker(describer, totalSubPackageCount, currentPackageNo, Objects.requireNonNull(tracker), compositeByteBuf, jt808RequestHeader, body, checkSum);
         }
         final ByteBuf escaped;
         try {
             escaped = this.messageProcessor.doEscapeForSend(compositeByteBuf);
             if (needTracker) {
-                final Jt808MessageDescriber.Tracker last = describer.trackers().getLast();
+                final Jt808MessageDescriber.Tracker last = Objects.requireNonNull(describer.trackers()).getLast();
                 last.setEscapedHexString("7e" + FormatUtils.toHexString(escaped) + "7e");
                 final RootSpan details = last.getDetails();
                 details.setHexString(
@@ -190,7 +191,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
             ByteBuf message, Jt808RequestHeader jt808RequestHeader, ByteBuf body, byte checkSum) {
 
         final Jt808MessageDescriber.Tracker responseTracker = new Jt808MessageDescriber.Tracker();
-        describer.trackers().add(responseTracker);
+        Objects.requireNonNull(describer.trackers()).add(responseTracker);
         responseTracker.setRawHexString("7e" + FormatUtils.toHexString(message) + "7e");
 
         final Header header = new Header(jt808RequestHeader);
@@ -253,7 +254,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
     }
 
     public static class Header {
-        @SuppressWarnings("unused")
+        @SuppressWarnings({"unused", "NullAway.Init"})
         public Header() {
         }
 
@@ -296,7 +297,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
 
         // byte[17-21)    消息包封装项
         @Preset.JtStyle.Object(condition = "hasSubPackage()", desc = "消息包封装项")
-        private SubPackageProps subPackageProps;
+        private @Nullable SubPackageProps subPackageProps;
 
         // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
         public int msgBodyLength() {
@@ -354,7 +355,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
             return this;
         }
 
-        public SubPackageProps getSubPackageProps() {
+        public @Nullable SubPackageProps getSubPackageProps() {
             return subPackageProps;
         }
 

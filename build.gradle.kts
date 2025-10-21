@@ -26,7 +26,13 @@ val mavenPublications = setOf(
     "jt-808-server-spring-boot-starter-reactive",
     "jt-808-server-dashboard-spring-boot-starter-reactive",
 )
-val errorpronePluginEnabledProjects = setOf("xtream-codec-base", "xtream-codec-core", "xtream-codec-server-reactive")
+val errorpronePluginEnabledProjects = setOf(
+    "xtream-codec-base",
+    "xtream-codec-core",
+    "xtream-codec-server-reactive",
+    "jt-808-server-spring-boot-starter-reactive",
+)
+
 version = xtreamConfig.projectVersion
 run {
     xtreamConfig.javaVersion
@@ -65,7 +71,12 @@ configure(subprojects) {
             options.errorprone {
                 check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
                 option("NullAway:AnnotatedPackages", "io.github.hylexus.xtream.codec")
-
+                option(
+                    "NullAway:ExcludedClasses",
+                    listOf(
+                        "io.github.hylexus.xtream.codec.ext.jt808.builtin.messages",
+                    ).joinToString(separator = ",")
+                )
                 disable(
                     "MissingSummary",
                     "StringCaseLocaleUsage",

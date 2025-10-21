@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamReq
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.NettyInbound;
 
 import java.net.InetSocketAddress;
@@ -107,9 +108,19 @@ public class DefaultJt808Request extends DefaultXtreamRequest implements Jt808Re
             extends AbstractXtreamRequestBuilder<Jt808RequestBuilder, Jt808Request>
             implements Jt808RequestBuilder {
         protected String traceId;
-        protected Jt808RequestHeader header;
-        protected Integer originalCheckSum;
-        protected Integer calculatedCheckSum;
+        protected @Nullable Jt808RequestHeader header;
+        protected @Nullable Integer originalCheckSum;
+        protected @Nullable Integer calculatedCheckSum;
+
+        @Override
+        public Jt808RequestBuilder payload(ByteBuf payload, boolean autoRelease) {
+            return super.payload(payload, autoRelease);
+        }
+
+        @Override
+        public Jt808RequestBuilder payload(ByteBuf payload) {
+            return Jt808RequestBuilder.super.payload(payload);
+        }
 
         public DefaultJt808RequestBuilder(Jt808Request delegateRequest) {
             super(delegateRequest);

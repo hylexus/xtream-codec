@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,10 @@ public class BuiltinMessage8500V2019 {
         }
 
         @Override
-        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Map<Integer, Object> value) {
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Map<Integer, Object> value) {
+            if (value == null) {
+                return;
+            }
             for (final Map.Entry<Integer, Object> entry : value.entrySet()) {
                 final Integer itemId = entry.getKey();
                 if (Objects.equals(itemId, 0x0001)) {

@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Accessors(chain = true)
+@SuppressWarnings("NullAway.Init")
 public class AlarmIdentifier {
     // 终端ID BYTE[7] 7个字节，由大写字母和数字组成
     @Preset.JtStyle.Str(length = 7, desc = "终端ID 7个字节，由大写字母和数字组成")

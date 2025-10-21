@@ -55,11 +55,11 @@ public class JtCryptoUtil {
 
     private static class Base {
 
-        public static ByteBuf toByteBuf(byte[] data) {
+        static ByteBuf toByteBuf(byte[] data) {
             return ByteBufAllocator.DEFAULT.buffer(data.length).writeBytes(data);
         }
 
-        public static byte[] encrypt(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data) {
+        static byte[] encrypt(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data) {
             try {
                 final SecretKeySpec secretKeySpec = new SecretKeySpec(key, algorithm);
                 final Cipher cipher = cipherSupplier.get();
@@ -70,7 +70,7 @@ public class JtCryptoUtil {
             }
         }
 
-        public static byte[] decrypt(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data) {
+        static byte[] decrypt(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data) {
             try {
                 final SecretKeySpec secretKeySpec = new SecretKeySpec(key, algorithm);
                 final Cipher cipher = cipherSupplier.get();
@@ -81,7 +81,7 @@ public class JtCryptoUtil {
             }
         }
 
-        public static byte[] encryptWithIv(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data, byte[] iv) {
+        static byte[] encryptWithIv(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data, byte[] iv) {
             try {
                 final SecretKeySpec secretKeySpec = new SecretKeySpec(key, algorithm);
                 final Cipher cipher = cipherSupplier.get();
@@ -92,8 +92,7 @@ public class JtCryptoUtil {
             }
         }
 
-
-        public static byte[] decryptWithIv(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data, byte[] iv) {
+        static byte[] decryptWithIv(String algorithm, Supplier<Cipher> cipherSupplier, byte[] key, byte[] data, byte[] iv) {
             try {
                 final SecretKeySpec secretKeySpec = new SecretKeySpec(key, algorithm);
                 final Cipher cipher = cipherSupplier.get();

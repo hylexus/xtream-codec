@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +91,14 @@ public class BuiltinMessage0608 {
         }
 
         @Override
-        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, List<Object> value) {
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable List<@Nullable Object> value) {
+            if (value == null) {
+                return;
+            }
             for (final Object item : value) {
+                if (item == null) {
+                    continue;
+                }
                 context.entityEncoder().encode(context.version(), item, output);
             }
         }

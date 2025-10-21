@@ -45,6 +45,7 @@ public class DefaultJt808RequestHeader implements Jt808RequestHeader {
 
     private Jt808SubPackageProps subPackageProps;
 
+    @SuppressWarnings("NullAway.Init")
     public DefaultJt808RequestHeader() {
     }
 
@@ -108,6 +109,7 @@ public class DefaultJt808RequestHeader implements Jt808RequestHeader {
         private int flowId;
         private Jt808SubPackageProps subPackage;
 
+        @SuppressWarnings("NullAway.Init")
         public DefaultJt808MessageHeaderBuilder() {
         }
 

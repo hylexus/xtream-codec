@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.StringJoiner;
 
+@SuppressWarnings("NullAway.Init")
 public abstract class AbstractCommandValue<T> implements CommandValue<T> {
     protected final int offset;
     protected T value;

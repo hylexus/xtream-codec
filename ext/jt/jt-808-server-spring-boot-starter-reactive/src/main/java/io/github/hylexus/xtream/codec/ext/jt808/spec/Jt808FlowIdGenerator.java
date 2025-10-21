@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808FlowIdGene
 /**
  * @author hylexus
  */
+@SuppressWarnings("ClassInitializationDeadlock")
 public interface Jt808FlowIdGenerator {
 
     Jt808FlowIdGenerator DEFAULT = new DefaultJt808FlowIdGenerator();

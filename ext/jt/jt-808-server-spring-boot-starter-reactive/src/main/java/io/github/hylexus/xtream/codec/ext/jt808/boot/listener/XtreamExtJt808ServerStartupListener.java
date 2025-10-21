@@ -26,7 +26,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.lang.NonNull;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,6 +34,7 @@ public class XtreamExtJt808ServerStartupListener implements ApplicationListener<
     private static final Logger log = LoggerFactory.getLogger(XtreamExtJt808ServerStartupListener.class);
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final XtreamJt808ServerProperties serverProps;
+    @SuppressWarnings("NullAway.Init")
     private ApplicationContext applicationContext;
 
     public XtreamExtJt808ServerStartupListener(XtreamJt808ServerProperties serverProps) {
@@ -42,7 +42,7 @@ public class XtreamExtJt808ServerStartupListener implements ApplicationListener<
     }
 
     @Override
-    public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         final boolean tcpServerEnabled = serverProps.getInstructionServer().getTcpServer().isEnabled() || serverProps.getAttachmentServer().getTcpServer().isEnabled();
         final boolean udpServerEnabled = serverProps.getInstructionServer().getUdpServer().isEnabled() || serverProps.getAttachmentServer().getUdpServer().isEnabled();
 
@@ -71,7 +71,7 @@ public class XtreamExtJt808ServerStartupListener implements ApplicationListener<
     }
 
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 }

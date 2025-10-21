@@ -22,12 +22,15 @@ import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808UdpDatagramPackageSpl
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808AttachmentServerUdpHandlerAdapter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author hylexus
  */
 public class Jt808AttachmentServerUdpHandlerAdapterBuilder extends Jt808InstructionServerUdpHandlerAdapterBuilder {
-    protected XtreamHandler attachementdispatcherXtreamHandler;
+    protected @Nullable XtreamHandler attachementdispatcherXtreamHandler;
 
     public Jt808AttachmentServerUdpHandlerAdapterBuilder(ByteBufAllocator allocator, Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter) {
         super(allocator, udpDatagramPackageSplitter);
@@ -38,11 +41,13 @@ public class Jt808AttachmentServerUdpHandlerAdapterBuilder extends Jt808Instruct
         return this;
     }
 
+    @Override
     public Jt808AttachmentServerUdpHandlerAdapterBuilder requestDecoder(Jt808RequestDecoder requestDecoder) {
         this.requestDecoder = requestDecoder;
         return this;
     }
 
+    @Override
     public Jt808AttachmentServerUdpHandlerAdapterBuilder requestLifecycleListener(Jt808RequestLifecycleListener requestLifecycleListener) {
         this.requestLifecycleListener = requestLifecycleListener;
         return this;
@@ -51,7 +56,15 @@ public class Jt808AttachmentServerUdpHandlerAdapterBuilder extends Jt808Instruct
     @Override
     public Jt808AttachmentServerUdpHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808AttachmentServerUdpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.udpDatagramPackageSplitter, this.attachementdispatcherXtreamHandler, this.requestDecoder, this.requestLifecycleListener);
+        return new Jt808AttachmentServerUdpHandlerAdapter(
+                super.byteBufAllocator,
+                requireNonNull(super.sessionManager),
+                exceptionHandlingHandler,
+                this.udpDatagramPackageSplitter,
+                requireNonNull(this.attachementdispatcherXtreamHandler),
+                requireNonNull(this.requestDecoder),
+                requireNonNull(this.requestLifecycleListener)
+        );
     }
 
 }

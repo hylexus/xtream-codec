@@ -20,6 +20,8 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 
@@ -28,9 +30,9 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
 
     protected final R delegateRequest;
     protected int version;
-    protected ByteBuf payload;
-    protected InetSocketAddress remoteAddress;
-    protected Channel channel;
+    protected @Nullable ByteBuf payload;
+    protected @Nullable InetSocketAddress remoteAddress;
+    protected @Nullable Channel channel;
 
     public AbstractXtreamRequestBuilder(R delegateRequest) {
         this.delegateRequest = delegateRequest;
@@ -46,7 +48,7 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
     }
 
     @Override
-    public B payload(ByteBuf payload, boolean autoRelease) {
+    public @NonNull B payload(ByteBuf payload, boolean autoRelease) {
         final ByteBuf old = this.payload;
         try {
             this.payload = payload;
@@ -59,7 +61,7 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
     }
 
     @Override
-    public B remoteAddress(InetSocketAddress remoteAddress) {
+    public @NonNull B remoteAddress(InetSocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
         return self();
     }
@@ -71,6 +73,6 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
     }
 
     @Override
-    public abstract R build();
+    public abstract @NonNull R build();
 
 }

@@ -26,8 +26,11 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerResult;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerResultHandler;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 /**
  * @author hylexus
@@ -48,7 +51,7 @@ public class Jt808ResponseBodyHandlerResultHandler implements XtreamHandlerResul
 
     @Override
     public Mono<Void> handleResult(XtreamExchange exchange, XtreamHandlerResult result) {
-        final Jt808ResponseBody annotation = this.getJt808ResponseBody(result);
+        final Jt808ResponseBody annotation = Objects.requireNonNull(this.getJt808ResponseBody(result));
         final Jt808Request jt808Request = (Jt808Request) exchange.request();
         final Jt808RequestHeader requestHeader = jt808Request.header();
 
@@ -64,7 +67,7 @@ public class Jt808ResponseBodyHandlerResultHandler implements XtreamHandlerResul
         return OrderedComponent.BUILTIN_COMPONENT_PRECEDENCE - 100;
     }
 
-    protected Mono<?> adaptReturnValue(Object returnValue) {
+    protected Mono<?> adaptReturnValue(@Nullable Object returnValue) {
         return switch (returnValue) {
             case null -> Mono.error(new IllegalArgumentException("message is null"));
             case Mono<?> mono -> mono;
@@ -73,7 +76,7 @@ public class Jt808ResponseBodyHandlerResultHandler implements XtreamHandlerResul
         };
     }
 
-    protected Jt808ResponseBody getJt808ResponseBody(XtreamHandlerResult handlerResult) {
+    protected @Nullable Jt808ResponseBody getJt808ResponseBody(XtreamHandlerResult handlerResult) {
         final XtreamMethodParameter returnType = handlerResult.getReturnType();
         // 优先获取方法上的注解
         final Jt808ResponseBody methodAnnotation = returnType.getMethodAnnotation(Jt808ResponseBody.class);

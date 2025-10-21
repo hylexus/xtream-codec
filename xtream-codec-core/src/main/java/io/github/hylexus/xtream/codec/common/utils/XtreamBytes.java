@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.common.utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.ReferenceCounted;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -51,7 +52,7 @@ public class XtreamBytes {
         }
     }
 
-    public static void releaseBuf(ReferenceCounted objects) {
+    public static void releaseBuf(@Nullable ReferenceCounted objects) {
         if (objects == null) {
             return;
         }

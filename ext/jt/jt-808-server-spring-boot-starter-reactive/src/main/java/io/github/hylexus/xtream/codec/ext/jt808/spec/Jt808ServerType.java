@@ -25,4 +25,8 @@ public enum Jt808ServerType {
     Jt808ServerType(String description) {
         this.description = description;
     }
+
+    public String description() {
+        return description;
+    }
 }

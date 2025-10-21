@@ -22,9 +22,9 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
@@ -37,14 +37,12 @@ import java.util.function.Consumer;
  * @author hylexus
  * @see io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionManager#closeSessionById(String, XtreamSessionEventListener.SessionCloseReason)
  */
-@Slf4j
 @ChannelHandler.Sharable
 public class XtreamTcpHeatBeatHandler extends ChannelInboundHandlerAdapter {
 
-    @Nullable
-    private final Jt808SessionManager sessionManager;
-    @Nullable
-    private final Jt808AttachmentSessionManager attachmentSessionManager;
+    private static final Logger log = LoggerFactory.getLogger(XtreamTcpHeatBeatHandler.class);
+    private final @Nullable Jt808SessionManager sessionManager;
+    private final @Nullable Jt808AttachmentSessionManager attachmentSessionManager;
 
     public XtreamTcpHeatBeatHandler(@Nullable Jt808SessionManager sessionManager, @Nullable Jt808AttachmentSessionManager attachmentSessionManager) {
         if (sessionManager == null && attachmentSessionManager == null) {
@@ -75,7 +73,7 @@ public class XtreamTcpHeatBeatHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelInactive(@Nonnull ChannelHandlerContext ctx) {
+    public void channelInactive(ChannelHandlerContext ctx) {
         if (log.isDebugEnabled()) {
             log.warn("channelInactive, address={} ", ctx.channel().remoteAddress());
         }
@@ -109,7 +107,7 @@ public class XtreamTcpHeatBeatHandler extends ChannelInboundHandlerAdapter {
     private static void closeAndIgnoreException(ChannelHandlerContext ctx, String message) {
         try {
             log.info(message, ctx.channel());
-            ctx.channel().close();
+            var ignored = ctx.channel().close();
         } catch (Exception ignored) {
             // ignored
         }

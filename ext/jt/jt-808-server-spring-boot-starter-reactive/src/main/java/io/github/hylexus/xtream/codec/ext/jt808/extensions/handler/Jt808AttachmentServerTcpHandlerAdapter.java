@@ -45,7 +45,7 @@ import java.time.Instant;
  * @author hylexus
  */
 public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNettyHandlerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(Jt808AttachmentServerTcpHandlerAdapter.class);
+    // private static final Logger log = LoggerFactory.getLogger(Jt808AttachmentServerTcpHandlerAdapter.class);
     protected final Jt808RequestDecoder requestDecoder;
     protected final Jt808RequestLifecycleListener requestLifecycleListener;
     protected final XtreamHandler attachmentHandler;
@@ -120,7 +120,7 @@ public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNett
     }
 
     @Override
-    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamRequest.Type type) {
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamInbound.Type type) {
         final String requestId = this.generateRequestId(nettyInbound);
         final XtreamInbound.Type requestType = XtreamInbound.Type.TCP;
         final Channel channel = inboundInfo.channel();

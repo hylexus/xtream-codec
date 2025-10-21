@@ -42,7 +42,7 @@ import java.util.List;
  * @author hylexus
  */
 public class Jt808InstructionServerUdpHandlerAdapter extends DefaultUdpXtreamNettyHandlerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(Jt808InstructionServerUdpHandlerAdapter.class);
+    // private static final Logger log = LoggerFactory.getLogger(Jt808InstructionServerUdpHandlerAdapter.class);
     protected final Jt808UdpDatagramPackageSplitter splitter;
     protected final Jt808RequestDecoder requestDecoder;
     protected final Jt808RequestLifecycleListener requestLifecycleListener;

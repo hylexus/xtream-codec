@@ -34,6 +34,7 @@ import java.util.Map;
 @Setter
 @ToString
 @ConfigurationProperties(prefix = "jt808-server")
+@SuppressWarnings("NullAway")
 public class XtreamJt808ServerProperties {
     private boolean enabled = true;
 

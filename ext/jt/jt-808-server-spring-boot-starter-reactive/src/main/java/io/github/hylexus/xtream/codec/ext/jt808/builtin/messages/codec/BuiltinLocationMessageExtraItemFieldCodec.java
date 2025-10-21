@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.*;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 public class BuiltinLocationMessageExtraItemFieldCodec
         extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec> {
@@ -94,7 +95,7 @@ public class BuiltinLocationMessageExtraItemFieldCodec
         }
 
         @Override
-        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, OverSpeedAlarmItem value) {
+        public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable OverSpeedAlarmItem value) {
             if (value == null) {
                 return;
             }
@@ -106,6 +107,7 @@ public class BuiltinLocationMessageExtraItemFieldCodec
         }
     }
 
+    @SuppressWarnings("NullAway.Init")
     public static class OverSpeedAlarmItem {
         /**
          * 位置类型

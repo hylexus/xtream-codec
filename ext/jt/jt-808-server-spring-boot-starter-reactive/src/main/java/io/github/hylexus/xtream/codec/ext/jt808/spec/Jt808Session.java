@@ -31,6 +31,7 @@ public interface Jt808Session extends XtreamSession {
 
     Jt808Session verified(boolean verified);
 
+    @Override
     Jt808Session lastCommunicateTime(Instant current);
 
     String terminalId();

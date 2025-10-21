@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author hylexus
@@ -41,7 +42,7 @@ public class ParameterItem {
     private short parameterLength;
 
     // 自定义 FieldCodec 时就不用加 @Preset.JtStyle.RuntimeType 注解了
-    private Object parameterValue;
+    private @Nullable Object parameterValue;
 
     // 非请求参数；仅仅为了调试方便；可以忽略这个参数
     private ParameterType parameterType;
@@ -49,7 +50,7 @@ public class ParameterItem {
     public ParameterItem() {
     }
 
-    public ParameterItem(long parameterId, short parameterLength, Object parameterValue) {
+    public ParameterItem(long parameterId, short parameterLength, @Nullable Object parameterValue) {
         this.parameterId = parameterId;
         this.parameterLength = parameterLength;
         this.parameterValue = parameterValue;

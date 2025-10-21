@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +131,7 @@ public class CustomParameterListFieldCodec extends AbstractFieldCodec<List<Param
     }
 
     @Override
-    protected void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, List<ParameterItem> value) {
+    protected void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, List<@Nullable ParameterItem> value) {
         for (final ParameterItem item : value) {
             if (item == null) {
                 continue;

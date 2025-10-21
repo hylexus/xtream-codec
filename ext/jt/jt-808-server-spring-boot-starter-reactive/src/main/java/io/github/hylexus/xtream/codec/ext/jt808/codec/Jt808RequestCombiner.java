@@ -18,7 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.codec;
 
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808RequestHeader;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.NettyInbound;
 
 import java.util.UUID;

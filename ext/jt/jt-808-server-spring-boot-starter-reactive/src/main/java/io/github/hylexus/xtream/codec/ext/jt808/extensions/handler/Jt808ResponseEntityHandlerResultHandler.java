@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerResult;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerResultHandler;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -75,7 +76,7 @@ public class Jt808ResponseEntityHandlerResultHandler implements XtreamHandlerRes
                 .flowId(responseEntity.getFlowId());
     }
 
-    protected Mono<Jt808ResponseEntity<Object>> adaptReturnValue(Object returnValue) {
+    protected Mono<Jt808ResponseEntity<Object>> adaptReturnValue(@Nullable Object returnValue) {
         return switch (returnValue) {
             case null -> Mono.error(new IllegalArgumentException("message is null"));
             case Mono<?> mono -> mono.map(Jt808ResponseEntityHandlerResultHandler::cast);

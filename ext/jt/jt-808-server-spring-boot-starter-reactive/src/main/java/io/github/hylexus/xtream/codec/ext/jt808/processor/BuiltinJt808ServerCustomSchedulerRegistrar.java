@@ -29,7 +29,6 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.env.Environment;
-import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -44,10 +43,11 @@ public class BuiltinJt808ServerCustomSchedulerRegistrar
         EnvironmentAware {
 
     private static final Logger log = LoggerFactory.getLogger(BuiltinJt808ServerCustomSchedulerRegistrar.class);
+    @SuppressWarnings({"NullAway"})
     private Environment environment;
 
     @Override
-    public void postProcessBeanDefinitionRegistry(@NonNull BeanDefinitionRegistry registry) throws BeansException {
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         final Map<String, XtreamJt808ServerProperties.NamedXtreamServerSchedulerProperties> customSchedulers = getCustomSchedulerConfig();
         if (CollectionUtils.isEmpty(customSchedulers)) {
             return;
@@ -73,7 +73,7 @@ public class BuiltinJt808ServerCustomSchedulerRegistrar
     }
 
     @Override
-    public void setEnvironment(@NonNull Environment environment) {
+    public void setEnvironment(Environment environment) {
         this.environment = environment;
     }
 

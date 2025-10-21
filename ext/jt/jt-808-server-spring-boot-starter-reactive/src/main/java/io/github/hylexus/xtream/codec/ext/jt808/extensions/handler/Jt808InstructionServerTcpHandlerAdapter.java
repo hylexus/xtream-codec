@@ -93,6 +93,7 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
         }
     }
 
+    @SuppressWarnings("FutureReturnValueIgnored")
     private static void closeAndIgnoreException(Channel channel, String message) {
         try {
             log.info(message, channel);
@@ -112,7 +113,7 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
     }
 
     @Override
-    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamRequest.Type type) {
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamInbound.Type type) {
         final Channel channel = inboundInfo.channel();
         final InetSocketAddress remoteAddress = inboundInfo.remoteAddress();
         final String requestId = this.generateRequestId(nettyInbound);

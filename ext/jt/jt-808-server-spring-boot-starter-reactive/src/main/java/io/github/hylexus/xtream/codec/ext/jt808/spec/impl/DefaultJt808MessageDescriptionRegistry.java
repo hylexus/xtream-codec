@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.spec.impl;
 
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriptionRegistry;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class DefaultJt808MessageDescriptionRegistry implements Jt808MessageDescr
     }
 
     @Override
-    public String getDescription(int messageId) {
+    public @Nullable String getDescription(int messageId) {
         return mappings.get(messageId);
     }
 

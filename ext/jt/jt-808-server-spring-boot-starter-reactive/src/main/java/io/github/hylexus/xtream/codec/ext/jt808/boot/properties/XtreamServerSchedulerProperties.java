@@ -30,6 +30,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString
+@SuppressWarnings("NullAway")
 public class XtreamServerSchedulerProperties {
 
     protected SchedulerType type = SchedulerType.BOUNDED_ELASTIC;
