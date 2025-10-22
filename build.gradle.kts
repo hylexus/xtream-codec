@@ -13,7 +13,7 @@ plugins {
     id("io.gitee.pkmer.pkmerboot-central-publisher") apply false
     id("signing")
     id("checkstyle")
-    id("net.minecraftforge.licenser")
+    id("net.minecraftforge.licenser") apply false
     id("com.github.jk1.dependency-license-report")
     id("com.namics.oss.gradle.license-enforce-plugin")
     id("net.ltgt.errorprone") apply false
@@ -184,16 +184,18 @@ configure(subprojects) {
     }
 
     // 本项目开源协议头
-    apply(plugin = "net.minecraftforge.licenser")
-    val creationYear = DateTimeFormatter.ofPattern("yyyy").format(LocalDate.now())
-    configure<net.minecraftforge.licenser.LicenseExtension> {
-        // setHeader(rootProject.file("build-script/license/license-header"))
-        header.set(rootProject.resources.text.fromFile("build-script/license/license-header"))
-        skipExistingHeaders.set(false)
-        exclude("**/spring.factories")
-        exclude("**/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
-        properties {
-            set("creationYear", creationYear)
+    if (xtreamConfig.licenseCheckerEnabled) {
+        apply(plugin = "net.minecraftforge.licenser")
+        val creationYear = DateTimeFormatter.ofPattern("yyyy").format(LocalDate.now())
+        configure<net.minecraftforge.licenser.LicenseExtension> {
+            // setHeader(rootProject.file("build-script/license/license-header"))
+            header.set(rootProject.resources.text.fromFile("build-script/license/license-header"))
+            skipExistingHeaders.set(false)
+            exclude("**/spring.factories")
+            exclude("**/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
+            properties {
+                set("creationYear", creationYear)
+            }
         }
     }
 
@@ -485,4 +487,6 @@ fun Project.isMavenPublications(): Boolean {
     return mavenPublications.contains(project.name)
 }
 
-private fun Project.errorPronePluginEnabled() = project.name in errorpronePluginEnabledProjects
+private fun Project.errorPronePluginEnabled(): Boolean {
+    return xtreamConfig.errorproneEnabled && project.name in errorpronePluginEnabledProjects
+}

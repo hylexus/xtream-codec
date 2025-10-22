@@ -156,6 +156,8 @@ object XtreamConfig {
         // build
         val skipFatJar: Boolean get() = !getOrLoadConfigAsBoolean("xtream.backend.build.debug-module-fatjar.enabled", true)
         val skipCheckStyle: Boolean get() = !getOrLoadConfigAsBoolean("xtream.backend.build.checkstyle.enabled", true)
+        val errorproneEnabled: Boolean get() = getOrLoadConfigAsBoolean("xtream.backend.build.errorprone.enabled", true)
+        val licenseCheckerEnabled: Boolean get() = getOrLoadConfigAsBoolean("xtream.backend.build.license-checker.enabled", true)
 
         // Maven
         val mavenRepoConfig: Properties
