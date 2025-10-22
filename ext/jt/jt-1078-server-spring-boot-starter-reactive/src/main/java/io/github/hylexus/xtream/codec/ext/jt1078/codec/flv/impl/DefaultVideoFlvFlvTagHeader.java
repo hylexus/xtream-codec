@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
+@SuppressWarnings("NullAway")
 public class DefaultVideoFlvFlvTagHeader implements VideoFlvTag.VideoFlvTagHeader, VideoFlvTag.VideoFlvTagHeaderBuilder {
     private VideoFlvTag.VideoFrameType frameType;
     private VideoFlvTag.VideoCodecId codecId;

@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.PcmToMp3Encoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,12 +38,13 @@ import javax.sound.sampled.AudioFormat;
  * @see <a href="https://sourceforge.net/projects/jump3r/">https://sourceforge.net/projects/jump3r/</a>
  * @see <a href="https://pure-java-mp3-encoder.blogspot.com/">https://pure-java-mp3-encoder.blogspot.com/</a>
  */
+@SuppressWarnings("NullAway")
 public class DefaultPcmToMp3Encoder implements PcmToMp3Encoder {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPcmToMp3Encoder.class);
-    private volatile LameEncoder lameEncoder;
+    private volatile @Nullable LameEncoder lameEncoder;
     private final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
-    private byte[] buffer;
+    private byte @Nullable [] buffer;
 
     public DefaultPcmToMp3Encoder() {
     }

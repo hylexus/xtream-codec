@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.ext.jt1078.dashboard.utils;
+@NullMarked
+package io.github.hylexus.xtream.codec.ext.jt1078.boot.configuration;
 
-import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078PayloadType;
-import org.jspecify.annotations.Nullable;
-import org.springframework.core.convert.converter.Converter;
-
-public class StringToJt1078PayloadTypeConverter implements Converter<String, Jt1078PayloadType> {
-
-    public StringToJt1078PayloadTypeConverter() {
-    }
-
-    @Override
-    public @Nullable Jt1078PayloadType convert(String source) {
-        return Jt1078PayloadType.jsonCreator(source);
-    }
-
-}
+import org.jspecify.annotations.NullMarked;

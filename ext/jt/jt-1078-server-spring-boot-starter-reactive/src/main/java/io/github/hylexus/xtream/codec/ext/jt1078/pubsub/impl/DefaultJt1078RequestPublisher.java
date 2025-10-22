@@ -19,9 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt1078.pubsub.impl;
 import io.github.hylexus.xtream.codec.ext.jt1078.pubsub.*;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Request;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078SimConverter;
-import jakarta.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
@@ -33,7 +31,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class DefaultJt1078RequestPublisher implements Jt1078RequestPublisher {
-    private static final Logger log = LoggerFactory.getLogger(DefaultJt1078RequestPublisher.class);
+    // private static final Logger log = LoggerFactory.getLogger(DefaultJt1078RequestPublisher.class);
     private final Jt1078SimConverter jt1078SimConverter;
     private final ConcurrentMap<Jt1078Channel.ChannelKey, Jt1078Channel> channels = new ConcurrentHashMap<>();
     private final Scheduler scheduler;
@@ -84,7 +82,7 @@ public class DefaultJt1078RequestPublisher implements Jt1078RequestPublisher {
     }
 
     @Override
-    public void unsubscribe(String id, @Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    public void unsubscribe(String id, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         for (final Map.Entry<Jt1078Channel.ChannelKey, Jt1078Channel> entry : this.channels.entrySet()) {
             final Jt1078Channel.ChannelKey channelKey = entry.getKey();
             final String prefix = Jt1078Channel.ChannelKey.prefix(channelKey.sim(), channelKey.channelNumber());
@@ -96,16 +94,16 @@ public class DefaultJt1078RequestPublisher implements Jt1078RequestPublisher {
     }
 
     @Override
-    public void unsubscribeWithSim(String sim, @Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    public void unsubscribeWithSim(String sim, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         this.doUnsubscribe(channelKey -> channelKey.sim().equals(sim), reason);
     }
 
     @Override
-    public void unsubscribeWithSimAndChannelNumber(String sim, short channelNumber, @Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    public void unsubscribeWithSimAndChannelNumber(String sim, short channelNumber, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         this.doUnsubscribe(channelKey -> channelKey.sim().equals(sim) && channelKey.channelNumber() == channelNumber, reason);
     }
 
-    private void doUnsubscribe(Predicate<Jt1078Channel.ChannelKey> predicate, Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    private void doUnsubscribe(Predicate<Jt1078Channel.ChannelKey> predicate, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         for (final Iterator<Map.Entry<Jt1078Channel.ChannelKey, Jt1078Channel>> iterator = this.channels.entrySet().iterator(); iterator.hasNext(); ) {
             final Map.Entry<Jt1078Channel.ChannelKey, Jt1078Channel> entry = iterator.next();
             final Jt1078Channel.ChannelKey channelKey = entry.getKey();

@@ -28,6 +28,7 @@ import java.util.Optional;
 /**
  * @author hylexus
  */
+@SuppressWarnings("NullAway")
 public class DefaultJt1078RequestHeader implements Jt1078RequestHeader {
 
     private short offset4;

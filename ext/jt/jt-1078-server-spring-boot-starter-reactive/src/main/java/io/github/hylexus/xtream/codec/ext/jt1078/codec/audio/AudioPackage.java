@@ -19,9 +19,13 @@ package io.github.hylexus.xtream.codec.ext.jt1078.codec.audio;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.BuiltinAudioFormatOptions;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.jspecify.annotations.Nullable;
 
-public record AudioPackage(AudioFormatOptions options, ByteBuf payload, int payloadSize) {
-    private static final AudioPackage EMPTY = new AudioPackage(BuiltinAudioFormatOptions.SILENCE, null, 0);
+@SuppressWarnings("NullAway")
+public record AudioPackage(@Nullable AudioFormatOptions options, ByteBuf payload, int payloadSize) {
+    private static final ByteBuf EMPTY_PAYLOAD = Unpooled.buffer(0);
+    private static final AudioPackage EMPTY_AUDIO_PACKAGE = new AudioPackage(BuiltinAudioFormatOptions.SILENCE, EMPTY_PAYLOAD, 0);
 
     @SuppressWarnings("redundent")
     public AudioPackage {
@@ -31,12 +35,13 @@ public record AudioPackage(AudioFormatOptions options, ByteBuf payload, int payl
         return new AudioPackage(options, payload);
     }
 
-    public AudioPackage(AudioFormatOptions options, ByteBuf payload) {
-        this(options, payload, payload == null ? 0 : payload.readableBytes());
+    public AudioPackage(@Nullable AudioFormatOptions options, @Nullable ByteBuf payload) {
+        this(options, payload != null ? payload : EMPTY_PAYLOAD, payload != null ? payload.readableBytes() : 0);
     }
 
+    @SuppressWarnings("ReferenceEquality")
     public boolean isEmpty() {
-        return this == EMPTY || this.payloadSize == 0 || this.payload == null || this.payload.readableBytes() == 0;
+        return this == EMPTY_AUDIO_PACKAGE || this.payloadSize == 0 || this.payload.readableBytes() == 0;
     }
 
     /**
@@ -44,13 +49,13 @@ public record AudioPackage(AudioFormatOptions options, ByteBuf payload, int payl
      */
     public AudioPackage shallowCopy() {
         if (this.isEmpty()) {
-            return EMPTY;
+            return EMPTY_AUDIO_PACKAGE;
         }
         return new AudioPackage(this.options, this.payload.slice());
     }
 
     public static AudioPackage empty() {
-        return EMPTY;
+        return EMPTY_AUDIO_PACKAGE;
     }
 
     public void close() {

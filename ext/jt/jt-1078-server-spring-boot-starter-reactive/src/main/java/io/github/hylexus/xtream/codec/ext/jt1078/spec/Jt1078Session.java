@@ -17,11 +17,13 @@
 package io.github.hylexus.xtream.codec.ext.jt1078.spec;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSession;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
 public interface Jt1078Session extends XtreamSession {
 
+    @Override
     Jt1078Session lastCommunicateTime(Instant current);
 
     int simLength();
@@ -32,11 +34,11 @@ public interface Jt1078Session extends XtreamSession {
 
     short channelNumber();
 
-    Jt1078PayloadType audioType();
+    @Nullable Jt1078PayloadType audioType();
 
     Jt1078Session audioType(Jt1078PayloadType type);
 
-    Jt1078PayloadType videoType();
+    @Nullable Jt1078PayloadType videoType();
 
     Jt1078Session videoType(Jt1078PayloadType type);
 

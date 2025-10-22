@@ -25,6 +25,7 @@ package io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.g711;
  */
 public class G711ALawJt1078AudioCodec extends AbstractG711AudioCodec {
 
+    @Override
     protected short decodeOne(byte input) {
         input = (byte) (input ^ 0x55);
         // G.711 符号位 unsigned byte

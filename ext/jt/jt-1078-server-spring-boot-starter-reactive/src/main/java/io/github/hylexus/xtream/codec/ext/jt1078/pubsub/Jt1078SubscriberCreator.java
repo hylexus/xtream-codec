@@ -32,6 +32,7 @@ import java.util.StringJoiner;
 @Accessors(chain = true, fluent = true)
 @SuperBuilder
 @NoArgsConstructor
+@SuppressWarnings("NullAway")
 public class Jt1078SubscriberCreator {
     protected String convertedSim;
     protected String rawSim;

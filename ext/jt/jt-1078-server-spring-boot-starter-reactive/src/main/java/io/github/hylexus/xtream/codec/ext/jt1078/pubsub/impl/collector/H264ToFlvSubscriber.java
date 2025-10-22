@@ -91,6 +91,10 @@ public class H264ToFlvSubscriber extends AbstractInternalSubscriber {
             return;
         }
         final AudioFormatOptions sourceAudioOptions = audioPackage.options();
+        if (sourceAudioOptions == null) {
+            log.warn("Unsupported audio format: {}", audioPackage);
+            return;
+        }
         if (sourceAudioOptions.isPcm()) {
             this.sendAsMp3(timestamp, audioPackage, type);
         } else if (sourceAudioOptions.isAac()) {

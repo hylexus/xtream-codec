@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.ext.jt1078.exception.Jt1078MessageDecodeException;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +101,7 @@ public enum Jt1078PayloadType {
     }
 
     @JsonCreator
-    public static Jt1078PayloadType jsonCreator(Object o) {
+    public static @Nullable Jt1078PayloadType jsonCreator(@Nullable Object o) {
         return switch (o) {
             case Number n -> Jt1078PayloadType.fromByte(n.byteValue()).orElse(null);
             case String s -> {

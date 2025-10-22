@@ -20,11 +20,10 @@ import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.AudioFormatOptions;
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.AudioPackage;
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.Jt1078AudioCodec;
 import io.netty.buffer.ByteBuf;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractJt1078AudioCodec implements Jt1078AudioCodec {
 
-    @Nonnull
     @Override
     public AudioPackage toPcm(AudioPackage source) {
         if (source.isEmpty()) {
@@ -35,8 +34,7 @@ public abstract class AbstractJt1078AudioCodec implements Jt1078AudioCodec {
         return this.doDecodeAsPcm(maybeChanged, source.options());
     }
 
-    @Nonnull
-    protected abstract AudioPackage doDecodeAsPcm(ByteBuf stream, AudioFormatOptions options);
+    protected abstract AudioPackage doDecodeAsPcm(ByteBuf stream, @Nullable AudioFormatOptions options);
 
     @SuppressWarnings("checkstyle:indentation")
     protected ByteBuf beforeAudioConvert(ByteBuf stream) {

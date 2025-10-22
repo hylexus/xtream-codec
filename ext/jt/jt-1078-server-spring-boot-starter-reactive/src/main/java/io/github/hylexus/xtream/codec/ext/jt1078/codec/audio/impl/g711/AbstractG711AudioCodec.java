@@ -22,7 +22,7 @@ import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.AbstractJt1078
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.BuiltinAudioFormatOptions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 当前类是从 <a href="https://gitee.com/mazcpnt/maz-g711/blob/master/maz_cpnt_g711.c">maz_cpnt_g711.c</a> 复制过来修改的。
@@ -35,9 +35,8 @@ public abstract class AbstractG711AudioCodec extends AbstractJt1078AudioCodec {
 
     protected final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
 
-    @Nonnull
     @Override
-    protected AudioPackage doDecodeAsPcm(ByteBuf stream, AudioFormatOptions options) {
+    protected AudioPackage doDecodeAsPcm(ByteBuf stream, @Nullable AudioFormatOptions options) {
         final int readableBytes = stream.readableBytes();
         final int length = readableBytes * 2;
         final ByteBuf buffer = this.allocator.buffer(length, length);

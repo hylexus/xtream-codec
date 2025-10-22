@@ -32,6 +32,7 @@ val errorpronePluginEnabledProjects = setOf(
     "xtream-codec-server-reactive",
     "jt-808-server-spring-boot-starter-reactive",
     "jt-808-server-dashboard-spring-boot-starter-reactive",
+    "jt-1078-server-spring-boot-starter-reactive",
 )
 
 version = xtreamConfig.projectVersion
