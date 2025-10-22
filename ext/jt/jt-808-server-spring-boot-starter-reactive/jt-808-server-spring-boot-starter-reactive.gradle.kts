@@ -16,8 +16,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-json")
     testImplementation("org.springframework.boot:spring-boot-starter-json")
 
-    implementation("jakarta.annotation:jakarta.annotation-api")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-core")
 }

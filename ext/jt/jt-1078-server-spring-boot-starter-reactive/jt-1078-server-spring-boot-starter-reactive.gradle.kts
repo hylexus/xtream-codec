@@ -12,8 +12,6 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-webflux")
     compileOnly("org.springframework.boot:spring-boot-starter-validation")
 
-    implementation("jakarta.annotation:jakarta.annotation-api")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

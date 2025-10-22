@@ -22,6 +22,4 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-validation")
     api("org.springframework.boot:spring-boot-starter-logging")
 
-    implementation("jakarta.annotation:jakarta.annotation-api")
-
 }

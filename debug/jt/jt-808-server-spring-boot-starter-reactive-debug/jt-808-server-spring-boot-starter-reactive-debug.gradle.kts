@@ -27,8 +27,6 @@ dependencies {
     // jt808-server.event-publisher.publisher-type = disruptor
     api("com.lmax:disruptor")
 
-    implementation("jakarta.annotation:jakarta.annotation-api")
-
 }
 
 // ./gradlew clean build -P xtream.frontend.build.jt-808-server-spring-boot-starter-debug-ui.enabled=true

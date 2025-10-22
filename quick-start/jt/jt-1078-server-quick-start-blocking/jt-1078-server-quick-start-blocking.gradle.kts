@@ -22,8 +22,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-websocket")
     api("org.springframework.boot:spring-boot-starter-logging")
-
-    implementation("jakarta.annotation:jakarta.annotation-api")
 }
 
 // ./gradlew clean build -P xtream.frontend.build.jt1078-quickstart-ui.blocking.enabled=true

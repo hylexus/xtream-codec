@@ -21,6 +21,4 @@ dependencies {
     api(project(":ext:jt:jt-808-server-spring-boot-starter-reactive"))
     api("org.springframework.boot:spring-boot-starter-logging")
 
-    implementation("jakarta.annotation:jakarta.annotation-api")
-
 }

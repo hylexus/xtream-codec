@@ -8,7 +8,6 @@ dependencies {
         exclude(module = "jul-to-slf4j")
     }
 
-    implementation("jakarta.annotation:jakarta.annotation-api")
     compileOnly("io.projectreactor:reactor-core-micrometer")
     compileOnly("com.lmax:disruptor")
 

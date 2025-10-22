@@ -25,8 +25,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-logging")
     api("org.springframework.boot:spring-boot-starter-web")
 
-    implementation("jakarta.annotation:jakarta.annotation-api")
-
     // region jdbc
     api("cn.mybatis-mp:mybatis-mp-spring-boot-starter")
     api("cn.mybatis-mp:mybatis-mp-datasource-routing")

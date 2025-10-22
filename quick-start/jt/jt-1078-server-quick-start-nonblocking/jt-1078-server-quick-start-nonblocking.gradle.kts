@@ -20,8 +20,6 @@ dependencies {
     // api(project(":ext:jt:jt-1078-server-spring-boot-starter-reactive"))
     api(project(":ext:jt:jt-1078-server-dashboard-spring-boot-starter-reactive"))
     api("org.springframework.boot:spring-boot-starter-logging")
-
-    implementation("jakarta.annotation:jakarta.annotation-api")
 }
 
 // ./gradlew clean build -P xtream.frontend.build.jt-1078-server-quick-start-ui.enabled=true

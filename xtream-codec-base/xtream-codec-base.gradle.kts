@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    compileOnly("jakarta.annotation:jakarta.annotation-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
     compileOnly("org.springframework.boot:spring-boot-starter-json")
     compileOnly("org.springframework.boot:spring-boot-starter-web")

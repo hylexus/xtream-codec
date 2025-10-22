@@ -16,11 +16,10 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.resources;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.scheduler.NonBlocking;
-import reactor.util.annotation.NonNull;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadFactory;
@@ -43,7 +42,7 @@ public class XtreamReactorThreadFactory implements ThreadFactory,
     private final boolean daemon;
     private final boolean rejectBlocking;
 
-    private final BiConsumer<Thread, Throwable> uncaughtExceptionHandler;
+    private final @Nullable BiConsumer<Thread, Throwable> uncaughtExceptionHandler;
 
     public XtreamReactorThreadFactory(
             String name,
@@ -71,7 +70,7 @@ public class XtreamReactorThreadFactory implements ThreadFactory,
     }
 
     @Override
-    public final Thread newThread(@NonNull Runnable runnable) {
+    public final Thread newThread(Runnable runnable) {
         String newThreadName = name + "-" + counterReference.incrementAndGet();
         Thread t = rejectBlocking
                 ? new NonBlockingThread(runnable, newThreadName)
