@@ -33,6 +33,7 @@ val errorpronePluginEnabledProjects = setOf(
     "jt-808-server-spring-boot-starter-reactive",
     "jt-808-server-dashboard-spring-boot-starter-reactive",
     "jt-1078-server-spring-boot-starter-reactive",
+    "jt-1078-server-dashboard-spring-boot-starter-reactive",
 )
 
 version = xtreamConfig.projectVersion
@@ -79,11 +80,14 @@ configure(subprojects) {
                         "io.github.hylexus.xtream.codec.ext.jt808.builtin.messages",
                         "io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto",
                         "io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.vo",
+                        "io.github.hylexus.xtream.codec.ext.jt1078.dashboard.domain.dto",
+                        "io.github.hylexus.xtream.codec.ext.jt1078.dashboard.domain.vo",
                     ).joinToString(separator = ",")
                 )
                 disable(
                     "MissingSummary",
                     "StringCaseLocaleUsage",
+                    "StringSplitter",
                     "UnnecessaryParentheses",
                     "ImmutableEnumChecker",
                     "DefaultCharset",
