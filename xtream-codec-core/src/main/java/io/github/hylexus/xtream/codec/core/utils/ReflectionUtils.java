@@ -21,9 +21,11 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public final class ReflectionUtils {
     private ReflectionUtils() {
@@ -42,6 +44,16 @@ public final class ReflectionUtils {
             }
         }
         return result;
+    }
+
+    public static <T extends Annotation> T findMergedAnnotationAndSynthesize(AnnotatedElement annotatedElement, Class<T> annotationClass, Supplier<T> callback) {
+        final MergedAnnotations mergedAnnotations = MergedAnnotations.from(annotatedElement);
+        final MergedAnnotation<T> mergedAnnotation = mergedAnnotations.get(annotationClass);
+        if (mergedAnnotation.isPresent()) {
+            return mergedAnnotation.synthesize();
+        }
+
+        return callback.get();
     }
 
 }

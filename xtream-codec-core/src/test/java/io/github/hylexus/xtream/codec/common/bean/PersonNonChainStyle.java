@@ -18,27 +18,127 @@ package io.github.hylexus.xtream.codec.common.bean;
 
 @SuppressWarnings("all")
 class PersonNonChainStyle {
-    private String name;
-    private int age;
+    private String stringField;
 
-    PersonNonChainStyle(String name, int age) {
-        this.name = name;
-        this.age = age;
+    private byte byteField;
+    private Byte byteObjField;
+
+    private short shortField;
+    private Short shortObjField;
+
+    private int intField;
+    private Integer intObjField;
+
+    private long longField;
+    private Long longObjField;
+
+    private float floatField;
+    private Float floatObjField;
+
+    private double doubleField;
+    private Double doubleObjField;
+
+    public String getStringField() {
+        return stringField;
     }
 
-    public String getName() {
-        return name;
+    public void setStringField(String stringField) {
+        this.stringField = stringField;
     }
 
-    public int getAge() {
-        return age;
+    public byte getByteField() {
+        return byteField;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setByteField(byte byteField) {
+        this.byteField = byteField;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public Byte getByteObjField() {
+        return byteObjField;
+    }
+
+    public void setByteObjField(Byte byteObjField) {
+        this.byteObjField = byteObjField;
+    }
+
+    public short getShortField() {
+        return shortField;
+    }
+
+    public void setShortField(short shortField) {
+        this.shortField = shortField;
+    }
+
+    public Short getShortObjField() {
+        return shortObjField;
+    }
+
+    public void setShortObjField(Short shortObjField) {
+        this.shortObjField = shortObjField;
+    }
+
+    public int getIntField() {
+        return intField;
+    }
+
+    public void setIntField(int intField) {
+        this.intField = intField;
+    }
+
+    public Integer getIntObjField() {
+        return intObjField;
+    }
+
+    public void setIntObjField(Integer intObjField) {
+        this.intObjField = intObjField;
+    }
+
+    public long getLongField() {
+        return longField;
+    }
+
+    public void setLongField(long longField) {
+        this.longField = longField;
+    }
+
+    public Long getLongObjField() {
+        return longObjField;
+    }
+
+    public void setLongObjField(Long longObjField) {
+        this.longObjField = longObjField;
+    }
+
+    public float getFloatField() {
+        return floatField;
+    }
+
+    public void setFloatField(float floatField) {
+        this.floatField = floatField;
+    }
+
+    public Float getFloatObjField() {
+        return floatObjField;
+    }
+
+    public void setFloatObjField(Float floatObjField) {
+        this.floatObjField = floatObjField;
+    }
+
+    public double getDoubleField() {
+        return doubleField;
+    }
+
+    public void setDoubleField(double doubleField) {
+        this.doubleField = doubleField;
+    }
+
+    public Double getDoubleObjField() {
+        return doubleObjField;
+    }
+
+    public void setDoubleObjField(Double doubleObjField) {
+        this.doubleObjField = doubleObjField;
     }
 }

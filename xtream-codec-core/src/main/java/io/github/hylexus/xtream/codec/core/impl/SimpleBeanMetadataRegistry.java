@@ -16,9 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl;
 
-import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
-import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.common.bean.FieldLengthExtractor;
+import io.github.hylexus.xtream.codec.common.bean.*;
 import io.github.hylexus.xtream.codec.common.bean.impl.BasicBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.MapBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.NestedBeanPropertyMetadata;
@@ -27,8 +25,10 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
+import io.github.hylexus.xtream.codec.core.utils.ReflectionUtils;
 import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.MergedAnnotations;
@@ -94,21 +94,29 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
 
     public BasicBeanPropertyMetadata createBeanPropertyMetadata(PropertyInfo pi) {
         final BeanUtils.BasicPropertyDescriptor basicPropertyDescriptor = (BeanUtils.BasicPropertyDescriptor) pi.propertyDescriptor();
+
+        final BeanPropertyMetadata.PropertyAccessor propertyAccessor = PropertyAccessorFactory.createPropertyAccessor(pi);
         return new BasicBeanPropertyMetadata(
                 this,
                 basicPropertyDescriptor.getName(),
                 basicPropertyDescriptor.getPropertyType(),
                 pi.version(),
-                pi.xtreamField(), basicPropertyDescriptor.getField(),
+                pi.xtreamField(),
+                basicPropertyDescriptor.getField(),
                 // pd,
-                BeanUtils.createGetter(basicPropertyDescriptor),
-                BeanUtils.createSetter(basicPropertyDescriptor)
+                propertyAccessor.getter(),
+                propertyAccessor.setter()
         );
+    }
+
+    @XtreamEntity(propertyAccessStrategy = PropertyAccessStrategy.AUTO)
+    private static class Placeholder {
     }
 
     public BeanMetadata doGetMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator) {
         // final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> AnnotatedElementUtils.findMergedAnnotation(field, XtreamField.class) != null);
         final BeanUtils.XtreamSimpleBeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> MergedAnnotations.from(field).isPresent(XtreamField.class));
+        final XtreamEntity xtreamEntityAnnotation = ReflectionUtils.findMergedAnnotationAndSynthesize(beanClass, XtreamEntity.class, () -> Placeholder.class.getAnnotation(XtreamEntity.class));
         final ArrayList<BeanPropertyMetadata> pdList = new ArrayList<>();
         final boolean isRecordClass = beanInfo.isRecordClass();
         for (final BeanUtils.BasicPropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
@@ -126,7 +134,7 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
                 continue;
             }
 
-            final BeanPropertyMetadata basicPropertyMetadata = creator.apply(new PropertyInfo(pd, xtreamFieldAnnotation, version));
+            final BeanPropertyMetadata basicPropertyMetadata = creator.apply(new PropertyInfo(xtreamEntityAnnotation, pd, xtreamFieldAnnotation, version));
             if (basicPropertyMetadata.fieldCodec() != FieldCodec.NullFieldCodec.INSTANCE) {
                 // 用户自定义 FieldCodec
                 pdList.add(basicPropertyMetadata);

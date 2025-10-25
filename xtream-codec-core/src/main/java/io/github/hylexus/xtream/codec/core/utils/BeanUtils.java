@@ -334,8 +334,7 @@ public final class BeanUtils {
         }
 
         @Override
-        @Nullable
-        public synchronized Method getReadMethod() {
+        public synchronized @Nullable Method getReadMethod() {
             return this.readMethod;
         }
 
@@ -345,8 +344,7 @@ public final class BeanUtils {
         }
 
         @Override
-        @Nullable
-        public synchronized Method getWriteMethod() {
+        public synchronized @Nullable Method getWriteMethod() {
             return this.writeMethod;
         }
 
@@ -360,8 +358,7 @@ public final class BeanUtils {
             return field.getType();
         }
 
-        @Nullable
-        public RecordComponent getRecordComponent() {
+        public @Nullable RecordComponent getRecordComponent() {
             return this.recordComponent;
         }
 

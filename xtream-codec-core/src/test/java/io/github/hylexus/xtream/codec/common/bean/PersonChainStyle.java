@@ -18,29 +18,140 @@ package io.github.hylexus.xtream.codec.common.bean;
 
 @SuppressWarnings("all")
 class PersonChainStyle {
-    private String name;
-    private int age;
+    private String stringField;
 
-    PersonChainStyle(String name, int age) {
-        this.name = name;
-        this.age = age;
+    private byte byteField;
+    private Byte byteObjField;
+
+    private short shortField;
+    private Short shortObjField;
+
+    private int intField;
+    private Integer intObjField;
+
+    private long longField;
+    private Long longObjField;
+
+    private float floatField;
+    private Float floatObjField;
+
+    private double doubleField;
+    private Double doubleObjField;
+
+    public String getStringField() {
+        return stringField;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public PersonChainStyle setName(String name) {
-        this.name = name;
+    public PersonChainStyle setStringField(String stringField) {
+        this.stringField = stringField;
         return this;
     }
 
-    public PersonChainStyle setAge(int age) {
-        this.age = age;
+    public byte getByteField() {
+        return byteField;
+    }
+
+    public PersonChainStyle setByteField(byte byteField) {
+        this.byteField = byteField;
+        return this;
+    }
+
+    public Byte getByteObjField() {
+        return byteObjField;
+    }
+
+    public PersonChainStyle setByteObjField(Byte byteObjField) {
+        this.byteObjField = byteObjField;
+        return this;
+    }
+
+    public short getShortField() {
+        return shortField;
+    }
+
+    public PersonChainStyle setShortField(short shortField) {
+        this.shortField = shortField;
+        return this;
+    }
+
+    public Short getShortObjField() {
+        return shortObjField;
+    }
+
+    public PersonChainStyle setShortObjField(Short shortObjField) {
+        this.shortObjField = shortObjField;
+        return this;
+    }
+
+    public int getIntField() {
+        return intField;
+    }
+
+    public PersonChainStyle setIntField(int intField) {
+        this.intField = intField;
+        return this;
+    }
+
+    public Integer getIntObjField() {
+        return intObjField;
+    }
+
+    public PersonChainStyle setIntObjField(Integer intObjField) {
+        this.intObjField = intObjField;
+        return this;
+    }
+
+    public long getLongField() {
+        return longField;
+    }
+
+    public PersonChainStyle setLongField(long longField) {
+        this.longField = longField;
+        return this;
+    }
+
+    public Long getLongObjField() {
+        return longObjField;
+    }
+
+    public PersonChainStyle setLongObjField(Long longObjField) {
+        this.longObjField = longObjField;
+        return this;
+    }
+
+    public float getFloatField() {
+        return floatField;
+    }
+
+    public PersonChainStyle setFloatField(float floatField) {
+        this.floatField = floatField;
+        return this;
+    }
+
+    public Float getFloatObjField() {
+        return floatObjField;
+    }
+
+    public PersonChainStyle setFloatObjField(Float floatObjField) {
+        this.floatObjField = floatObjField;
+        return this;
+    }
+
+    public double getDoubleField() {
+        return doubleField;
+    }
+
+    public PersonChainStyle setDoubleField(double doubleField) {
+        this.doubleField = doubleField;
+        return this;
+    }
+
+    public Double getDoubleObjField() {
+        return doubleObjField;
+    }
+
+    public PersonChainStyle setDoubleObjField(Double doubleObjField) {
+        this.doubleObjField = doubleObjField;
         return this;
     }
 }

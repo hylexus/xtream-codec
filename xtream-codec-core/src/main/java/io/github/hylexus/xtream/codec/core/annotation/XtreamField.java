@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.annotation;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.bean.PropertyAccessStrategy;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
@@ -190,6 +191,16 @@ public @interface XtreamField {
      * @since 0.1.0
      */
     CodecStrategy codecStrategy() default CodecStrategy.DEFAULT;
+
+    /**
+     * 当前字段的属性访问策略。
+     * <p>
+     * 可以覆盖 {@link XtreamEntity#propertyAccessStrategy()} 的类级别配置。
+     *
+     * @see XtreamEntity#propertyAccessStrategy()
+     * @since 0.3.0
+     */
+    PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
     /**
      * 仅仅对 {@link Record} 类型有效

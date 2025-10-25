@@ -16,14 +16,14 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
+import java.util.function.*;
 
 /**
  *
@@ -224,28 +224,86 @@ public final class PropertySetters {
 
         static LambdaMetaFactoryMethodNonChainSetter of(Method method) {
             try {
-                final MethodHandles.Lookup lookup = MethodHandles.lookup();
-                final MethodHandle target = lookup.unreflect(method);
+                final MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(method.getDeclaringClass(), MethodHandles.lookup());
+                final MethodHandle rawTarget = lookup.unreflect(method);
+
                 final Class<?> paramType = method.getParameterTypes()[0];
-                final MethodType targetType = target.type()
-                        .changeParameterType(1, paramType);
 
-                final MethodType invokedType = MethodType.methodType(BiConsumer.class);
-                final MethodType interfaceType = MethodType.methodType(void.class, Object.class, Object.class);
+                // 适配基础类型
+                // 下面代码理解起来可能有点费力
+                // 为方便调试 就不重构了
+                if (paramType == byte.class) {
+                    final MethodType invokedType = MethodType.methodType(ObjByteConsumer.class);
+                    final MethodType samMethodType = MethodType.methodType(void.class, Object.class, byte.class);
+                    final MethodType implMethodType = rawTarget.type();
 
-                final CallSite site = LambdaMetafactory.metafactory(
-                        lookup,
-                        "accept",
-                        invokedType,
-                        interfaceType,
-                        target,
-                        targetType
-                );
+                    final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
 
-                @SuppressWarnings("unchecked") final BiConsumer<Object, Object> setter = (BiConsumer<Object, Object>) site.getTarget().invoke();
-                return new LambdaMetaFactoryMethodNonChainSetter(setter);
+                    @SuppressWarnings("unchecked") final ObjByteConsumer<Object> oc = (ObjByteConsumer<@NonNull Object>) cs.getTarget().invoke();
+                    final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).byteValue());
+                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                } else if (paramType == short.class) {
+                    final MethodType invokedType = MethodType.methodType(ObjShortConsumer.class);
+                    final MethodType samMethodType = MethodType.methodType(void.class, Object.class, short.class);
+                    final MethodType implMethodType = rawTarget.type();
+
+                    final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
+
+                    @SuppressWarnings("unchecked") final ObjShortConsumer<Object> oc = (ObjShortConsumer<@NonNull Object>) cs.getTarget().invoke();
+                    final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).shortValue());
+                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                } else if (paramType == int.class) {
+                    final MethodType invokedType = MethodType.methodType(ObjIntConsumer.class);
+                    final MethodType samMethodType = MethodType.methodType(void.class, Object.class, int.class);
+                    final MethodType implMethodType = rawTarget.type();
+
+                    final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
+                    @SuppressWarnings("unchecked") final ObjIntConsumer<Object> oc = (ObjIntConsumer<Object>) cs.getTarget().invoke();
+                    final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).intValue());
+                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                } else if (paramType == long.class) {
+                    final MethodType invokedType = MethodType.methodType(ObjLongConsumer.class);
+                    final MethodType samMethodType = MethodType.methodType(void.class, Object.class, long.class);
+                    final MethodType implMethodType = rawTarget.type();
+
+                    final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
+
+                    @SuppressWarnings("unchecked") final ObjLongConsumer<Object> oc = (ObjLongConsumer<Object>) cs.getTarget().invoke();
+                    final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).longValue());
+                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                } else if (paramType == float.class) {
+                    final MethodType invokedType = MethodType.methodType(ObjFloatConsumer.class);
+                    final MethodType samMethodType = MethodType.methodType(void.class, Object.class, float.class);
+                    final MethodType implMethodType = rawTarget.type();
+
+                    final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
+
+                    @SuppressWarnings("unchecked") final ObjFloatConsumer<Object> oc = (ObjFloatConsumer<@NonNull Object>) cs.getTarget().invoke();
+                    final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).floatValue());
+                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                } else if (paramType == double.class) {
+                    final MethodType invokedType = MethodType.methodType(ObjDoubleConsumer.class);
+                    final MethodType samMethodType = MethodType.methodType(void.class, Object.class, double.class);
+                    final MethodType implMethodType = rawTarget.type();
+
+                    final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
+
+                    @SuppressWarnings("unchecked") final ObjDoubleConsumer<Object> oc = (ObjDoubleConsumer<Object>) cs.getTarget().invoke();
+                    final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).doubleValue());
+                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                } else {
+                    // 引用类型（包括 包装类型）
+                    final MethodType invokedType = MethodType.methodType(BiConsumer.class);
+                    final MethodType samMethodType = MethodType.methodType(void.class, Object.class, Object.class);
+                    final MethodType implMethodType = rawTarget.type();
+
+                    final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
+
+                    @SuppressWarnings("unchecked") final BiConsumer<Object, Object> bc = (BiConsumer<Object, Object>) cs.getTarget().invoke();
+                    return new LambdaMetaFactoryMethodNonChainSetter(bc);
+                }
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("无法创建 LambdaMetaFactory setter (non-chain): " + method, e);
             }
         }
 
@@ -260,32 +318,76 @@ public final class PropertySetters {
 
         static LambdaMetaFactoryMethodChainSetter of(Method method) {
             try {
-                final MethodHandles.Lookup lookup = MethodHandles.lookup();
+                final MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(method.getDeclaringClass(), MethodHandles.lookup());
                 final MethodHandle target = lookup.unreflect(method);
 
+                final Class<?> declaringClass = method.getDeclaringClass();
                 final Class<?> paramType = method.getParameterTypes()[0];
                 final Class<?> returnType = method.getReturnType();
 
-                final MethodType targetType = target.type()
-                        .changeParameterType(1, paramType)
-                        .changeReturnType(returnType);
+                // implMethodType = (declaringClass, paramType) -> returnType
+                final MethodType implMethodType = MethodType.methodType(returnType, declaringClass, paramType);
 
-                final MethodType invokedType = MethodType.methodType(BiFunction.class);
-                final MethodType interfaceMethodType = MethodType.methodType(Object.class, Object.class, Object.class);
+                final MethodType invokedType;
+                final MethodType samMethodType;
+
+                // 根据参数类型决定函数式接口
+                if (paramType == byte.class) {
+                    invokedType = MethodType.methodType(ObjByteFunction.class);
+                    samMethodType = MethodType.methodType(Object.class, Object.class, byte.class);
+                } else if (paramType == short.class) {
+                    invokedType = MethodType.methodType(ObjShortFunction.class);
+                    samMethodType = MethodType.methodType(Object.class, Object.class, short.class);
+                } else if (paramType == int.class) {
+                    invokedType = MethodType.methodType(ObjIntFunction.class);
+                    samMethodType = MethodType.methodType(Object.class, Object.class, int.class);
+                } else if (paramType == long.class) {
+                    invokedType = MethodType.methodType(ObjLongFunction.class);
+                    samMethodType = MethodType.methodType(Object.class, Object.class, long.class);
+                } else if (paramType == float.class) {
+                    invokedType = MethodType.methodType(ObjFloatFunction.class);
+                    samMethodType = MethodType.methodType(Object.class, Object.class, float.class);
+                } else if (paramType == double.class) {
+                    invokedType = MethodType.methodType(ObjDoubleFunction.class);
+                    samMethodType = MethodType.methodType(Object.class, Object.class, double.class);
+                } else {
+                    // Object类型，正常 BiFunction
+                    invokedType = MethodType.methodType(BiFunction.class);
+                    samMethodType = MethodType.methodType(Object.class, Object.class, Object.class);
+                }
 
                 final CallSite site = LambdaMetafactory.metafactory(
                         lookup,
                         "apply",
                         invokedType,
-                        interfaceMethodType,
+                        samMethodType,
                         target,
-                        targetType
+                        implMethodType
                 );
 
-                @SuppressWarnings("unchecked") final BiFunction<Object, Object, Object> setter = (BiFunction<Object, Object, Object>) site.getTarget().invoke();
-                return new LambdaMetaFactoryMethodChainSetter(setter);
+                final Object fn = site.getTarget().invoke();
+
+                // 用统一包装器包装成 BiFunction<Object,Object,Object>
+                @SuppressWarnings("unchecked") final BiFunction<Object, Object, Object> unified = (instance, value) -> {
+                    try {
+                        return switch (fn) {
+                            case BiFunction<?, ?, ?> f -> ((BiFunction<Object, Object, Object>) f).apply(instance, value);
+                            case ObjByteFunction<?, ?> f -> ((ObjByteFunction<@NonNull Object, @NonNull Object>) f).apply(instance, ((Number) value).byteValue());
+                            case ObjShortFunction<?, ?> f -> ((ObjShortFunction<@NonNull Object, @NonNull Object>) f).apply(instance, ((Number) value).shortValue());
+                            case ObjIntFunction<?, ?> f -> ((ObjIntFunction<@NonNull Object, @NonNull Object>) f).apply(instance, ((Number) value).intValue());
+                            case ObjLongFunction<?, ?> f -> ((ObjLongFunction<@NonNull Object, @NonNull Object>) f).apply(instance, ((Number) value).longValue());
+                            case ObjFloatFunction<?, ?> f -> ((ObjFloatFunction<@NonNull Object, @NonNull Object>) f).apply(instance, ((Number) value).floatValue());
+                            case ObjDoubleFunction<?, ?> f -> ((ObjDoubleFunction<@NonNull Object, @NonNull Object>) f).apply(instance, ((Number) value).doubleValue());
+                            case null, default -> throw new IllegalStateException("Unexpected lambda type: " + fn);
+                        };
+                    } catch (Throwable e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+
+                return new LambdaMetaFactoryMethodChainSetter(unified);
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("无法创建 LambdaMetaFactory setter(chain): " + method, e);
             }
         }
 
@@ -295,6 +397,64 @@ public final class PropertySetters {
             this.setter.apply(instance, value);
         }
 
+    }
+
+    /* ========================================================================
+     * =============== 5. Record 类型没有 Setter，这里用作占位符 ===================
+     * ======================================================================== */
+    public enum RecordReadOnlyPropertySetter implements BeanPropertyMetadata.PropertySetter {
+        INSTANCE;
+
+        @Override
+        public void setProperty(BeanPropertyMetadata metadata, Object instance, @Nullable Object value) {
+            throw new UnsupportedOperationException("Record property is read-only: " + metadata);
+        }
+
+    }
+
+    @FunctionalInterface
+    public interface ObjByteFunction<T, R> {
+        R apply(T t, byte value);
+    }
+
+    @FunctionalInterface
+    public interface ObjShortFunction<T, R> {
+        R apply(T t, short value);
+    }
+
+    @FunctionalInterface
+    public interface ObjIntFunction<T, R> {
+        R apply(T t, int value);
+    }
+
+    @FunctionalInterface
+    public interface ObjLongFunction<T, R> {
+        R apply(T t, long value);
+    }
+
+    @FunctionalInterface
+    public interface ObjFloatFunction<T, R> {
+        R apply(T t, float value);
+    }
+
+    @FunctionalInterface
+    public interface ObjDoubleFunction<T, R> {
+        R apply(T t, double value);
+    }
+
+    @FunctionalInterface
+    public interface ObjByteConsumer<T> {
+        void accept(T t, byte value);
+    }
+
+    @FunctionalInterface
+    public interface ObjShortConsumer<T> {
+        void accept(T t, short value);
+    }
+
+    @FunctionalInterface
+    public interface ObjFloatConsumer<T> {
+        void accept(T t, float value);
     }
 
 }

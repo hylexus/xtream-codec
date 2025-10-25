@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import org.jspecify.annotations.Nullable;
@@ -27,7 +28,10 @@ import java.util.function.Function;
 
 public interface BeanMetadataRegistry {
 
-    record PropertyInfo(PropertyDescriptor propertyDescriptor, XtreamField xtreamField, int version) {
+    record PropertyInfo(XtreamEntity xtreamEntity, PropertyDescriptor propertyDescriptor, XtreamField xtreamField, int version) {
+        @SuppressWarnings("redundent")
+        public PropertyInfo {
+        }
     }
 
     default BeanMetadata getBeanMetadata(Class<?> beanClass) {

@@ -102,6 +102,7 @@ configure(subprojects) {
             if (name.lowercase(Locale.getDefault()).contains("test")) {
                 options.errorprone {
                     disable("NullAway")
+                    disable("IntLiteralCast")
                 }
             }
         }

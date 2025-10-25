@@ -168,4 +168,10 @@ public interface BeanPropertyMetadata {
         @Nullable Object getProperty(BeanPropertyMetadata metadata, Object instance);
     }
 
+    record PropertyAccessor(
+            PropertyGetter getter,
+            PropertySetter setter
+    ) {
+    }
+
 }

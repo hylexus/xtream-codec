@@ -54,7 +54,7 @@ public class PropertySetterBenchmark {
     BeanPropertyMetadata.PropertySetter forFieldViaVarHandleInstance;
     BeanPropertyMetadata beanPropertyMetadata = null;
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Trial)
     public void setup() throws Exception {
         beanInstance = new Person(null, 100000);
         final Method setName = Person.class.getMethod("setName", String.class);
