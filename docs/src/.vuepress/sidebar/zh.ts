@@ -198,8 +198,7 @@ export const zhSidebar = sidebar({
     ],
     "/release-notes": [
         {text: 'Latest', link: '/release-notes/latest.md', icon: 'code-branch'},
-        {text: 'v-0.2.x(Latest)', link: '/release-notes/0.2.x.md', icon: 'code-branch'},
-        '/release-notes/0.1.x.md',
+        '/release-notes/0.1.x-latest.md',
         '/release-notes/0.0.x.md',
     ],
 });

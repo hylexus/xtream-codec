@@ -21,4 +21,6 @@ rm -rf /tmp/xtream-codec/temp-bom
 -P xtream.maven.publications.signing=on \
 -P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true \
 -P xtream.backend.build.checkstyle.enabled=true \
+-P xtream.backend.build.errorprone.enabled=true \
+-P xtream.backend.build.license-checker.enabled=true \
 -P xtream.backend.build.debug-module-fatjar.enabled=false

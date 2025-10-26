@@ -15,4 +15,6 @@ echo "Working-Directory        : ${XTREAM_PROJECT_ROOT_DIR}"
 -P xtream.maven.repo.private.enabled=true \
 -P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true \
 -P xtream.backend.build.checkstyle.enabled=true \
+-P xtream.backend.build.errorprone.enabled=true \
+-P xtream.backend.build.license-checker.enabled=true \
 -P xtream.backend.build.debug-module-fatjar.enabled=false

@@ -7,6 +7,10 @@
 </p>
 
 <p align="center">
+    <a href="https://deepwiki.com/hylexus/xtream-codec">
+        <img alt="deepwiki" src="https://deepwiki.com/badge.svg"/>
+    </a>
+    <br/>
     <a href="https://www.apache.org/licenses/LICENSE-2.0">
         <img alt="license" src="https://img.shields.io/badge/License-Apache2-blue" />
     </a>
@@ -121,6 +125,7 @@
 
 - 国内站点: https://iotplanet.top/xtream-codec/
 - Github: https://hylexus.github.io/xtream-codec/
+- DeepWiki(**AI** 生成): https://deepwiki.com/hylexus/xtream-codec/
 
 ## QuickStart
 
