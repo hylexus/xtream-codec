@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://deepwiki.com/hylexus/xtream-codec">
-        <img alt="deepwiki" src="https://deepwiki.com/badge.svg"/>
+        <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
     </a>
     <br/>
     <a href="https://www.apache.org/licenses/LICENSE-2.0">
@@ -129,6 +129,7 @@
 
 ## QuickStart
 
+- **Maven** 版示例: [https://github.com/iotplanet/jt-808-quick-start](https://github.com/iotplanet/jt-808-quick-start)
 - 带存储的 **JT/T 808** 服务示例
     - 非阻塞版 [jt-808-server-quick-start-with-storage-nonblocking](quick-start/jt/jt-808-server-quick-start-with-storage-nonblocking/README.md)
     - 阻塞版 [jt-808-server-quick-start-with-storage-blocking](quick-start/jt/jt-808-server-quick-start-with-storage-blocking/README.md)
