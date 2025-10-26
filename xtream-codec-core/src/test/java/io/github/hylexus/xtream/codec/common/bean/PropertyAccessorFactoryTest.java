@@ -137,7 +137,7 @@ class PropertyAccessorFactoryTest {
         final PropertyAccessor accessor = PropertyAccessorFactory.createPropertyAccessor(PropertyAccessStrategy.AUTO, descriptor);
 
         assertInstanceOf(PropertyGetters.LambdaMetaFactoryMethodPropertyGetter.class, accessor.getter());
-        assertInstanceOf(PropertySetters.LambdaMetaFactoryMethodChainSetter.class, accessor.setter());
+        assertInstanceOf(PropertySetters.LambdaMetaFactoryMethodPropertyChainSetter.class, accessor.setter());
 
         final TestEntity1 user = new TestEntity1();
         accessor.setter().setProperty(beanPropertyMetadata, user, "Tom");
@@ -208,7 +208,7 @@ class PropertyAccessorFactoryTest {
         final PropertyAccessor accessor = PropertyAccessorFactory.createPropertyAccessor(PropertyAccessStrategy.LAMBDA_META_FACTORY, descriptor);
 
         assertInstanceOf(PropertyGetters.LambdaMetaFactoryMethodPropertyGetter.class, accessor.getter());
-        assertInstanceOf(PropertySetters.LambdaMetaFactoryMethodChainSetter.class, accessor.setter());
+        assertInstanceOf(PropertySetters.LambdaMetaFactoryMethodPropertyChainSetter.class, accessor.setter());
 
         final TestEntity1 user = new TestEntity1();
         accessor.setter().setProperty(beanPropertyMetadata, user, "Alice");
@@ -221,7 +221,7 @@ class PropertyAccessorFactoryTest {
         final PropertyAccessor accessor = PropertyAccessorFactory.createPropertyAccessor(PropertyAccessStrategy.LAMBDA_META_FACTORY, descriptor);
 
         assertInstanceOf(PropertyGetters.LambdaMetaFactoryMethodPropertyGetter.class, accessor.getter());
-        assertInstanceOf(PropertySetters.LambdaMetaFactoryMethodChainSetter.class, accessor.setter());
+        assertInstanceOf(PropertySetters.LambdaMetaFactoryMethodPropertyChainSetter.class, accessor.setter());
 
         final TestEntity1 user = new TestEntity1();
         accessor.setter().setProperty(beanPropertyMetadata, user, 1111);

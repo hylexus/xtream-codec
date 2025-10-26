@@ -16,7 +16,10 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.controller;
 
+import io.github.hylexus.xtream.codec.base.web.domain.dto.PageableDto;
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpException;
+import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
+import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.DecodeMessageDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.EncodeMessageDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.values.SimpleTypes;
@@ -36,9 +39,11 @@ import java.util.Objects;
 public class BuiltinJt808DashboardCodecController {
 
     private final Jt808DashboardCodecService codecService;
+    private final BeanMetadataRegistry beanMetadataRegistry;
 
-    public BuiltinJt808DashboardCodecController(Jt808DashboardCodecService codecService) {
+    public BuiltinJt808DashboardCodecController(Jt808DashboardCodecService codecService, BeanMetadataRegistry beanMetadataRegistry) {
         this.codecService = codecService;
+        this.beanMetadataRegistry = beanMetadataRegistry;
     }
 
     @GetMapping("/codec-options")
@@ -50,6 +55,14 @@ public class BuiltinJt808DashboardCodecController {
     public List<Jt808MessageDescriber.Tracker> encode(@Validated @RequestBody EncodeMessageDto dto) {
         dto.setTerminalId(this.convertTerminalId(dto.getTerminalId(), dto.getVersion()));
         return this.codecService.encodeWithTracker(dto);
+    }
+
+    @GetMapping("/bean-metadata")
+    public List<BeanDescriptor> beanMetadata(@Validated PageableDto dto) {
+        return this.beanMetadataRegistry.beanDescriptors()
+                .skip((dto.getOffset()))
+                .limit(dto.getPageSize())
+                .toList();
     }
 
     private String convertTerminalId(String original, Jt808ProtocolVersion version) {

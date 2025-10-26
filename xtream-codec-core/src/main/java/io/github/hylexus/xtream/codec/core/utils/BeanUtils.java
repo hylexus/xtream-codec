@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.utils;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.bean.PropertyAccessStrategy;
 import io.github.hylexus.xtream.codec.common.bean.PropertyGetters;
 import io.github.hylexus.xtream.codec.common.bean.PropertySetters;
 import io.github.hylexus.xtream.codec.common.exception.BeanIntrospectionException;
@@ -24,8 +25,11 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntityCreator;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -38,6 +42,7 @@ public final class BeanUtils {
     public static final BasicPropertyDescriptor[] EMPTY_ARRAY = {};
 
     private static final Map<Class<?>, XtreamSimpleBeanInfo> CACHE = new HashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(BeanUtils.class);
 
     public static class XtreamSimpleBeanInfo extends SimpleBeanInfo {
         private final Class<?> beanClass;
@@ -185,6 +190,10 @@ public final class BeanUtils {
         return pdMap.values().toArray(EMPTY_ARRAY);
     }
 
+    /**
+     * @deprecated Use {@link io.github.hylexus.xtream.codec.common.bean.PropertyAccessorFactory#createPropertyAccessor(PropertyAccessStrategy, BasicPropertyDescriptor)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.3.0")
     public static BeanPropertyMetadata.PropertySetter createSetter(BeanUtils.BasicPropertyDescriptor pd) {
         if (pd.getWriteMethod() != null) {
             // return new MethodPropertySetter(pd.getWriteMethod());
@@ -194,6 +203,10 @@ public final class BeanUtils {
         return PropertySetters.forFieldViaReflection(pd.getField());
     }
 
+    /**
+     * @deprecated Use {@link io.github.hylexus.xtream.codec.common.bean.PropertyAccessorFactory#createPropertyAccessor(PropertyAccessStrategy, BasicPropertyDescriptor)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.3.0")
     public static BeanPropertyMetadata.PropertyGetter createGetter(BeanUtils.BasicPropertyDescriptor pd) {
         if (pd.getReadMethod() != null) {
             // return new MethodPropertyGetter(pd.getReadMethod());
@@ -204,17 +217,33 @@ public final class BeanUtils {
     }
 
     public static Constructor<?> getConstructor(BeanInfo beanInfo) {
-        try {
-            final Class<?> beanClass = beanInfo.getBeanDescriptor().getBeanClass();
-            if (beanClass.isRecord()) {
-                return XtreamRecordUtils.findCanonicalRecordConstructor(beanClass);
+        final Class<?> beanClass = beanInfo.getBeanDescriptor().getBeanClass();
+        if (beanClass.isRecord()) {
+            return XtreamRecordUtils.findCanonicalRecordConstructor(beanClass);
+        }
+        final Constructor<?>[] constructors = beanClass.getConstructors();
+        if (constructors.length == 0) {
+            throw new BeanIntrospectionException("No constructor found for " + beanClass.getName());
+        } else if (constructors.length == 1) {
+            final Constructor<?> result = constructors[0];
+            result.setAccessible(true);
+            return result;
+        } else {
+            final Constructor<?> correspondingConstructor = io.github.hylexus.xtream.codec.core.utils.ReflectionUtils.findCorrespondingConstructor(beanClass, XtreamEntityCreator.class);
+            if (correspondingConstructor != null) {
+                correspondingConstructor.setAccessible(true);
+                return correspondingConstructor;
             }
-
-            final Constructor<?> constructor = beanClass.getConstructor();
+            log.warn("Multiple constructors found for {}", beanClass.getName());
+            final Constructor<?> constructor = Arrays.stream(constructors)
+                    .filter(it -> it.getParameterCount() == 0)
+                    .findFirst()
+                    .orElseGet(() -> {
+                        log.error("No default constructor found for {}", beanClass.getName());
+                        return constructors[0];
+                    });
             constructor.setAccessible(true);
             return constructor;
-        } catch (NoSuchMethodException e) {
-            throw new BeanIntrospectionException(e);
         }
     }
 

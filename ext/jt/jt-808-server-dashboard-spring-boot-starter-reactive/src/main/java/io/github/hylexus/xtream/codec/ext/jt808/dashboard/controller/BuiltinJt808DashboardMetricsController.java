@@ -20,8 +20,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.dashboard.service.Jt808Dashboard
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.service.Jt808DashboardMetricsServiceWithMicroMeter;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +37,11 @@ public class BuiltinJt808DashboardMetricsController {
     // private static final Logger log = LoggerFactory.getLogger(BuiltinJt808DashboardMetricsController.class);
 
     private final Jt808DashboardMetricsService jt808DashboardMetricsService;
-    private final Jt808DashboardMetricsServiceWithMicroMeter jt808DashboardMetricsServiceWithMicroMeter;
+    private final @Nullable Jt808DashboardMetricsServiceWithMicroMeter jt808DashboardMetricsServiceWithMicroMeter;
 
-    public BuiltinJt808DashboardMetricsController(Jt808DashboardMetricsService jt808DashboardMetricsService, Jt808DashboardMetricsServiceWithMicroMeter jt808DashboardMetricsServiceWithMicroMeter) {
+    public BuiltinJt808DashboardMetricsController(
+            Jt808DashboardMetricsService jt808DashboardMetricsService,
+            @Nullable Jt808DashboardMetricsServiceWithMicroMeter jt808DashboardMetricsServiceWithMicroMeter) {
         this.jt808DashboardMetricsService = jt808DashboardMetricsService;
         this.jt808DashboardMetricsServiceWithMicroMeter = jt808DashboardMetricsServiceWithMicroMeter;
     }

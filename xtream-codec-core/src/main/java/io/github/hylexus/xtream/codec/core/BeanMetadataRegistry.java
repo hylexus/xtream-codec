@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core;
 
+import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
@@ -25,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.beans.PropertyDescriptor;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public interface BeanMetadataRegistry {
 
@@ -59,5 +61,12 @@ public interface BeanMetadataRegistry {
         return this.getFieldCodecRegistry()
                 .getOrCreateFieldCodec(version, this, targetType, codecClass, charset, targetEntityClass);
     }
+
+    /**
+     * 当前注册器中已经注册的 Bean 的描述信息
+     *
+     * @since 0.3.0
+     */
+    Stream<BeanDescriptor> beanDescriptors();
 
 }

@@ -17,11 +17,13 @@
 package io.github.hylexus.xtream.codec.core.utils;
 
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,45 @@ public final class ReflectionUtils {
         }
 
         return callback.get();
+    }
+
+    /**
+     * 在指定类及其父类中查找带有指定注解的构造函数，
+     * 并返回在目标类（clazz）中“参数类型相同”的构造函数。
+     *
+     * @return 对应的子类构造函数，若无匹配则返回 null
+     */
+    public static @Nullable Constructor<?> findCorrespondingConstructor(
+            Class<?> clazz,
+            Class<? extends Annotation> annotationType) {
+
+        Class<?> targetClass = clazz;
+
+        // 从当前类向上查找，找到第一个带有注解的构造函数
+        while (targetClass != null && !targetClass.equals(Object.class)) {
+            for (Constructor<?> constructor : targetClass.getDeclaredConstructors()) {
+                if (constructor.isAnnotationPresent(annotationType)) {
+                    // 找到了带注解的构造函数
+                    // 查找子类中参数类型相同的构造函数
+                    final Class<?>[] paramTypes = constructor.getParameterTypes();
+                    return findConstructorInClass(clazz, paramTypes);
+                }
+            }
+            targetClass = targetClass.getSuperclass();
+        }
+
+        return null;
+    }
+
+    /**
+     * 在指定类中查找参数类型完全匹配的构造函数
+     */
+    private static @Nullable Constructor<?> findConstructorInClass(Class<?> clazz, Class<?>[] paramTypes) {
+        try {
+            return clazz.getDeclaredConstructor(paramTypes);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
     }
 
 }

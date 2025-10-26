@@ -136,6 +136,8 @@ configure(subprojects) {
             dependency("io.minio:minio:8.5.14")
             dependency("com.lmax:disruptor:4.0.0")
             dependency("org.jspecify:jspecify:1.0.0")
+            dependency("org.jetbrains:annotations:26.0.2")
+
             xtreamConfig.thirdpartyDependencies().forEach {
                 dependency(it.toIdentifier())
             }
@@ -154,6 +156,7 @@ configure(subprojects) {
         testImplementation("org.junit.jupiter:junit-jupiter")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         api("org.jspecify:jspecify")
+        api("org.jetbrains:annotations")
         if (project.errorPronePluginEnabled()) {
             val errorprone = configurations.getByName("errorprone")
             errorprone("com.uber.nullaway:nullaway:0.12.10")

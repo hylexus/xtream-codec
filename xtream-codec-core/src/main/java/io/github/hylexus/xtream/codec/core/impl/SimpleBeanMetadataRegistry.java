@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author hylexus
@@ -56,6 +57,17 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     @Override
     public FieldCodecRegistry getFieldCodecRegistry() {
         return fieldCodecRegistry;
+    }
+
+    @Override
+    public Stream<BeanDescriptor> beanDescriptors() {
+        return this.multiVersionCache.values()
+                .stream()
+                .flatMap(it -> {
+                    // ...
+                    return it.values().stream().map(BeanDescriptor::of);
+                })
+                .sorted(Comparator.comparing(BeanDescriptor::getRawType));
     }
 
     @Override

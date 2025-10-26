@@ -186,13 +186,13 @@ public final class PropertySetters {
 
     public sealed interface LambdaMetaFactoryMethodPropertySetter
             extends BeanPropertyMetadata.PropertySetter
-            permits LambdaMetaFactoryMethodNonChainSetter, LambdaMetaFactoryMethodChainSetter {
+            permits LambdaMetaFactoryMethodPropertydNonChainSetter, LambdaMetaFactoryMethodPropertyChainSetter {
 
         static LambdaMetaFactoryMethodPropertySetter of(Method method) {
             if (method.getReturnType() == void.class) {
-                return LambdaMetaFactoryMethodNonChainSetter.of(method);
+                return LambdaMetaFactoryMethodPropertydNonChainSetter.of(method);
             }
-            return LambdaMetaFactoryMethodChainSetter.of(method);
+            return LambdaMetaFactoryMethodPropertyChainSetter.of(method);
         }
     }
 
@@ -219,10 +219,10 @@ public final class PropertySetters {
     }
 
     // ====================== 普通 setter =========================
-    record LambdaMetaFactoryMethodNonChainSetter(BiConsumer<Object, @Nullable Object> setter)
+    record LambdaMetaFactoryMethodPropertydNonChainSetter(BiConsumer<Object, @Nullable Object> setter)
             implements LambdaMetaFactoryMethodPropertySetter {
 
-        static LambdaMetaFactoryMethodNonChainSetter of(Method method) {
+        static LambdaMetaFactoryMethodPropertydNonChainSetter of(Method method) {
             try {
                 final MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(method.getDeclaringClass(), MethodHandles.lookup());
                 final MethodHandle rawTarget = lookup.unreflect(method);
@@ -241,7 +241,7 @@ public final class PropertySetters {
 
                     @SuppressWarnings("unchecked") final ObjByteConsumer<Object> oc = (ObjByteConsumer<@NonNull Object>) cs.getTarget().invoke();
                     final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).byteValue());
-                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                    return new LambdaMetaFactoryMethodPropertydNonChainSetter(unified);
                 } else if (paramType == short.class) {
                     final MethodType invokedType = MethodType.methodType(ObjShortConsumer.class);
                     final MethodType samMethodType = MethodType.methodType(void.class, Object.class, short.class);
@@ -251,7 +251,7 @@ public final class PropertySetters {
 
                     @SuppressWarnings("unchecked") final ObjShortConsumer<Object> oc = (ObjShortConsumer<@NonNull Object>) cs.getTarget().invoke();
                     final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).shortValue());
-                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                    return new LambdaMetaFactoryMethodPropertydNonChainSetter(unified);
                 } else if (paramType == int.class) {
                     final MethodType invokedType = MethodType.methodType(ObjIntConsumer.class);
                     final MethodType samMethodType = MethodType.methodType(void.class, Object.class, int.class);
@@ -260,7 +260,7 @@ public final class PropertySetters {
                     final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
                     @SuppressWarnings("unchecked") final ObjIntConsumer<Object> oc = (ObjIntConsumer<Object>) cs.getTarget().invoke();
                     final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).intValue());
-                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                    return new LambdaMetaFactoryMethodPropertydNonChainSetter(unified);
                 } else if (paramType == long.class) {
                     final MethodType invokedType = MethodType.methodType(ObjLongConsumer.class);
                     final MethodType samMethodType = MethodType.methodType(void.class, Object.class, long.class);
@@ -270,7 +270,7 @@ public final class PropertySetters {
 
                     @SuppressWarnings("unchecked") final ObjLongConsumer<Object> oc = (ObjLongConsumer<Object>) cs.getTarget().invoke();
                     final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).longValue());
-                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                    return new LambdaMetaFactoryMethodPropertydNonChainSetter(unified);
                 } else if (paramType == float.class) {
                     final MethodType invokedType = MethodType.methodType(ObjFloatConsumer.class);
                     final MethodType samMethodType = MethodType.methodType(void.class, Object.class, float.class);
@@ -280,7 +280,7 @@ public final class PropertySetters {
 
                     @SuppressWarnings("unchecked") final ObjFloatConsumer<Object> oc = (ObjFloatConsumer<@NonNull Object>) cs.getTarget().invoke();
                     final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).floatValue());
-                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                    return new LambdaMetaFactoryMethodPropertydNonChainSetter(unified);
                 } else if (paramType == double.class) {
                     final MethodType invokedType = MethodType.methodType(ObjDoubleConsumer.class);
                     final MethodType samMethodType = MethodType.methodType(void.class, Object.class, double.class);
@@ -290,7 +290,7 @@ public final class PropertySetters {
 
                     @SuppressWarnings("unchecked") final ObjDoubleConsumer<Object> oc = (ObjDoubleConsumer<Object>) cs.getTarget().invoke();
                     final BiConsumer<Object, Object> unified = (instance, value) -> oc.accept(instance, ((Number) value).doubleValue());
-                    return new LambdaMetaFactoryMethodNonChainSetter(unified);
+                    return new LambdaMetaFactoryMethodPropertydNonChainSetter(unified);
                 } else {
                     // 引用类型（包括 包装类型）
                     final MethodType invokedType = MethodType.methodType(BiConsumer.class);
@@ -300,7 +300,7 @@ public final class PropertySetters {
                     final CallSite cs = LambdaMetafactory.metafactory(lookup, "accept", invokedType, samMethodType, rawTarget, implMethodType);
 
                     @SuppressWarnings("unchecked") final BiConsumer<Object, Object> bc = (BiConsumer<Object, Object>) cs.getTarget().invoke();
-                    return new LambdaMetaFactoryMethodNonChainSetter(bc);
+                    return new LambdaMetaFactoryMethodPropertydNonChainSetter(bc);
                 }
             } catch (Throwable e) {
                 throw new RuntimeException("无法创建 LambdaMetaFactory setter (non-chain): " + method, e);
@@ -314,9 +314,9 @@ public final class PropertySetters {
     }
 
     // ====================== 链式 setter =========================
-    record LambdaMetaFactoryMethodChainSetter(BiFunction<Object, @Nullable Object, Object> setter) implements LambdaMetaFactoryMethodPropertySetter {
+    record LambdaMetaFactoryMethodPropertyChainSetter(BiFunction<Object, @Nullable Object, Object> setter) implements LambdaMetaFactoryMethodPropertySetter {
 
-        static LambdaMetaFactoryMethodChainSetter of(Method method) {
+        static LambdaMetaFactoryMethodPropertyChainSetter of(Method method) {
             try {
                 final MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(method.getDeclaringClass(), MethodHandles.lookup());
                 final MethodHandle target = lookup.unreflect(method);
@@ -385,7 +385,7 @@ public final class PropertySetters {
                     }
                 };
 
-                return new LambdaMetaFactoryMethodChainSetter(unified);
+                return new LambdaMetaFactoryMethodPropertyChainSetter(unified);
             } catch (Throwable e) {
                 throw new RuntimeException("无法创建 LambdaMetaFactory setter(chain): " + method, e);
             }
