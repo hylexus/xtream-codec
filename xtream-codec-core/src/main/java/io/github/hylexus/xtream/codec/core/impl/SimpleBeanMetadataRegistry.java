@@ -67,7 +67,7 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
                     // ...
                     return it.values().stream().map(BeanDescriptor::of);
                 })
-                .sorted(Comparator.comparing(BeanDescriptor::getRawType));
+                .sorted(Comparator.comparing(BeanDescriptor::rawClass));
     }
 
     @Override

@@ -30,7 +30,12 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.util.Objects;
 
-public interface FieldLengthExtractor {
+public sealed interface FieldLengthExtractor
+        permits FieldLengthExtractor.ConstantFieldLengthExtractor,
+        FieldLengthExtractor.PrependFieldLengthExtractor,
+        FieldLengthExtractor.ExpressionFieldLengthExtractor,
+        FieldLengthExtractor.PlaceholderFieldLengthExtractor,
+        FieldLengthExtractor.CustomFieldLengthExtractor {
 
     int extractFieldLength(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext, ByteBuf input);
 
@@ -38,14 +43,7 @@ public interface FieldLengthExtractor {
         return this.extractFieldLength(context, evaluationContext, input);
     }
 
-    @ToString
-    @SuppressWarnings("ClassCanBeRecord")
-    class ConstantFieldLengthExtractor implements FieldLengthExtractor {
-        private final int length;
-
-        public ConstantFieldLengthExtractor(int length) {
-            this.length = length;
-        }
+    record ConstantFieldLengthExtractor(int length) implements FieldLengthExtractor {
 
         @Override
         public int extractFieldLength(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext, ByteBuf input) {
@@ -53,16 +51,10 @@ public interface FieldLengthExtractor {
         }
     }
 
-    @SuppressWarnings("ClassCanBeRecord")
-    class PrependFieldLengthExtractor implements FieldLengthExtractor {
-        private final PrependLengthFieldType prependLengthFieldType;
-
-        public PrependFieldLengthExtractor(PrependLengthFieldType prependLengthFieldType) {
-            this.prependLengthFieldType = prependLengthFieldType;
-        }
+    record PrependFieldLengthExtractor(PrependLengthFieldType prependLengthFieldType) implements FieldLengthExtractor {
 
         public PrependFieldLengthExtractor(int length) {
-            this.prependLengthFieldType = PrependLengthFieldType.from(length);
+            this(PrependLengthFieldType.from(length));
         }
 
         @Override
@@ -83,7 +75,7 @@ public interface FieldLengthExtractor {
     }
 
     @ToString(exclude = "expression")
-    class ExpressionFieldLengthExtractor implements FieldLengthExtractor {
+    final class ExpressionFieldLengthExtractor implements FieldLengthExtractor {
         final Expression expression;
         private final String expressionString;
 
@@ -100,20 +92,24 @@ public interface FieldLengthExtractor {
             }
             return number.intValue();
         }
+
+        public String expressionString() {
+            return this.expressionString;
+        }
+
     }
 
-    @SuppressWarnings("ClassCanBeRecord")
-    class PlaceholderFieldLengthExtractor implements FieldLengthExtractor {
-        private final String msg;
-
-        public PlaceholderFieldLengthExtractor(String msg) {
-            this.msg = msg;
-        }
+    record PlaceholderFieldLengthExtractor(String msg) implements FieldLengthExtractor {
 
         @Override
         public int extractFieldLength(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext, ByteBuf input) {
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    non-sealed interface CustomFieldLengthExtractor extends FieldLengthExtractor {
+        @Override
+        int extractFieldLength(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext, ByteBuf input);
     }
 
 }

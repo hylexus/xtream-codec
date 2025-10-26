@@ -21,7 +21,11 @@ import lombok.ToString;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-public interface FieldConditionEvaluator {
+public sealed interface FieldConditionEvaluator
+        permits FieldConditionEvaluator.AlwaysFalseFieldConditionEvaluator,
+        FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator,
+        FieldConditionEvaluator.ExpressionFieldConditionEvaluator,
+        FieldConditionEvaluator.CustomFieldConditionEvaluator {
 
     boolean evaluate(FieldCodec.CodecContext context);
 
@@ -44,7 +48,7 @@ public interface FieldConditionEvaluator {
     }
 
     @ToString(exclude = "expression")
-    class ExpressionFieldConditionEvaluator implements FieldConditionEvaluator {
+    final class ExpressionFieldConditionEvaluator implements FieldConditionEvaluator {
         private final Expression expression;
         private final String expressionString;
 
@@ -59,5 +63,13 @@ public interface FieldConditionEvaluator {
             return value != null && value;
         }
 
+        public String expressionString() {
+            return expressionString;
+        }
+
     }
+
+    non-sealed interface CustomFieldConditionEvaluator extends FieldConditionEvaluator {
+    }
+
 }

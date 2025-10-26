@@ -75,6 +75,11 @@ public final class StringFieldCodecs {
             BcdOps.encodeBcd8421StringIntoByteBuf(value, output);
         }
 
+        @Override
+        public String encoding() {
+            return XtreamConstants.CHARSET_NAME_BCD_8421;
+        }
+
     }
 
     public static final class StringFieldCodecHex implements CharSequenceFieldCodec<String> {
@@ -91,6 +96,11 @@ public final class StringFieldCodecs {
         @Override
         public void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, String value) {
             XtreamBytes.writeHexString(output, value);
+        }
+
+        @Override
+        public String encoding() {
+            return XtreamConstants.CHARSET_NAME_HEX;
         }
     }
 
@@ -145,6 +155,11 @@ public final class StringFieldCodecs {
             } else {
                 output.writeCharSequence(value, charset);
             }
+        }
+
+        @Override
+        public String encoding() {
+            return this.charset.displayName();
         }
 
         public Charset charset() {

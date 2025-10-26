@@ -32,4 +32,6 @@ public interface CharSequenceFieldCodec<T extends CharSequence> extends FieldCod
 
     void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value);
 
+    String encoding();
+
 }

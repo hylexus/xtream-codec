@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.type;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.bean.PropertyAccessStrategy;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
@@ -649,6 +650,9 @@ public @interface Preset {
         @interface Byte {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};

@@ -135,7 +135,7 @@ public final class PropertyGetters {
      * ============ 2. 基于 MethodHandle（方法 + 字段） ========================
      * ========================================================= */
 
-    public record MethodHandleMethodPropertyGetter(MethodHandle handle)
+    public record MethodHandleMethodPropertyGetter(Method method, MethodHandle handle)
             implements BeanPropertyMetadata.PropertyGetter {
         public static MethodHandleMethodPropertyGetter of(Method method) {
             try {
@@ -144,7 +144,7 @@ public final class PropertyGetters {
                 // 适配成 (Object)Object 类型，避免 invokeWithArguments
                 final MethodType targetType = MethodType.methodType(Object.class, method.getDeclaringClass());
                 final MethodHandle adapted = target.asType(targetType);
-                return new MethodHandleMethodPropertyGetter(adapted);
+                return new MethodHandleMethodPropertyGetter(method, adapted);
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -161,7 +161,7 @@ public final class PropertyGetters {
         }
     }
 
-    public record MethodHandleFieldPropertyGetter(MethodHandle handle)
+    public record MethodHandleFieldPropertyGetter(Field field, MethodHandle handle)
             implements BeanPropertyMetadata.PropertyGetter {
         public static MethodHandleFieldPropertyGetter of(Field field) {
             try {
@@ -170,7 +170,7 @@ public final class PropertyGetters {
                 // 适配成 (Object)Object 类型，避免 invokeWithArguments
                 final MethodType targetType = MethodType.methodType(Object.class, field.getDeclaringClass());
                 final MethodHandle adapted = target.asType(targetType);
-                return new MethodHandleFieldPropertyGetter(adapted);
+                return new MethodHandleFieldPropertyGetter(field, adapted);
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -191,7 +191,7 @@ public final class PropertyGetters {
      * ========== 3. 基于 LambdaMetafactory（方法） ======================
      * ========================================================= */
 
-    public record LambdaMetaFactoryMethodPropertyGetter(Function<Object, @Nullable Object> getter) implements BeanPropertyMetadata.PropertyGetter {
+    public record LambdaMetaFactoryMethodPropertyGetter(Method method, Function<Object, @Nullable Object> getter) implements BeanPropertyMetadata.PropertyGetter {
         public static LambdaMetaFactoryMethodPropertyGetter of(Method method) {
             try {
                 final MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -210,7 +210,7 @@ public final class PropertyGetters {
                 );
 
                 @SuppressWarnings("unchecked") final Function<Object, Object> getter = (Function<Object, Object>) site.getTarget().invoke();
-                return new LambdaMetaFactoryMethodPropertyGetter(getter);
+                return new LambdaMetaFactoryMethodPropertyGetter(method, getter);
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -226,13 +226,13 @@ public final class PropertyGetters {
      * =============== 4. 基于 VarHandle（字段） ==================
      * ========================================================= */
 
-    public record VarHandleFieldPropertyGetter(VarHandle varHandle)
+    public record VarHandleFieldPropertyGetter(Field field, VarHandle varHandle)
             implements BeanPropertyMetadata.PropertyGetter {
         public static VarHandleFieldPropertyGetter of(Field field) {
             try {
                 final MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(field.getDeclaringClass(), MethodHandles.lookup());
                 final VarHandle varHandle = lookup.unreflectVarHandle(field);
-                return new VarHandleFieldPropertyGetter(varHandle);
+                return new VarHandleFieldPropertyGetter(field, varHandle);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
