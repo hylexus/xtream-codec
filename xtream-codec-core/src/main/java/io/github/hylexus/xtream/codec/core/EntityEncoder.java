@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultSerializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
+import io.github.hylexus.xtream.codec.core.type.simple.SimpleField;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.jspecify.annotations.Nullable;
@@ -30,22 +31,44 @@ public class EntityEncoder {
     protected final ByteBufAllocator bufferFactory = ByteBufAllocator.DEFAULT;
     private final BeanMetadataRegistry beanMetadataRegistry;
     private final FieldCodecRegistry fieldCodecRegistry;
+    protected final SimpleFieldEncoder simpleFieldEncoder;
 
     public EntityEncoder(BeanMetadataRegistry beanMetadataRegistry) {
         this.beanMetadataRegistry = beanMetadataRegistry;
         this.fieldCodecRegistry = beanMetadataRegistry.getFieldCodecRegistry();
+        this.simpleFieldEncoder = new SimpleFieldEncoder();
     }
 
     public void encode(Object instance, ByteBuf target) {
         this.encode(XtreamField.ALL_VERSION, instance, target);
     }
 
+    // todo 优化
     public void encode(int version, Object instance, ByteBuf target) {
-        if (instance == null) {
-            return;
+        switch (instance) {
+            case null -> {
+                // ignored
+            }
+            case SimpleField simpleField -> {
+                final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, null);
+                this.simpleFieldEncoder.encode(context, simpleField, target);
+            }
+            case Iterable<?> iterable -> {
+                final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, null);
+                for (Object object : iterable) {
+                    if (object instanceof SimpleField simpleField) {
+                        this.simpleFieldEncoder.encode(context, simpleField, target);
+                    } else {
+                        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(object.getClass(), version);
+                        this.encode(version, beanMetadata, object, target);
+                    }
+                }
+            }
+            default -> {
+                final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass(), version);
+                this.encode(version, beanMetadata, instance, target);
+            }
         }
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass(), version);
-        this.encode(version, beanMetadata, instance, target);
     }
 
     public void encode(BeanMetadata beanMetadata, Object instance, ByteBuf target) {
