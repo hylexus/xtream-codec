@@ -43,6 +43,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -62,6 +65,9 @@ public @interface Preset {
         @interface u8 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -83,6 +89,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -102,6 +111,9 @@ public @interface Preset {
         @interface i16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -123,6 +135,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -142,6 +157,9 @@ public @interface Preset {
         @interface u16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -163,6 +181,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -182,6 +203,9 @@ public @interface Preset {
         @interface i32_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -203,6 +227,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -223,6 +250,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -242,6 +272,9 @@ public @interface Preset {
         @interface str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -287,6 +320,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -322,6 +358,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -356,6 +395,9 @@ public @interface Preset {
         @interface list {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -398,6 +440,9 @@ public @interface Preset {
         @interface map {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -446,6 +491,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamMapField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamMapField.class, attribute = "length")
             int length() default -1;
 
@@ -477,6 +525,9 @@ public @interface Preset {
         @interface byte_array {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -526,6 +577,10 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
         }
     }
 
@@ -539,6 +594,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -563,6 +621,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -584,6 +645,9 @@ public @interface Preset {
         @interface Bcd {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -616,6 +680,9 @@ public @interface Preset {
         @Repeatable(PresetAliasContainers.JtStyleContainerBcdDateTime.class)
         @XtreamDateTimeField(pattern = "yyMMddHHmmss", charset = XtreamConstants.CHARSET_NAME_BCD_8421)
         @interface BcdDateTime {
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -673,6 +740,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -707,6 +777,9 @@ public @interface Preset {
         @interface Str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -751,6 +824,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -785,6 +861,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -818,6 +897,9 @@ public @interface Preset {
         @interface List {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
@@ -867,6 +949,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
 
@@ -913,6 +998,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamMapField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
             @AliasFor(annotation = XtreamMapField.class, attribute = "length")
             int length() default -1;
 
@@ -958,6 +1046,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "version")
             int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
         }
     }
