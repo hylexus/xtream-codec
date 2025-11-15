@@ -53,8 +53,8 @@ public class BaseCodecTest {
     protected String terminalId2013 = "013912344323";
     protected String terminalId2019 = "00000000013912344329";
 
-    ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
-    Jt808RequestDecoder decoder = new DefaultJt808RequestDecoder(new DefaultJt808BytesProcessor(allocator), new Jt808MessageEncryptionHandler.NoOps(), new DefaultJt808RequestCombiner(allocator, 100, Duration.ofSeconds(100)));
+    protected ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
+    protected Jt808RequestDecoder decoder = new DefaultJt808RequestDecoder(new DefaultJt808BytesProcessor(allocator), new Jt808MessageEncryptionHandler.NoOps(), new DefaultJt808RequestCombiner(allocator, 100, Duration.ofSeconds(100)));
     NettyInbound nettyInbound;
     protected EntityCodec entityCodec = new EntityCodec(new SimpleBeanMetadataRegistry(
             new DefaultFieldCodecRegistry(),

@@ -39,6 +39,10 @@ public abstract class BaseSpan {
         this.children.add(child);
     }
 
+    public void addChild(int offset, BaseSpan child) {
+        this.children.add(offset, child);
+    }
+
     public List<BaseSpan> getChildren() {
         return children;
     }

@@ -107,6 +107,6 @@ public class DictJsonDeserializer extends JsonDeserializer<SimpleField.Dict<? ex
             Map<SimpleField.DictKey, SimpleField> rawValueMap,
             PrependLengthFieldType prependLengthFieldType) {
         @SuppressWarnings("unchecked") final Map<K, SimpleField> typedMap = (Map<K, SimpleField>) rawValueMap;
-        return new SimpleField.Dict<>(keyType, valueLengthType, typedMap, prependLengthFieldType);
+        return new SimpleField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, typedMap);
     }
 }

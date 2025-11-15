@@ -582,6 +582,44 @@ public @interface Preset {
             PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
         }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerBasic.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
+        @interface basic {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
+            Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
     }
 
     @interface JtStyle {
@@ -1050,6 +1088,43 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
             PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
 
+        }
+
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBasic.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
+        @interface Basic {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
+            Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
         }
     }
 

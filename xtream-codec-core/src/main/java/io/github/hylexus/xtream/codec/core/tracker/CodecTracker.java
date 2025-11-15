@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 @SuppressWarnings("NullAway")
@@ -67,8 +68,29 @@ public class CodecTracker {
         return this.addSpan(span);
     }
 
+    public NestedFieldSpan startNewNestedFieldSpan(String name, String desc, String fieldType, @Nullable String fieldCodec) {
+        final NestedFieldSpan span = new NestedFieldSpan(
+                this.current,
+                name, desc,
+                fieldType,
+                fieldCodec);
+        if (fieldType != null) {
+            span.setFieldType(fieldType);
+        } else if (this.current instanceof CollectionItemSpan collectionItemSpan) {
+            final String fieldName = collectionItemSpan.getFieldName() + "(" + collectionItemSpan.getOffset() + ")";
+            span.setFieldName(fieldName);
+            span.setFieldType(collectionItemSpan.getFieldType());
+        }
+        return this.addSpan(span);
+    }
+
     public CollectionFieldSpan startNewCollectionFieldSpan(BeanPropertyMetadata metadata) {
         final CollectionFieldSpan span = new CollectionFieldSpan(this.current, metadata.name(), this.getFieldFirstGenericTypeName(metadata.field()), metadata.xtreamFieldAnnotation().desc());
+        return this.addSpan(span);
+    }
+
+    public CollectionFieldSpan startNewCollectionFieldSpanForSimpleField(String name) {
+        final CollectionFieldSpan span = new CollectionFieldSpan(this.current, name, "SimpleField", "");
         return this.addSpan(span);
     }
 
@@ -82,6 +104,11 @@ public class CodecTracker {
 
     public MapFieldSpan startNewMapFieldSpan(BeanPropertyMetadata metadata, String fieldCodec) {
         final MapFieldSpan span = new MapFieldSpan(this.current, metadata.name(), metadata.xtreamFieldAnnotation().desc(), fieldCodec);
+        return this.addSpan(span);
+    }
+
+    public MapFieldSpan startNewMapFieldSpan(String name, String desc, String fieldCodec) {
+        final MapFieldSpan span = new MapFieldSpan(this.current, name, desc, fieldCodec);
         return this.addSpan(span);
     }
 
@@ -110,20 +137,32 @@ public class CodecTracker {
     }
 
     public void addFieldSpan(BaseSpan parent, String fieldName, @Nullable Object value, String hexString, FieldCodec<?> fieldCodec, String fieldDesc) {
+        this.addFieldSpan(parent, fieldName, value, hexString, fieldCodec.getClass().getSimpleName(), fieldDesc);
+    }
+
+    public void addFieldSpan(BaseSpan parent, String fieldName, @Nullable Object value, String hexString, String fieldCodec, String fieldDesc) {
         final BaseSpan trackerItem;
+        boolean needAdd = true;
         if (parent instanceof MapEntrySpan) {
             trackerItem = new MapEntryItemSpan(parent, this.tempMapItemType)
-                    .setFieldCodec(fieldCodec.getClass().getSimpleName())
+                    .setFieldCodec(fieldCodec)
                     .setValue(value)
                     .setHexString(hexString);
+            final List<BaseSpan> children = this.current.getChildren();
+            if (this.tempMapItemType == MapEntryItemSpan.Type.VALUE_LENGTH && children.size() == 2) {
+                this.current.addChild(children.size() - 1, trackerItem);
+                needAdd = false;
+            }
             this.tempMapItemType = null;
         } else {
             trackerItem = new BasicFieldSpan(parent, fieldName, fieldDesc)
-                    .setFieldCodec(fieldCodec.getClass().getSimpleName())
+                    .setFieldCodec(fieldCodec)
                     .setValue(value)
                     .setHexString(hexString);
         }
-        this.current.addChild(trackerItem);
+        if (needAdd) {
+            this.current.addChild(trackerItem);
+        }
         this.current = parent;
     }
 

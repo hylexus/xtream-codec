@@ -104,11 +104,30 @@ public class EntityEncoder {
     }
 
     public void encodeWithTracker(int version, Object instance, ByteBuf target, CodecTracker tracker) {
-        if (instance == null) {
-            return;
+        switch (instance) {
+            case null -> {
+                // ignored
+            }
+            case SimpleField simpleField -> {
+                final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, tracker);
+                this.simpleFieldEncoder.encodeWithTracker(context, simpleField, target);
+            }
+            case Iterable<?> iterable -> {
+                final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, tracker);
+                for (Object object : iterable) {
+                    if (object instanceof SimpleField simpleField) {
+                        this.simpleFieldEncoder.encodeWithTracker(context, simpleField, target);
+                    } else {
+                        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(object.getClass(), version);
+                        this.encodeWithTracker(version, beanMetadata, object, target, tracker);
+                    }
+                }
+            }
+            default -> {
+                final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass(), version);
+                this.encodeWithTracker(version, beanMetadata, instance, target, tracker);
+            }
         }
-        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(instance.getClass(), version);
-        this.encodeWithTracker(version, beanMetadata, instance, target, tracker);
     }
 
     public void encodeWithTracker(BeanMetadata beanMetadata, @Nullable Object instance, ByteBuf target, CodecTracker tracker) {

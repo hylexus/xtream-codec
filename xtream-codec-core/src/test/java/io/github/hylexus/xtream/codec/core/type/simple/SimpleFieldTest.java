@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
-import io.github.hylexus.xtream.codec.core.SimpleFieldEncoder;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +30,8 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+
+import static io.github.hylexus.xtream.codec.core.type.simple.SimpleFields.*;
 
 class SimpleFieldTest extends BaseEntityCodecTest {
 
@@ -48,39 +49,39 @@ class SimpleFieldTest extends BaseEntityCodecTest {
 
     @Test
     void test5() throws Exception {
-        final String json = objectMapper.writeValueAsString(new CustomSimpleField1("haha", new SimpleField.U16(2), PrependLengthFieldType.u8));
+        final String json = objectMapper.writeValueAsString(new CustomSimpleField1("haha", u16(2), PrependLengthFieldType.u8));
         System.out.println(json);
-        final Object o = SimpleFieldEncoder.parseSimpleFieldFromJson(json);
+        final Object o = SimpleFields.parseSimpleFieldFromJson(json);
         System.out.println(o);
     }
 
     @Test
     void test3() throws Exception {
-        final Object data = new SimpleField.StrGbk("222", PrependLengthFieldType.u8);
+        final Object data = strGbk(PrependLengthFieldType.u8, "222");
         System.out.println(objectMapper.writeValueAsString(data));
 
         final List<Object> data1 = List.of(
-                new SimpleField.StrGbk("222", PrependLengthFieldType.u8),
+                strGbk(PrependLengthFieldType.u8, "222"),
                 new SimpleField.Str("222", "utf-8", PrependLengthFieldType.u16),
-                new SimpleField.I8((byte) 1),
-                new SimpleField.U8((short) 2),
-                new SimpleField.Struct(List.of(new SimpleField.I16((short) 11), new SimpleField.U16(22))),
-                new SimpleField.Sequence(List.of(new SimpleField.I32(111), new SimpleField.U32(222L))),
-                new SimpleField.Dict<>(
+                i8((byte) 1),
+                u8((short) 2),
+                struct(List.of(i16((short) 11), u16(22))),
+                sequence(List.of(i32(111), u32(222L))),
+                dict(
                         SimpleField.U16.class,
                         SimpleField.KeyLengthType.u8,
                         Map.of(
-                                new SimpleField.U16(1), new SimpleField.StrGbk("1111"),
-                                new SimpleField.U16(2), new SimpleField.StrGbk("2222"),
-                                new SimpleField.U16(3), new SimpleField.StrGb2312("2222"),
-                                new SimpleField.U16(4), new SimpleField.ByteSequence(new byte[]{11, 22}),
-                                new SimpleField.U16(5), new SimpleField.StrUtf8("xxx")
+                                u16(1), strGbk("1111"),
+                                u16(2), strGbk("2222"),
+                                u16(3), strGb2312("2222"),
+                                u16(4), byteSequence(new byte[]{11, 22}),
+                                u16(5), strUtf8("xxx")
                         )
                 ),
-                new SimpleField.ByteSequence(new byte[]{1, 2, 3}, PrependLengthFieldType.u8),
-                new CustomSimpleField1("haha", new SimpleField.U16(1), PrependLengthFieldType.u8)
+                byteSequence(PrependLengthFieldType.u8, new byte[]{1, 2, 3}),
+                new CustomSimpleField1("haha", u16(1), PrependLengthFieldType.u8)
         );
-        System.out.println(SimpleFieldEncoder.mixedListToJsonString(data1));
+        System.out.println(SimpleFields.mixedListToJsonString(data1));
     }
 
 
@@ -173,13 +174,13 @@ class SimpleFieldTest extends BaseEntityCodecTest {
                     }
                 ]
                 """;
-        final Object object = SimpleFieldEncoder.parseSimpleFieldListFromJson(json);
+        final Object object = SimpleFields.parseSimpleFieldsFromJson(json);
         System.out.println(object);
     }
 
     @Test
     void test2() throws Exception {
-        final Object data = new SimpleField.StrGbk("222", PrependLengthFieldType.u8);
+        final Object data = strGbk(PrependLengthFieldType.u8, "222");
         System.out.println(objectMapper.writeValueAsString(data));
         final ByteBuf buffer = allocator.buffer();
         this.entityCodec.encode(data, buffer);
@@ -189,8 +190,8 @@ class SimpleFieldTest extends BaseEntityCodecTest {
     @Test
     void test() throws Exception {
         final List<SimpleField> data = List.of(
-                new SimpleField.I8((byte) 1),
-                new SimpleField.StrGbk("222", PrependLengthFieldType.u8)
+                i8((byte) 1),
+                strGbk(PrependLengthFieldType.u8, "222")
         );
         final ObjectWriter objectWriter = objectMapper.writerFor(new TypeReference<List<SimpleField>>() {
         });

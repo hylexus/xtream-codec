@@ -7,11 +7,11 @@ plugins {
 }
 
 application {
-    mainClass.set("io.github.hylexus.xtream.debug.ext.jt808.Jt808SpringBootStarterDebugApp")
+    mainClass.set("io.github.hylexus.xtream.debug.ext.jt808.Jt808ServerSpringBootStarterReactiveDebugApp")
 }
 tasks.bootJar {
     archiveFileName.set("${project.name}.jar")
-    mainClass.set("io.github.hylexus.xtream.debug.ext.jt808.Jt808SpringBootStarterDebugApp")
+    mainClass.set("io.github.hylexus.xtream.debug.ext.jt808.Jt808ServerSpringBootStarterReactiveDebugApp")
 }
 apply<XtreamCodecFastModePlugin>()
 
