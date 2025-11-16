@@ -5,7 +5,7 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
-name: Gradle Build
+name: Gradle Build(Multi-Platform)
 
 on:
   # 1. 手动触发
@@ -29,12 +29,12 @@ on:
         type: boolean
         description: 'Skip unit tests?'
         default: false
-  # 2. 推送
-  push:
-    branches: [ "develop" ]
-  # 3. PR 合并到目标分支
-  pull_request:
-    branches: [ "main", "pre-release", "release-candidate" ]
+#  # 2. 推送
+#  push:
+#    branches: [ "develop" ]
+#  # 3. PR 合并到目标分支
+#  pull_request:
+#    branches: [ "main", "pre-release", "release-candidate" ]
 
 # 辅助 Job：动态生成平台矩阵
 jobs:
