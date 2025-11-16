@@ -36,39 +36,64 @@ on:
   pull_request:
     branches: [ "main", "pre-release", "release-candidate" ]
 
+# 辅助 Job：动态生成平台矩阵
 jobs:
-  build:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          platforms="${{ github.event.inputs.platforms || 'all' }}"
+          custom="${{ github.event.inputs.custom_platforms || '' }}"
 
+          # 默认全平台
+          if [ "$platforms" = "all" ]; then
+            echo "matrix={\"os\":[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]}" >> "$GITHUB_OUTPUT"
+          elif [ "$platforms" = "linux" ]; then
+            echo "matrix={\"os\":[\"ubuntu-latest\"]}" >> "$GITHUB_OUTPUT"
+          elif [ "$platforms" = "windows" ]; then
+            echo "matrix={\"os\":[\"windows-latest\"]}" >> "$GITHUB_OUTPUT"
+          elif [ "$platforms" = "macos" ]; then
+            echo "matrix={\"os\":[\"macos-latest\"]}" >> "$GITHUB_OUTPUT"
+          elif [ "$platforms" = "custom" ]; then
+            # 解析自定义平台，映射为 runner 名称
+            os_list=()
+            IFS=',' read -ra PARTS <<< "$custom"
+            for part in "${PARTS[@]}"; do
+              part=$(echo "$part" | xargs)  # trim
+              case "$part" in
+                linux)   os_list+=("ubuntu-latest") ;;
+                windows) os_list+=("windows-latest") ;;
+                macos)   os_list+=("macos-latest") ;;
+                *) echo "Unknown platform: $part" >&2; exit 1 ;;
+              esac
+            done
+            if [ ${#os_list[@]} -eq 0 ]; then
+              echo "matrix={\"os\":[]}" >> "$GITHUB_OUTPUT"
+            else
+              # 构造 JSON 数组
+              json_array=$(printf '%s,' "${os_list[@]}" | sed 's/,$//')
+              echo "matrix={\"os\":[\"$(echo "$json_array" | sed 's/,/","/g')\"]}" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            # fallback to all
+            echo "matrix={\"os\":[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]}" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: setup-matrix
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
 
-    strategy:
-      fail-fast: false
-      matrix:
-        # 默认包含所有平台
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            platform_name: linux
-          - os: windows-latest
-            platform_name: windows
-          - os: macos-latest
-            platform_name: macos
-
-    # 动态跳过不需要的平台（仅在 workflow_dispatch 时生效）
-    if: |
-      github.event_name != 'workflow_dispatch' ||
-      (
-        (
-          inputs.platforms == 'all' ||
-          inputs.platforms == matrix.platform_name ||
-          (inputs.platforms == 'custom' && contains(fromJSON(format('[{0}]', inputs.custom_platforms)), matrix.platform_name))
-        )
-      )
-
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
