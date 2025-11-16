@@ -18,7 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
-import io.github.hylexus.xtream.codec.core.type.simple.SimpleField;
+import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriber;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.hylexus.xtream.codec.core.type.simple.SimpleFields.*;
+import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
 
 class MixedEntity02Test extends BaseCodecTest {
 
@@ -42,15 +42,15 @@ class MixedEntity02Test extends BaseCodecTest {
         final List<Object> dataList = new ArrayList<>();
         dataList.add(u32("报警标志", 111L));
         dataList.add(u32("状态", 222L));
-        final SimpleField.Dict<SimpleField.U8> extraItems = dict(
-                SimpleField.U8.class,
-                SimpleField.KeyLengthType.u8,
+        final DataField.Dict<DataField.U8> extraItems = dict(
+                DataField.U8.class,
+                DataField.KeyLengthType.u8,
                 Map.of(
                         // 里程，DWORD，1/10km，对应车上里程表读数
                         u8((short) 0x01), u32(123L),
                         // 油量，WORD，1/10L，对应车上油量表读数
                         u8((short) 0x02), u16(88),
-                        u8((short) 0xe1), strGbk("测试")
+                        u8((short) 0xe1), gbkString("测试")
                 )
         );
         final MixedEntity02 mixedEntity02 = new MixedEntity02()

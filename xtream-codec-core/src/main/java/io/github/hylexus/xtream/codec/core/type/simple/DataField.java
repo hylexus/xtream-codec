@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.DataFieldEncoder;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
@@ -34,15 +36,30 @@ import java.util.Objects;
 
 import static java.util.Objects.requireNonNullElse;
 
-@JsonTypeIdResolver(SimpleFieldTypeIdResolver.class)
+/**
+ * 当前类中定义的数据类型，都提供了对应的工厂方法：{@link DataFields}
+ *
+ * @see DataFields
+ */
+@JsonTypeIdResolver(DataFieldTypeIdResolver.class)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
         property = "type"
 )
 @ApiStatus.Experimental
-public sealed interface SimpleField {
+public sealed interface DataField {
 
+    /**
+     * 返回该字段的名称，主要用于调试和日志追踪。
+     * <p>
+     * 如果构造时未指定名称，则默认返回实现类的简单类名（如 "U32", "GbkString"）。
+     * <p>
+     * 此方法不应在业务逻辑中依赖，仅用于可观测性（observability）。
+     *
+     * @see DataFieldEncoder#encodeWithTracker(FieldCodec.SerializeContext, DataField, ByteBuf)
+     * @see DataFieldEncoder#encodeWithTracker(FieldCodec.SerializeContext, Iterable, ByteBuf)
+     */
     default String name() {
         return this.getClass().getSimpleName();
     }
@@ -59,15 +76,19 @@ public sealed interface SimpleField {
         throw new UnsupportedOperationException();
     }
 
-    sealed interface StrField extends SimpleField
-            permits Str, StrBcd8421, StrGb2312, StrGbk, StrHex, StrUtf8 {
+    sealed interface StringDataField extends DataField
+            permits GenericString, Bcd8421String, Gb2312String, GbkString, HexString, Utf8String {
 
         @Override
         String charset();
 
     }
 
-    sealed interface DictKey extends SimpleField
+    sealed interface IntegralDataField extends DataField
+            permits DictKey {
+    }
+
+    sealed interface DictKey extends IntegralDataField
             permits I8, U8, I16, U16, I32, U32, I64 {
 
         static DictKey from(Class<? extends DictKey> clazz, String value) {
@@ -85,7 +106,11 @@ public sealed interface SimpleField {
 
     }
 
-    non-sealed interface CustomSimpleField extends SimpleField {
+    sealed interface FloatDataField extends DataField
+            permits F32, F64 {
+    }
+
+    non-sealed interface CustomDataField extends DataField {
 
         void writeTo(ByteBuf output);
 
@@ -95,9 +120,9 @@ public sealed interface SimpleField {
         }
     }
 
-    record F32(String name, Float value) implements SimpleField {
+    record F32(String name, Float value) implements FloatDataField {
         public F32(@Nullable String name, Float value) {
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -111,9 +136,9 @@ public sealed interface SimpleField {
         }
     }
 
-    record F64(String name, Double value) implements SimpleField {
+    record F64(String name, Double value) implements FloatDataField {
         public F64(@Nullable String name, Double value) {
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -127,25 +152,25 @@ public sealed interface SimpleField {
         }
     }
 
-    record StrGbk(String name, PrependLengthFieldType prependLengthFieldType, String value) implements SimpleField.StrField {
+    record GbkString(String name, PrependLengthFieldType prependLengthFieldType, String value) implements StringDataField {
 
-        public StrGbk(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+        public GbkString(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
-        public StrGbk(PrependLengthFieldType prependLengthFieldType, String value) {
+        public GbkString(PrependLengthFieldType prependLengthFieldType, String value) {
             this(null, prependLengthFieldType, value);
         }
 
-        public StrGbk(String value) {
+        public GbkString(String value) {
             this(null, PrependLengthFieldType.none, value);
         }
 
         @Override
         public String type() {
-            return "str_gbk";
+            return "gbk_string";
         }
 
         @Override
@@ -154,45 +179,45 @@ public sealed interface SimpleField {
         }
     }
 
-    record Str(String value, String charset, PrependLengthFieldType prependLengthFieldType) implements SimpleField.StrField {
-        public Str(String value, String charset, @Nullable PrependLengthFieldType prependLengthFieldType) {
+    record GenericString(String value, String charset, PrependLengthFieldType prependLengthFieldType) implements StringDataField {
+        public GenericString(String value, String charset, @Nullable PrependLengthFieldType prependLengthFieldType) {
             this.value = value;
             this.charset = Objects.requireNonNull(charset, "charset is null");
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
         }
 
-        public Str(String value, String charset) {
+        public GenericString(String value, String charset) {
             this(value, charset, PrependLengthFieldType.none);
         }
 
         @Override
         public String type() {
-            return "str";
+            return "string";
         }
     }
 
-    record StrGb2312(String name, PrependLengthFieldType prependLengthFieldType, String value) implements SimpleField.StrField {
-        public StrGb2312(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
-            this.name = filedName(name, this);
+    record Gb2312String(String name, PrependLengthFieldType prependLengthFieldType, String value) implements StringDataField {
+        public Gb2312String(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+            this.name = fieldName(name, this);
             this.value = value;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
         }
 
-        public StrGb2312(@Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+        public Gb2312String(@Nullable PrependLengthFieldType prependLengthFieldType, String value) {
             this(null, prependLengthFieldType, value);
         }
 
-        public StrGb2312(String value) {
+        public Gb2312String(String value) {
             this(null, PrependLengthFieldType.none, value);
         }
 
-        public StrGb2312(String name, String value) {
+        public Gb2312String(String name, String value) {
             this(name, PrependLengthFieldType.none, value);
         }
 
         @Override
         public String type() {
-            return "str_gb2312";
+            return "gb2312_string";
         }
 
         @Override
@@ -201,29 +226,29 @@ public sealed interface SimpleField {
         }
     }
 
-    record StrUtf8(String name, PrependLengthFieldType prependLengthFieldType, String value) implements SimpleField.StrField {
+    record Utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value) implements StringDataField {
 
-        public StrUtf8(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
-            this.name = filedName(name, this);
+        public Utf8String(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+            this.name = fieldName(name, this);
             this.value = value;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
         }
 
-        public StrUtf8(@Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+        public Utf8String(@Nullable PrependLengthFieldType prependLengthFieldType, String value) {
             this(null, prependLengthFieldType, value);
         }
 
-        public StrUtf8(String name, String value) {
+        public Utf8String(String name, String value) {
             this(name, PrependLengthFieldType.none, value);
         }
 
-        public StrUtf8(String value) {
+        public Utf8String(String value) {
             this(null, PrependLengthFieldType.none, value);
         }
 
         @Override
         public String type() {
-            return "str_utf8";
+            return "utf8_string";
         }
 
         @Override
@@ -232,20 +257,20 @@ public sealed interface SimpleField {
         }
     }
 
-    record StrBcd8421(String value, PrependLengthFieldType prependLengthFieldType) implements SimpleField.StrField {
+    record Bcd8421String(String value, PrependLengthFieldType prependLengthFieldType) implements StringDataField {
 
-        public StrBcd8421(String value, @Nullable PrependLengthFieldType prependLengthFieldType) {
+        public Bcd8421String(String value, @Nullable PrependLengthFieldType prependLengthFieldType) {
             this.value = value;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
         }
 
-        public StrBcd8421(String value) {
+        public Bcd8421String(String value) {
             this(value, PrependLengthFieldType.none);
         }
 
         @Override
         public String type() {
-            return "bcd_8421";
+            return "bcd_8421_string";
         }
 
         @Override
@@ -254,20 +279,20 @@ public sealed interface SimpleField {
         }
     }
 
-    record StrHex(String value, PrependLengthFieldType prependLengthFieldType) implements SimpleField.StrField {
+    record HexString(String value, PrependLengthFieldType prependLengthFieldType) implements StringDataField {
 
-        public StrHex(String value, @Nullable PrependLengthFieldType prependLengthFieldType) {
+        public HexString(String value, @Nullable PrependLengthFieldType prependLengthFieldType) {
             this.value = value;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
         }
 
-        public StrHex(String value) {
+        public HexString(String value) {
             this(value, PrependLengthFieldType.none);
         }
 
         @Override
         public String type() {
-            return "hex";
+            return "hex_string";
         }
 
         @Override
@@ -276,19 +301,19 @@ public sealed interface SimpleField {
         }
     }
 
-    record Struct(@Nullable String name, PrependLengthFieldType prependLengthFieldType, List<SimpleField> value) implements SimpleField {
+    record Struct(@Nullable String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value) implements DataField {
 
-        public Struct(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<SimpleField> value) {
-            this.name = filedName(name, this);
+        public Struct(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
+            this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.value = value;
         }
 
-        public Struct(@Nullable PrependLengthFieldType prependLengthFieldType, List<SimpleField> value) {
+        public Struct(@Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
             this(null, prependLengthFieldType, value);
         }
 
-        public Struct(List<SimpleField> value) {
+        public Struct(List<DataField> value) {
             this(null, PrependLengthFieldType.none, value);
         }
 
@@ -320,9 +345,9 @@ public sealed interface SimpleField {
         }
     }
 
-    record I8(String name, Byte value) implements SimpleField.DictKey {
+    record I8(String name, Byte value) implements DataField.DictKey {
         public I8(@Nullable String name, Byte value) {
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -337,10 +362,10 @@ public sealed interface SimpleField {
 
     }
 
-    record U8(String name, Short value) implements SimpleField.DictKey {
+    record U8(String name, Short value) implements DataField.DictKey {
         public U8(@Nullable String name, Short value) {
-            this.name = filedName(name, this);
-            SimpleField.checkU8(value);
+            this.name = fieldName(name, this);
+            DataField.checkU8(value);
             this.value = value;
         }
 
@@ -354,9 +379,9 @@ public sealed interface SimpleField {
         }
     }
 
-    record I16(String name, Short value) implements SimpleField.DictKey {
+    record I16(String name, Short value) implements DataField.DictKey {
         public I16(@Nullable String name, Short value) {
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -370,10 +395,10 @@ public sealed interface SimpleField {
         }
     }
 
-    record U16(String name, Integer value) implements SimpleField.DictKey {
+    record U16(String name, Integer value) implements DataField.DictKey {
         public U16(@Nullable String name, Integer value) {
-            SimpleField.checkU16(value);
-            this.name = filedName(name, this);
+            DataField.checkU16(value);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -387,9 +412,9 @@ public sealed interface SimpleField {
         }
     }
 
-    record I32(String name, Integer value) implements SimpleField.DictKey {
+    record I32(String name, Integer value) implements DataField.DictKey {
         public I32(@Nullable String name, Integer value) {
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -404,10 +429,10 @@ public sealed interface SimpleField {
 
     }
 
-    record U32(String name, Long value) implements SimpleField.DictKey {
+    record U32(String name, Long value) implements DataField.DictKey {
         public U32(@Nullable String name, Long value) {
-            SimpleField.checkU32(value);
-            this.name = filedName(name, this);
+            DataField.checkU32(value);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -421,9 +446,9 @@ public sealed interface SimpleField {
         }
     }
 
-    record I64(String name, Long value) implements SimpleField.DictKey {
+    record I64(String name, Long value) implements DataField.DictKey {
         public I64(@Nullable String name, Long value) {
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.value = value;
         }
 
@@ -455,22 +480,22 @@ public sealed interface SimpleField {
             Class<K> keyType,
 
             @JsonProperty("valueLengthType") KeyLengthType valueLengthType,
-            @JsonProperty("value") Map<K, SimpleField> value
-    ) implements SimpleField {
+            @JsonProperty("value") Map<K, DataField> value
+    ) implements DataField {
 
-        public Dict(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, Class<K> keyType, KeyLengthType valueLengthType, Map<K, SimpleField> value) {
-            this.name = filedName(name, this);
+        public Dict(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, Class<K> keyType, KeyLengthType valueLengthType, Map<K, DataField> value) {
+            this.name = fieldName(name, this);
             this.keyType = keyType;
             this.value = value;
             this.valueLengthType = valueLengthType;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
         }
 
-        public Dict(PrependLengthFieldType prependLengthFieldType, Class<K> keyClass, SimpleField.KeyLengthType valueLengthType, Map<K, SimpleField> value) {
+        public Dict(PrependLengthFieldType prependLengthFieldType, Class<K> keyClass, DataField.KeyLengthType valueLengthType, Map<K, DataField> value) {
             this(null, prependLengthFieldType, keyClass, valueLengthType, value);
         }
 
-        public Dict(Class<K> keyClass, SimpleField.KeyLengthType valueLengthType, Map<K, SimpleField> value) {
+        public Dict(Class<K> keyClass, DataField.KeyLengthType valueLengthType, Map<K, DataField> value) {
             this(null, PrependLengthFieldType.none, keyClass, valueLengthType, value);
         }
 
@@ -480,19 +505,35 @@ public sealed interface SimpleField {
         }
     }
 
-    record Sequence(String name, PrependLengthFieldType prependLengthFieldType, List<SimpleField> value) implements SimpleField {
+    /**
+     * 表示协议中的字段序列（有序字段列表）。
+     * <p>
+     * 本类型用于描述一段由多个 {@link DataField} 按固定顺序组成的结构化数据，
+     * 常见于变长记录、嵌套消息体、或需要显式顺序的协议段（如 TLV 列表、日志条目等）。
+     * <p>
+     * 命名为 {@code Sequence}（而非 {@code List<DataField>} 或 {@code FieldList}）是为了：
+     * <ul>
+     *   <li>强调其作为“协议语义序列”的角色，而非通用的 Java 集合；</li>
+     *   <li>避免与 {@code java.util.List} 等标准库类型在概念上混淆；</li>
+     *   <li>与本框架中其他协议字段类型（如 {@link ByteSequence}）保持统一的命名风格。</li>
+     * </ul>
+     * <p>
+     * 编码时可选择是否在序列内容前附加总长度或元素个数字段
+     * （通过 {@link PrependLengthFieldType} 控制）。
+     */
+    record Sequence(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value) implements DataField {
 
-        public Sequence(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<SimpleField> value) {
-            this.name = filedName(name, this);
+        public Sequence(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
+            this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.value = value;
         }
 
-        public Sequence(PrependLengthFieldType prependLengthFieldType, List<SimpleField> value) {
+        public Sequence(PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
             this(null, prependLengthFieldType, value);
         }
 
-        public Sequence(List<SimpleField> value) {
+        public Sequence(List<DataField> value) {
             this(null, PrependLengthFieldType.none, value);
         }
 
@@ -502,14 +543,29 @@ public sealed interface SimpleField {
         }
     }
 
+    /**
+     * 表示协议中的原始字节序列字段。
+     * <p>
+     * 与通用的 {@code byte[]} 或 {@code ByteArray} 不同，本类型专用于描述协议中的一段
+     * 无结构、未经编码的原始字节数据（例如：加密载荷、二进制附件、自定义 TLV 的值等）。
+     * <p>
+     * 命名为 {@code ByteSequence}（而非 {@code ByteArray}）是为了：
+     * <ul>
+     *   <li>强调其作为“协议字节流”的语义，而非内存中的数组实现；</li>
+     *   <li>与本框架中的 {@link Sequence}（字段序列）命名风格保持一致；</li>
+     *   <li>避免与其他库中泛化的“字节数组”概念混淆，突出领域专用性。</li>
+     * </ul>
+     * <p>
+     * 编码时可选择是否在字节内容前附加长度字段（通过 {@link PrependLengthFieldType} 控制）。
+     */
     record ByteSequence(
             String name,
             PrependLengthFieldType prependLengthFieldType, @JsonSerialize(using = ByteArrayJsonSerializer.class)
             byte[] value
-    ) implements SimpleField {
+    ) implements DataField {
 
         public ByteSequence(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, byte[] value) {
-            this.name = filedName(name, this);
+            this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.value = value;
         }
@@ -528,7 +584,7 @@ public sealed interface SimpleField {
         }
     }
 
-    static String filedName(@Nullable String name, SimpleField self) {
+    static String fieldName(@Nullable String name, DataField self) {
         if (name == null) {
             return self.getClass().getSimpleName();
         }

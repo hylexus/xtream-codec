@@ -32,7 +32,7 @@ import io.github.hylexus.xtream.codec.core.impl.codec.wrapper.*;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.github.hylexus.xtream.codec.core.type.ByteBufContainer;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
-import io.github.hylexus.xtream.codec.core.type.simple.SimpleField;
+import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.core.type.wrapper.*;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
@@ -229,23 +229,23 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         registry.register(StringWrapperBcdFieldCodec.INSTANCE, StringWrapperBcd.class, -1, "", false);
         registry.register(DataWrapperFieldCodes.INSTANCE_STRING_BCD_8421, StringWrapperBcd.class, -1, "", false);
 
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.I8.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.U8.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.I16.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.U16.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.I32.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.U32.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.I64.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.F32.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.F64.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.StrGbk.class, -1, XtreamConstants.CHARSET_NAME_GBK, false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.StrUtf8.class, -1, XtreamConstants.CHARSET_NAME_UTF8, false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.StrGb2312.class, -1, XtreamConstants.CHARSET_NAME_GB_2312, false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.StrBcd8421.class, -1, XtreamConstants.CHARSET_NAME_BCD_8421, false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.Struct.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.Dict.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.Sequence.class, -1, "", false);
-        registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.ByteSequence.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.I8.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.U8.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.I16.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.U16.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.I32.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.U32.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.I64.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.F32.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.F64.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.GbkString.class, -1, XtreamConstants.CHARSET_NAME_GBK, false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.Utf8String.class, -1, XtreamConstants.CHARSET_NAME_UTF8, false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.Gb2312String.class, -1, XtreamConstants.CHARSET_NAME_GB_2312, false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.Bcd8421String.class, -1, XtreamConstants.CHARSET_NAME_BCD_8421, false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.Struct.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.Dict.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.Sequence.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.ByteSequence.class, -1, "", false);
 
         registerDefaultStringCodec(registry);
     }
@@ -332,7 +332,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
             return Optional.of(FieldCodec.TransientRecordComponentFieldCodec.INSTANCE);
         }
-        if (SimpleField.class.isAssignableFrom(metadata.rawClass())) {
+        if (DataField.class.isAssignableFrom(metadata.rawClass())) {
             return this.getFieldCodec(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), metadata.rawClass());
         }
         if (metadata.isRecordClass()) {

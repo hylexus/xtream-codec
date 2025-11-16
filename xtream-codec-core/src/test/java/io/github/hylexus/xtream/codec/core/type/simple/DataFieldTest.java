@@ -31,14 +31,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.hylexus.xtream.codec.core.type.simple.SimpleFields.*;
+import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
 
-class SimpleFieldTest extends BaseEntityCodecTest {
+class DataFieldTest extends BaseEntityCodecTest {
 
     final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    record CustomSimpleField1(String value, U16 haha, PrependLengthFieldType prependLengthFieldType) implements SimpleField.CustomSimpleField {
+    record CustomDataField1(
+            String value, U16 haha,
+            PrependLengthFieldType prependLengthFieldType
+    ) implements DataField.CustomDataField {
 
         @Override
         public void writeTo(@NotNull ByteBuf output) {
@@ -49,39 +52,40 @@ class SimpleFieldTest extends BaseEntityCodecTest {
 
     @Test
     void test5() throws Exception {
-        final String json = objectMapper.writeValueAsString(new CustomSimpleField1("haha", u16(2), PrependLengthFieldType.u8));
+        final String json = objectMapper.writeValueAsString(new CustomDataField1("haha", u16(2), PrependLengthFieldType.u8));
         System.out.println(json);
-        final Object o = SimpleFields.parseSimpleFieldFromJson(json);
+        final Object o = DataFields.parseSimpleFieldFromJson(json);
         System.out.println(o);
     }
 
     @Test
     void test3() throws Exception {
-        final Object data = strGbk(PrependLengthFieldType.u8, "222");
+        final Object data = gbkString(PrependLengthFieldType.u8, "222");
         System.out.println(objectMapper.writeValueAsString(data));
 
         final List<Object> data1 = List.of(
-                strGbk(PrependLengthFieldType.u8, "222"),
-                new SimpleField.Str("222", "utf-8", PrependLengthFieldType.u16),
+                gbkString(PrependLengthFieldType.u8, "222"),
+                new DataField.GenericString("222", "utf-8", PrependLengthFieldType.u16),
                 i8((byte) 1),
                 u8((short) 2),
                 struct(List.of(i16((short) 11), u16(22))),
                 sequence(List.of(i32(111), u32(222L))),
                 dict(
-                        SimpleField.U16.class,
-                        SimpleField.KeyLengthType.u8,
+                        DataField.U16.class,
+                        DataField.KeyLengthType.u8,
                         Map.of(
-                                u16(1), strGbk("1111"),
-                                u16(2), strGbk("2222"),
-                                u16(3), strGb2312("2222"),
+                                u16(1), gbkString("1111"),
+                                u16(2), gbkString("2222"),
+                                u16(3), gb2312String("2222"),
                                 u16(4), byteSequence(new byte[]{11, 22}),
-                                u16(5), strUtf8("xxx")
+                                u16(5), utf8String("xxx"),
+                                u16(6), new CustomDataField1("value",u16(111),PrependLengthFieldType.none)
                         )
                 ),
                 byteSequence(PrependLengthFieldType.u8, new byte[]{1, 2, 3}),
-                new CustomSimpleField1("haha", u16(1), PrependLengthFieldType.u8)
+                new CustomDataField1("haha", u16(1), PrependLengthFieldType.u8)
         );
-        System.out.println(SimpleFields.mixedListToJsonString(data1));
+        System.out.println(DataFields.mixedListToJsonString(data1));
     }
 
 
@@ -90,7 +94,7 @@ class SimpleFieldTest extends BaseEntityCodecTest {
         String json = """
                 [
                     {
-                        "type": "str_gbk",
+                        "type": "gbk_str",
                         "value": "222",
                         "prependLengthFieldType": "u8"
                     },
@@ -142,12 +146,12 @@ class SimpleFieldTest extends BaseEntityCodecTest {
                         "valueLengthType": "u8",
                         "value": {
                             "1": {
-                                "type": "str_gbk",
+                                "type": "gbk_str",
                                 "value": "1111",
                                 "prependLengthFieldType": "none"
                             },
                             "2": {
-                                "type": "str_gbk",
+                                "type": "gbk_str",
                                 "value": "2222",
                                 "prependLengthFieldType": "none"
                             }
@@ -164,7 +168,7 @@ class SimpleFieldTest extends BaseEntityCodecTest {
                         "prependLengthFieldType": "u8"
                     },
                     {
-                        "type": "io.github.hylexus.xtream.codec.core.type.simple.SimpleFieldTest$CustomSimpleField1",
+                        "type": "io.github.hylexus.xtream.codec.core.type.simple.DataFieldTest$CustomDataField1",
                         "value": "haha",
                         "haha": {
                             "type": "u16",
@@ -174,13 +178,13 @@ class SimpleFieldTest extends BaseEntityCodecTest {
                     }
                 ]
                 """;
-        final Object object = SimpleFields.parseSimpleFieldsFromJson(json);
+        final Object object = DataFields.parseSimpleFieldsFromJson(json);
         System.out.println(object);
     }
 
     @Test
     void test2() throws Exception {
-        final Object data = strGbk(PrependLengthFieldType.u8, "222");
+        final Object data = gbkString(PrependLengthFieldType.u8, "222");
         System.out.println(objectMapper.writeValueAsString(data));
         final ByteBuf buffer = allocator.buffer();
         this.entityCodec.encode(data, buffer);
@@ -189,11 +193,14 @@ class SimpleFieldTest extends BaseEntityCodecTest {
 
     @Test
     void test() throws Exception {
-        final List<SimpleField> data = List.of(
+        final List<DataField> data = List.of(
                 i8((byte) 1),
-                strGbk(PrependLengthFieldType.u8, "222")
+                u32(222L),
+                gbkString(PrependLengthFieldType.u8, "222"),
+                gbkString(PrependLengthFieldType.u16, "222"),
+                utf8String(PrependLengthFieldType.u8, "222")
         );
-        final ObjectWriter objectWriter = objectMapper.writerFor(new TypeReference<List<SimpleField>>() {
+        final ObjectWriter objectWriter = objectMapper.writerFor(new TypeReference<List<DataField>>() {
         });
         System.out.println(objectWriter.writeValueAsString(data));
         final ByteBuf buffer = allocator.buffer();

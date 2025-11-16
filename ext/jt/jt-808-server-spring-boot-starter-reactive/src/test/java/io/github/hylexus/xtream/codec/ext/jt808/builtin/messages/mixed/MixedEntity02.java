@@ -18,7 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import io.github.hylexus.xtream.codec.core.type.simple.SimpleField;
+import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +54,7 @@ public class MixedEntity02 {
 
     // @Preset.RustStyle.u16(desc = "方向")
     @Preset.RustStyle.basic
-    private SimpleField.U16 direction;
+    private DataField.U16 direction;
 
     // 时间  BCD[6] yyMMddHHmmss
     @Preset.JtStyle.BcdDateTime(desc = "时间")
@@ -63,5 +63,5 @@ public class MixedEntity02 {
     private LocalDateTime time;
 
     @Preset.RustStyle.basic
-    private SimpleField.Dict<SimpleField.U8> extraItems;
+    private DataField.Dict<DataField.U8> extraItems;
 }

@@ -22,7 +22,7 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.DefaultSerializeContext;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
-import io.github.hylexus.xtream.codec.core.type.simple.SimpleField;
+import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.jspecify.annotations.Nullable;
@@ -31,12 +31,12 @@ public class EntityEncoder {
     protected final ByteBufAllocator bufferFactory = ByteBufAllocator.DEFAULT;
     private final BeanMetadataRegistry beanMetadataRegistry;
     private final FieldCodecRegistry fieldCodecRegistry;
-    protected final SimpleFieldEncoder simpleFieldEncoder;
+    protected final DataFieldEncoder dataFieldEncoder;
 
     public EntityEncoder(BeanMetadataRegistry beanMetadataRegistry) {
         this.beanMetadataRegistry = beanMetadataRegistry;
         this.fieldCodecRegistry = beanMetadataRegistry.getFieldCodecRegistry();
-        this.simpleFieldEncoder = new SimpleFieldEncoder();
+        this.dataFieldEncoder = new DataFieldEncoder();
     }
 
     public void encode(Object instance, ByteBuf target) {
@@ -49,15 +49,15 @@ public class EntityEncoder {
             case null -> {
                 // ignored
             }
-            case SimpleField simpleField -> {
+            case DataField dataField -> {
                 final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, null);
-                this.simpleFieldEncoder.encode(context, simpleField, target);
+                this.dataFieldEncoder.encode(context, dataField, target);
             }
             case Iterable<?> iterable -> {
                 final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, null);
                 for (Object object : iterable) {
-                    if (object instanceof SimpleField simpleField) {
-                        this.simpleFieldEncoder.encode(context, simpleField, target);
+                    if (object instanceof DataField dataField) {
+                        this.dataFieldEncoder.encode(context, dataField, target);
                     } else {
                         final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(object.getClass(), version);
                         this.encode(version, beanMetadata, object, target);
@@ -108,15 +108,15 @@ public class EntityEncoder {
             case null -> {
                 // ignored
             }
-            case SimpleField simpleField -> {
+            case DataField dataField -> {
                 final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, tracker);
-                this.simpleFieldEncoder.encodeWithTracker(context, simpleField, target);
+                this.dataFieldEncoder.encodeWithTracker(context, dataField, target);
             }
             case Iterable<?> iterable -> {
                 final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, tracker);
                 for (Object object : iterable) {
-                    if (object instanceof SimpleField simpleField) {
-                        this.simpleFieldEncoder.encodeWithTracker(context, simpleField, target);
+                    if (object instanceof DataField dataField) {
+                        this.dataFieldEncoder.encodeWithTracker(context, dataField, target);
                     } else {
                         final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(object.getClass(), version);
                         this.encodeWithTracker(version, beanMetadata, object, target, tracker);

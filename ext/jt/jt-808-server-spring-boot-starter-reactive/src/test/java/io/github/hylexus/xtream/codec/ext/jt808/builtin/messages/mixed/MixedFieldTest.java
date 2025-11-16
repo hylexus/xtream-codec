@@ -18,7 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
-import io.github.hylexus.xtream.codec.core.type.simple.SimpleField;
+import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriber;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
@@ -31,8 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.hylexus.xtream.codec.core.type.simple.SimpleField.*;
-import static io.github.hylexus.xtream.codec.core.type.simple.SimpleFields.*;
+import static io.github.hylexus.xtream.codec.core.type.simple.DataField.*;
+import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
 
 public class MixedFieldTest extends BaseCodecTest {
 
@@ -54,8 +54,8 @@ public class MixedFieldTest extends BaseCodecTest {
 
     @Test
     void test() {
-        final Map<U8, SimpleField> extraItems = getExtraItems();
-        List<SimpleField> simpleFieldList = List.of(
+        final Map<U8, DataField> extraItems = getExtraItems();
+        List<DataField> dataFieldList = List.of(
                 // 报警标志
                 u32("报警标志", 11L),
                 // 状态
@@ -71,27 +71,27 @@ public class MixedFieldTest extends BaseCodecTest {
                 // 方向
                 u16(71),
                 // 时间
-                new StrBcd8421("251108223456"),
+                new Bcd8421String("251108223456"),
                 // 位置附加项
                 dict(U8.class, KeyLengthType.u8, extraItems)
         );
 
-        final ByteBuf encode = responseEncoder.encode(simpleFieldList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
+        final ByteBuf encode = responseEncoder.encode(dataFieldList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
         System.out.println(FormatUtils.toHexString(encode));
         encode.release();
         Assertions.assertEquals(0, encode.refCnt());
 
         final ByteBuf buffer = this.allocator.buffer();
         final CodecTracker tracker = new CodecTracker();
-        this.entityCodec.entityEncoder().encodeWithTracker(simpleFieldList, buffer, tracker);
+        this.entityCodec.entityEncoder().encodeWithTracker(dataFieldList, buffer, tracker);
         System.out.println(FormatUtils.toHexString(buffer));
         tracker.visit();
         buffer.release();
         Assertions.assertEquals(0, buffer.refCnt());
     }
 
-    private static Map<U8, SimpleField> getExtraItems() {
-        final Map<U8, SimpleField> extraItems = new LinkedHashMap<>();
+    private static Map<U8, DataField> getExtraItems() {
+        final Map<U8, DataField> extraItems = new LinkedHashMap<>();
         // 里程，DWORD，1/10km，对应车上里程表读数
         extraItems.put(u8("里程", (short) 0x01), dword(111L));
         // 油量，WORD，1/10L，对应车上油量表读数

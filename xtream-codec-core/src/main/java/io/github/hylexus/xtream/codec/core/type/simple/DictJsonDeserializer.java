@@ -29,16 +29,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class DictJsonDeserializer extends JsonDeserializer<SimpleField.Dict<? extends SimpleField.DictKey>> {
+public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? extends DataField.DictKey>> {
 
-    private static final Map<String, Class<? extends SimpleField.DictKey>> NAME_TO_CLASS = Map.of(
-            "i8", SimpleField.I8.class,
-            "u8", SimpleField.U8.class,
-            "i16", SimpleField.I16.class,
-            "u16", SimpleField.U16.class,
-            "i32", SimpleField.I32.class,
-            "u32", SimpleField.U32.class,
-            "i64", SimpleField.I64.class
+    private static final Map<String, Class<? extends DataField.DictKey>> NAME_TO_CLASS = Map.of(
+            "i8", DataField.I8.class,
+            "u8", DataField.U8.class,
+            "i16", DataField.I16.class,
+            "u16", DataField.U16.class,
+            "i32", DataField.I32.class,
+            "u32", DataField.U32.class,
+            "i64", DataField.I64.class
     );
 
     private final ObjectMapper objectMapper;
@@ -48,7 +48,7 @@ public class DictJsonDeserializer extends JsonDeserializer<SimpleField.Dict<? ex
     }
 
     @Override
-    public SimpleField.Dict<? extends SimpleField.DictKey> deserialize(JsonParser p, DeserializationContext context) throws IOException {
+    public DataField.Dict<? extends DataField.DictKey> deserialize(JsonParser p, DeserializationContext context) throws IOException {
         final JsonNode node = p.getCodec().readTree(p);
 
         // 1. keyType
@@ -57,7 +57,7 @@ public class DictJsonDeserializer extends JsonDeserializer<SimpleField.Dict<? ex
             throw new JsonParseException(p, "keyType is required");
         }
         final String keyTypeString = keyTypeNode.asText();
-        final Class<? extends SimpleField.DictKey> keyType = NAME_TO_CLASS.get(keyTypeString);
+        final Class<? extends DataField.DictKey> keyType = NAME_TO_CLASS.get(keyTypeString);
         if (keyType == null) {
             throw new JsonParseException(p, "Invalid keyType: " + keyTypeString + ". Supported: " + NAME_TO_CLASS.keySet());
         }
@@ -68,7 +68,7 @@ public class DictJsonDeserializer extends JsonDeserializer<SimpleField.Dict<? ex
             throw new JsonParseException(p, "valueLengthType is required");
         }
         final String valueLengthTypeStr = valueLengthTypeNode.asText().toLowerCase();
-        final SimpleField.KeyLengthType valueLengthType = SimpleField.KeyLengthType.valueOf(valueLengthTypeStr);
+        final DataField.KeyLengthType valueLengthType = DataField.KeyLengthType.valueOf(valueLengthTypeStr);
 
         final PrependLengthFieldType prependLengthFieldType = node.has("prependLengthFieldType")
                 ? PrependLengthFieldType.valueOf(node.get("prependLengthFieldType").asText())
@@ -76,17 +76,17 @@ public class DictJsonDeserializer extends JsonDeserializer<SimpleField.Dict<? ex
 
         // 3. 手动反序列化 value map
         final JsonNode valueNode = node.get("value");
-        final Map<SimpleField.DictKey, SimpleField> valueMap = new LinkedHashMap<>();
+        final Map<DataField.DictKey, DataField> valueMap = new LinkedHashMap<>();
 
         final Set<Map.Entry<String, JsonNode>> properties = valueNode.properties();
         for (Map.Entry<String, JsonNode> entry : properties) {
             final String keyValueStr = entry.getKey();
 
             // 将字符串 key 转为 DictKey 实例
-            final SimpleField.DictKey dictKey = SimpleField.DictKey.from(keyType, keyValueStr);
+            final DataField.DictKey dictKey = DataField.DictKey.from(keyType, keyValueStr);
 
             // 反序列化 value
-            final SimpleField fieldValue = this.objectMapper.treeToValue(entry.getValue(), SimpleField.class);
+            final DataField fieldValue = this.objectMapper.treeToValue(entry.getValue(), DataField.class);
 
             valueMap.put(dictKey, fieldValue);
         }
@@ -101,12 +101,12 @@ public class DictJsonDeserializer extends JsonDeserializer<SimpleField.Dict<? ex
 
     }
 
-    private <K extends SimpleField.DictKey> SimpleField.Dict<K> createDict(
+    private <K extends DataField.DictKey> DataField.Dict<K> createDict(
             Class<K> keyType,
-            SimpleField.KeyLengthType valueLengthType,
-            Map<SimpleField.DictKey, SimpleField> rawValueMap,
+            DataField.KeyLengthType valueLengthType,
+            Map<DataField.DictKey, DataField> rawValueMap,
             PrependLengthFieldType prependLengthFieldType) {
-        @SuppressWarnings("unchecked") final Map<K, SimpleField> typedMap = (Map<K, SimpleField>) rawValueMap;
-        return new SimpleField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, typedMap);
+        @SuppressWarnings("unchecked") final Map<K, DataField> typedMap = (Map<K, DataField>) rawValueMap;
+        return new DataField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, typedMap);
     }
 }

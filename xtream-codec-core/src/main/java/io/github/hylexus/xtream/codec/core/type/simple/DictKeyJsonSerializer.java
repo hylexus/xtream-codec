@@ -23,10 +23,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.util.Objects;
 
-public class DictKeyJsonSerializer extends JsonSerializer<SimpleField.DictKey> {
+public class DictKeyJsonSerializer extends JsonSerializer<DataField.DictKey> {
 
     @Override
-    public void serialize(SimpleField.DictKey value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(DataField.DictKey value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeFieldName(Objects.requireNonNull(value.value()).toString());
     }
 
