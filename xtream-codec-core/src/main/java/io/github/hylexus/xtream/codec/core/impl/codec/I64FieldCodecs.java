@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
@@ -52,6 +53,11 @@ public class I64FieldCodecs {
             return NumberSignedness.SIGNED;
         }
 
+        @Override
+        public NumberEndian endian() {
+            return NumberEndian.BIG_ENDIAN;
+        }
+
     }
 
     public static final class I64FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
@@ -76,6 +82,11 @@ public class I64FieldCodecs {
         @Override
         public NumberSignedness signedness() {
             return NumberSignedness.SIGNED;
+        }
+
+        @Override
+        public NumberEndian endian() {
+            return NumberEndian.LITTLE_ENDIAN;
         }
     }
 

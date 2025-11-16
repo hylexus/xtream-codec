@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
@@ -35,6 +36,11 @@ public class U16FieldCodecs {
     public static final class U16FieldCodec extends BaseU16FieldCodec<Integer> {
         private U16FieldCodec() {
             super(Integer.class, Function.identity());
+        }
+
+        @Override
+        public NumberEndian endian() {
+            return NumberEndian.BIG_ENDIAN;
         }
     }
 
@@ -115,6 +121,11 @@ public class U16FieldCodecs {
         @Override
         public NumberSignedness signedness() {
             return NumberSignedness.UNSIGNED;
+        }
+
+        @Override
+        public NumberEndian endian() {
+            return NumberEndian.BIG_ENDIAN;
         }
     }
 

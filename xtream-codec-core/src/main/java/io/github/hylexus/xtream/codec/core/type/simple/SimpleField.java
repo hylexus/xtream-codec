@@ -97,7 +97,7 @@ public sealed interface SimpleField {
 
     record F32(String name, Float value) implements SimpleField {
         public F32(@Nullable String name, Float value) {
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -113,7 +113,7 @@ public sealed interface SimpleField {
 
     record F64(String name, Double value) implements SimpleField {
         public F64(@Nullable String name, Double value) {
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -131,7 +131,7 @@ public sealed interface SimpleField {
 
         public StrGbk(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -322,7 +322,7 @@ public sealed interface SimpleField {
 
     record I8(String name, Byte value) implements SimpleField.DictKey {
         public I8(@Nullable String name, Byte value) {
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -339,7 +339,7 @@ public sealed interface SimpleField {
 
     record U8(String name, Short value) implements SimpleField.DictKey {
         public U8(@Nullable String name, Short value) {
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             SimpleField.checkU8(value);
             this.value = value;
         }
@@ -356,7 +356,7 @@ public sealed interface SimpleField {
 
     record I16(String name, Short value) implements SimpleField.DictKey {
         public I16(@Nullable String name, Short value) {
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -373,7 +373,7 @@ public sealed interface SimpleField {
     record U16(String name, Integer value) implements SimpleField.DictKey {
         public U16(@Nullable String name, Integer value) {
             SimpleField.checkU16(value);
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -389,7 +389,7 @@ public sealed interface SimpleField {
 
     record I32(String name, Integer value) implements SimpleField.DictKey {
         public I32(@Nullable String name, Integer value) {
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -407,7 +407,7 @@ public sealed interface SimpleField {
     record U32(String name, Long value) implements SimpleField.DictKey {
         public U32(@Nullable String name, Long value) {
             SimpleField.checkU32(value);
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -423,7 +423,7 @@ public sealed interface SimpleField {
 
     record I64(String name, Long value) implements SimpleField.DictKey {
         public I64(@Nullable String name, Long value) {
-            this.name = nonNull(name, this.getClass().getSimpleName());
+            this.name = filedName(name, this);
             this.value = value;
         }
 
@@ -533,10 +533,6 @@ public sealed interface SimpleField {
             return self.getClass().getSimpleName();
         }
         return name;
-    }
-
-    static <T> T nonNull(@Nullable T value, T defaultValue) {
-        return value != null ? value : defaultValue;
     }
 
     private static void checkU8(@Nullable Short v) {

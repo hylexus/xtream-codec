@@ -17,11 +17,13 @@
 package io.github.hylexus.xtream.codec.core;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface FieldCodecRegistry {
 
@@ -49,6 +51,21 @@ public interface FieldCodecRegistry {
 
     interface FieldCodecRegistryAware {
         void setFieldCodecRegistry(FieldCodecRegistry registry);
+    }
+
+    Stream<CodecDescriptor> descriptors();
+
+    record CodecDescriptor(
+            String key,
+            String rawClassName,
+            NumberSignedness signedness,
+            String charset,
+            boolean isBuiltin,
+            NumberEndian endian
+    ) {
+        @SuppressWarnings("unused")
+        public CodecDescriptor {
+        }
     }
 
 }

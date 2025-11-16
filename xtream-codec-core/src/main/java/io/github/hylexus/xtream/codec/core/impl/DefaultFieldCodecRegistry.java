@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistryAware;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
@@ -37,14 +38,18 @@ import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Stream;
 
 @NullMarked
 public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
 
+    private static final Logger log = LoggerFactory.getLogger(DefaultFieldCodecRegistry.class);
     // private static final Logger log = LoggerFactory.getLogger(DefaultFieldCodecRegistry.class);
     private final Map<String, FieldCodec<?>> mapping = new LinkedHashMap<>();
     @SuppressWarnings("rawtypes")
@@ -243,21 +248,10 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         registry.register(SimpleFieldCodecs.INSTANCE, SimpleField.ByteSequence.class, -1, "", false);
 
         registerDefaultStringCodec(registry);
-
-        registry.register(StringFieldCodecs.INSTANCE_UTF8, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_UTF8, false);
-        registry.register(StringFieldCodecs.INSTANCE_GBK, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_GBK, false);
-        registry.register(StringFieldCodecs.INSTANCE_GB_2312, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_GB_2312, false);
-        registry.register(StringFieldCodecs.INSTANCE_BCD_8421, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_BCD_8421, false);
-        registry.register(StringFieldCodecs.INSTANCE_HEX, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_HEX, false);
-
     }
 
-    @SuppressWarnings("removal")
     private static void registerDefaultStringCodec(DefaultFieldCodecRegistry registry) {
         Arrays.asList(
-                XtreamConstants.CHARSET_GBK,
-                XtreamConstants.CHARSET_GB_2312,
-                StandardCharsets.UTF_8,
                 StandardCharsets.US_ASCII,
                 StandardCharsets.ISO_8859_1,
                 StandardCharsets.UTF_16BE,
@@ -265,8 +259,12 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
                 StandardCharsets.UTF_16
         ).forEach(charset -> {
             // ...
-            registry.register(new StringFieldCodec(charset.name()), String.class, XtreamDataType.string.sizeInBytes(), charset.name(), false);
+            registry.register(StringFieldCodecs.createStringCodec(charset.name()), String.class, XtreamDataType.string.sizeInBytes(), charset.name(), false);
         });
+
+        registry.register(StringFieldCodecs.INSTANCE_UTF8, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_UTF8, false);
+        registry.register(StringFieldCodecs.INSTANCE_GBK, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_GBK, false);
+        registry.register(StringFieldCodecs.INSTANCE_GB_2312, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_GB_2312, false);
 
         registry.register(StringFieldCodecs.INSTANCE_BCD_8421, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_BCD_8421, false);
         registry.register(StringFieldCodecs.INSTANCE_HEX, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_HEX, false);
@@ -279,8 +277,35 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         }
         final NumberSignedness signedness = fieldCodec.signedness();
         final String key = this.generateKey(signedness, targetType, sizeInBytes, charset, littleEndian);
-        this.mapping.put(key, fieldCodec);
+        final FieldCodec<?> oldCodec = this.mapping.put(key, fieldCodec);
+        if (oldCodec != null) {
+            log.debug("FieldCodec has been replaced. key= `{}`, oldCodec= `{}`, newCodec= `{}`", key, oldCodec.getClass().getName(), fieldCodec.getClass().getName());
+        }
         this.instanceMapping.put(fieldCodec.getClass(), fieldCodec);
+    }
+
+    @Override
+    public Stream<CodecDescriptor> descriptors() {
+        return this.mapping.entrySet()
+                .stream()
+                .map(entry -> {
+                    final String key = entry.getKey();
+                    final FieldCodec<?> value = entry.getValue();
+                    final NumberSignedness signedness = value.signedness();
+                    final String rawClassName = value.getClass().getName();
+                    final String charset = value instanceof CharSequenceFieldCodec<?> charSequenceFieldCodec
+                            ? charSequenceFieldCodec.encoding()
+                            : "NONE";
+                    final boolean isBuiltin = isBuiltinFieldCodec(value);
+                    final NumberEndian endian = value instanceof IntegralFieldCodec integralFieldCodec
+                            ? integralFieldCodec.endian()
+                            : NumberEndian.NONE;
+                    return new CodecDescriptor(key, rawClassName, signedness, charset, isBuiltin, endian);
+                });
+    }
+
+    private boolean isBuiltinFieldCodec(FieldCodec<?> fieldCodec) {
+        return fieldCodec.getClass().getName().startsWith("io.github.hylexus.xtream.codec.core.impl.codec");
     }
 
     protected String generateKey(NumberSignedness signedness, Class<?> targetType, int sizeInBytes, @Nullable String charset, boolean littleEndian) {
@@ -353,14 +378,14 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         }
 
         if (codecClass != null && !Objects.equals(FieldCodec.Placeholder.class, codecClass)) {
-            final FieldCodec<?> instance = this.instanceMapping.get(codecClass);
-            if (instance != null) {
-                return instance;
-            }
-
             if (CharSequenceFieldCodec.class.isAssignableFrom(codecClass)) {
                 Objects.requireNonNull(charset, "StringFieldCodec.charset is null");
                 return StringFieldCodecs.createStringCodecAndCastToObject(charset);
+            }
+
+            final FieldCodec<?> instance = this.instanceMapping.get(codecClass);
+            if (instance != null) {
+                return instance;
             }
 
             Objects.requireNonNull(beanMetadataRegistry);

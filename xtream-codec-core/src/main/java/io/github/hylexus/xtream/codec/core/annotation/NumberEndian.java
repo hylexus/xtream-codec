@@ -14,22 +14,35 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.core.impl.codec;
+package io.github.hylexus.xtream.codec.core.annotation;
 
-import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 
 /**
- * 标记接口。
- * <p>
- * 用来表示整数类型的编解码器(不含小数部分)。
- *
  * @author hylexus
  */
-public interface IntegralFieldCodec extends FieldCodec<Number> {
+public enum NumberEndian {
+    /**
+     * 大端
+     */
+    BIG_ENDIAN("bigEndian"),
 
-    default NumberEndian endian() {
-        return NumberEndian.NONE;
+    /**
+     * 小端
+     */
+    LITTLE_ENDIAN("littleEndian"),
+    /**
+     * 占位符
+     */
+    NONE("NONE");
+
+    private final String value;
+
+    NumberEndian(String value) {
+        this.value = value;
+    }
+
+    public String value() {
+        return value;
     }
 
 }
