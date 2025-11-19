@@ -5,7 +5,7 @@ pluginManagement {
         id("org.springframework.boot") version defaultSpringBootBomVersion apply false
         id("net.minecraftforge.licenser") version "1.2.0" apply false
         // @see https://github.com/jk1/Gradle-License-Report/issues/339
-        id("com.github.jk1.dependency-license-report") version "2.9" apply false
+        id("com.github.jk1.dependency-license-report") version "3.0.1" apply false
         id("com.namics.oss.gradle.license-enforce-plugin") version "1.7.0" apply false
         id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1" apply false
         // https://github.com/melix/jmh-gradle-plugin
