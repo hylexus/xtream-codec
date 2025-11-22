@@ -16,14 +16,16 @@
 
 package io.github.hylexus.xtream.codec.core.type.simple;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
-import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.DataFieldEncoder;
+import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
@@ -68,6 +70,13 @@ public sealed interface DataField {
 
     @Nullable Object value();
 
+    @JsonAnyGetter
+    @JsonAnySetter
+    @JsonProperty("__attributes__")
+    default @Nullable Map<String, @Nullable Object> attributes() {
+        return null;
+    }
+
     default PrependLengthFieldType prependLengthFieldType() {
         return PrependLengthFieldType.none;
     }
@@ -93,13 +102,13 @@ public sealed interface DataField {
 
         static DictKey from(Class<? extends DictKey> clazz, String value) {
             return switch (clazz.getSimpleName().toLowerCase()) {
-                case "i8", "int8" -> new I8(Byte.parseByte(value));
-                case "u8", "uint8" -> new U8(Short.parseShort(value));
-                case "i16", "int16" -> new I16(Short.parseShort(value));
-                case "u16", "uint16" -> new U16(Integer.parseInt(value));
-                case "i32", "int32" -> new I32(Integer.parseInt(value));
-                case "u32", "uint32" -> new U32(Long.parseLong(value));
-                case "i64", "int64" -> new I64(Long.parseLong(value));
+                case "i8", "int8" -> new I8(null, Byte.parseByte(value), null);
+                case "u8", "uint8" -> new U8(null, Short.parseShort(value), null);
+                case "i16", "int16" -> new I16(null, Short.parseShort(value), null);
+                case "u16", "uint16" -> new U16(null, Integer.parseInt(value), null);
+                case "i32", "int32" -> new I32(null, Integer.parseInt(value), null);
+                case "u32", "uint32" -> new U32(null, Long.parseLong(value), null);
+                case "i64", "int64" -> new I64(null, Long.parseLong(value), null);
                 default -> throw new IllegalArgumentException("Unknown dict key type: " + clazz.getSimpleName());
             };
         }
@@ -120,14 +129,11 @@ public sealed interface DataField {
         }
     }
 
-    record F32(String name, Float value) implements FloatDataField {
-        public F32(@Nullable String name, Float value) {
+    record F32(String name, Float value, @Nullable Map<String, @Nullable Object> attributes) implements FloatDataField {
+        public F32(@Nullable String name, Float value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public F32(Float value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -136,14 +142,11 @@ public sealed interface DataField {
         }
     }
 
-    record F64(String name, Double value) implements FloatDataField {
-        public F64(@Nullable String name, Double value) {
+    record F64(String name, Double value, @Nullable Map<String, @Nullable Object> attributes) implements FloatDataField {
+        public F64(@Nullable String name, Double value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public F64(Double value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -152,20 +155,17 @@ public sealed interface DataField {
         }
     }
 
-    record GbkString(String name, PrependLengthFieldType prependLengthFieldType, String value) implements StringDataField {
+    record GbkString(
+            String name,
+            PrependLengthFieldType prependLengthFieldType,
+            String value,
+            @Nullable Map<String, @Nullable Object> attributes) implements StringDataField {
 
-        public GbkString(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+        public GbkString(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public GbkString(PrependLengthFieldType prependLengthFieldType, String value) {
-            this(null, prependLengthFieldType, value);
-        }
-
-        public GbkString(String value) {
-            this(null, PrependLengthFieldType.none, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -179,15 +179,13 @@ public sealed interface DataField {
         }
     }
 
-    record GenericString(String value, String charset, PrependLengthFieldType prependLengthFieldType) implements StringDataField {
-        public GenericString(String value, String charset, @Nullable PrependLengthFieldType prependLengthFieldType) {
+    record GenericString(String name, PrependLengthFieldType prependLengthFieldType, String value, String charset, @Nullable Map<String, @Nullable Object> attributes) implements StringDataField {
+        public GenericString(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value, String charset, @Nullable Map<String, @Nullable Object> attributes) {
+            this.name = fieldName(name, this);
+            this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.value = value;
             this.charset = Objects.requireNonNull(charset, "charset is null");
-            this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-        }
-
-        public GenericString(String value, String charset) {
-            this(value, charset, PrependLengthFieldType.none);
+            this.attributes = attributes;
         }
 
         @Override
@@ -196,23 +194,12 @@ public sealed interface DataField {
         }
     }
 
-    record Gb2312String(String name, PrependLengthFieldType prependLengthFieldType, String value) implements StringDataField {
-        public Gb2312String(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+    record Gb2312String(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) implements StringDataField {
+        public Gb2312String(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-        }
-
-        public Gb2312String(@Nullable PrependLengthFieldType prependLengthFieldType, String value) {
-            this(null, prependLengthFieldType, value);
-        }
-
-        public Gb2312String(String value) {
-            this(null, PrependLengthFieldType.none, value);
-        }
-
-        public Gb2312String(String name, String value) {
-            this(name, PrependLengthFieldType.none, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -226,24 +213,13 @@ public sealed interface DataField {
         }
     }
 
-    record Utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value) implements StringDataField {
+    record Utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) implements StringDataField {
 
-        public Utf8String(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value) {
+        public Utf8String(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-        }
-
-        public Utf8String(@Nullable PrependLengthFieldType prependLengthFieldType, String value) {
-            this(null, prependLengthFieldType, value);
-        }
-
-        public Utf8String(String name, String value) {
-            this(name, PrependLengthFieldType.none, value);
-        }
-
-        public Utf8String(String value) {
-            this(null, PrependLengthFieldType.none, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -257,15 +233,17 @@ public sealed interface DataField {
         }
     }
 
-    record Bcd8421String(String value, PrependLengthFieldType prependLengthFieldType) implements StringDataField {
+    static PrependLengthFieldType filedLengthType(@Nullable PrependLengthFieldType input) {
+        return requireNonNullElse(input, PrependLengthFieldType.none);
+    }
 
-        public Bcd8421String(String value, @Nullable PrependLengthFieldType prependLengthFieldType) {
+    record Bcd8421String(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) implements StringDataField {
+
+        public Bcd8421String(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
+            this.name = fieldName(name, this);
             this.value = value;
-            this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-        }
-
-        public Bcd8421String(String value) {
-            this(value, PrependLengthFieldType.none);
+            this.prependLengthFieldType = filedLengthType(prependLengthFieldType);
+            this.attributes = attributes;
         }
 
         @Override
@@ -279,15 +257,13 @@ public sealed interface DataField {
         }
     }
 
-    record HexString(String value, PrependLengthFieldType prependLengthFieldType) implements StringDataField {
+    record HexString(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) implements StringDataField {
 
-        public HexString(String value, @Nullable PrependLengthFieldType prependLengthFieldType) {
-            this.value = value;
+        public HexString(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
+            this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-        }
-
-        public HexString(String value) {
-            this(value, PrependLengthFieldType.none);
+            this.value = value;
+            this.attributes = attributes;
         }
 
         @Override
@@ -301,20 +277,13 @@ public sealed interface DataField {
         }
     }
 
-    record Struct(@Nullable String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value) implements DataField {
+    record Struct(@Nullable String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value, @Nullable Map<String, @Nullable Object> attributes) implements DataField {
 
-        public Struct(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
+        public Struct(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.value = value;
-        }
-
-        public Struct(@Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
-            this(null, prependLengthFieldType, value);
-        }
-
-        public Struct(List<DataField> value) {
-            this(null, PrependLengthFieldType.none, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -324,7 +293,7 @@ public sealed interface DataField {
 
     }
 
-    enum KeyLengthType {
+    enum ValueLengthType {
         i8, u8, i16, u16, i32, u32, i64;
 
         public void writeToWithTracker(ByteBuf output, long value, CodecTracker codecTracker) {
@@ -336,23 +305,20 @@ public sealed interface DataField {
 
         public void writeTo(ByteBuf output, long value) {
             switch (this) {
-                case null -> throw new IllegalArgumentException("Key length type cannot be null");
                 case i8, u8 -> output.writeByte((int) value);
                 case i16, u16 -> output.writeShort((int) value);
                 case i32, u32 -> output.writeInt((int) value);
                 case i64 -> output.writeLong(value);
+                default -> throw new IllegalArgumentException("Unsupported value length type: " + this);
             }
         }
     }
 
-    record I8(String name, Byte value) implements DataField.DictKey {
-        public I8(@Nullable String name, Byte value) {
+    record I8(String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.DictKey {
+        public I8(@Nullable String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public I8(Byte value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -362,15 +328,12 @@ public sealed interface DataField {
 
     }
 
-    record U8(String name, Short value) implements DataField.DictKey {
-        public U8(@Nullable String name, Short value) {
+    record U8(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.DictKey {
+        public U8(@Nullable String name, Short value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             DataField.checkU8(value);
             this.value = value;
-        }
-
-        public U8(Short value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -379,14 +342,11 @@ public sealed interface DataField {
         }
     }
 
-    record I16(String name, Short value) implements DataField.DictKey {
-        public I16(@Nullable String name, Short value) {
+    record I16(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.DictKey {
+        public I16(@Nullable String name, Short value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public I16(Short value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -395,15 +355,12 @@ public sealed interface DataField {
         }
     }
 
-    record U16(String name, Integer value) implements DataField.DictKey {
-        public U16(@Nullable String name, Integer value) {
+    record U16(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.DictKey {
+        public U16(@Nullable String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) {
             DataField.checkU16(value);
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public U16(Integer value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -412,14 +369,11 @@ public sealed interface DataField {
         }
     }
 
-    record I32(String name, Integer value) implements DataField.DictKey {
-        public I32(@Nullable String name, Integer value) {
+    record I32(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.DictKey {
+        public I32(@Nullable String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public I32(Integer value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -429,15 +383,12 @@ public sealed interface DataField {
 
     }
 
-    record U32(String name, Long value) implements DataField.DictKey {
-        public U32(@Nullable String name, Long value) {
+    record U32(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.DictKey {
+        public U32(@Nullable String name, Long value, @Nullable Map<String, @Nullable Object> attributes) {
             DataField.checkU32(value);
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public U32(Long value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -446,14 +397,11 @@ public sealed interface DataField {
         }
     }
 
-    record I64(String name, Long value) implements DataField.DictKey {
-        public I64(@Nullable String name, Long value) {
+    record I64(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.DictKey {
+        public I64(@Nullable String name, Long value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
-        }
-
-        public I64(Long value) {
-            this(null, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -479,24 +427,18 @@ public sealed interface DataField {
             @JsonSerialize(using = DictKeyTypeJsonSerializer.class)
             Class<K> keyType,
 
-            @JsonProperty("valueLengthType") KeyLengthType valueLengthType,
-            @JsonProperty("value") Map<K, DataField> value
+            @JsonProperty("valueLengthType") ValueLengthType valueLengthType,
+            @JsonProperty("value") Map<K, DataField> value,
+            @Nullable Map<String, @Nullable Object> attributes
     ) implements DataField {
 
-        public Dict(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, Class<K> keyType, KeyLengthType valueLengthType, Map<K, DataField> value) {
+        public Dict(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, Class<K> keyType, ValueLengthType valueLengthType, Map<K, DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.keyType = keyType;
             this.value = value;
             this.valueLengthType = valueLengthType;
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
-        }
-
-        public Dict(PrependLengthFieldType prependLengthFieldType, Class<K> keyClass, DataField.KeyLengthType valueLengthType, Map<K, DataField> value) {
-            this(null, prependLengthFieldType, keyClass, valueLengthType, value);
-        }
-
-        public Dict(Class<K> keyClass, DataField.KeyLengthType valueLengthType, Map<K, DataField> value) {
-            this(null, PrependLengthFieldType.none, keyClass, valueLengthType, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -521,20 +463,13 @@ public sealed interface DataField {
      * 编码时可选择是否在序列内容前附加总长度或元素个数字段
      * （通过 {@link PrependLengthFieldType} 控制）。
      */
-    record Sequence(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value) implements DataField {
+    record Sequence(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value, @Nullable Map<String, @Nullable Object> attributes) implements DataField {
 
-        public Sequence(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
+        public Sequence(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, List<DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.value = value;
-        }
-
-        public Sequence(PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
-            this(null, prependLengthFieldType, value);
-        }
-
-        public Sequence(List<DataField> value) {
-            this(null, PrependLengthFieldType.none, value);
+            this.attributes = attributes;
         }
 
         @Override
@@ -560,23 +495,21 @@ public sealed interface DataField {
      */
     record ByteSequence(
             String name,
-            PrependLengthFieldType prependLengthFieldType, @JsonSerialize(using = ByteArrayJsonSerializer.class)
-            byte[] value
+            PrependLengthFieldType prependLengthFieldType,
+
+            @JsonSerialize(using = ByteArrayJsonSerializer.class)
+            byte[] value,
+
+            @Nullable Map<String, @Nullable Object> attributes
     ) implements DataField {
 
-        public ByteSequence(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, byte[] value) {
+        public ByteSequence(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, byte[] value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.value = value;
+            this.attributes = attributes;
         }
 
-        public ByteSequence(@Nullable PrependLengthFieldType prependLengthFieldType, byte[] value) {
-            this(null, prependLengthFieldType, value);
-        }
-
-        public ByteSequence(byte[] value) {
-            this(null, PrependLengthFieldType.none, value);
-        }
 
         @Override
         public String type() {

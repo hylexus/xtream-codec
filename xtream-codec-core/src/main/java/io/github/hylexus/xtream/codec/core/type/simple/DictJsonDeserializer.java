@@ -68,7 +68,7 @@ public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? exte
             throw new JsonParseException(p, "valueLengthType is required");
         }
         final String valueLengthTypeStr = valueLengthTypeNode.asText().toLowerCase();
-        final DataField.KeyLengthType valueLengthType = DataField.KeyLengthType.valueOf(valueLengthTypeStr);
+        final DataField.ValueLengthType valueLengthType = DataField.ValueLengthType.valueOf(valueLengthTypeStr);
 
         final PrependLengthFieldType prependLengthFieldType = node.has("prependLengthFieldType")
                 ? PrependLengthFieldType.valueOf(node.get("prependLengthFieldType").asText())
@@ -103,10 +103,10 @@ public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? exte
 
     private <K extends DataField.DictKey> DataField.Dict<K> createDict(
             Class<K> keyType,
-            DataField.KeyLengthType valueLengthType,
+            DataField.ValueLengthType valueLengthType,
             Map<DataField.DictKey, DataField> rawValueMap,
             PrependLengthFieldType prependLengthFieldType) {
         @SuppressWarnings("unchecked") final Map<K, DataField> typedMap = (Map<K, DataField>) rawValueMap;
-        return new DataField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, typedMap);
+        return new DataField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, typedMap, null);
     }
 }

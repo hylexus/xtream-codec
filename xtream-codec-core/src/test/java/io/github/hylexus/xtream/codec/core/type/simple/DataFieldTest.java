@@ -50,6 +50,29 @@ class DataFieldTest extends BaseEntityCodecTest {
 
     }
 
+
+    @Test
+    void test6() throws Exception {
+        final Object data = new DataField.GbkString(null, PrependLengthFieldType.u8, "222", Map.of("a", 1, "b", "222"));
+        System.out.println("Encode: " + objectMapper.writeValueAsString(data));
+        final DataField dataField = parseSimpleFieldFromJson("""
+                {
+                    "type": "gbk_string",
+                    "name": "GbkString",
+                    "prependLengthFieldType": "u8",
+                    "value": "222",
+                    "attributes": {
+                        "a": 111
+                    },
+                    "x-a": 111,
+                    "x-b": "111"
+                }
+                """);
+        System.out.println("Decode: " + dataField);
+        System.out.println(objectMapper.writeValueAsString(dataField));
+    }
+
+
     @Test
     void test5() throws Exception {
         final String json = objectMapper.writeValueAsString(new CustomDataField1("haha", u16(2), PrependLengthFieldType.u8));
@@ -65,21 +88,21 @@ class DataFieldTest extends BaseEntityCodecTest {
 
         final List<Object> data1 = List.of(
                 gbkString(PrependLengthFieldType.u8, "222"),
-                new DataField.GenericString("222", "utf-8", PrependLengthFieldType.u16),
+                string(PrependLengthFieldType.u16, "222", "utf-8"),
                 i8((byte) 1),
                 u8((short) 2),
                 struct(List.of(i16((short) 11), u16(22))),
                 sequence(List.of(i32(111), u32(222L))),
                 dict(
                         DataField.U16.class,
-                        DataField.KeyLengthType.u8,
+                        DataField.ValueLengthType.u8,
                         Map.of(
                                 u16(1), gbkString("1111"),
                                 u16(2), gbkString("2222"),
                                 u16(3), gb2312String("2222"),
                                 u16(4), byteSequence(new byte[]{11, 22}),
                                 u16(5), utf8String("xxx"),
-                                u16(6), new CustomDataField1("value",u16(111),PrependLengthFieldType.none)
+                                u16(6), new CustomDataField1("value", u16(111), PrependLengthFieldType.none)
                         )
                 ),
                 byteSequence(PrependLengthFieldType.u8, new byte[]{1, 2, 3}),

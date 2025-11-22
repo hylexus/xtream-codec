@@ -84,12 +84,12 @@ public class DataFieldEncoder {
             case DataField.I64 i64 -> output.writeLong(i64.value());
             case DataField.F32 f32 -> output.writeFloat(f32.value());
             case DataField.F64 f64 -> output.writeDouble(f64.value());
-            case DataField.Bcd8421String(String value, var ignored) -> BcdOps.encodeBcd8421StringIntoByteBuf(value, output);
-            case DataField.HexString(String value, var ignored) -> XtreamBytes.writeHexString(output, value);
+            case DataField.Bcd8421String bcd8421String -> BcdOps.encodeBcd8421StringIntoByteBuf(bcd8421String.value(), output);
+            case DataField.HexString hexString -> XtreamBytes.writeHexString(output, hexString.value());
             case DataField.GbkString gbkString -> encodeString(output, gbkString.value(), XtreamConstants.CHARSET_GBK);
             case DataField.Gb2312String gb2312String -> encodeString(output, gb2312String.value(), XtreamConstants.CHARSET_GB_2312);
             case DataField.Utf8String utf8String -> encodeString(output, utf8String.value(), XtreamConstants.CHARSET_UTF8);
-            case DataField.GenericString(String value, String charset, var ignored) -> encodeString(output, value, Charset.forName(charset));
+            case DataField.GenericString genericString -> encodeString(output, genericString.value(), Charset.forName(genericString.charset()));
             case DataField.ByteSequence byteSequence -> output.writeBytes(byteSequence.value());
             case DataField.Struct struct -> {
                 final List<DataField> value = struct.value();
@@ -184,12 +184,12 @@ public class DataFieldEncoder {
             case DataField.I64 i64 -> output.writeLong(i64.value());
             case DataField.F32 f32 -> output.writeFloat(f32.value());
             case DataField.F64 f64 -> output.writeDouble(f64.value());
-            case DataField.Bcd8421String(String value, var ignored) -> BcdOps.encodeBcd8421StringIntoByteBuf(value, output);
-            case DataField.HexString(String value, var ignored) -> XtreamBytes.writeHexString(output, value);
+            case DataField.Bcd8421String bcd8421String -> BcdOps.encodeBcd8421StringIntoByteBuf(bcd8421String.value(), output);
+            case DataField.HexString hexString -> XtreamBytes.writeHexString(output, hexString.value());
             case DataField.GbkString gbkString -> encodeString(output, gbkString.value(), XtreamConstants.CHARSET_GBK);
             case DataField.Gb2312String gb2312String -> encodeString(output, gb2312String.value(), XtreamConstants.CHARSET_GB_2312);
             case DataField.Utf8String utf8String -> encodeString(output, utf8String.value(), XtreamConstants.CHARSET_UTF8);
-            case DataField.GenericString(String value, String charset, var ignored) -> encodeString(output, value, Charset.forName(charset));
+            case DataField.GenericString genericString -> encodeString(output, genericString.value(), Charset.forName(genericString.charset()));
             case DataField.ByteSequence byteSequence -> output.writeBytes(byteSequence.value());
             case DataField.Struct struct -> {
                 final List<DataField> value = struct.value();

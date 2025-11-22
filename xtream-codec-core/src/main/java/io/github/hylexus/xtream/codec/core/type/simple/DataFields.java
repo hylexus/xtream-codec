@@ -76,197 +76,301 @@ public final class DataFields {
 
     // region 工厂方法
 
+    public static DataField.I8 i8(String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.I8(name, value, attributes);
+    }
+
     public static DataField.I8 i8(String name, Byte value) {
-        return new DataField.I8(name, value);
+        return new DataField.I8(name, value, null);
     }
 
     public static DataField.I8 i8(Byte value) {
-        return new DataField.I8(value);
+        return new DataField.I8(null, value, null);
+    }
+
+    public static DataField.U8 u8(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.U8(name, value, attributes);
     }
 
     public static DataField.U8 u8(String name, Short value) {
-        return new DataField.U8(name, value);
+        return new DataField.U8(name, value, null);
     }
 
     public static DataField.U8 u8(Short value) {
-        return new DataField.U8(value);
+        return new DataField.U8(null, value, null);
+    }
+
+    public static DataField.I16 i16(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.I16(name, value, attributes);
     }
 
     public static DataField.I16 i16(String name, Short value) {
-        return new DataField.I16(name, value);
+        return new DataField.I16(name, value, null);
     }
 
     public static DataField.I16 i16(Short value) {
-        return new DataField.I16(value);
+        return new DataField.I16(null, value, null);
+    }
+
+    public static DataField.U16 u16(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.U16(name, value, attributes);
     }
 
     public static DataField.U16 u16(String name, Integer value) {
-        return new DataField.U16(name, value);
+        return new DataField.U16(name, value, null);
     }
 
     public static DataField.U16 u16(Integer value) {
-        return new DataField.U16(value);
+        return new DataField.U16(null, value, null);
     }
 
     public static DataField.U16 word(String name, Integer value) {
-        return new DataField.U16(name, value);
+        return new DataField.U16(name, value, null);
     }
 
     public static DataField.U16 word(Integer value) {
-        return new DataField.U16(value);
+        return new DataField.U16(null, value, null);
+    }
+
+    public static DataField.I32 i32(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.I32(name, value, attributes);
     }
 
     public static DataField.I32 i32(String name, Integer value) {
-        return new DataField.I32(name, value);
+        return new DataField.I32(name, value, null);
     }
 
     public static DataField.I32 i32(Integer value) {
-        return new DataField.I32(value);
+        return new DataField.I32(null, value, null);
+    }
+
+    public static DataField.U32 u32(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.U32(name, value, attributes);
     }
 
     public static DataField.U32 u32(String name, Long value) {
-        return new DataField.U32(name, value);
+        return new DataField.U32(name, value, null);
     }
 
     public static DataField.U32 u32(Long value) {
-        return new DataField.U32(value);
+        return new DataField.U32(null, value, null);
     }
 
     public static DataField.U32 dword(String name, Long value) {
-        return new DataField.U32(name, value);
+        return new DataField.U32(name, value, null);
     }
 
     public static DataField.U32 dword(Long value) {
-        return new DataField.U32(value);
+        return new DataField.U32(null, value, null);
+    }
+
+    public static DataField.F32 f32(String name, Float value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.F32(name, value, attributes);
     }
 
     public static DataField.F32 f32(String name, Float value) {
-        return new DataField.F32(name, value);
+        return new DataField.F32(name, value, null);
     }
 
     public static DataField.F32 f32(Float value) {
-        return new DataField.F32(value);
+        return new DataField.F32(null, value, null);
+    }
+
+    public static DataField.I64 i64(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.I64(name, value, attributes);
     }
 
     public static DataField.I64 i64(String name, Long value) {
-        return new DataField.I64(name, value);
+        return new DataField.I64(name, value, null);
     }
 
     public static DataField.I64 i64(Long value) {
-        return new DataField.I64(value);
+        return new DataField.I64(null, value, null);
+    }
+
+    public static DataField.F64 f64(String name, Double value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.F64(name, value, attributes);
     }
 
     public static DataField.F64 f64(String name, Double value) {
-        return new DataField.F64(name, value);
+        return new DataField.F64(name, value, null);
     }
 
     public static DataField.F64 f64(Double value) {
-        return new DataField.F64(value);
+        return new DataField.F64(null, value, null);
+    }
+
+    public static DataField.GenericString string(String name, PrependLengthFieldType prependLengthFieldType, String value, String charset, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.GenericString(name, prependLengthFieldType, value, charset, attributes);
+    }
+
+    public static DataField.GenericString string(PrependLengthFieldType prependLengthFieldType, String value, String charset) {
+        return new DataField.GenericString(null, prependLengthFieldType, value, charset, null);
+    }
+
+    public static DataField.GenericString string(String value, String charset) {
+        return new DataField.GenericString(null, null, value, charset, null);
+    }
+
+    public static DataField.GbkString gbkString(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.GbkString(name, prependLengthFieldType, value, attributes);
     }
 
     public static DataField.GbkString gbkString(String name, PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.GbkString(name, prependLengthFieldType, value);
+        return new DataField.GbkString(name, prependLengthFieldType, value, null);
     }
 
     public static DataField.GbkString gbkString(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.GbkString(null, prependLengthFieldType, value);
+        return new DataField.GbkString(null, prependLengthFieldType, value, null);
     }
 
     public static DataField.GbkString gbkString(String name, String value) {
-        return new DataField.GbkString(name, PrependLengthFieldType.none, value);
+        return new DataField.GbkString(name, PrependLengthFieldType.none, value, null);
     }
 
     public static DataField.GbkString gbkString(String value) {
-        return new DataField.GbkString(null, PrependLengthFieldType.none, value);
+        return new DataField.GbkString(null, PrependLengthFieldType.none, value, null);
     }
 
-    public static DataField.Gb2312String gb2312String(String name, PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Gb2312String(name, prependLengthFieldType, value);
+    public static DataField.HexString hexString(String name, PrependLengthFieldType prependLengthFieldType, String value) {
+        return new DataField.HexString(name, prependLengthFieldType, value, null);
+    }
+
+    public static DataField.HexString hexString(PrependLengthFieldType prependLengthFieldType, String value) {
+        return new DataField.HexString(null, prependLengthFieldType, value, null);
+    }
+
+    public static DataField.HexString hexString(String name, String value) {
+        return new DataField.HexString(name, PrependLengthFieldType.none, value, null);
+    }
+
+    public static DataField.HexString hexString(String value) {
+        return new DataField.HexString(null, PrependLengthFieldType.none, value, null);
+    }
+
+    public static DataField.Bcd8421String bcd8421String(String name, PrependLengthFieldType prependLengthFieldType, String value) {
+        return new DataField.Bcd8421String(name, prependLengthFieldType, value, null);
+    }
+
+    public static DataField.Bcd8421String bcd8421String(PrependLengthFieldType prependLengthFieldType, String value) {
+        return new DataField.Bcd8421String(null, prependLengthFieldType, value, null);
+    }
+
+    public static DataField.Bcd8421String bcd8421String(String name, String value) {
+        return new DataField.Bcd8421String(name, PrependLengthFieldType.none, value, null);
+    }
+
+    public static DataField.Bcd8421String bcd8421String(String value) {
+        return new DataField.Bcd8421String(null, PrependLengthFieldType.none, value, null);
+    }
+
+    public static DataField.Gb2312String gb2312String(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.Gb2312String(name, prependLengthFieldType, value, attributes);
     }
 
     public static DataField.Gb2312String gb2312String(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Gb2312String(null, prependLengthFieldType, value);
+        return new DataField.Gb2312String(null, prependLengthFieldType, value, null);
     }
 
     public static DataField.Gb2312String gb2312String(String name, String value) {
-        return new DataField.Gb2312String(name, PrependLengthFieldType.none, value);
+        return new DataField.Gb2312String(name, PrependLengthFieldType.none, value, null);
     }
 
     public static DataField.Gb2312String gb2312String(String value) {
-        return new DataField.Gb2312String(null, PrependLengthFieldType.none, value);
+        return new DataField.Gb2312String(null, PrependLengthFieldType.none, value, null);
+    }
+
+    public static DataField.Utf8String utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.Utf8String(name, prependLengthFieldType, value, attributes);
     }
 
     public static DataField.Utf8String utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Utf8String(name, prependLengthFieldType, value);
+        return new DataField.Utf8String(name, prependLengthFieldType, value, null);
     }
 
     public static DataField.Utf8String utf8String(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Utf8String(null, prependLengthFieldType, value);
+        return new DataField.Utf8String(null, prependLengthFieldType, value, null);
     }
 
     public static DataField.Utf8String utf8String(String name, String value) {
-        return new DataField.Utf8String(name, PrependLengthFieldType.none, value);
+        return new DataField.Utf8String(name, PrependLengthFieldType.none, value, null);
     }
 
     public static DataField.Utf8String utf8String(String value) {
-        return new DataField.Utf8String(null, PrependLengthFieldType.none, value);
+        return new DataField.Utf8String(null, PrependLengthFieldType.none, value, null);
+    }
+
+    public static DataField.Struct struct(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> fields, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.Struct(name, prependLengthFieldType, fields, attributes);
     }
 
     public static DataField.Struct struct(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> fields) {
-        return new DataField.Struct(name, prependLengthFieldType, fields);
+        return new DataField.Struct(name, prependLengthFieldType, fields, null);
     }
 
     public static DataField.Struct struct(PrependLengthFieldType prependLengthFieldType, List<DataField> fields) {
-        return new DataField.Struct(null, prependLengthFieldType, fields);
+        return new DataField.Struct(null, prependLengthFieldType, fields, null);
     }
 
     @SuppressWarnings("checkstyle:NoWhitespaceBefore")
     public static DataField.Struct struct(@Nullable DataField @Nullable ... fields) {
         if (fields == null || fields.length == 0) {
-            return new DataField.Struct(null, PrependLengthFieldType.none, List.of());
+            return new DataField.Struct(null, PrependLengthFieldType.none, List.of(), null);
         }
         final List<@Nullable DataField> fieldList = Arrays.stream(fields).filter(Objects::nonNull).toList();
-        return new DataField.Struct(null, PrependLengthFieldType.none, fieldList);
+        return new DataField.Struct(null, PrependLengthFieldType.none, fieldList, null);
     }
 
     public static DataField.Struct struct(List<DataField> fields) {
-        return new DataField.Struct(null, PrependLengthFieldType.none, fields);
+        return new DataField.Struct(null, PrependLengthFieldType.none, fields, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.Dict<K> dict(String name, PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.KeyLengthType valueLengthType, Map<K, DataField> value) {
-        return new DataField.Dict<>(name, prependLengthFieldType, keyType, valueLengthType, value);
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(String name, PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.Dict<>(name, prependLengthFieldType, keyType, valueLengthType, value, attributes);
     }
 
-    public static <K extends DataField.DictKey> DataField.Dict<K> dict(PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.KeyLengthType valueLengthType, Map<K, DataField> value) {
-        return new DataField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, value);
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(String name, PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value) {
+        return new DataField.Dict<>(name, prependLengthFieldType, keyType, valueLengthType, value, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.Dict<K> dict(Class<K> keyType, DataField.KeyLengthType valueLengthType, Map<K, DataField> value) {
-        return new DataField.Dict<>(null, null, keyType, valueLengthType, value);
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value) {
+        return new DataField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, value, null);
+    }
+
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value) {
+        return new DataField.Dict<>(null, null, keyType, valueLengthType, value, null);
+    }
+
+    public static DataField.Sequence sequence(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.Sequence(name, prependLengthFieldType, value, attributes);
     }
 
     public static DataField.Sequence sequence(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
-        return new DataField.Sequence(name, prependLengthFieldType, value);
+        return new DataField.Sequence(name, prependLengthFieldType, value, null);
     }
 
     public static DataField.Sequence sequence(PrependLengthFieldType prependLengthFieldType, List<DataField> value) {
-        return new DataField.Sequence(null, prependLengthFieldType, value);
+        return new DataField.Sequence(null, prependLengthFieldType, value, null);
     }
 
     public static DataField.Sequence sequence(List<DataField> value) {
-        return new DataField.Sequence(null, PrependLengthFieldType.none, value);
+        return new DataField.Sequence(null, PrependLengthFieldType.none, value, null);
+    }
+
+    public static DataField.ByteSequence byteSequence(String name, PrependLengthFieldType prependLengthFieldType, byte[] value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.ByteSequence(name, prependLengthFieldType, value, attributes);
     }
 
     public static DataField.ByteSequence byteSequence(String name, PrependLengthFieldType prependLengthFieldType, byte[] value) {
-        return new DataField.ByteSequence(name, prependLengthFieldType, value);
+        return new DataField.ByteSequence(name, prependLengthFieldType, value, null);
     }
 
     public static DataField.ByteSequence byteSequence(PrependLengthFieldType prependLengthFieldType, byte[] value) {
-        return new DataField.ByteSequence(null, prependLengthFieldType, value);
+        return new DataField.ByteSequence(null, prependLengthFieldType, value, null);
     }
 
     public static DataField.ByteSequence byteSequence(byte[] value) {
-        return new DataField.ByteSequence(null, PrependLengthFieldType.none, value);
+        return new DataField.ByteSequence(null, PrependLengthFieldType.none, value, null);
     }
     // endregion 工厂方法
 

@@ -31,7 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.hylexus.xtream.codec.core.type.simple.DataField.*;
+import static io.github.hylexus.xtream.codec.core.type.simple.DataField.U8;
+import static io.github.hylexus.xtream.codec.core.type.simple.DataField.ValueLengthType;
 import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
 
 public class MixedFieldTest extends BaseCodecTest {
@@ -71,9 +72,9 @@ public class MixedFieldTest extends BaseCodecTest {
                 // 方向
                 u16(71),
                 // 时间
-                new Bcd8421String("251108223456"),
+                bcd8421String("251108223456"),
                 // 位置附加项
-                dict(U8.class, KeyLengthType.u8, extraItems)
+                dict(U8.class, ValueLengthType.u8, extraItems)
         );
 
         final ByteBuf encode = responseEncoder.encode(dataFieldList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
