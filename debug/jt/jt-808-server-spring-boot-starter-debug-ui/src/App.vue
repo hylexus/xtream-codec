@@ -13,6 +13,7 @@
           <el-menu-item index="/home">首页</el-menu-item>
           <el-menu-item index="/message-encoding">消息编码</el-menu-item>
           <el-menu-item index="/message-decoding">消息解码</el-menu-item>
+          <el-menu-item index="/field-test">field-test</el-menu-item>
         </el-menu>
       </el-scrollbar>
     </el-aside>

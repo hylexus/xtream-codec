@@ -1,0 +1,58 @@
+<template>
+  <BaseField
+      :model-value="modelValue"
+      :type-label="modelValue.type + ' / DWORD'"
+      @update:model-value="safeEmit"
+  >
+    <template #inline-value="{ onUpdate }">
+      <el-input-number
+          v-model="localValue"
+          :min="0"
+          :max="4294967295"
+          controls-position="right"
+          size="small"
+          class="inline-input ignore-click"
+          @input="onUpdate(localValue)"
+          @change="onUpdate(localValue)"
+      />
+    </template>
+
+    <template #editor-value="{ onUpdate }">
+      <el-form-item label="Value">
+        <el-input-number
+            v-model="localValue"
+            :min="0"
+            :max="4294967295"
+            controls-position="right"
+            @change="onUpdate"
+        />
+      </el-form-item>
+    </template>
+
+    <!-- 透传 actions 插槽 -->
+    <template #actions>
+      <slot name="actions"/>
+    </template>
+
+  </BaseField>
+</template>
+
+<script setup lang="ts">
+import {ref, watch} from 'vue';
+import BaseField from '../BaseField.vue';
+import {IntegralDataField, useTypedFieldEmit} from "@/types/data-fields.ts";
+
+interface U32Like extends IntegralDataField {
+  type: "u32";
+  value: number;
+}
+
+const props = defineProps<{ modelValue: U32Like }>();
+const emit = defineEmits<{ (e: 'update:modelValue', value: U32Like): void }>();
+const safeEmit = useTypedFieldEmit<'u32', U32Like>('u32', emit);
+const localValue = ref(props.modelValue.value);
+
+watch(() => props.modelValue.value, (newVal) => {
+  localValue.value = newVal;
+});
+</script>
