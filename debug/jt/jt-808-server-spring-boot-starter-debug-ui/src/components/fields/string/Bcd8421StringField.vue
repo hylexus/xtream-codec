@@ -4,11 +4,11 @@
       :type-label="modelValue.type"
       @update:model-value="safeEmit"
   >
-    <template #inline-value="{ onUpdate }">
+    <template #inline-value>
       <el-input
           v-model="localValue"
-          @input="handleInput(onUpdate)"
-          @blur="handleBlur(onUpdate)"
+          @input="handleInput"
+          @blur="handleInput"
           size="small"
           class="inline-input ignore-click"
           :maxlength="isFixed ? maxDigits : undefined"
@@ -23,12 +23,12 @@
       </el-input>
     </template>
 
-    <template #editor-value="{ onUpdate }">
+    <template #editor-value>
       <el-form-item label="值">
         <el-input
             v-model="localValue"
-            @input="handleInput(onUpdate)"
-            @blur="handleBlur(onUpdate)"
+            @input="handleInput"
+            @blur="handleInput"
             :maxlength="isFixed ? maxDigits : undefined"
             :placeholder="placeholder"
         >
@@ -53,14 +53,8 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
 import BaseField from '../BaseField.vue';
-import {StringDataField, useTypedFieldEmit} from '@/types/data-fields.ts';
+import {Bcd8421StringLike, useTypedFieldEmit} from '@/types/data-fields.ts';
 
-interface Bcd8421StringLike extends StringDataField {
-  type: 'bcd_8421_string';
-  charset: 'bcd_8421';
-  value: string;
-  fixedLength?: number;
-}
 
 const props = withDefaults(defineProps<{
   modelValue: Bcd8421StringLike;
@@ -115,7 +109,7 @@ watch(
     {immediate: true}
 );
 
-const handleInput = (onUpdate: (value: string) => void) => {
+const handleInput = () => {
   let val = localValue.value;
 
   val = val.replace(/\D/g, '');
@@ -128,10 +122,17 @@ const handleInput = (onUpdate: (value: string) => void) => {
     localValue.value = val;
   }
 
-  onUpdate(val);
+  onValueChange();
 };
 
-const handleBlur = (onUpdate: (value: string) => void) => {
-  handleInput(onUpdate);
+
+// 值变化时 emit 整个对象
+const onValueChange = () => {
+  if (localValue.value !== props.modelValue.value) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      value: localValue.value,
+    });
+  }
 };
 </script>

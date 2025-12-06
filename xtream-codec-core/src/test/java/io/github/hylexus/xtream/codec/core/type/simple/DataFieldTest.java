@@ -70,8 +70,9 @@ class DataFieldTest extends BaseEntityCodecTest {
                 """);
         System.out.println("Decode: " + dataField);
         System.out.println(objectMapper.writeValueAsString(dataField));
+        System.out.println(parseSimpleFieldFromObject(Map.of("type", "u8", "value", 1, "name", "n", "desc", "...")));
+        System.out.println(parseSimpleFieldsFromObject(List.of(Map.of("type", "u8", "value", 1, "name", "n", "desc", "..."), Map.of("type", "u8", "value", 1, "name", "n", "desc", "..."))));
     }
-
 
     @Test
     void test5() throws Exception {

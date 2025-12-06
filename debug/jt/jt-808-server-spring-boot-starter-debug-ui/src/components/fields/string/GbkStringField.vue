@@ -4,21 +4,22 @@
       :type-label="modelValue.type"
       @update:model-value="safeEmit"
   >
-    <template #inline-value="{ onUpdate }">
+    <template #inline-value>
       <el-input
           v-model="localValue"
-          @input="onUpdate(localValue)"
-          @change="onUpdate(localValue)"
+          @change="onValueChange"
+          @input="onValueChange"
           size="small"
           class="inline-input ignore-click"
       />
     </template>
 
-    <template #editor-value="{ onUpdate }">
+    <template #editor-value>
       <el-form-item label="值">
         <el-input
             v-model="localValue"
-            @change="onUpdate(localValue)"
+            @input="onValueChange"
+            @change="onValueChange"
         />
       </el-form-item>
     </template>
@@ -34,13 +35,8 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue';
 import BaseField from '../BaseField.vue';
-import {StringDataField, useTypedFieldEmit} from "@/types/data-fields.ts";
+import {GbkStringLike, useTypedFieldEmit} from "@/types/data-fields.ts";
 
-interface GbkStringLike extends StringDataField {
-  type: 'gbk_string';
-  charset: 'gbk';
-  value: string;
-}
 
 const props = defineProps<{
   modelValue: GbkStringLike;
@@ -61,4 +57,14 @@ watch(
       }
     }
 );
+
+// 值变化时 emit 整个对象
+const onValueChange = () => {
+  if (localValue.value !== props.modelValue.value) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      value: localValue.value,
+    });
+  }
+};
 </script>

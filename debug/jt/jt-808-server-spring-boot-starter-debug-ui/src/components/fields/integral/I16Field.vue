@@ -4,7 +4,7 @@
       :type-label="modelValue.type"
       @update:model-value="safeEmit"
   >
-    <template #inline-value="{ onUpdate }">
+    <template #inline-value>
       <el-input-number
           v-model="localValue"
           :min="-32768"
@@ -12,19 +12,18 @@
           controls-position="right"
           size="small"
           class="inline-input ignore-click"
-          @input="onUpdate(localValue)"
-          @change="onUpdate(localValue)"
+          @change="onValueChange"
       />
     </template>
 
-    <template #editor-value="{ onUpdate }">
+    <template #editor-value>
       <el-form-item label="Value">
         <el-input-number
             v-model="localValue"
             :min="-32768"
             :max="32767"
             controls-position="right"
-            @change="onUpdate"
+            @change="onValueChange"
         />
       </el-form-item>
     </template>
@@ -39,12 +38,7 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue';
 import BaseField from '../BaseField.vue';
-import {IntegralDataField, useTypedFieldEmit} from "@/types/data-fields.ts";
-
-interface I16Like extends IntegralDataField {
-  type: "i16";
-  value: number;
-}
+import {I16Like, useTypedFieldEmit} from "@/types/data-fields.ts";
 
 const props = defineProps<{ modelValue: I16Like }>();
 const emit = defineEmits<{ (e: 'update:modelValue', value: I16Like): void }>();
@@ -52,6 +46,19 @@ const safeEmit = useTypedFieldEmit<'i16', I16Like>('i16', emit);
 const localValue = ref(props.modelValue.value);
 
 watch(() => props.modelValue.value, (newVal) => {
-  localValue.value = newVal;
+  if (newVal !== localValue.value) {
+    localValue.value = newVal;
+  }
 });
+
+// 值变化时 emit 整个对象
+const onValueChange = () => {
+  if (localValue.value !== props.modelValue.value) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      value: localValue.value,
+    });
+  }
+};
+
 </script>

@@ -17,7 +17,7 @@
     "@types/sortablejs": "^1.15.9",
     "axios": "^1.13.2",
     "build": "^0.1.4",
-    "element-plus": "^2.11.8",
+    "element-plus": "^2.12.0",
     "run": "^1.5.0",
     "sortablejs": "^1.15.6",
     "vue": "^3.5.25",
@@ -29,10 +29,10 @@
     "fast-glob": "^3.3.3",
     "sass": "^1.94.2",
     "typescript": "~5.9.3",
-    "unocss": "^66.5.9",
+    "unocss": "66.5.10",
     "unplugin-element-plus": "^0.11.1",
-    "vite": "^7.2.4",
+    "vite": "^7.2.6",
     "vite-plugin-svg-icons": "^2.0.1",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.1.6"
   }
 }

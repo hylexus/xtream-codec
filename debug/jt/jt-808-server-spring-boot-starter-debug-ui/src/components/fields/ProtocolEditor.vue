@@ -14,9 +14,15 @@ import FieldEditorPopover, {
 
 interface Props {
   modelValue: DataField[];
+  showTitle?: boolean;
+  title?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  showTitle: true,
+  title: '字段编辑器'
+});
+
 const emit = defineEmits<{
   (e: 'update:modelValue', value: DataField[]): void;
 }>();
@@ -25,13 +31,14 @@ const fields = ref<DataField[]>(
     props.modelValue.map(f => ({...f, id: f.id ?? generateFieldId()}))
 );
 
-// 同步外部更新
 watch(
     () => props.modelValue,
-    (newVal) => {
-      fields.value = newVal.map(f => ({...f, id: f.id ?? generateFieldId()}));
+    (newVal, oldVal) => {
+      if (newVal !== oldVal) {
+        fields.value = newVal.map(f => ({...f, id: f.id ?? generateFieldId()}));
+      }
     },
-    {deep: true}
+    {deep: false}
 );
 
 const fieldListRef = ref<HTMLDivElement | null>(null);
@@ -66,20 +73,18 @@ onBeforeUnmount(() => {
   if (sortableInstance) sortableInstance.destroy();
 });
 
-// 获取组件
 const getFieldComponent = (type: string) => {
   return FIELD_COMPONENT_MAP[type as keyof typeof FIELD_COMPONENT_MAP] || 'div';
 };
 
-// 更新
 const onFieldUpdate = (index: number, updated: DataField) => {
   const newFields = [...fields.value];
+  // 保留原 id
   newFields[index] = {...updated, id: newFields[index].id!};
   fields.value = newFields;
   emit('update:modelValue', newFields);
 };
 
-// 删除
 const removeField = (index: number) => {
   const newFields = [...fields.value];
   newFields.splice(index, 1);
@@ -87,46 +92,46 @@ const removeField = (index: number) => {
   emit('update:modelValue', newFields);
 };
 
-// watch(fields, validate, {deep: true});
 const popoverProps = ref<FieldPopoverProps>({
   visible: false,
   title: '',
   actionType: 'add',
   virtualRef: null,
   dataField: createDefaultField('u8', 'field_1')
-})
-const oldValue = ref<DataField | null>(null)
-const popoverVirtualRefButtonIndex = ref(-1)
+});
+const oldValue = ref<DataField | null>(null);
+const popoverVirtualRefButtonIndex = ref(-1);
+
 const openPopover = async (index: number, action: FieldPopoverActionType, title: string, e: any) => {
-  popoverProps.value.title = title
-  popoverProps.value.virtualRef = e.currentTarget
-  popoverProps.value.actionType = action
+  popoverProps.value.title = title;
+  popoverProps.value.virtualRef = e.currentTarget;
+  popoverProps.value.actionType = action;
   if (action === 'edit' && index >= 0) {
-    popoverProps.value.dataField = JSON.parse(JSON.stringify(fields.value[index]))
-    oldValue.value = JSON.parse(JSON.stringify(fields.value[index]))
+    popoverProps.value.dataField = JSON.parse(JSON.stringify(fields.value[index]));
+    oldValue.value = JSON.parse(JSON.stringify(fields.value[index]));
   }
-  popoverVirtualRefButtonIndex.value = index
-  await nextTick()
-  popoverProps.value.visible = true
-}
+  popoverVirtualRefButtonIndex.value = index;
+  await nextTick();
+  popoverProps.value.visible = true;
+};
+
 const closePopover = async () => {
-  popoverProps.value.visible = false
-  await nextTick()
-}
+  popoverProps.value.visible = false;
+  await nextTick();
+};
 
 const onPopoverConfirm = async (e: FieldPopoverConfirmEvent) => {
   const action = e.action;
-  const data = JSON.parse(JSON.stringify(e.data))
-  await closePopover()
+  const data = JSON.parse(JSON.stringify(e.data));
+  await closePopover();
+
   if (action === 'add') {
     const field = {
       ...data,
-      ...{
-        value: getDefaultFieldValue(data.type),
-        id: generateFieldId()
-      }
-    }
-    const index = popoverVirtualRefButtonIndex.value
+      value: getDefaultFieldValue(data.type),
+      id: generateFieldId()
+    };
+    const index = popoverVirtualRefButtonIndex.value;
     if (index === -1) {
       fields.value = [field, ...fields.value];
     } else if (index === -2) {
@@ -135,17 +140,15 @@ const onPopoverConfirm = async (e: FieldPopoverConfirmEvent) => {
       fields.value.splice(index + 1, 0, field);
     }
   } else if (action === 'edit') {
-    const index = popoverVirtualRefButtonIndex.value
-    if (index < 0) {
-      return
-    }
+    const index = popoverVirtualRefButtonIndex.value;
+    if (index < 0) return;
     if (oldValue.value && oldValue.value.type !== data.type) {
-      data.value = getDefaultFieldValue(data.type)
+      data.value = getDefaultFieldValue(data.type);
     }
     oldValue.value = null;
-    const newValues = [...fields.value]
-    newValues[index] = data
-    fields.value = newValues
+    const newValues = [...fields.value];
+    newValues[index] = data;
+    fields.value = newValues;
   }
   emit('update:modelValue', fields.value);
 };
@@ -154,16 +157,19 @@ const onPopoverConfirm = async (e: FieldPopoverConfirmEvent) => {
 <template>
   <div>
     <div class="protocol-editor">
-      <div class="summary">
-        <div class="mr-5">
-          共 <span class="color-blue">{{ fields.length }}</span> 个字段
+      <div v-if="props.showTitle" class="summary">
+        <div class="summary-left">
+          <div>
+            共 <span class="color-blue">{{ fields.length }}</span> 个字段
+          </div>
+          <el-button
+              :icon="Plus"
+              circle
+              type="primary"
+              size="small"
+              @click="(e) => openPopover(-1,'add','添加字段', e)"/>
         </div>
-        <el-button
-            :icon="Plus"
-            circle
-            type="primary"
-            size="small"
-            @click="(e) => openPopover(-1,'add','添加字段', e)"/>
+        <div class="summary-title">{{ props.title }}</div>
       </div>
       <div ref="fieldListRef" class="field-list">
         <div v-for="(field,index) in fields"
@@ -219,14 +225,19 @@ const onPopoverConfirm = async (e: FieldPopoverConfirmEvent) => {
             </component>
           </div>
         </div>
+        <div v-if="fields.length === 0" style="display: flex; align-items: center; justify-content: start;">
+          点击
+          <el-button
+              :icon="Plus"
+              class="ml-2 mr-2"
+              circle
+              type="primary"
+              size="small"
+              @click="e => openPopover(-2,'add','添加字段', e)">
+          </el-button>
+          添加字段
+        </div>
       </div>
-      <el-button
-          :icon="Plus"
-          circle
-          type="primary"
-          size="small"
-          class="ml-10"
-          @click="e => openPopover(-2,'add','添加字段', e)"/>
     </div>
 
     <FieldEditorPopover v-model="popoverProps" @on-confirm="onPopoverConfirm"/>
@@ -245,10 +256,22 @@ const onPopoverConfirm = async (e: FieldPopoverConfirmEvent) => {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
+
+    .summary-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-title {
+      margin: 0 auto;
+      font-weight: bold;
+      color: var(--el-text-color-primary);
+      font-size: 14px;
+    }
   }
 
   .field-list {
-    margin-bottom: 16px;
 
     .field-row {
       box-sizing: border-box;
@@ -256,7 +279,7 @@ const onPopoverConfirm = async (e: FieldPopoverConfirmEvent) => {
       align-items: center;
 
       &:not(:last-child) {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
       }
 
       .field-row-drag-handle {

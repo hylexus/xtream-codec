@@ -213,7 +213,8 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         if (totalSubPackageCount == 0 && currentPackageNo == 0) {
             details.getChildren().add(new VirtualEntitySpan(tracker.getRootSpan(), "body", "消息体"));
         } else {
-            details.getChildren().add(new VirtualFieldSpan("body", "消息体", "ByteBuf", body).setHexString(FormatUtils.toHexString(body)));
+            // details.getChildren().add(new VirtualFieldSpan("body", "消息体", "ByteBuf", body).setHexString(FormatUtils.toHexString(body)));
+            details.getChildren().add(new VirtualFieldSpan("body", "消息体", "ByteBuf", null).setHexString(FormatUtils.toHexString(body)));
         }
 
         // 3. checkSum

@@ -63,6 +63,14 @@ public final class DataFields {
         }
     }
 
+    public static DataField parseSimpleFieldFromObject(Object object) {
+        return OBJECT_MAPPER.convertValue(object, DataField.class);
+    }
+
+    public static List<DataField> parseSimpleFieldsFromObject(Object object) {
+        return OBJECT_MAPPER.convertValue(object, LIST_TYPE_REFERENCE);
+    }
+
     public static List<DataField> parseSimpleFieldsFromJson(String json) {
         try {
             return OBJECT_MAPPER.readValue(json, LIST_TYPE_REFERENCE);

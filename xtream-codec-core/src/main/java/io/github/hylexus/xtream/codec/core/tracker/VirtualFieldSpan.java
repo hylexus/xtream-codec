@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -27,9 +28,9 @@ public class VirtualFieldSpan extends BaseSpan {
     private final String fieldType;
 
     @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
-    protected Object value;
+    protected @Nullable Object value;
 
-    public VirtualFieldSpan(String fieldName, String fieldDesc, String fieldType, Object fieldValue) {
+    public VirtualFieldSpan(String fieldName, String fieldDesc, String fieldType, @Nullable Object fieldValue) {
         super(null);
         this.fieldName = fieldName;
         this.fieldDesc = fieldDesc;
@@ -49,7 +50,7 @@ public class VirtualFieldSpan extends BaseSpan {
         return fieldType;
     }
 
-    public Object getValue() {
+    public @Nullable Object getValue() {
         return value;
     }
 

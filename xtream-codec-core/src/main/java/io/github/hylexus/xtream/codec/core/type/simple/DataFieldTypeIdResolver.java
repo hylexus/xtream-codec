@@ -73,6 +73,12 @@ public class DataFieldTypeIdResolver implements TypeIdResolver {
         TYPE_REGISTRY.put("utf8_str", DataField.Utf8String.class);
         TYPE_REGISTRY.put("utf8_string", DataField.Utf8String.class);
 
+        TYPE_REGISTRY.put("hex", DataField.HexString.class);
+        TYPE_REGISTRY.put("hex_string", DataField.HexString.class);
+
+        TYPE_REGISTRY.put("bcd_8421", DataField.Bcd8421String.class);
+        TYPE_REGISTRY.put("bcd_8421_string", DataField.Bcd8421String.class);
+
         TYPE_REGISTRY.put("byte_sequence", DataField.ByteSequence.class);
         TYPE_REGISTRY.put("byte_seq", DataField.ByteSequence.class);
         TYPE_REGISTRY.put("bytes", DataField.ByteSequence.class);

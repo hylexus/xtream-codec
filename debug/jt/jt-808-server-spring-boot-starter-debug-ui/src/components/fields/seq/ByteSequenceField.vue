@@ -15,6 +15,8 @@
         <el-input
             v-model="hexInput"
             placeholder="例如: 12 34 AB CD 或 1234ABCD"
+            @change="parseHexInput"
+            @input="parseHexInput"
             @blur="parseHexInput"
             @keyup.enter="parseHexInput"
             clearable
@@ -36,12 +38,8 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue';
 import BaseField from '@/components/fields/BaseField.vue';
-import {ByteSequence, DataField, useTypedFieldEmit} from '@/types/data-fields';
+import {ByteSequenceLike, useTypedFieldEmit} from '@/types/data-fields';
 
-interface ByteSequenceLike extends DataField {
-  type: 'byte_seq';
-  value: number[];
-}
 
 const props = defineProps<{
   modelValue: ByteSequenceLike;
@@ -79,10 +77,9 @@ function parseHexInput() {
   // 移除非十六进制字符（保留0-9a-fA-F）
   let hexStr = input.replace(/[^0-9a-fA-F]/g, '');
 
-  // if (hexStr.length % 2 !== 0) {
-  //   // 补零（如 "123" → "0123"）
-  //   hexStr = '0' + hexStr;
-  // }
+  if (hexStr.length % 2 !== 0) {
+    return;
+  }
 
   const bytes: number[] = [];
   for (let i = 0; i < hexStr.length; i += 2) {
@@ -98,14 +95,10 @@ function parseHexInput() {
 }
 
 function emitUpdate(newValue: number[]) {
-  const updated = new ByteSequence(newValue, props.modelValue.name, {
-    prependLengthFieldType: props.modelValue.prependLengthFieldType,
-    ...Object.fromEntries(
-        Object.entries(props.modelValue).filter(
-            ([k]) => !['type', 'value', 'name', 'prependLengthFieldType'].includes(k)
-        )
-    ),
-  });
+  const updated: ByteSequenceLike = {
+    ...props.modelValue,
+    value: newValue,
+  };
   emit('update:modelValue', updated);
 }
 

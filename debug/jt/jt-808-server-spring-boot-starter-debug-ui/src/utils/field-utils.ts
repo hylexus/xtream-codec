@@ -1,15 +1,15 @@
-import {DataField, FieldType} from "@/types/data-fields.ts";
+import {ConcreteDataField, FieldType} from "@/types/data-fields.ts";
 
 export const generateFieldId = () => 'field_' + Math.random().toString(36).slice(2) + Date.now()
 
-export const createDefaultField = (type: FieldType, name?: string, charset?: string): DataField => {
+export const createDefaultField = (type: FieldType, name?: string, charset?: string): ConcreteDataField => {
     return {
         id: generateFieldId(),
         name: name || undefined,
         type,
         value: getDefaultFieldValue(type),
         charset,
-    };
+    } as ConcreteDataField;
 }
 
 export const getDefaultFieldValue = (type: FieldType): any => {
@@ -27,7 +27,7 @@ export const getDefaultFieldValue = (type: FieldType): any => {
         case 'u32':
             return 0;
         case 'i64':
-            return 0n;
+            return 0;
         case 'f32':
             return 0.0;
         case 'f64':

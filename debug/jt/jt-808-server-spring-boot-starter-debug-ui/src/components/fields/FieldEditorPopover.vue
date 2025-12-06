@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import {DataField} from '@/types/data-fields';
+import {ConcreteDataField} from '@/types/data-fields';
 import {Close, Select} from "@element-plus/icons-vue";
 import {ClickOutside as vClickOutside, ElButton} from "element-plus";
 import FieldEditor from "@/components/fields/FieldEditor.vue";
@@ -38,7 +38,7 @@ export interface FieldPopoverProps {
   actionType: FieldPopoverActionType;
   visible: boolean;
   title: string;
-  dataField: DataField;
+  dataField: ConcreteDataField;
   virtualRef: any;
 }
 
@@ -58,10 +58,10 @@ const model = defineModel<FieldPopoverProps>({
 
 export interface FieldPopoverConfirmEvent {
   action: FieldPopoverActionType;
-  data: DataField;
+  data: ConcreteDataField;
 }
+
 const emit = defineEmits<{
-  // (e: 'update:modelValue', val: FieldType): void;
   (e: 'onConfirm', val: FieldPopoverConfirmEvent): void;
   (e: 'onCancel'): void;
 }>();

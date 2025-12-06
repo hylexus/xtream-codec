@@ -4,11 +4,11 @@
       :type-label="modelValue.type"
       @update:model-value="safeEmit"
   >
-    <template #inline-value="{ onUpdate }">
+    <template #inline-value>
       <el-input
           v-model="localValue"
-          @input="handleInput(onUpdate)"
-          @blur="handleBlur(onUpdate)"
+          @input="handleInput"
+          @blur="handleInput"
           size="small"
           class="inline-input ignore-click"
           placeholder="如: a1b2c3"
@@ -19,12 +19,12 @@
       </el-input>
     </template>
 
-    <template #editor-value="{ onUpdate }">
+    <template #editor-value>
       <el-form-item label="值">
         <el-input
             v-model="localValue"
-            @input="handleInput(onUpdate)"
-            @blur="handleBlur(onUpdate)"
+            @input="handleInput"
+            @blur="handleInput"
             placeholder="请输入十六进制字符串（0-9, a-f）"
         >
           <template #append>
@@ -45,13 +45,8 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
 import BaseField from '../BaseField.vue';
-import {StringDataField, useTypedFieldEmit} from '@/types/data-fields.ts';
+import {HexStringLike, useTypedFieldEmit} from '@/types/data-fields.ts';
 
-interface HexStringLike extends StringDataField {
-  type: 'hex_string';
-  charset: 'hex';
-  value: string;
-}
 
 const props = defineProps<{
   modelValue: HexStringLike;
@@ -77,7 +72,7 @@ watch(
     {immediate: true}
 );
 
-function handleInput(onUpdate: (value: string) => void) {
+function handleInput() {
   let val = localValue.value;
 
   val = val.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
@@ -87,10 +82,16 @@ function handleInput(onUpdate: (value: string) => void) {
   }
 
   // 通知父组件
-  onUpdate(val);
+  onValueChange();
 }
 
-function handleBlur(onUpdate: (value: string) => void) {
-  handleInput(onUpdate);
-}
+// 值变化时 emit 整个对象
+const onValueChange = () => {
+  if (localValue.value !== props.modelValue.value) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      value: localValue.value,
+    });
+  }
+};
 </script>

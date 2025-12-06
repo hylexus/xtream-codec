@@ -5,129 +5,191 @@
         type-label="dict"
         @update:model-value="safeEmit"
     >
-      <!-- Inline 显示 -->
       <template #inline-value>
         <el-tag type="warning" size="small">
-          {{ Object.keys(localValue).length }} 个键值对
+          {{ numericEntries.length }} 个键值
         </el-tag>
-        <el-tooltip
-            effect="dark"
-            content="添加键值对"
-            placement="top"
-        >
-          <el-button color="#626aef" size="small" class="ml-2" :icon="Plus" circle
-                     @click="e => openPopover('-1','add','添加键值对', e)"
-                     @click.stop
+        <el-tooltip effect="dark" content="添加键值对" placement="top">
+          <el-button
+              color="#626aef"
+              size="small"
+              class="ml-2"
+              :icon="Plus"
+              circle
+              @click="(e:any)=> openPopover(null, 'add', '添加键值对', e)"
+              @click.stop
           />
         </el-tooltip>
       </template>
 
-      <!-- 编辑器 -->
       <template #editor-value>
-        <el-form-item class="dict-editor" label="键值对">
-          <!-- 字段列表 -->
-          <div class="field-list">
-            <div
-                v-for="(field, keyStr) in localValue"
-                :key="keyStr"
-                class="field-item"
-            >
-              <!-- 键输入 -->
-              <div class="key-input">
-                <el-input-number
-                    style="width: 100px;"
-                    v-model.number="editableKeys[keyStr]"
-                    :min="getKeyMin()"
-                    :max="getKeyMax()"
-                    size="small"
-                    :controls="false"
-                    @change="onKeyChange(keyStr, $event)"
-                >
-                  <template #prefix>Key</template>
-                </el-input-number>
-              </div>
+        <el-form-item label="Key类型">
+          <template #label>
+            <div class="form-item-label-with-icon">
+              键类型
+              <el-tooltip content="字典中 Key 的类型" placement="top">
+                <el-icon>
+                  <InfoFilled/>
+                </el-icon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-radio-group v-model="internalKeyType" @change="onKeyTypeChange">
+            <el-radio-button label="u8"/>
+            <el-radio-button label="u16"/>
+            <el-radio-button label="u32"/>
+            <el-radio-button label="i8"/>
+            <el-radio-button label="i16"/>
+            <el-radio-button label="i32"/>
+            <el-radio-button label="i64"/>
+          </el-radio-group>
+        </el-form-item>
 
-              <!-- 值编辑器 -->
-              <div style="flex: 1; min-width: 0;">
-                <component
-                    :is="getComponentForType(field.type)"
-                    :model-value="field"
-                    @update:model-value="onValueUpdate(keyStr, $event)"
-                >
-                  <template #actions>
-                    <el-tooltip
-                        effect="dark"
-                        content="编辑"
-                        placement="top"
-                    >
-                      <el-button
-                          size="small"
-                          type="default"
-                          :icon="Edit"
-                          circle
-                          @click="e => openPopover(keyStr,'edit','编辑字段', e)"
-                      />
-                    </el-tooltip>
-                    <el-tooltip
-                        effect="dark"
-                        content="添加同级字段"
-                        placement="top"
-                    >
-                      <el-button
-                          size="small"
-                          type="primary"
-                          :icon="Plus"
-                          circle
-                          @click="e => openPopover(keyStr,'add','添加同级字段', e)"
-                      />
-                    </el-tooltip>
-                    <el-tooltip
-                        effect="dark"
-                        content="删除"
-                        placement="top"
-                    >
-                      <el-button size="small" type="danger" :icon="Delete" circle
-                                 @click="removeEntry(keyStr)"
-                      />
-                    </el-tooltip>
-                  </template>
-                </component>
+        <el-form-item label="Value长度类型">
+          <template #label>
+            <div class="form-item-label-with-icon">
+              值长度
+              <el-tooltip content="描述字典值长度的数据类型" placement="top">
+                <el-icon>
+                  <InfoFilled/>
+                </el-icon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-radio-group v-model="internalValueLengthType" @change="onValueLengthTypeChange">
+            <el-radio-button label="u8"/>
+            <el-radio-button label="u16"/>
+            <el-radio-button label="u32"/>
+            <el-radio-button label="i8"/>
+            <el-radio-button label="i16"/>
+            <el-radio-button label="i32"/>
+            <el-radio-button label="i64"/>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item class="dict-editor" label="键值对">
+          <template #label>
+            <div class="form-item-label-with-icon">
+              键值对
+              <el-tooltip content="字典数据条目" placement="top">
+                <el-icon>
+                  <InfoFilled/>
+                </el-icon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-tooltip v-if="!numericEntries || numericEntries.length == 0" effect="dark" content="添加键值对"
+                      placement="top">
+            <el-button
+                color="#626aef"
+                size="small"
+                class="ml-2"
+                :icon="Plus"
+                circle
+                @click="(e:any)=> openPopover(null, 'add', '添加键值对', e)"
+                @click.stop
+            />
+          </el-tooltip>
+          <div v-else class="dict-editor" style="width: 100%;">
+            <div class="field-list">
+              <div
+                  v-for="[keyNum, field] in numericEntries"
+                  :key="keyNum"
+                  class="field-item"
+              >
+                <div class="key-input">
+                  <el-input-number
+                      :model-value="keyNum"
+                      :min="getKeyMin()"
+                      :max="getKeyMax()"
+                      size="small"
+                      :controls="false"
+                      @update:model-value="(newVal: number) => onKeyChange(keyNum, newVal)"
+                      style="width: 120px; height: 36px;"
+                  >
+                    <template #prefix>{{ internalKeyType }}</template>
+                    <template #suffix>{{ toHexString(keyNum) }}</template>
+                  </el-input-number>
+                </div>
+
+                <div style="flex: 1; min-width: 0">
+                  <component
+                      :is="getComponentForType(field.type)"
+                      :model-value="field"
+                      @update:model-value="(updated: ConcreteDataField) => onValueUpdate(keyNum, updated)"
+                  >
+                    <template #actions>
+                      <el-tooltip effect="dark" content="编辑" placement="top">
+                        <el-button
+                            size="small"
+                            type="default"
+                            :icon="Edit"
+                            circle
+                            @click="(e:any) => openPopover(keyNum, 'edit', '编辑字段', e)"
+                        />
+                      </el-tooltip>
+                      <el-tooltip effect="dark" content="添加同级字段" placement="top">
+                        <el-button
+                            size="small"
+                            type="primary"
+                            :icon="Plus"
+                            circle
+                            @click="(e :any)=> openPopover(keyNum, 'add', '添加同级字段', e)"
+                        />
+                      </el-tooltip>
+                      <el-tooltip effect="dark" content="删除" placement="top">
+                        <el-button
+                            size="small"
+                            type="danger"
+                            :icon="Delete"
+                            circle
+                            @click="() => removeEntry(keyNum)"
+                        />
+                      </el-tooltip>
+                    </template>
+                  </component>
+                </div>
               </div>
             </div>
           </div>
         </el-form-item>
       </template>
 
-      <!-- 透传 actions 插槽 -->
       <template #actions>
         <slot name="actions"/>
       </template>
-
     </BaseField>
-    <FieldEditorPopover v-model="popoverProps" @on-confirm="onPopoverConfirm"/>
+
+    <FieldEditorPopover
+        v-model="popoverProps"
+        @on-confirm="onPopoverConfirm"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import {nextTick, ref, watch} from 'vue';
-import BaseField from "@/components/fields/BaseField.vue";
-import {DataField, DicKeyType, FieldType, useTypedFieldEmit,} from '@/types/data-fields';
+import {computed, nextTick, ref, watch} from 'vue';
+import BaseField from '@/components/fields/BaseField.vue';
+import {
+  ConcreteDataField,
+  DicKeyType,
+  DictLike,
+  FieldType,
+  useTypedFieldEmit,
+  ValueLengthType,
+} from '@/types/data-fields';
 import {FIELD_COMPONENT_MAP} from '@/components/fields';
 import {createDefaultField, generateFieldId, getDefaultFieldValue} from '@/utils/field-utils';
-import {Delete, Edit, Plus} from "@element-plus/icons-vue";
-import {ElButton} from "element-plus";
+import {Delete, Edit, InfoFilled, Plus} from '@element-plus/icons-vue';
 import FieldEditorPopover, {
   FieldPopoverActionType,
-  FieldPopoverProps
-} from "@/components/fields/FieldEditorPopover.vue";
+  FieldPopoverProps,
+} from '@/components/fields/FieldEditorPopover.vue';
+import {toHexString} from "@/utils/codec-utils.ts";
 
-interface DictLike extends DataField {
-  type: 'dict';
-  value: Record<number, DataField>;
-}
 
 const props = defineProps<{
-  modelValue: DictLike;
+  modelValue: DictLike; // value: Record<number, ConcreteDataField>
 }>();
 
 const emit = defineEmits<{
@@ -136,51 +198,37 @@ const emit = defineEmits<{
 
 const safeEmit = useTypedFieldEmit<'dict', DictLike>('dict', emit);
 
-// 本地状态：使用 string key 便于 Vue 响应式处理
-type LocalDict = Record<string, DataField>;
-const localValue = ref<LocalDict>({});
-const editableKeys = ref<Record<string, number>>({});
+// 内部状态
+const internalKeyType = ref<DicKeyType>(props.modelValue.keyType);
+const internalValueLengthType = ref<ValueLengthType>(props.modelValue.valueLengthType);
 
-// 初始化本地状态
-function initLocalState() {
-  const newVal: LocalDict = {};
-  const newKeys: Record<string, number> = {};
-  for (const [keyNum, field] of Object.entries(props.modelValue.value)) {
-    const keyStr = keyNum;
-    newVal[keyStr] = {
-      ...field,
-      id: field.id ?? generateFieldId(),
-    };
-    newKeys[keyStr] = parseInt(keyNum, 10);
-  }
-  localValue.value = newVal;
-  editableKeys.value = newKeys;
-}
-
-initLocalState();
-
-// 同步外部 modelValue 变化
 watch(
-    () => props.modelValue.value,
-    () => {
-      initLocalState();
+    () => props.modelValue,
+    (newVal) => {
+      internalKeyType.value = newVal.keyType;
+      internalValueLengthType.value = newVal.valueLengthType;
     },
     {deep: true}
 );
 
-const newValueType = ref<FieldType | undefined>(undefined);
-const newValueName = ref<string>('');
+// 将 Record<number, T> 转为 [number, T][] 用于安全遍历
+const numericEntries = computed<[number, ConcreteDataField][]>(() => {
+  return Object.entries(props.modelValue.value).map(([k, v]) => [
+    Number(k),
+    v,
+  ]);
+});
 
-// 获取组件
 const getComponentForType = (type: FieldType) => {
   return FIELD_COMPONENT_MAP[type] || 'div';
 };
 
-// 键取值范围（根据 keyType）
-const getKeyMin = (): number => 0;
+const getKeyMin = (): number => {
+  return 0;
+};
+
 const getKeyMax = (): number => {
-  const keyType = props.modelValue.keyType as DicKeyType;
-  switch (keyType) {
+  switch (internalKeyType.value) {
     case 'u8':
       return 255;
     case 'u16':
@@ -192,180 +240,165 @@ const getKeyMax = (): number => {
   }
 };
 
-// 更新值
-const onValueUpdate = (keyStr: string, updatedField: DataField) => {
-  const newValue = {...localValue.value};
-  newValue[keyStr] = updatedField;
-  localValue.value = newValue;
-  emitDictUpdate();
-};
-
-// 更新键（带去重）
-const onKeyChange = (oldKeyStr: string, newKeyNum: number | null) => {
+// 更新 key
+const onKeyChange = (oldKey: number, newKeyNum: number | null) => {
   if (newKeyNum === null || isNaN(newKeyNum)) return;
 
-  const newKeyStr = String(newKeyNum);
+  const currentValue = props.modelValue.value;
 
-  // 防止键冲突
-  if (newKeyStr !== oldKeyStr && localValue.value[newKeyStr]) {
-    // 回滚
-    editableKeys.value[oldKeyStr] = parseInt(oldKeyStr, 10);
+  // 检查冲突（用 number key）
+  if (newKeyNum !== oldKey && currentValue[newKeyNum] !== undefined) {
     return;
   }
 
-  // 重命名键
-  const newValue = {...localValue.value};
-  const newKeys = {...editableKeys.value};
+  // 构造新对象：先删旧 key，再加新 key
+  const {[oldKey]: fieldToMove, ...rest} = currentValue;
+  const newValue = {...rest, [newKeyNum]: fieldToMove} as Record<number, ConcreteDataField>;
 
-  const field = newValue[oldKeyStr];
-  delete newValue[oldKeyStr];
-  delete newKeys[oldKeyStr];
+  emit('update:modelValue', {
+    ...props.modelValue,
+    value: newValue,
+  });
+};
 
-  newValue[newKeyStr] = field;
-  newKeys[newKeyStr] = newKeyNum;
-
-  localValue.value = newValue;
-  editableKeys.value = newKeys;
-  emitDictUpdate();
+// 更新值
+const onValueUpdate = (key: number, updatedField: ConcreteDataField) => {
+  emit('update:modelValue', {
+    ...props.modelValue,
+    value: {
+      ...props.modelValue.value,
+      [key]: updatedField,
+    },
+  });
 };
 
 // 删除条目
-const removeEntry = (keyStr: string) => {
-  const newValue = {...localValue.value};
-  const newKeys = {...editableKeys.value};
-  delete newValue[keyStr];
-  delete newKeys[keyStr];
-  localValue.value = newValue;
-  editableKeys.value = newKeys;
-  emitDictUpdate();
+const removeEntry = (key: number) => {
+  const {[key]: _, ...newValue} = props.modelValue.value;
+  emit('update:modelValue', {
+    ...props.modelValue,
+    value: newValue as Record<number, ConcreteDataField>,
+  });
 };
 
 // 添加条目
-const addEntry = (data: DataField) => {
-
-  const newField = createDefaultField(data.type, data.name, data.charset as string);
-
-  // 生成不冲突的默认键（从 0 开始）
-  let newKeyNum = 0;
-  const existingKeys = Object.keys(localValue.value).map(Number);
-  while (existingKeys.includes(newKeyNum)) {
-    newKeyNum++;
+const addEntry = (data: ConcreteDataField) => {
+  const currentKeys = Object.keys(props.modelValue.value).map(Number);
+  let newKey = 0;
+  while (currentKeys.includes(newKey)) {
+    newKey++;
   }
 
-  const newKeyStr = String(newKeyNum);
-
-  const newValue = {...localValue.value};
-  const newKeys = {...editableKeys.value};
-
-  newValue[newKeyStr] = newField;
-  newKeys[newKeyStr] = newKeyNum;
-
-  localValue.value = newValue;
-  editableKeys.value = newKeys;
-  emitDictUpdate();
-
-  newValueType.value = undefined;
-  newValueName.value = '';
-};
-
-// 触发更新
-const emitDictUpdate = () => {
-  const outputValue: Record<number, DataField> = {};
-  for (const [keyStr, field] of Object.entries(localValue.value)) {
-    outputValue[parseInt(keyStr, 10)] = field;
-  }
-
-  const updated: DictLike = {
+  emit('update:modelValue', {
     ...props.modelValue,
-    value: outputValue,
-  };
-  emit('update:modelValue', updated);
+    value: {
+      ...props.modelValue.value,
+      [newKey]: {
+        ...data,
+        value: getDefaultFieldValue(data.type),
+        id: generateFieldId(),
+      },
+    },
+  });
 };
 
+// KeyType 变更
+const onKeyTypeChange = (val: DicKeyType) => {
+  emit('update:modelValue', {...props.modelValue, keyType: val});
+};
+
+const onValueLengthTypeChange = (val: ValueLengthType) => {
+  emit('update:modelValue', {...props.modelValue, valueLengthType: val});
+};
+
+// Popover
 const popoverProps = ref<FieldPopoverProps>({
   visible: false,
   title: '',
   actionType: 'add',
   virtualRef: null,
-  dataField: createDefaultField('u8', 'field_1')
-})
-const ADD_ENTRY_BUTTON_INDEX_TOP = 'top' as const;
-const popoverVirtualRefButtonIndex = ref<string>(ADD_ENTRY_BUTTON_INDEX_TOP)
-const oldValue = ref<DataField | null>(null)
-const openPopover = async (index: string, action: FieldPopoverActionType, title: string, e: any) => {
-  popoverProps.value.title = title
-  popoverProps.value.virtualRef = e.currentTarget
-  popoverProps.value.actionType = action
-  if (action == 'edit' && index !== ADD_ENTRY_BUTTON_INDEX_TOP) {
-    popoverProps.value.dataField = JSON.parse(JSON.stringify(localValue.value[index]))
-    oldValue.value = JSON.parse(JSON.stringify(localValue.value[index]))
+  dataField: createDefaultField('u8', 'field_1'),
+});
+const popoverTargetKey = ref<number | null>(null);
+const oldValue = ref<ConcreteDataField | null>(null);
+
+const openPopover = async (
+    key: number | null,
+    action: FieldPopoverActionType,
+    title: string,
+    e: any
+) => {
+  popoverProps.value.title = title;
+  popoverProps.value.virtualRef = e.currentTarget;
+  popoverProps.value.actionType = action;
+  popoverTargetKey.value = key;
+
+  if (action === 'edit' && key !== null) {
+    popoverProps.value.dataField = JSON.parse(JSON.stringify(props.modelValue.value[key]));
+    oldValue.value = JSON.parse(JSON.stringify(props.modelValue.value[key]));
   } else {
     oldValue.value = null;
   }
-  popoverVirtualRefButtonIndex.value = index
-  await nextTick()
-  popoverProps.value.visible = true
-}
+
+  await nextTick();
+  popoverProps.value.visible = true;
+};
 
 const closePopover = async () => {
-  popoverProps.value.visible = false
-  await nextTick()
-}
+  popoverProps.value.visible = false;
+  await nextTick();
+};
 
-const onPopoverConfirm = async (e: { action: FieldPopoverActionType, data: DataField }) => {
-  const action = e.action;
-  const data = JSON.parse(JSON.stringify(e.data))
-  await closePopover()
-  if (action == 'add') {
-    const field = {
-      ...data,
-      ...{
-        value: getDefaultFieldValue(data.type),
-        id: generateFieldId()
-      }
+const onPopoverConfirm = async (e: { action: FieldPopoverActionType; data: ConcreteDataField }) => {
+  const {action, data} = e;
+  const cloned = JSON.parse(JSON.stringify(data));
+  await closePopover();
+
+  if (action === 'add') {
+    addEntry(cloned);
+  } else if (action === 'edit') {
+    const key = popoverTargetKey.value;
+    if (key === null) return;
+
+    let finalValue = cloned.value;
+    if (oldValue.value?.type !== cloned.type) {
+      finalValue = getDefaultFieldValue(cloned.type);
     }
-    addEntry(field)
-  } else if (action == 'edit') {
-    const index = popoverVirtualRefButtonIndex.value
-    if (index === ADD_ENTRY_BUTTON_INDEX_TOP) {
-      return
-    }
-    if (oldValue.value) {
-      if (oldValue.value.type !== data.type) {
-        data.value = getDefaultFieldValue(data.type)
-      } else {
-        data.value = oldValue.value.value
-      }
-    }
-    oldValue.value = null
-    onValueUpdate(index, data)
+
+    onValueUpdate(key, {...cloned, value: finalValue});
+    oldValue.value = null;
   }
-}
+};
+
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .dict-editor {
   border-radius: 4px;
   background-color: #fafafa;
-}
+  margin-bottom: 5px;
 
-.field-list {
-  border: 1px solid var(--el-border-color-light);
-  padding: 5px 10px;
-}
+  .field-list {
+    border: 1px solid var(--el-border-color-light);
+    padding: 5px 10px;
+  }
 
-.field-item {
-  display: flex;
-  align-items: center;
-  justify-content: start;
-  gap: 8px;
-  padding: 8px 0;
-  border-bottom: 1px dashed #eee;
-}
+  .field-item {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 8px;
+    padding: 8px 0;
 
-.key-input {
-  width: 100px;
-  margin-right: 5px;
+    &:not(:last-child) {
+      border-bottom: 1px dashed #eee;
+    }
+  }
+
+  .key-input {
+    width: 120px;
+    margin-right: 5px;
+  }
 }
 
 </style>
