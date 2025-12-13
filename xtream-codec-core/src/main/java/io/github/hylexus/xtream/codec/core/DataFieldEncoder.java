@@ -126,6 +126,26 @@ public class DataFieldEncoder {
                     temp.release();
                 }
             }
+            case DataField.TlvDataField tlvDataField -> {
+                final DefaultSerializeContext newContext = new DefaultSerializeContext(context, tlvDataField);
+                // 1. tag
+                final DataField.DictKey tag = tlvDataField.tag();
+                this.doEncodeField(newContext, output, tag);
+                final ByteBuf temp = context.bufferFactory().buffer();
+
+                try {
+                    // 2. value
+                    final DataField value = tlvDataField.value();
+                    this.doEncodeField(newContext, temp, value);
+
+                    // 3. length
+                    final int valueLength = temp.writerIndex();
+                    tlvDataField.length().writeTo(output, valueLength);
+                    output.writeBytes(temp);
+                } finally {
+                    temp.release();
+                }
+            }
             case DataField.CustomDataField customSimpleField -> customSimpleField.writeTo(output);
         }
     }
@@ -246,11 +266,36 @@ public class DataFieldEncoder {
                     temp.release();
                 }
             }
+            case DataField.TlvDataField tlvDataField -> {
+                final DefaultSerializeContext newContext = new DefaultSerializeContext(context, tlvDataField);
+                final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(dataField.name(), "", dataField.type(), this.getClass().getSimpleName());
+                // 1. tag
+                final DataField.DictKey tag = tlvDataField.tag();
+                this.doEncodeFieldWithTracker(newContext, output, tag);
+                final ByteBuf temp = context.bufferFactory().buffer();
+
+                try {
+                    // 2. value
+                    final DataField value = tlvDataField.value();
+                    this.doEncodeFieldWithTracker(newContext, temp, value);
+
+                    // 3. length
+                    final int valueLength = temp.writerIndex();
+                    tlvDataField.length().writeToWithTracker(output, valueLength, codecTracker);
+                    output.writeBytes(temp);
+
+                    nestedFieldSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
+                    codecTracker.finishCurrentSpan();
+                } finally {
+                    temp.release();
+                }
+            }
             case DataField.CustomDataField customSimpleField -> customSimpleField.writeTo(output);
         }
         if (!(dataField instanceof DataField.Struct)
                 && !(dataField instanceof DataField.Dict<?>)
-                && !(dataField instanceof DataField.Sequence)) {
+                && !(dataField instanceof DataField.Sequence)
+                && !(dataField instanceof DataField.SimpleTlvDataField<?>)) {
             final String hexString = FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite);
             codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), dataField.name(), dataField.value(), hexString, this.getClass().getSimpleName(), dataField.getClass().getSimpleName());
         }

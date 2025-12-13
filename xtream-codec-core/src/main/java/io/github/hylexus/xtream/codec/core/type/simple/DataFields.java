@@ -349,6 +349,22 @@ public final class DataFields {
         return new DataField.Dict<>(null, null, keyType, valueLengthType, value, null);
     }
 
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(String name, PrependLengthFieldType prependLengthFieldType, K tag, DataField.ValueLengthType valueLengthType, DataField value, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.SimpleTlvDataField<>(name, prependLengthFieldType, tag, valueLengthType, value, attributes);
+    }
+
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(String name, PrependLengthFieldType prependLengthFieldType, K tag, DataField.ValueLengthType valueLengthType, DataField value) {
+        return new DataField.SimpleTlvDataField<>(name, prependLengthFieldType, tag, valueLengthType, value, null);
+    }
+
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(PrependLengthFieldType prependLengthFieldType, K tag, DataField.ValueLengthType valueLengthType, DataField value) {
+        return new DataField.SimpleTlvDataField<>(null, prependLengthFieldType, tag, valueLengthType, value, null);
+    }
+
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(K tag, DataField.ValueLengthType valueLengthType, DataField value) {
+        return new DataField.SimpleTlvDataField<>(null, null, tag, valueLengthType, value, null);
+    }
+
     public static DataField.Sequence sequence(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
         return new DataField.Sequence(name, prependLengthFieldType, value, attributes);
     }

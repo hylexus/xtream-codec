@@ -92,6 +92,8 @@ public class DataFieldTypeIdResolver implements TypeIdResolver {
         TYPE_REGISTRY.put("map", DataField.Dict.class);
         TYPE_REGISTRY.put("dict", DataField.Dict.class);
         TYPE_REGISTRY.put("dictionary", DataField.Dict.class);
+
+        TYPE_REGISTRY.put("tlv", DataField.SimpleTlvDataField.class);
     }
 
     @Override

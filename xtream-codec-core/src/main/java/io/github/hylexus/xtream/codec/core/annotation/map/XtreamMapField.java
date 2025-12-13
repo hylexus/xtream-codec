@@ -102,6 +102,7 @@ public @interface XtreamMapField {
 
     }
 
+    // todo 改为 io.github.hylexus.xtream.codec.core.annotation.PaddingType
     enum PaddingType {
         LEFT,
         RIGHT,

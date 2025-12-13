@@ -17,8 +17,12 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
+import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
+import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
+import io.github.hylexus.xtream.codec.core.type.wrapper.StringWrapperBcd;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriber;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
@@ -26,6 +30,7 @@ import io.netty.buffer.ByteBuf;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +65,13 @@ class MixedEntity02Test extends BaseCodecTest {
                 .setSpeed(80)
                 .setDirection(u16(1))
                 .setTime(time)
-                .setExtraItems(extraItems);
+                .setExtraItems(extraItems)
+                .setExtraItems2(tlv(u8((short) 0x01), DataField.ValueLengthType.u8, u32(123L)))
+                //.setExtraItems3(new TLV.TLVImpl(new TLV.U8Tag((short) 1), new TLV.LengthImpl(TLV.LengthType.u8), new U8Wrapper((short) 3)));
+                //.setExtraItems3(TLV.of(new TLV.U8Tag((short) 1), TLV.LengthType.u8, new StringWrapperBcd("112233")));
+                //.setExtraItems3(TLV.of(new TLV.StringTag("111", StandardCharsets.UTF_8, new PaddingConfig(PaddingType.LEFT, (byte) 0x0, 10)), TLV.LengthType.u8, new StringWrapperBcd("112233")));
+                //.setExtraItems3(TLV.of(new TLV.Bcd8421Tag("1234", new PaddingConfig(PaddingType.LEFT, (byte) 0x0, 10)), TLV.LengthType.u8, new StringWrapperBcd("112233")));
+                .setExtraItems3(TLV.of(new TLV.HexStringTag("1234", new PaddingConfig(PaddingType.LEFT, (byte) 0x0, 10)), TLV.LengthType.u8, new StringWrapperBcd("112233")));
         dataList.add(mixedEntity02);
 
         final ByteBuf encodeBuffer = responseEncoder.encode(dataList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));

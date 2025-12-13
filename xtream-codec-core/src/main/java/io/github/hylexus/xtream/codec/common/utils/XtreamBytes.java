@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.common.utils;
 
+import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
+import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.ReferenceCounted;
@@ -34,6 +36,20 @@ public class XtreamBytes {
     private static final char[] DIGITS_HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final char[] ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
+    private static final byte[] HEX_DECODE_TABLE = new byte[256];
+
+    static {
+        // -1 表示无效字符
+        Arrays.fill(HEX_DECODE_TABLE, (byte) -1);
+        for (int i = 0; i < 10; i++) {
+            HEX_DECODE_TABLE['0' + i] = (byte) i;
+        }
+        for (int i = 0; i < 6; i++) {
+            HEX_DECODE_TABLE['A' + i] = (byte) (10 + i);
+            HEX_DECODE_TABLE['a' + i] = (byte) (10 + i);
+        }
+    }
+
     public static String randomString(int length) {
         final ThreadLocalRandom random = ThreadLocalRandom.current();
         final StringBuilder sb = new StringBuilder();
@@ -43,7 +59,7 @@ public class XtreamBytes {
         return sb.toString();
     }
 
-    public static void releaseBufList(Collection<? extends ReferenceCounted> components) {
+    public static void releaseBufList(@Nullable Collection<? extends ReferenceCounted> components) {
         if (components == null || components.isEmpty()) {
             return;
         }
@@ -61,14 +77,40 @@ public class XtreamBytes {
         }
     }
 
-    public static ByteBuf byteBufFromHexString(ByteBufAllocator allocator, String hexString) {
-        final byte[] bytes = XtreamBytes.decodeHex(hexString);
-        return allocator.buffer().writeBytes(bytes);
+    public static ByteBuf byteBufFromHexString(ByteBufAllocator allocator, @Nullable String hexString) {
+        final ByteBuf buffer = allocator.buffer();
+        return byteBufFromHexString(buffer, hexString);
     }
 
-    public static ByteBuf byteBufFromHexString(ByteBuf buffer, String hexString) {
-        final byte[] bytes = XtreamBytes.decodeHex(hexString);
-        return buffer.writeBytes(bytes);
+    public static ByteBuf byteBufFromHexString(ByteBuf buffer, @Nullable String hexString) {
+        if (hexString == null || hexString.isEmpty()) {
+            return buffer;
+        }
+
+        final String trimmed = hexString.trim();
+        final int len = trimmed.length();
+        if (len == 0) {
+            return buffer;
+        }
+
+        if ((len & 1) != 0) {
+            throw new IllegalArgumentException("Hex string must have even length: \"" + hexString + "\"");
+        }
+
+        for (int i = 0; i < len; i += 2) {
+            final char highChar = trimmed.charAt(i);
+            final char lowChar = trimmed.charAt(i + 1);
+
+            final int high = HEX_DECODE_TABLE[highChar] & 0xFF;
+            final int low = HEX_DECODE_TABLE[lowChar] & 0xFF;
+
+            if (high > 15 || low > 15) {
+                throw new IllegalArgumentException("Invalid hex character at index " + i + ": \"" + hexString + "\"");
+            }
+
+            buffer.writeByte((byte) ((high << 4) | low));
+        }
+        return buffer;
     }
 
     public static String encodeHex(ByteBuf byteBuf) {
@@ -97,30 +139,49 @@ public class XtreamBytes {
         return decodeHex(hex.toCharArray());
     }
 
-    public static byte[] decodeHex(char[] data) {
-        int len = data.length;
+    /**
+     * 将十六进制字符数组解码为字节数组
+     *
+     * @param data 十六进制字符数组，必须为偶数长度，仅包含 [0-9a-fA-F]
+     * @return 解码后的字节数组
+     * @throws IllegalArgumentException 如果输入为 null、长度为奇数或包含非法字符
+     */
+    public static byte[] decodeHex(char @Nullable [] data) {
+        if (data == null) {
+            throw new IllegalArgumentException("Input char array must not be null");
+        }
+
+        final int len = data.length;
         if ((len & 1) != 0) {
-            throw new RuntimeException("字符个数应该为偶数");
+            throw new IllegalArgumentException("字符个数应该为偶数，实际长度: " + len);
         }
-        byte[] out = new byte[len >> 1];
+
+        if (len == 0) {
+            return new byte[0];
+        }
+
+        // len / 2
+        final byte[] out = new byte[len >> 1];
+
         for (int i = 0, j = 0; j < len; i++) {
-            int f = toDigit(data[j], j) << 4;
-            j++;
-            f |= toDigit(data[j], j);
-            j++;
-            out[i] = (byte) (f & 0xFF);
+            final char hiChar = data[j++];
+            final char loChar = data[j++];
+
+            final int high = HEX_DECODE_TABLE[hiChar] & 0xFF;
+            final int low = HEX_DECODE_TABLE[loChar] & 0xFF;
+
+            if (high > 15 || low > 15) {
+                // 确定是哪个位置出错
+                final char badChar = high > 15 ? hiChar : loChar;
+                final int badIndex = high > 15 ? j - 2 : j - 1;
+                throw new IllegalArgumentException("非法的十六进制字符 '" + badChar + "', 位置: " + badIndex);
+            }
+
+            out[i] = (byte) ((high << 4) | low);
         }
+
         return out;
     }
-
-    private static int toDigit(char ch, int index) {
-        int digit = Character.digit(ch, 16);
-        if (digit == -1) {
-            throw new RuntimeException("Illegal hexadecimal character " + ch + " at index " + index);
-        }
-        return digit;
-    }
-
 
     public static byte[] readBytes(ByteBuf byteBuf, int length) {
         final byte[] bytes = new byte[length];
@@ -173,6 +234,50 @@ public class XtreamBytes {
         return BcdOps.decodeBcd8421AsString(readable, length);
     }
 
+    public static void writeBcd8421(ByteBuf buffer, String bcdString, PaddingConfig paddingConfig) {
+        final PaddingType paddingType = paddingConfig.paddingType();
+        switch (paddingType) {
+            case null -> BcdOps.encodeBcd8421StringIntoByteBuf(bcdString, buffer);
+            case NONE -> BcdOps.encodeBcd8421StringIntoByteBuf(bcdString, buffer);
+            case LEFT -> writeBcd8421WithLeftPadding(buffer, bcdString, paddingConfig.minEncodedLength(), paddingConfig.paddingElement());
+            case RIGHT -> writeBcd8421WithRightPadding(buffer, bcdString, paddingConfig.minEncodedLength(), paddingConfig.paddingElement());
+        }
+    }
+
+    public static void writeBcd8421WithLeftPadding(ByteBuf buffer, String bcdString, int minLength, byte paddingElement) {
+        final int writerIndex = buffer.writerIndex();
+        BcdOps.encodeBcd8421StringIntoByteBuf(bcdString, buffer);
+        final int valueLength = buffer.writerIndex() - writerIndex;
+        final int delta = minLength - valueLength;
+        if (delta > 0) {
+            // 重置写指针 从头开始覆盖
+            buffer.writerIndex(writerIndex);
+            writePadding(buffer, paddingElement, delta);
+            BcdOps.encodeBcd8421StringIntoByteBuf(bcdString, buffer);
+        }
+    }
+
+    public static void writeBcd8421WithRightPadding(ByteBuf buffer, String bcdString, int minLength, byte paddingElement) {
+        final int writerIndex = buffer.writerIndex();
+        BcdOps.encodeBcd8421StringIntoByteBuf(bcdString, buffer);
+        final int valueLength = buffer.writerIndex() - writerIndex;
+        final int delta = minLength - valueLength;
+        if (delta > 0) {
+            // 尾部追加填充元素
+            writePadding(buffer, paddingElement, delta);
+        }
+    }
+
+    public static void writeCharSequence(ByteBuf buffer, CharSequence charSequence, Charset charset, PaddingConfig paddingConfig) {
+        final PaddingType paddingType = paddingConfig.paddingType();
+        switch (paddingType) {
+            case null -> buffer.writeCharSequence(charSequence, charset);
+            case NONE -> buffer.writeCharSequence(charSequence, charset);
+            case LEFT -> writeCharSequenceWithLeftPadding(buffer, charSequence, charset, paddingConfig.minEncodedLength(), paddingConfig.paddingElement());
+            case RIGHT -> writeCharSequenceWithRightPadding(buffer, charSequence, charset, paddingConfig.minEncodedLength(), paddingConfig.paddingElement());
+        }
+    }
+
     public static void writeCharSequenceWithLeftPadding(ByteBuf buffer, CharSequence charSequence, Charset charset, int minLength, byte paddingElement) {
         final int writerIndex = buffer.writerIndex();
         final int valueLength = buffer.writeCharSequence(charSequence, charset);
@@ -204,10 +309,63 @@ public class XtreamBytes {
         return byteBuf.writeShort(value);
     }
 
-    public static ByteBuf writeHexString(ByteBuf byteBuf, String value) {
-        final byte[] hexBytes = decodeHex(value.toLowerCase());
-        byteBuf.writeBytes(hexBytes);
+    public static ByteBuf writeHexString(ByteBuf byteBuf, @Nullable String value) {
+        if (value == null || value.isEmpty()) {
+            return byteBuf;
+        }
+
+        // 去除可能的空格
+        value = value.trim();
+
+        if ((value.length() & 1) != 0) {
+            throw new IllegalArgumentException("Hex string must have even length: " + value);
+        }
+
+        final int len = value.length();
+        for (int i = 0; i < len; i += 2) {
+            final int high = HEX_DECODE_TABLE[value.charAt(i)] & 0xFF;
+            final int low = HEX_DECODE_TABLE[value.charAt(i + 1)] & 0xFF;
+            if (high > 15 || low > 15) {
+                throw new IllegalArgumentException("Invalid hex char in: " + value);
+            }
+            byteBuf.writeByte((byte) ((high << 4) | low));
+        }
+
         return byteBuf;
+    }
+
+    public static void writeHexString(ByteBuf byteBuf, String value, PaddingConfig paddingConfig) {
+        final PaddingType paddingType = paddingConfig.paddingType();
+        switch (paddingType) {
+            case null -> writeHexString(byteBuf, value);
+            case NONE -> writeHexString(byteBuf, value);
+            case LEFT -> writeHexStringWithLeftPadding(byteBuf, value, paddingConfig.minEncodedLength(), paddingConfig.paddingElement());
+            case RIGHT -> writeHexStringWithRightPadding(byteBuf, value, paddingConfig.minEncodedLength(), paddingConfig.paddingElement());
+        }
+    }
+
+    public static void writeHexStringWithLeftPadding(ByteBuf buffer, String hexString, int minLength, byte paddingElement) {
+        final int writerIndex = buffer.writerIndex();
+        writeHexString(buffer, hexString);
+        final int valueLength = buffer.writerIndex() - writerIndex;
+        final int delta = minLength - valueLength;
+        if (delta > 0) {
+            // 重置写指针 从头开始覆盖
+            buffer.writerIndex(writerIndex);
+            writePadding(buffer, paddingElement, delta);
+            writeHexString(buffer, hexString);
+        }
+    }
+
+    public static void writeHexStringWithRightPadding(ByteBuf buffer, String hexString, int minLength, byte paddingElement) {
+        final int writerIndex = buffer.writerIndex();
+        writeHexString(buffer, hexString);
+        final int valueLength = buffer.writerIndex() - writerIndex;
+        final int delta = minLength - valueLength;
+        if (delta > 0) {
+            // 尾部追加填充元素
+            writePadding(buffer, paddingElement, delta);
+        }
     }
 
     public static ByteBuf writeBcd(ByteBuf byteBuf, String value) {
@@ -251,4 +409,5 @@ public class XtreamBytes {
     public static int gbkByteCount(String str) {
         return str.getBytes(XtreamConstants.CHARSET_GBK).length;
     }
+
 }

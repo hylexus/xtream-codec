@@ -448,6 +448,43 @@ public sealed interface DataField {
     }
 
     /**
+     * TLV: Tag-Length-Value
+     */
+    sealed interface TlvDataField extends DataField permits SimpleTlvDataField {
+        DictKey tag();
+
+        ValueLengthType length();
+
+        @Override
+        DataField value();
+    }
+
+    record SimpleTlvDataField<T extends DictKey>(
+            String name,
+            PrependLengthFieldType prependLengthFieldType,
+            T tag,
+            ValueLengthType length,
+            DataField value,
+            @Nullable Map<String, @Nullable Object> attributes
+    ) implements TlvDataField {
+
+        public SimpleTlvDataField(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, T tag, ValueLengthType length, DataField value, @Nullable Map<String, @Nullable Object> attributes) {
+            this.name = fieldName(name, this);
+            this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
+            this.tag = tag;
+            this.length = length;
+            this.value = value;
+            this.attributes = attributes;
+        }
+
+        @Override
+        public String type() {
+            return "tlv";
+        }
+
+    }
+
+    /**
      * 表示协议中的字段序列（有序字段列表）。
      * <p>
      * 本类型用于描述一段由多个 {@link DataField} 按固定顺序组成的结构化数据，

@@ -159,6 +159,13 @@ public class CodecTracker {
                     .setFieldCodec(fieldCodec)
                     .setValue(value)
                     .setHexString(hexString);
+
+            if (parent instanceof NestedFieldSpan nestedFieldSpan
+                    && "tlv".equalsIgnoreCase(nestedFieldSpan.getFieldType())
+                    && this.current.getChildren().size() == 2) {
+                this.current.addChild(this.current.getChildren().size() - 1, trackerItem);
+                needAdd = false;
+            }
         }
         if (needAdd) {
             this.current.addChild(trackerItem);

@@ -42,6 +42,10 @@ public interface FieldCodecRegistry {
 
     void register(FieldCodec<?> fieldCodec, Class<?> targetType, int sizeInBytes, String charset, boolean littleEndian);
 
+    default void registerPojoFieldCodec(FieldCodec<?> fieldCodec, Class<?> targetType) {
+        this.register(fieldCodec, targetType, -1, "", false);
+    }
+
     default Optional<FieldCodec<Object>> getFieldCodecAndCastToObject(int sizeInBytes, NumberSignedness signedness, @Nullable String charset, boolean littleEndian, Class<?> targetType) {
         return this.getFieldCodec(sizeInBytes, signedness, charset, littleEndian, targetType).map(it -> {
             @SuppressWarnings("unchecked") final FieldCodec<Object> cast = (FieldCodec<Object>) it;

@@ -28,9 +28,11 @@ import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
+import io.github.hylexus.xtream.codec.core.impl.codec.tlv.TLVCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.wrapper.*;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.github.hylexus.xtream.codec.core.type.ByteBufContainer;
+import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.core.type.wrapper.*;
@@ -246,6 +248,8 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         registry.register(DataFieldCodecs.INSTANCE, DataField.Dict.class, -1, "", false);
         registry.register(DataFieldCodecs.INSTANCE, DataField.Sequence.class, -1, "", false);
         registry.register(DataFieldCodecs.INSTANCE, DataField.ByteSequence.class, -1, "", false);
+        registry.register(DataFieldCodecs.INSTANCE, DataField.SimpleTlvDataField.class, -1, "", false);
+        registry.registerPojoFieldCodec(TLVCodecs.INSTANCE, TLV.class);
 
         registerDefaultStringCodec(registry);
     }

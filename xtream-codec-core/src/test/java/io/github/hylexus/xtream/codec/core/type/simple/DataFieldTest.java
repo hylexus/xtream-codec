@@ -50,6 +50,11 @@ class DataFieldTest extends BaseEntityCodecTest {
 
     }
 
+    @Test
+    void test7() throws Exception {
+        final DataField.SimpleTlvDataField<DataField.U8> tlv = tlv(u8((short) 1), DataField.ValueLengthType.u32, gbkString("111"));
+        System.out.println(objectMapper.writeValueAsString(tlv));
+    }
 
     @Test
     void test6() throws Exception {
@@ -107,6 +112,7 @@ class DataFieldTest extends BaseEntityCodecTest {
                         )
                 ),
                 byteSequence(PrependLengthFieldType.u8, new byte[]{1, 2, 3}),
+                tlv(u8((short) 1), DataField.ValueLengthType.u16, gbkString("222")),
                 new CustomDataField1("haha", u16(1), PrependLengthFieldType.u8)
         );
         System.out.println(DataFields.mixedListToJsonString(data1));
@@ -118,84 +124,147 @@ class DataFieldTest extends BaseEntityCodecTest {
         String json = """
                 [
                     {
-                        "type": "gbk_str",
-                        "value": "222",
-                        "prependLengthFieldType": "u8"
+                        "type": "gbk_string",
+                        "name": "GbkString",
+                        "prependLengthFieldType": "u8",
+                        "value": "222"
                     },
                     {
-                        "type": "str",
+                        "type": "string",
+                        "name": "GenericString",
+                        "prependLengthFieldType": "u16",
                         "value": "222",
-                        "charset": "utf-8",
-                        "prependLengthFieldType": "u16"
+                        "charset": "utf-8"
                     },
                     {
                         "type": "i8",
+                        "name": "I8",
                         "value": 1
                     },
                     {
                         "type": "u8",
+                        "name": "U8",
                         "value": 2
                     },
                     {
                         "type": "struct",
+                        "name": "Struct",
+                        "prependLengthFieldType": "none",
                         "value": [
                             {
                                 "type": "i16",
+                                "name": "I16",
                                 "value": 11
                             },
                             {
                                 "type": "u16",
+                                "name": "U16",
                                 "value": 22
                             }
-                        ],
-                        "prependLengthFieldType": "none"
+                        ]
                     },
                     {
                         "type": "seq",
+                        "name": "Sequence",
+                        "prependLengthFieldType": "none",
                         "value": [
                             {
                                 "type": "i32",
+                                "name": "I32",
                                 "value": 111
                             },
                             {
                                 "type": "u32",
+                                "name": "U32",
                                 "value": 222
                             }
-                        ],
-                        "prependLengthFieldType": "none"
+                        ]
                     },
                     {
                         "type": "dict",
+                        "name": "Dict",
+                        "prependLengthFieldType": "none",
                         "keyType": "u16",
                         "valueLengthType": "u8",
                         "value": {
                             "1": {
-                                "type": "gbk_str",
-                                "value": "1111",
-                                "prependLengthFieldType": "none"
+                                "type": "gbk_string",
+                                "name": "GbkString",
+                                "prependLengthFieldType": "none",
+                                "value": "1111"
                             },
                             "2": {
-                                "type": "gbk_str",
-                                "value": "2222",
+                                "type": "gbk_string",
+                                "name": "GbkString",
+                                "prependLengthFieldType": "none",
+                                "value": "2222"
+                            },
+                            "3": {
+                                "type": "gb2312_string",
+                                "name": "Gb2312String",
+                                "prependLengthFieldType": "none",
+                                "value": "2222"
+                            },
+                            "4": {
+                                "type": "byte_seq",
+                                "name": "ByteSequence",
+                                "prependLengthFieldType": "none",
+                                "value": [
+                                    11,
+                                    22
+                                ]
+                            },
+                            "5": {
+                                "type": "utf8_string",
+                                "name": "Utf8String",
+                                "prependLengthFieldType": "none",
+                                "value": "xxx"
+                            },
+                            "6": {
+                                "type": "io.github.hylexus.xtream.codec.core.type.simple.DataFieldTest$CustomDataField1",
+                                "value": "value",
+                                "haha": {
+                                    "type": "u16",
+                                    "name": "U16",
+                                    "value": 111
+                                },
                                 "prependLengthFieldType": "none"
                             }
-                        },
-                        "prependLengthFieldType": "none"
+                        }
                     },
                     {
                         "type": "byte_seq",
+                        "name": "ByteSequence",
+                        "prependLengthFieldType": "u8",
                         "value": [
                             1,
                             2,
                             3
-                        ],
-                        "prependLengthFieldType": "u8"
+                        ]
+                    },
+                    {
+                        "type": "tlv",
+                        "name": "Tlv",
+                        "prependLengthFieldType": "none",
+                        "tag": {
+                            "type": "u8",
+                            "name": "U8",
+                            "value": 1
+                        },
+                        "length": "u16",
+                        "value": {
+                            "type": "gbk_string",
+                            "name": "GbkString",
+                            "prependLengthFieldType": "none",
+                            "value": "222"
+                        }
                     },
                     {
                         "type": "io.github.hylexus.xtream.codec.core.type.simple.DataFieldTest$CustomDataField1",
                         "value": "haha",
                         "haha": {
                             "type": "u16",
+                            "name": "U16",
                             "value": 1
                         },
                         "prependLengthFieldType": "u8"
