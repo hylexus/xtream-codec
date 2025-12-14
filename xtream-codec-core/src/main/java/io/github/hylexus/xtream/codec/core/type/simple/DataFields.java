@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
@@ -208,104 +209,140 @@ public final class DataFields {
         return new DataField.F64(null, value, null);
     }
 
-    public static DataField.GenericString string(String name, PrependLengthFieldType prependLengthFieldType, String value, String charset, @Nullable Map<String, @Nullable Object> attributes) {
-        return new DataField.GenericString(name, prependLengthFieldType, value, charset, attributes);
+    public static DataField.GenericString string(String name, PrependLengthFieldType prependLengthFieldType, String value, String charset, PaddingConfig paddingConfig, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.GenericString(name, prependLengthFieldType, value, charset, paddingConfig, attributes);
+    }
+
+    public static DataField.GenericString string(PrependLengthFieldType prependLengthFieldType, String value, String charset, PaddingConfig paddingConfig) {
+        return new DataField.GenericString(null, prependLengthFieldType, value, charset, paddingConfig, null);
     }
 
     public static DataField.GenericString string(PrependLengthFieldType prependLengthFieldType, String value, String charset) {
-        return new DataField.GenericString(null, prependLengthFieldType, value, charset, null);
+        return new DataField.GenericString(null, prependLengthFieldType, value, charset, PaddingConfig.none(), null);
+    }
+
+    public static DataField.GenericString string(String value, String charset, PaddingConfig paddingConfig) {
+        return new DataField.GenericString(null, null, value, charset, paddingConfig, null);
     }
 
     public static DataField.GenericString string(String value, String charset) {
-        return new DataField.GenericString(null, null, value, charset, null);
+        return new DataField.GenericString(null, null, value, charset, PaddingConfig.none(), null);
     }
 
-    public static DataField.GbkString gbkString(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
-        return new DataField.GbkString(name, prependLengthFieldType, value, attributes);
+    public static DataField.GbkString gbkString(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable PaddingConfig paddingConfig, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.GbkString(name, prependLengthFieldType, value, paddingConfig, attributes);
     }
 
-    public static DataField.GbkString gbkString(String name, PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.GbkString(name, prependLengthFieldType, value, null);
+    public static DataField.GbkString gbkString(String name, PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.GbkString(name, prependLengthFieldType, value, paddingConfig, null);
+    }
+
+    public static DataField.GbkString gbkString(PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.GbkString(null, prependLengthFieldType, value, paddingConfig, null);
     }
 
     public static DataField.GbkString gbkString(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.GbkString(null, prependLengthFieldType, value, null);
+        return new DataField.GbkString(null, prependLengthFieldType, value, PaddingConfig.none(), null);
     }
 
-    public static DataField.GbkString gbkString(String name, String value) {
-        return new DataField.GbkString(name, PrependLengthFieldType.none, value, null);
+    public static DataField.GbkString gbkString(String name, String value, PaddingConfig paddingConfig) {
+        return new DataField.GbkString(name, PrependLengthFieldType.none, value, paddingConfig, null);
+    }
+
+    public static DataField.GbkString gbkString(String value, PaddingConfig paddingConfig) {
+        return new DataField.GbkString(null, PrependLengthFieldType.none, value, paddingConfig, null);
     }
 
     public static DataField.GbkString gbkString(String value) {
-        return new DataField.GbkString(null, PrependLengthFieldType.none, value, null);
+        return new DataField.GbkString(null, PrependLengthFieldType.none, value, PaddingConfig.none(), null);
     }
 
-    public static DataField.HexString hexString(String name, PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.HexString(name, prependLengthFieldType, value, null);
+    public static DataField.HexString hexString(String name, PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.HexString(name, prependLengthFieldType, value, paddingConfig, null);
     }
 
-    public static DataField.HexString hexString(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.HexString(null, prependLengthFieldType, value, null);
+    public static DataField.HexString hexString(PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.HexString(null, prependLengthFieldType, value, paddingConfig, null);
     }
 
-    public static DataField.HexString hexString(String name, String value) {
-        return new DataField.HexString(name, PrependLengthFieldType.none, value, null);
+    public static DataField.HexString hexString(String name, String value, PaddingConfig paddingConfig) {
+        return new DataField.HexString(name, PrependLengthFieldType.none, value, paddingConfig, null);
+    }
+
+    public static DataField.HexString hexString(String value, PaddingConfig paddingConfig) {
+        return new DataField.HexString(null, PrependLengthFieldType.none, value, paddingConfig, null);
     }
 
     public static DataField.HexString hexString(String value) {
-        return new DataField.HexString(null, PrependLengthFieldType.none, value, null);
+        return new DataField.HexString(null, PrependLengthFieldType.none, value, PaddingConfig.none(), null);
     }
 
-    public static DataField.Bcd8421String bcd8421String(String name, PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Bcd8421String(name, prependLengthFieldType, value, null);
+    public static DataField.Bcd8421String bcd8421String(String name, PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.Bcd8421String(name, prependLengthFieldType, value, paddingConfig, null);
     }
 
-    public static DataField.Bcd8421String bcd8421String(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Bcd8421String(null, prependLengthFieldType, value, null);
+    public static DataField.Bcd8421String bcd8421String(PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.Bcd8421String(null, prependLengthFieldType, value, paddingConfig, null);
     }
 
-    public static DataField.Bcd8421String bcd8421String(String name, String value) {
-        return new DataField.Bcd8421String(name, PrependLengthFieldType.none, value, null);
+    public static DataField.Bcd8421String bcd8421String(String name, String value, PaddingConfig paddingConfig) {
+        return new DataField.Bcd8421String(name, PrependLengthFieldType.none, value, paddingConfig, null);
+    }
+
+    public static DataField.Bcd8421String bcd8421String(String value, PaddingConfig paddingConfig) {
+        return new DataField.Bcd8421String(null, PrependLengthFieldType.none, value, paddingConfig, null);
     }
 
     public static DataField.Bcd8421String bcd8421String(String value) {
-        return new DataField.Bcd8421String(null, PrependLengthFieldType.none, value, null);
+        return new DataField.Bcd8421String(null, PrependLengthFieldType.none, value, PaddingConfig.none(), null);
     }
 
-    public static DataField.Gb2312String gb2312String(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
-        return new DataField.Gb2312String(name, prependLengthFieldType, value, attributes);
+    public static DataField.Gb2312String gb2312String(String name, PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.Gb2312String(name, prependLengthFieldType, value, paddingConfig, attributes);
     }
 
-    public static DataField.Gb2312String gb2312String(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Gb2312String(null, prependLengthFieldType, value, null);
+    public static DataField.Gb2312String gb2312String(PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.Gb2312String(null, prependLengthFieldType, value, paddingConfig, null);
     }
 
-    public static DataField.Gb2312String gb2312String(String name, String value) {
-        return new DataField.Gb2312String(name, PrependLengthFieldType.none, value, null);
+    public static DataField.Gb2312String gb2312String(String name, String value, PaddingConfig paddingConfig) {
+        return new DataField.Gb2312String(name, PrependLengthFieldType.none, value, paddingConfig, null);
+    }
+
+    public static DataField.Gb2312String gb2312String(String value, PaddingConfig paddingConfig) {
+        return new DataField.Gb2312String(null, PrependLengthFieldType.none, value, paddingConfig, null);
     }
 
     public static DataField.Gb2312String gb2312String(String value) {
-        return new DataField.Gb2312String(null, PrependLengthFieldType.none, value, null);
+        return new DataField.Gb2312String(null, PrependLengthFieldType.none, value, PaddingConfig.none(), null);
     }
 
-    public static DataField.Utf8String utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value, @Nullable Map<String, @Nullable Object> attributes) {
-        return new DataField.Utf8String(name, prependLengthFieldType, value, attributes);
+    public static DataField.Utf8String utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig, @Nullable Map<String, @Nullable Object> attributes) {
+        return new DataField.Utf8String(name, prependLengthFieldType, value, paddingConfig, attributes);
     }
 
-    public static DataField.Utf8String utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Utf8String(name, prependLengthFieldType, value, null);
+    public static DataField.Utf8String utf8String(String name, PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.Utf8String(name, prependLengthFieldType, value, paddingConfig, null);
+    }
+
+    public static DataField.Utf8String utf8String(PrependLengthFieldType prependLengthFieldType, String value, PaddingConfig paddingConfig) {
+        return new DataField.Utf8String(null, prependLengthFieldType, value, paddingConfig, null);
     }
 
     public static DataField.Utf8String utf8String(PrependLengthFieldType prependLengthFieldType, String value) {
-        return new DataField.Utf8String(null, prependLengthFieldType, value, null);
+        return new DataField.Utf8String(null, prependLengthFieldType, value, PaddingConfig.none(), null);
     }
 
-    public static DataField.Utf8String utf8String(String name, String value) {
-        return new DataField.Utf8String(name, PrependLengthFieldType.none, value, null);
+    public static DataField.Utf8String utf8String(String name, String value, PaddingConfig paddingConfig) {
+        return new DataField.Utf8String(name, PrependLengthFieldType.none, value, paddingConfig, null);
+    }
+
+    public static DataField.Utf8String utf8String(String value, PaddingConfig paddingConfig) {
+        return new DataField.Utf8String(null, PrependLengthFieldType.none, value, paddingConfig, null);
     }
 
     public static DataField.Utf8String utf8String(String value) {
-        return new DataField.Utf8String(null, PrependLengthFieldType.none, value, null);
+        return new DataField.Utf8String(null, PrependLengthFieldType.none, value, PaddingConfig.none(), null);
     }
 
     public static DataField.Struct struct(String name, PrependLengthFieldType prependLengthFieldType, List<DataField> fields, @Nullable Map<String, @Nullable Object> attributes) {

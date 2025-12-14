@@ -336,9 +336,11 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
             return Optional.of(FieldCodec.TransientRecordComponentFieldCodec.INSTANCE);
         }
-        if (DataField.class.isAssignableFrom(metadata.rawClass())) {
+
+        if (HasSpecifiedFieldCodec.class.isAssignableFrom(metadata.rawClass())) {
             return this.getFieldCodec(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), metadata.rawClass());
         }
+
         if (metadata.isRecordClass()) {
             final BeanMetadata beanMetadata = metadata.beanMetadataRegistry().getBeanMetadata(metadata.rawClass(), metadata.version());
             return Optional.of(new DelegateBeanMetadataFieldCodec(beanMetadata));

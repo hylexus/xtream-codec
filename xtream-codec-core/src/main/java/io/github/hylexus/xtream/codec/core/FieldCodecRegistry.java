@@ -72,4 +72,7 @@ public interface FieldCodecRegistry {
         }
     }
 
+    interface HasSpecifiedFieldCodec {
+    }
+
 }

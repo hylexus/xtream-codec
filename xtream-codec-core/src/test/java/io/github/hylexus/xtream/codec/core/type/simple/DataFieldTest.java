@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ class DataFieldTest extends BaseEntityCodecTest {
 
     @Test
     void test6() throws Exception {
-        final Object data = new DataField.GbkString(null, PrependLengthFieldType.u8, "222", Map.of("a", 1, "b", "222"));
+        final Object data = new DataField.GbkString(null, PrependLengthFieldType.u8, "222", PaddingConfig.none(), Map.of("a", 1, "b", "222"));
         System.out.println("Encode: " + objectMapper.writeValueAsString(data));
         final DataField dataField = parseSimpleFieldFromJson("""
                 {
