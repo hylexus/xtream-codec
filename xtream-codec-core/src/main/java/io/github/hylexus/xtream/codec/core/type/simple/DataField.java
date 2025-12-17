@@ -54,7 +54,7 @@ import static java.util.Objects.requireNonNullElse;
         property = "type"
 )
 @ApiStatus.Experimental
-public sealed interface DataField extends FieldCodecRegistry.HasSpecifiedFieldCodec {
+public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
 
     /**
      * 返回该字段的名称，主要用于调试和日志追踪。
@@ -89,7 +89,7 @@ public sealed interface DataField extends FieldCodecRegistry.HasSpecifiedFieldCo
         throw new UnsupportedOperationException();
     }
 
-    sealed interface StringDataField extends DictKey, DataField
+    sealed interface StringDataField extends DictKey, CodecTracker.FlattedSpan
             permits GenericString, Bcd8421String, Gb2312String, GbkString, HexString, Utf8String {
 
         @Override
@@ -98,7 +98,7 @@ public sealed interface DataField extends FieldCodecRegistry.HasSpecifiedFieldCo
         PaddingConfig paddingConfig();
     }
 
-    sealed interface IntegralDataField extends DictKey
+    sealed interface IntegralDataField extends DictKey, CodecTracker.FlattedSpan
             permits I8, U8, I16, U16, I32, U32, I64 {
     }
 

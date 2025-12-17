@@ -216,8 +216,28 @@ public final class BeanUtils {
         return PropertyGetters.forFieldViaReflection(pd.getField());
     }
 
+    record InterfacePlaceholder() {
+        InterfacePlaceholder {
+            throw new UnsupportedOperationException();
+        }
+
+        @SuppressWarnings("rawtypes")
+        public static final Constructor PLACEHOLDER_CONSTRUCTOR;
+
+        static {
+            try {
+                PLACEHOLDER_CONSTRUCTOR = InterfacePlaceholder.class.getDeclaredConstructor();
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public static Constructor<?> getConstructor(BeanInfo beanInfo) {
         final Class<?> beanClass = beanInfo.getBeanDescriptor().getBeanClass();
+        if (beanClass.isInterface()) {
+            return InterfacePlaceholder.PLACEHOLDER_CONSTRUCTOR;
+        }
         if (beanClass.isRecord()) {
             return XtreamRecordUtils.findCanonicalRecordConstructor(beanClass);
         }
@@ -252,7 +272,7 @@ public final class BeanUtils {
         if (constructors.length == 0) {
             throw new IllegalStateException(
                     "Cannot create FieldCodec instance for class [" + cls.getName() + "]"
-                    + "\nNo Constructor found");
+                            + "\nNo Constructor found");
         }
         if (constructors.length == 1) {
             return createFieldCodecInstance(version, cls, constructors[0], beanMetadataRegistry);
@@ -264,12 +284,12 @@ public final class BeanUtils {
         if (constructorList.isEmpty()) {
             throw new IllegalStateException(
                     "Failed to create FieldCodec instance for class [" + cls.getName() + "]"
-                    + "\nMore than 1 Constructor found."
-                    + "\nConsider using the @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " annotation to mark which constructor to use.");
+                            + "\nMore than 1 Constructor found."
+                            + "\nConsider using the @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " annotation to mark which constructor to use.");
         }
         throw new IllegalStateException(
                 "Failed to create FieldCodec instance for class [" + cls.getName() + "]"
-                + "\nMore than 1 @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " found.");
+                        + "\nMore than 1 @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " found.");
     }
 
     private static <T extends FieldCodec<?>> T createFieldCodecInstance(int version, Class<T> cls, Constructor<?> constructor, BeanMetadataRegistry beanMetadataRegistry) {

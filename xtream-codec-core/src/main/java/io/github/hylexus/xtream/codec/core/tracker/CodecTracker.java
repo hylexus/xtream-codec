@@ -30,6 +30,7 @@ public class CodecTracker {
     private final RootSpan root;
     private BaseSpan current;
     private MapEntryItemSpan.@Nullable Type tempMapItemType;
+    private @Nullable String tempFieldName;
 
     public CodecTracker() {
         final RootSpan rootSpan = new RootSpan();
@@ -43,6 +44,10 @@ public class CodecTracker {
 
     public void updateTrackerHints(MapEntryItemSpan.Type type) {
         this.tempMapItemType = type;
+    }
+
+    public void updateTempFieldName(@Nullable String tempFieldName) {
+        this.tempFieldName = tempFieldName;
     }
 
     public NestedFieldSpan startNewNestedFieldSpan(BeanPropertyMetadata metadata, FieldCodec<?> fieldCodec, String fieldType) {
@@ -155,6 +160,10 @@ public class CodecTracker {
             }
             this.tempMapItemType = null;
         } else {
+            if (this.tempFieldName != null) {
+                fieldName = this.tempFieldName;
+                this.tempFieldName = null;
+            }
             trackerItem = new BasicFieldSpan(parent, fieldName, fieldDesc)
                     .setFieldCodec(fieldCodec)
                     .setValue(value)
@@ -209,4 +218,8 @@ public class CodecTracker {
         }
         return "unknown";
     }
+
+    public interface FlattedSpan {
+    }
+
 }

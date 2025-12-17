@@ -138,8 +138,9 @@ public class BaseCodecTest {
     protected String encode(Object instance, Jt808ProtocolVersion version, String terminalId, int messageId) {
         ByteBuf encoded = null;
         try {
-            final Jt808MessageDescriber describer = new Jt808MessageDescriber(messageId, version, terminalId);
+            final Jt808MessageDescriber describer = new Jt808MessageDescriber(messageId, version, terminalId).enableTracker();
             encoded = responseEncoder.encode(instance, describer);
+            describer.visitTracker();
             return FormatUtils.toHexString(encoded);
         } finally {
             if (encoded != null) {

@@ -31,6 +31,13 @@ public interface FieldCodecRegistry {
 
     Optional<FieldCodec<?>> getFieldCodec(int sizeInBytes, NumberSignedness signedness, @Nullable String charset, boolean littleEndian, Class<?> targetType);
 
+    /**
+     * @see AtomicDataType
+     */
+    default Optional<FieldCodec<?>> getFieldCodecForAtomicDataType(Class<?> targetType) {
+        return this.getFieldCodec(-1, NumberSignedness.NONE, null, false, targetType);
+    }
+
     @Nullable
     FieldCodec<?> getOrCreateFieldCodec(
             int version,
@@ -72,7 +79,10 @@ public interface FieldCodecRegistry {
         }
     }
 
-    interface HasSpecifiedFieldCodec {
+    /**
+     * @see #getFieldCodecForAtomicDataType(Class)
+     */
+    interface AtomicDataType {
     }
 
 }

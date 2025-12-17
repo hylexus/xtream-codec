@@ -337,18 +337,19 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
             return Optional.of(FieldCodec.TransientRecordComponentFieldCodec.INSTANCE);
         }
 
-        if (HasSpecifiedFieldCodec.class.isAssignableFrom(metadata.rawClass())) {
-            return this.getFieldCodec(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), metadata.rawClass());
+        if (xtreamField.fieldCodec() != FieldCodec.Placeholder.class) {
+            final Class<? extends FieldCodec<?>> aClass = xtreamField.fieldCodec();
+            final FieldCodec<?> newInstance = this.getOrCreateFieldCodec(metadata.version(), metadata.beanMetadataRegistry(), null, aClass, xtreamField.charset(), null);
+            return Optional.ofNullable(newInstance);
+        }
+
+        if (AtomicDataType.class.isAssignableFrom(metadata.rawClass())) {
+            return this.getFieldCodecForAtomicDataType(metadata.rawClass());
         }
 
         if (metadata.isRecordClass()) {
             final BeanMetadata beanMetadata = metadata.beanMetadataRegistry().getBeanMetadata(metadata.rawClass(), metadata.version());
             return Optional.of(new DelegateBeanMetadataFieldCodec(beanMetadata));
-        }
-        if (xtreamField.fieldCodec() != FieldCodec.Placeholder.class) {
-            final Class<? extends FieldCodec<?>> aClass = xtreamField.fieldCodec();
-            final FieldCodec<?> newInstance = this.getOrCreateFieldCodec(metadata.version(), metadata.beanMetadataRegistry(), null, aClass, xtreamField.charset(), null);
-            return Optional.ofNullable(newInstance);
         }
 
         final Class<?> rawClassType = metadata.rawClass();

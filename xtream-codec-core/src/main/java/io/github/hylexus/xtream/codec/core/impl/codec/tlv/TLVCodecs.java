@@ -21,8 +21,8 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
-import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.FieldLength;
+import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.Nullable;
@@ -74,25 +74,37 @@ public class TLVCodecs {
         }
 
         @Override
-        public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable TLV value) {
-            if (value == null) {
+        public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable TLV tlv) {
+            if (tlv == null) {
                 return;
             }
             final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
             final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan("TLV", "Tag-Length-Value", "TLV", this.getClass().getSimpleName());
             final int indexBeforeWrite = output.writerIndex();
-            final DataField.DictKey tag = value.tag();
+            final DataField.DictKey tag = tlv.tag();
 
             // 1. 编码 tag
             tag.encodeWithTracker(output, codecTracker);
 
             // Length 是 sealed interface 并且只有一个实现类，所以强转是安全的
-            final FieldLength.DefaultFieldLength valueLength = (FieldLength.DefaultFieldLength) value.length();
+            final FieldLength.DefaultFieldLength valueLength = (FieldLength.DefaultFieldLength) tlv.length();
             final ByteBuf temp = context.bufferFactory().buffer();
             try {
+                final boolean flattedSpan = tlv.value() instanceof CodecTracker.FlattedSpan;
                 // 2. 编码 value
-                context.entityEncoder().encodeWithTracker(value.value(), temp, codecTracker);
-                valueLength.setValue(temp.readableBytes());
+                if (flattedSpan) {
+                    codecTracker.updateTempFieldName("value");
+                    context.entityEncoder().encodeWithTracker(tlv.value(), temp, codecTracker);
+                    valueLength.setValue(temp.readableBytes());
+                } else {
+                    final NestedFieldSpan valueTracker = codecTracker.startNewNestedFieldSpan("value", "", tlv.value().getClass().getSimpleName(), this.getClass().getSimpleName());
+
+                    context.entityEncoder().encodeWithTracker(tlv.value(), temp, codecTracker);
+                    valueLength.setValue(temp.readableBytes());
+
+                    valueTracker.setHexString(FormatUtils.toHexString(temp, 0, temp.writerIndex()));
+                    codecTracker.finishCurrentSpan();
+                }
 
                 // 3. 编码 value 长度
                 valueLength.type().writeToWithTracker(output, valueLength.value(), codecTracker);

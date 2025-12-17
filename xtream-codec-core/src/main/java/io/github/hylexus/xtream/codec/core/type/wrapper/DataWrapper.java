@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.type.wrapper;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.github.hylexus.xtream.codec.common.utils.BcdOps;
+import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.Nullable;
@@ -28,7 +29,7 @@ import java.nio.charset.Charset;
  * @author hylexus
  */
 @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
-public interface DataWrapper<T> {
+public interface DataWrapper<T> extends FieldCodecRegistry.AtomicDataType {
 
     void writeTo(ByteBuf output);
 

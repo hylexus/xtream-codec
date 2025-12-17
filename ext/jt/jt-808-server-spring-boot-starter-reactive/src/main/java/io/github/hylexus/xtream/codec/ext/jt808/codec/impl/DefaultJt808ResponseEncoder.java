@@ -277,7 +277,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
             return Jt808RequestHeader.Jt808MessageBodyProps.from(this.messageBodyProps).versionIdentifier() == 1;
         }
 
-        @Preset.JtStyle.Word(desc = "消息ID")
+        @Preset.JtStyle.Word(desc = "消息 ID")
         private int messageId;
 
         // byte[2-4)    消息体属性 word(16)
@@ -289,7 +289,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         private short protocolVersion;
 
         // byte[5-15)    终端手机号或设备ID bcd[10]
-        @Preset.JtStyle.Bcd(lengthExpression = "hasVersionField() ? 10 : 6", desc = "终端手机号或设备ID")
+        @Preset.JtStyle.Bcd(lengthExpression = "hasVersionField() ? 10 : 6", desc = "终端手机号或设备 ID")
         private String terminalId;
 
         // byte[15-17)    消息流水号 word(16)

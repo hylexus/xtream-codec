@@ -31,11 +31,14 @@ public record TLV(
         DataField.DictKey tag,
         FieldLength length,
         Object value
-)
-        implements FieldCodecRegistry.HasSpecifiedFieldCodec {
+) implements FieldCodecRegistry.AtomicDataType {
+
+    public TLV(DataField.DictKey tag, FieldLength.LengthType length, Object value) {
+        this(tag, new FieldLength.DefaultFieldLength(length), value);
+    }
 
     public static TLV of(DataField.DictKey tag, FieldLength.LengthType length, Object value) {
-        return new TLV(tag, new FieldLength.DefaultFieldLength(length), value);
+        return new TLV(tag, length, value);
     }
 
 }

@@ -264,7 +264,6 @@ public @interface XtreamField {
     enum Nulls {
         AS_EMPTY,
         AS_NULL,
-        ;
     }
 
     enum CodecStrategy {
@@ -273,7 +272,6 @@ public @interface XtreamField {
          */
         TRANSIENT,
         DEFAULT,
-        ;
     }
 
 }

@@ -17,8 +17,8 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.DataFieldEncoder;
+import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.Nullable;

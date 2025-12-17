@@ -1,7 +1,9 @@
 <component name="ProjectDictionaryState">
-    <dictionary name="xtream">
-        <words>
-            <w>Xtream</w>
-        </words>
-    </dictionary>
+  <dictionary name="xtream">
+    <words>
+      <w>ByteBuf</w>
+      <w>Xtream</w>
+      <w>XtreamField</w>
+    </words>
+  </dictionary>
 </component>

@@ -16,12 +16,14 @@
 
 package io.github.hylexus.xtream.codec.common.bean.impl;
 
+import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.IterationTimesExtractor;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.CollectionFieldSpan;
@@ -35,6 +37,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class SequenceBeanPropertyMetadata extends BasicBeanPropertyMetadata {
+    // todo nestedBeanPropertyMetadata 配置
     private final NestedBeanPropertyMetadata nestedBeanPropertyMetadata;
     private final BeanPropertyMetadata delegate;
     private final ContainerInstanceFactory containerInstanceFactory;
@@ -72,25 +75,50 @@ public class SequenceBeanPropertyMetadata extends BasicBeanPropertyMetadata {
 
     @Override
     public void doEncode(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
-        @SuppressWarnings("unchecked") final Collection<Object> collection = (Collection<Object>) value;
+        @SuppressWarnings("unchecked") final Collection<@Nullable Object> collection = (Collection<Object>) value;
         for (final Object object : collection) {
-            nestedBeanPropertyMetadata.encodePropertyValue(context, output, object);
+            if (object == null) {
+                continue;
+            }
+            final Class<?> entityClass = object.getClass();
+            if (object instanceof FieldCodecRegistry.AtomicDataType) {
+                final FieldCodec<Object> fieldCodec = beanMetadataRegistry.getFieldCodecRegistry().getFieldCodecAndCastToObject(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), object.getClass())
+                        .orElseThrow();
+                fieldCodec.serialize(this.delegate, context, output, object);
+            } else {
+                final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass, context.version());
+                context.entityEncoder().encode(context.version(), beanMetadata, object, output);
+            }
         }
     }
 
     @Override
     protected void doEncodeWithTracker(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
-        @SuppressWarnings("unchecked") final Collection<Object> collection = (Collection<Object>) value;
+        @SuppressWarnings("unchecked") final Collection<@Nullable Object> collection = (Collection<Object>) value;
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         final CollectionFieldSpan collectionFieldSpan = codecTracker.startNewCollectionFieldSpan(this);
         final int parentIndexBeforeWrite = output.writerIndex();
         int sequence = 0;
         for (final Object object : collection) {
-            final int indexBeforeWrite = output.writerIndex();
-            final CollectionItemSpan collectionItemSpan = codecTracker.startNewCollectionItemSpan(collectionFieldSpan, collectionFieldSpan.getFieldName(), sequence++);
-            nestedBeanPropertyMetadata.encodePropertyValueWithTracker(context, output, object);
-            collectionItemSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
-            codecTracker.finishCurrentSpan();
+            if (object == null) {
+                continue;
+            }
+            if (object instanceof FieldCodecRegistry.AtomicDataType) {
+                final FieldCodec<Object> fieldCodec = this.beanMetadataRegistry.getFieldCodecRegistry().getFieldCodecAndCastToObject(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), object.getClass())
+                        .orElseThrow();
+                fieldCodec.serializeWithTracker(this.delegate, context, output, object);
+            } else {
+                final Class<?> entityClass = object.getClass();
+                final BeanMetadata beanMetadata = this.beanMetadataRegistry.getBeanMetadata(entityClass, context.version());
+
+                final int indexBeforeWrite = output.writerIndex();
+                final CollectionItemSpan collectionItemSpan = codecTracker.startNewCollectionItemSpan(collectionFieldSpan, collectionFieldSpan.getFieldName(), sequence++);
+
+                context.entityEncoder().encodeWithTracker(context.version(), beanMetadata, object, output, codecTracker);
+
+                collectionItemSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
+                codecTracker.finishCurrentSpan();
+            }
         }
         collectionFieldSpan.setHexString(FormatUtils.toHexString(output, parentIndexBeforeWrite, output.writerIndex() - parentIndexBeforeWrite));
         codecTracker.finishCurrentSpan();

@@ -361,17 +361,17 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     @Override
     public String toString() {
         return "BasicBeanPropertyMetadata{"
-               + "name='" + name + '\''
-               + ", type=" + type
-               + ", filedValueType=" + filedValueType
-               + ", field=" + field
-               + ", fieldCodec=" + fieldCodec
-               + ", propertyGetter=" + propertyGetter
-               + ", propertySetter=" + propertySetter
-               + ", order=" + order
-               + ", fieldLengthExtractor=" + fieldLengthExtractor
-               + ", xtreamField=" + xtreamField
-               + '}';
+                + "name='" + name + '\''
+                + ", type=" + type
+                + ", filedValueType=" + filedValueType
+                + ", field=" + field
+                + ", fieldCodec=" + fieldCodec
+                + ", propertyGetter=" + propertyGetter
+                + ", propertySetter=" + propertySetter
+                + ", order=" + order
+                + ", fieldLengthExtractor=" + fieldLengthExtractor
+                + ", xtreamField=" + xtreamField
+                + '}';
     }
 
 }
