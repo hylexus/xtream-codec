@@ -18,20 +18,17 @@ package io.github.hylexus.xtream.codec.common.bean.impl;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.common.bean.IterationTimesExtractor;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.CollectionFieldSpan;
 import io.github.hylexus.xtream.codec.core.tracker.CollectionItemSpan;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.Nullable;
-import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -41,7 +38,6 @@ public class SequenceBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     private final NestedBeanPropertyMetadata nestedBeanPropertyMetadata;
     private final BeanPropertyMetadata delegate;
     private final ContainerInstanceFactory containerInstanceFactory;
-    private final IterationTimesExtractor iterationTimesExtractor;
 
     public SequenceBeanPropertyMetadata(BeanMetadataRegistry beanMetadataRegistry, BeanPropertyMetadata delegate, NestedBeanPropertyMetadata metadata) {
         super(beanMetadataRegistry, delegate.name(), delegate.rawClass(), delegate.version(), delegate.xtreamFieldAnnotation(), delegate.field(), delegate.propertyGetter(), delegate.propertySetter());
@@ -50,17 +46,6 @@ public class SequenceBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         this.containerInstanceFactory = this.xtreamField.containerInstanceFactory() == ContainerInstanceFactory.PlaceholderContainerInstanceFactory.class
                 ? BeanUtils.createNewInstance(ContainerInstanceFactory.ArrayListContainerInstanceFactory.class, (Object[]) null)
                 : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
-        this.iterationTimesExtractor = this.initIterationTimesExtractor(this.xtreamField);
-    }
-
-    private IterationTimesExtractor initIterationTimesExtractor(XtreamField xtreamField) {
-        if (xtreamField.iterationTimes() > 0) {
-            return new IterationTimesExtractor.ConstantIterationTimesExtractor(xtreamField.iterationTimes());
-        }
-        if (StringUtils.hasText(xtreamField.iterationTimesExpression())) {
-            return new IterationTimesExtractor.ExpressionIterationTimesExtractor(xtreamField);
-        }
-        return IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
     }
 
     @Override
@@ -69,21 +54,24 @@ public class SequenceBeanPropertyMetadata extends BasicBeanPropertyMetadata {
     }
 
     @Override
-    public IterationTimesExtractor iterationTimesExtractor() {
-        return this.iterationTimesExtractor;
-    }
-
-    @Override
     public void doEncode(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
         @SuppressWarnings("unchecked") final Collection<@Nullable Object> collection = (Collection<Object>) value;
+        int sequence = 0;
         for (final Object object : collection) {
+            sequence++;
             if (object == null) {
                 continue;
             }
             final Class<?> entityClass = object.getClass();
             if (object instanceof FieldCodecRegistry.AtomicDataType) {
-                final FieldCodec<Object> fieldCodec = beanMetadataRegistry.getFieldCodecRegistry().getFieldCodecAndCastToObject(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), object.getClass())
-                        .orElseThrow();
+                final int finalSequence = sequence;
+                final FieldCodec<Object> fieldCodec = this.beanMetadataRegistry.getFieldCodecRegistry().getFieldCodecAndCastToObject(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), object.getClass())
+                        .orElseThrow(() -> new IllegalStateException("""
+                                No FieldCode found
+                                ==> field: %s
+                                    elementOffset: %d
+                                    elementType: %s
+                                """.strip().formatted(this.nestedBeanPropertyMetadata.field().toGenericString(), finalSequence, object.getClass().getName())));
                 fieldCodec.serialize(this.delegate, context, output, object);
             } else {
                 final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(entityClass, context.version());
@@ -104,8 +92,14 @@ public class SequenceBeanPropertyMetadata extends BasicBeanPropertyMetadata {
                 continue;
             }
             if (object instanceof FieldCodecRegistry.AtomicDataType) {
+                final int finalSequence = sequence;
                 final FieldCodec<Object> fieldCodec = this.beanMetadataRegistry.getFieldCodecRegistry().getFieldCodecAndCastToObject(-1, xtreamField.signedness(), null, xtreamField.littleEndian(), object.getClass())
-                        .orElseThrow();
+                        .orElseThrow(() -> new IllegalStateException("""
+                                No FieldCode found
+                                ==> field: %s
+                                    elementOffset: %d
+                                    elementType: %s
+                                """.strip().formatted(this.nestedBeanPropertyMetadata.field().toGenericString(), finalSequence, object.getClass().getName())));
                 fieldCodec.serializeWithTracker(this.delegate, context, output, object);
             } else {
                 final Class<?> entityClass = object.getClass();

@@ -29,6 +29,7 @@ import io.github.hylexus.xtream.codec.core.DataFieldEncoder;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import io.netty.buffer.ByteBuf;
@@ -118,11 +119,35 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
             };
         }
 
-        default void encodeWithTracker(ByteBuf output, CodecTracker codecTracker) {
+        default void encodeWithTracker(ByteBuf output, CodecTracker codecTracker, String fieldName) {
             final int indexBeforeWrite = output.writerIndex();
             this.encode(output);
             final String hexString = FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite);
-            codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), "tag", this.value(), hexString, this.getClass().getSimpleName(), "");
+            codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), fieldName, this.value(), hexString, this.getClass().getSimpleName(), "");
+        }
+
+        static DictKey deserialize(KeyType keyType, ByteBuf input, int sizeInBytes, String charset) {
+            return switch (keyType) {
+                case i8 -> new I8(null, input.readByte(), null);
+                case u8 -> new U8(null, input.readUnsignedByte(), null);
+                case i16 -> new I16(null, input.readShort(), null);
+                case u16 -> new U16(null, input.readUnsignedShort(), null);
+                case i32 -> new I32(null, input.readInt(), null);
+                case u32 -> new U32(null, input.readUnsignedInt(), null);
+                case i64 -> new I64(null, input.readLong(), null);
+                case str -> new GenericString(null, null, input.readCharSequence(sizeInBytes, Charset.forName(charset)).toString(), charset, null, null);
+                case str_gb_2312 -> new GbkString(null, null, input.readCharSequence(sizeInBytes, XtreamConstants.CHARSET_GB_2312).toString(), null, null);
+                case str_gbk -> new GbkString(null, null, input.readCharSequence(sizeInBytes, XtreamConstants.CHARSET_GBK).toString(), null, null);
+                case str_utf8 -> new Utf8String(null, null, input.readCharSequence(sizeInBytes, XtreamConstants.CHARSET_UTF8).toString(), null, null);
+            };
+        }
+
+        static DictKey deserializeWithTracker(CodecTracker codecTracker, KeyType keyType, ByteBuf input, int sizeInBytes, String charset, String fieldName) {
+            final int readerIndex = input.readerIndex();
+            final DictKey key = DictKey.deserialize(keyType, input, sizeInBytes, charset);
+            final String hexString = FormatUtils.toHexString(input, readerIndex, input.readerIndex() - readerIndex);
+            codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), fieldName, key, hexString, DictKey.class.getSimpleName(), "");
+            return key;
         }
 
         default void encode(ByteBuf output) {
@@ -329,6 +354,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
 
     }
 
+    // todo 修改为 io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType
     enum ValueLengthType {
         i8, u8, i16, u16, i32, u32, i64;
 
@@ -350,7 +376,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
         }
     }
 
-    record I8(String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.IntegralDataField {
+    record I8(String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public I8(@Nullable String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
@@ -364,7 +390,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
 
     }
 
-    record U8(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.IntegralDataField {
+    record U8(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public U8(@Nullable String name, Short value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             DataField.checkU8(value);
@@ -378,7 +404,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
         }
     }
 
-    record I16(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.IntegralDataField {
+    record I16(String name, Short value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public I16(@Nullable String name, Short value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
@@ -391,7 +417,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
         }
     }
 
-    record U16(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.IntegralDataField {
+    record U16(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public U16(@Nullable String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) {
             DataField.checkU16(value);
             this.name = fieldName(name, this);
@@ -405,7 +431,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
         }
     }
 
-    record I32(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.IntegralDataField {
+    record I32(String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public I32(@Nullable String name, Integer value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;
@@ -419,7 +445,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
 
     }
 
-    record U32(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.IntegralDataField {
+    record U32(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public U32(@Nullable String name, Long value, @Nullable Map<String, @Nullable Object> attributes) {
             DataField.checkU32(value);
             this.name = fieldName(name, this);
@@ -433,7 +459,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
         }
     }
 
-    record I64(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) implements DataField.IntegralDataField {
+    record I64(String name, Long value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public I64(@Nullable String name, Long value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.value = value;

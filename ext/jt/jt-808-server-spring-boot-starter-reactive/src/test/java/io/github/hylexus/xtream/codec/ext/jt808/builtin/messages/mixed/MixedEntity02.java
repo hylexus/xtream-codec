@@ -18,7 +18,6 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
 import lombok.Getter;
@@ -68,8 +67,5 @@ public class MixedEntity02 {
 
     @Preset.RustStyle.basic
     private DataField.SimpleTlvDataField<DataField.U8> extraItems2;
-
-    @Preset.RustStyle.basic
-    private TLV extraItems3;
 
 }

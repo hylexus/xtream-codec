@@ -73,7 +73,7 @@ public final class FormatUtils {
     }
 
     public static String toHexString(ByteBuf byteBuf, int length) {
-        return ByteBufUtil.hexDump(byteBuf, 0, length);
+        return ByteBufUtil.hexDump(byteBuf, byteBuf.readerIndex(), length);
     }
 
     public static String toHexString(ByteBuf byteBuf) {

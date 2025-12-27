@@ -140,7 +140,6 @@ public class JtCryptoUtil {
 
     }
 
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public static class AES {
         static {
             addProviderIfNecessary();
@@ -164,7 +163,6 @@ public class JtCryptoUtil {
         }
     }
 
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public static class DES {
         static {
             addProviderIfNecessary();
@@ -187,7 +185,6 @@ public class JtCryptoUtil {
         }
     }
 
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public static class RSA {
 
         static {

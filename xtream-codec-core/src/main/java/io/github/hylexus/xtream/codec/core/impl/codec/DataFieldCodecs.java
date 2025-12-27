@@ -50,6 +50,12 @@ public final class DataFieldCodecs {
                 this.dataFieldEncoder.encodeWithTracker(context, value, output);
             }
         }
+
+        @Override
+        public @Nullable DataField deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+            return this.dataFieldEncoder.decode(context, input);
+        }
+
     }
 
     public interface DataFieldCodec extends FieldCodec<DataField> {

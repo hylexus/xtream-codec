@@ -22,10 +22,21 @@ import lombok.ToString;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.StringUtils;
 
 public interface IterationTimesExtractor {
 
     int extractIterationTimes(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext);
+
+    static IterationTimesExtractor from(XtreamField xtreamField) {
+        if (xtreamField.iterationTimes() > 0) {
+            return new IterationTimesExtractor.ConstantIterationTimesExtractor(xtreamField.iterationTimes());
+        }
+        if (StringUtils.hasText(xtreamField.iterationTimesExpression())) {
+            return new IterationTimesExtractor.ExpressionIterationTimesExtractor(xtreamField);
+        }
+        return IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
+    }
 
     @ToString
     class ConstantIterationTimesExtractor implements IterationTimesExtractor {

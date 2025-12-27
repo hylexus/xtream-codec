@@ -92,9 +92,7 @@ public interface BeanPropertyMetadata {
 
     FieldLengthExtractor fieldLengthExtractor();
 
-    default IterationTimesExtractor iterationTimesExtractor() {
-        throw new UnsupportedOperationException();
-    }
+    IterationTimesExtractor iterationTimesExtractor();
 
     FieldConditionEvaluator conditionEvaluator();
 

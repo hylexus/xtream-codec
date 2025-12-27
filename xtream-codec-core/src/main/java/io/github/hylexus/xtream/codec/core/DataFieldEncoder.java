@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core;
 
+import io.github.hylexus.xtream.codec.common.exception.NotYetImplementedException;
 import io.github.hylexus.xtream.codec.common.utils.BcdOps;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
@@ -37,6 +38,12 @@ import java.util.Objects;
 @NullMarked
 @ApiStatus.Experimental
 public class DataFieldEncoder {
+    public DataFieldEncoder() {
+    }
+
+    public @Nullable DataField decode(FieldCodec.DeserializeContext context, ByteBuf input) {
+        throw new NotYetImplementedException("暂不支持");
+    }
 
     public void encode(FieldCodec.SerializeContext context, Iterable<? extends @Nullable DataField> simpleFields, ByteBuf output) {
         for (final DataField dataField : simpleFields) {

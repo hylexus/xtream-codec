@@ -16,23 +16,21 @@
 
 package io.github.hylexus.xtream.codec.core.type;
 
-import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
-import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
-import io.netty.buffer.ByteBuf;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 
 import java.util.Optional;
+import java.util.StringJoiner;
 
 public sealed interface FieldLength permits FieldLength.DefaultFieldLength {
 
-    LengthType type();
+    LengthFieldType type();
 
     // value 没有暴露 set 方法；
     // 使用方也没必要手动 setValue
     // 编解码器会负责设置 value
-    // 定义为 long 类型是兼容性考虑：u32, i64(虽然协议中不太可能用这么大范围的长度表示某个字段的字节数)
-    long value();
+    int value();
 
-    default Optional<Long> getValue() {
+    default Optional<Integer> getValue() {
         if (this.initialized()) {
             return Optional.of(this.value());
         }
@@ -41,45 +39,25 @@ public sealed interface FieldLength permits FieldLength.DefaultFieldLength {
 
     boolean initialized();
 
-    enum LengthType {
-        i8, u8, i16, u16, i32, u32, i64;
-
-        public void writeToWithTracker(ByteBuf output, long value, CodecTracker codecTracker) {
-            final int writerIndex = output.writerIndex();
-            this.writeTo(output, value);
-            final String hexString = FormatUtils.toHexString(output, writerIndex, output.writerIndex() - writerIndex);
-            codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), "length", value, hexString, this.getDeclaringClass().getSimpleName(), "");
-        }
-
-        public void writeTo(ByteBuf output, long value) {
-            switch (this) {
-                case i8, u8 -> output.writeByte((int) value);
-                case i16, u16 -> output.writeShort((int) value);
-                case i32, u32 -> output.writeInt((int) value);
-                case i64 -> output.writeLong(value);
-                default -> throw new IllegalArgumentException("Unsupported length type: " + this);
-            }
-        }
-    }
-
     // 只有这个一个实现类
     final class DefaultFieldLength implements FieldLength {
-        private final LengthType type;
-        private long value;
+        private final LengthFieldType type;
+        private int value;
         private boolean initialized = false;
 
-        public DefaultFieldLength(LengthType type) {
+        public DefaultFieldLength(LengthFieldType type) {
             this.type = type;
         }
 
         @Override
-        public long value() {
+        public int value() {
             return this.value;
         }
 
-        public void setValue(long value) {
+        public DefaultFieldLength setValue(int value) {
             this.value = value;
             this.initialized = true;
+            return this;
         }
 
         @Override
@@ -88,8 +66,17 @@ public sealed interface FieldLength permits FieldLength.DefaultFieldLength {
         }
 
         @Override
-        public LengthType type() {
+        public LengthFieldType type() {
             return this.type;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", DefaultFieldLength.class.getSimpleName() + "[", "]")
+                    .add("type=" + type)
+                    .add("value=" + value)
+                    .add("initialized=" + initialized)
+                    .toString();
         }
     }
 }

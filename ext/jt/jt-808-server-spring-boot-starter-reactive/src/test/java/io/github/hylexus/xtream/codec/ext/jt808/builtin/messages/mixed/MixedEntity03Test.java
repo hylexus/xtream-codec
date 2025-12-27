@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.FieldLength;
 import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.wrapper.U8Wrapper;
@@ -45,22 +46,21 @@ class MixedEntity03Test extends BaseCodecTest {
                 .setTime(time)
                 .setExtraItems2(u8((short) 0x01))
                 .setExtraItems3(new U8Wrapper((short) 0x01))
-                .setExtraItems1(TLV.of(u8((short) 0x01), FieldLength.LengthType.u8, u32(0x01L)))
                 .setExtraItems(List.of(
-                        TLV.of(u8((short) 0x01), FieldLength.LengthType.u8, u32(11L)),
-                        TLV.of(u8((short) 0x02), FieldLength.LengthType.u8, u16(22)),
-                        TLV.of(u8((short) 0x03), FieldLength.LengthType.u8, u16(33)),
-                        TLV.of(u8((short) 0x04), FieldLength.LengthType.u8, u16(44)),
-                        TLV.of(u8((short) 0x05), FieldLength.LengthType.u8, byteSequence(new byte[]{1, 2, 3, 4, 5})),
-                        TLV.of(u8((short) 0x06), FieldLength.LengthType.u8, i16((short) 66)),
-                        TLV.of(u8((short) 0x11), FieldLength.LengthType.u8, new BuiltinMessage0200.Item0x11((short) 11, 22L)),
-                        TLV.of(u8((short) 0x12), FieldLength.LengthType.u8, new BuiltinMessage0200.Item0x12((short) 11, 22L, (short) 33)),
-                        TLV.of(u8((short) 0x13), FieldLength.LengthType.u8, new BuiltinMessage0200.Item0x13(11L, 22, (short) 33)),
-                        TLV.of(u8((short) 0x25), FieldLength.LengthType.u8, u32(0x25L)),
-                        TLV.of(u8((short) 0x2A), FieldLength.LengthType.u8, u16(0x2A)),
-                        TLV.of(u8((short) 0x2B), FieldLength.LengthType.u8, i32(0x2B)),
-                        TLV.of(u8((short) 0x30), FieldLength.LengthType.u8, u8((short) 30)),
-                        TLV.of(u8((short) 0x31), FieldLength.LengthType.u8, u8((short) 31))
+                        TLV.of(u8((short) 0x01), LengthFieldType.u8, u32(11L)),
+                        TLV.of(u8((short) 0x02), LengthFieldType.u8, u16(22)),
+                        TLV.of(u8((short) 0x03), LengthFieldType.u8, u16(33)),
+                        TLV.of(u8((short) 0x04), LengthFieldType.u8, u16(44)),
+                        TLV.of(u8((short) 0x05), LengthFieldType.u8, byteSequence(new byte[]{1, 2, 3, 4, 5})),
+                        TLV.of(u8((short) 0x06), LengthFieldType.u8, i16((short) 66)),
+                        TLV.of(u8((short) 0x11), LengthFieldType.u8, new BuiltinMessage0200.Item0x11((short) 11, 22L)),
+                        TLV.of(u8((short) 0x12), LengthFieldType.u8, new BuiltinMessage0200.Item0x12((short) 11, 22L, (short) 33)),
+                        TLV.of(u8((short) 0x13), LengthFieldType.u8, new BuiltinMessage0200.Item0x13(11L, 22, (short) 33)),
+                        TLV.of(u8((short) 0x25), LengthFieldType.u8, u32(0x25L)),
+                        TLV.of(u8((short) 0x2A), LengthFieldType.u8, u16(0x2A)),
+                        TLV.of(u8((short) 0x2B), LengthFieldType.u8, i32(0x2B)),
+                        TLV.of(u8((short) 0x30), LengthFieldType.u8, u8((short) 30)),
+                        TLV.of(u8((short) 0x31), LengthFieldType.u8, u8((short) 31))
                 ));
         final String hex = this.encode(sourceEntity, Jt808ProtocolVersion.VERSION_2013, terminalId2013);
         System.out.println(hex);

@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.type;
 
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
@@ -24,7 +25,6 @@ import org.jspecify.annotations.NullMarked;
 /**
  * TLV（Tag-Length-Value）结构
  */
-@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @NullMarked
 @ApiStatus.Experimental
 public record TLV(
@@ -33,11 +33,11 @@ public record TLV(
         Object value
 ) implements FieldCodecRegistry.AtomicDataType {
 
-    public TLV(DataField.DictKey tag, FieldLength.LengthType length, Object value) {
+    public TLV(DataField.DictKey tag, LengthFieldType length, Object value) {
         this(tag, new FieldLength.DefaultFieldLength(length), value);
     }
 
-    public static TLV of(DataField.DictKey tag, FieldLength.LengthType length, Object value) {
+    public static TLV of(DataField.DictKey tag, LengthFieldType length, Object value) {
         return new TLV(tag, length, value);
     }
 

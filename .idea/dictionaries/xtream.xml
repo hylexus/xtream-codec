@@ -2,8 +2,17 @@
   <dictionary name="xtream">
     <words>
       <w>ByteBuf</w>
+      <w>GNSS</w>
+      <w>TLV</w>
+      <w>TLVField</w>
       <w>Xtream</w>
       <w>XtreamField</w>
+      <w>errorprone</w>
+      <w>fatjar</w>
+      <w>hylexus</w>
+      <w>jvmargs</w>
+      <w>xtream</w>
+      <w>yyMMddHHmmss</w>
     </words>
   </dictionary>
 </component>

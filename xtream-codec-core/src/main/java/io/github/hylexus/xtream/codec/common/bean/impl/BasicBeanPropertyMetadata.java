@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.common.bean.impl;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.FieldConditionEvaluator;
 import io.github.hylexus.xtream.codec.common.bean.FieldLengthExtractor;
+import io.github.hylexus.xtream.codec.common.bean.IterationTimesExtractor;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.common.utils.XtreamUtils;
@@ -60,6 +61,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     private final FieldCodec<?> fieldCodec;
     protected final boolean isRecordClass;
     protected final boolean isRecordComponent;
+    protected final IterationTimesExtractor iterationTimesExtractor;
 
     public BasicBeanPropertyMetadata(BeanMetadataRegistry registry, String name, Class<?> type, int version, XtreamField xtreamField, Field field, PropertyGetter getter, PropertySetter setter) {
         this.beanMetadataRegistry = registry;
@@ -87,6 +89,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
                     : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
         }
         this.fieldCodec = this.detectFieldCodec();
+        this.iterationTimesExtractor = IterationTimesExtractor.from(this.xtreamField);
     }
 
     private FieldCodec<?> detectFieldCodec() {
@@ -98,7 +101,10 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
             return switch (this.filedValueType) {
                 case struct, sequence, map -> FieldCodec.NullFieldCodec.INSTANCE;
                 case dynamic -> RuntimeTypeFieldCodec.INSTANCE;
-                default -> throw new IllegalStateException("Cannot determine FieldCodec for Field [" + this.field() + "]");
+                default -> throw new IllegalStateException("""
+                        Cannot determine FieldCodec
+                        ==> Field: %s
+                        """.strip().formatted(this.field.toGenericString()));
             };
         });
     }
@@ -241,6 +247,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     @Override
     public FieldConditionEvaluator conditionEvaluator() {
         return this.fieldConditionEvaluator;
+    }
+
+    @Override
+    public IterationTimesExtractor iterationTimesExtractor() {
+        return this.iterationTimesExtractor;
     }
 
     @Override

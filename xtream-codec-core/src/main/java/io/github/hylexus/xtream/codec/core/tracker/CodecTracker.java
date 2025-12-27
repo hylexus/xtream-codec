@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.type.TLV;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -172,6 +173,13 @@ public class CodecTracker {
             if (parent instanceof NestedFieldSpan nestedFieldSpan
                     && "tlv".equalsIgnoreCase(nestedFieldSpan.getFieldType())
                     && this.current.getChildren().size() == 2) {
+                this.current.addChild(this.current.getChildren().size() - 1, trackerItem);
+                needAdd = false;
+            } else if (parent instanceof CollectionItemSpan collectionItemSpan
+                    && TLV.class.getName().equals(collectionItemSpan.getFieldType())
+                    && this.current.getChildren().size() == 2
+                    && this.current.getChildren().getLast() instanceof BasicFieldSpan basicFieldSpan
+                    && !"length".equalsIgnoreCase(basicFieldSpan.getFieldName())) {
                 this.current.addChild(this.current.getChildren().size() - 1, trackerItem);
                 needAdd = false;
             }

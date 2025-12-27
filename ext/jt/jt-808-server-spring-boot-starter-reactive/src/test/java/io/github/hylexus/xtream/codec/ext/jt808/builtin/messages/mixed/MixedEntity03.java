@@ -17,8 +17,6 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
@@ -68,11 +66,7 @@ public class MixedEntity03 {
     private LocalDateTime time;
 
     @Preset.RustStyle.list(desc = "扩展项")
-    @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence)
     private List<TLV> extraItems;
-
-    @Preset.RustStyle.list(desc = "扩展项")
-    private TLV extraItems1;
 
     @Preset.RustStyle.basic
     private DataField.U8 extraItems2;

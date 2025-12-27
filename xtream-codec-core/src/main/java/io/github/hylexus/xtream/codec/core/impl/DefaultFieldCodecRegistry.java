@@ -28,12 +28,10 @@ import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
+import io.github.hylexus.xtream.codec.core.impl.codec.pair.PairCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.tlv.TLVCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.wrapper.*;
-import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
-import io.github.hylexus.xtream.codec.core.type.ByteBufContainer;
-import io.github.hylexus.xtream.codec.core.type.TLV;
-import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import io.github.hylexus.xtream.codec.core.type.*;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.core.type.wrapper.*;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
@@ -249,7 +247,9 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         registry.register(DataFieldCodecs.INSTANCE, DataField.Sequence.class, -1, "", false);
         registry.register(DataFieldCodecs.INSTANCE, DataField.ByteSequence.class, -1, "", false);
         registry.register(DataFieldCodecs.INSTANCE, DataField.SimpleTlvDataField.class, -1, "", false);
+
         registry.registerPojoFieldCodec(TLVCodecs.INSTANCE, TLV.class);
+        registry.registerPojoFieldCodec(PairCodecs.INSTANCE, Pair.class);
 
         registerDefaultStringCodec(registry);
     }
@@ -408,7 +408,11 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
 
         if (targetEntityClass != null && !(Objects.equals(Object.class, targetEntityClass))) {
             Objects.requireNonNull(beanMetadataRegistry);
-            final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(targetEntityClass);
+            if (AtomicDataType.class.isAssignableFrom(targetEntityClass)) {
+                return this.getFieldCodecForAtomicDataType(targetEntityClass)
+                        .orElseThrow(() -> new IllegalArgumentException("Cannot found FieldCodec for AtomicDataType [" + targetEntityClass.getName() + "]"));
+            }
+            final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(targetEntityClass, version);
             return new DelegateBeanMetadataFieldCodec(beanMetadata);
         }
 
