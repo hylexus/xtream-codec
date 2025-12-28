@@ -3,7 +3,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "src/*",
+        "src/shims-vue.d.ts"
       ]
     }
   },
