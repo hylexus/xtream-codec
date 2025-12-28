@@ -28,6 +28,7 @@ import org.jspecify.annotations.Nullable;
 public record ValueMatcherMeta(
         int version,
         Object key,
+        int length,
         XtreamDataType valueType,
         FieldCodec<Object> valueCodec,
         Class<?> valueEntity,

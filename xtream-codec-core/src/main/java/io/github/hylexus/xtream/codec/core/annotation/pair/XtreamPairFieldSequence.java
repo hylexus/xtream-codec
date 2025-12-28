@@ -21,7 +21,7 @@ import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.ValueDecoderCommonParam;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueMatcherWithLength;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueMatcher;
 import io.github.hylexus.xtream.codec.core.impl.codec.pair.PairCodecs;
 import org.jetbrains.annotations.ApiStatus;
 import org.springframework.core.annotation.AliasFor;
@@ -49,7 +49,7 @@ public @interface XtreamPairFieldSequence {
     @interface Value {
         ValueDecoderCommonParam[] commonParams() default {};
 
-        ValueMatcherWithLength[] matchers();
+        ValueMatcher[] matchers();
     }
 
     // 以下都是 XtreamField 的属性

@@ -32,16 +32,19 @@ import io.github.hylexus.xtream.codec.core.impl.codec.utils.HasVersions;
 import io.github.hylexus.xtream.codec.core.impl.codec.utils.VersionMatchResult;
 import io.github.hylexus.xtream.codec.core.impl.domain.*;
 import io.github.hylexus.xtream.codec.core.type.CodecCharset;
+import io.github.hylexus.xtream.codec.core.type.Pair;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.github.hylexus.xtream.codec.common.utils.XtreamAssertions.assertNotBlank;
@@ -67,15 +70,28 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
     }
 
     @Override
-    public XtreamPairFieldSequenceMeta getXtreamPairFieldSequenceMeta(int targetVersion, Field field, XtreamPairFieldSequence xtreamPairFieldSequence) {
+    public XtreamPairFieldSequenceMeta getXtreamPairFieldSequenceMeta(int targetVersion, Field field) {
         final ConcurrentMap<Field, XtreamPairFieldSequenceMeta> map = pairFieldSequenceMetaCache.computeIfAbsent(targetVersion, k -> new ConcurrentHashMap<>());
         return map.computeIfAbsent(field, f -> {
+            final XtreamPairFieldSequence xtreamPairFieldSequence = AnnotatedElementUtils.getMergedAnnotation(f, XtreamPairFieldSequence.class);
+            if (xtreamPairFieldSequence == null) {
+                throw new IllegalArgumentException("@" + XtreamPairFieldSequence.class.getSimpleName() + " annotation is required.\n--> Field: " + f.toGenericString());
+            }
             try {
                 final XtreamPairFieldSequence.Decoder decoderConfig = xtreamPairFieldSequence.decoder();
                 final KeyMeta keyMeta = this.createKeyMeta(targetVersion, field, decoderConfig.key());
 
                 final XtreamPairFieldSequence.Value valueConfig = decoderConfig.value();
-                final ValueMatcherWithLengthMetas valueMatcherMetas = this.createValueMatcherWithLengthMetas(keyMeta.type(), targetVersion, field, valueConfig.commonParams(), valueConfig.matchers());
+                final ValueMatcherMetas valueMatcherMetas = this.createValueMatcherMetas(keyMeta.type(), targetVersion, f, valueConfig.commonParams(), valueConfig.matchers(), valueMatcherMeta -> {
+                    if (valueMatcherMeta.length() <= 0) {
+                        throw new IllegalArgumentException("""
+                                
+                                ===> @%s.length() must be greater than 0 when target element is <%s>
+                                     %s
+                                """.stripTrailing().formatted(ValueMatcher.class.getSimpleName(), Pair.class.getName(), valueMatcherMeta));
+                    }
+                    return valueMatcherMeta;
+                });
                 return new XtreamPairFieldSequenceMeta(new XtreamPairFieldSequenceMeta.DecoderMeta(
                         keyMeta,
                         valueMatcherMetas
@@ -88,9 +104,13 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
     }
 
     @Override
-    public XtreamTLVFieldSequenceMeta getXtreamTlvFieldSequenceMeta(int targetVersion, Field field, XtreamTLVFieldSequence xtreamTlvFieldSequence) {
+    public XtreamTLVFieldSequenceMeta getXtreamTlvFieldSequenceMeta(int targetVersion, Field field) {
         final ConcurrentMap<Field, XtreamTLVFieldSequenceMeta> map = tlvFieldSequenceMetaCache.computeIfAbsent(targetVersion, k -> new ConcurrentHashMap<>());
         return map.computeIfAbsent(field, f -> {
+            final XtreamTLVFieldSequence xtreamTlvFieldSequence = AnnotatedElementUtils.getMergedAnnotation(f, XtreamTLVFieldSequence.class);
+            if (xtreamTlvFieldSequence == null) {
+                throw new IllegalArgumentException("@" + XtreamTLVFieldSequence.class.getSimpleName() + " annotation is required.\n--> Field: " + f.toGenericString());
+            }
             try {
                 final XtreamTLVFieldSequence.Decoder decoderConfig = xtreamTlvFieldSequence.decoder();
                 final KeyMeta keyMeta = this.createKeyMeta(targetVersion, field, decoderConfig.tag());
@@ -98,7 +118,7 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
                 final ValueLengthMeta valueLengthMeta = this.createValueLengthMeta(targetVersion, field, decoderConfig.length());
 
                 final XtreamTLVFieldSequence.Value valueConfig = decoderConfig.value();
-                final ValueMatcherMetas valueMatcherMetas = this.createValueMatcherMetas(keyMeta.type(), targetVersion, field, valueConfig.commonParams(), valueConfig.matchers());
+                final ValueMatcherMetas valueMatcherMetas = this.createValueMatcherMetas(keyMeta.type(), targetVersion, field, valueConfig.commonParams(), valueConfig.matchers(), Function.identity());
                 final FallbackValueMatcherMeta fallbackValueMatcherMeta = this.createFallbackValueMatcherMeta(targetVersion, field, valueConfig.fallbackMatchers());
                 return new XtreamTLVFieldSequenceMeta(new XtreamTLVFieldSequenceMeta.DecoderMeta(
                         keyMeta,
@@ -147,78 +167,16 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
         );
     }
 
-    ValueMatcherWithLengthMetas createValueMatcherWithLengthMetas(KeyType keyType, int targetVersion, Field field, ValueDecoderCommonParam[] commonParams, ValueMatcherWithLength[] valueMatchers) {
-        final ValueDecoderCommonParam commonParam = HasVersions.matchVersion(
-                targetVersion,
-                Arrays.stream(commonParams).map(it -> new HasVersions<>(it.version(), it)),
-                HasVersion::data
-        ).getIfAvailable();
-        final Map<Object, ValueMatcherWithLengthMeta> resultMap = new HashMap<>();
-        final String fallbackCharset = commonParam == null ? null : commonParam.charset();
-
-        Arrays.stream(valueMatchers)
-                .flatMap(valueMatcher -> {
-                    final int[] version = valueMatcher.version();
-                    final Map<Integer, Integer> duplicateVersions = findDuplicateVersions(version);
-                    if (!duplicateVersions.isEmpty()) {
-                        final String tips = duplicateVersions.entrySet().stream().map(it -> "version: " + it.getKey() + ", times: " + it.getValue()).collect(Collectors.joining("\n- ", "- ", ""));
-                        throw new IllegalArgumentException("Duplicate versions [@" + ValueMatcher.class.getName() + "]\n" + tips);
-                    }
-                    return Arrays.stream(version).mapToObj(v -> new HasVersion<>(v, valueMatcher));
-                })
-                .filter(hasVersion -> isVersionMatched(targetVersion, hasVersion.version()))
-                .forEach(hasVersion -> {
-                    final ValueMatcherWithLength matcher = hasVersion.data();
-                    final String detectedCharset = detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
-                    final String finalCharset = detectedCharset != null ? detectedCharset : fallbackCharset;
-                    final FieldCodec<Object> valueCodec = createValueCodec(targetVersion, matcher.valueType(), matcher.valueCodec(), matcher.valueEntity(), finalCharset);
-                    if (valueCodec == null) {
-                        throw new IllegalArgumentException("Unsupported valueType: " + matcher.valueType());
-                    }
-
-                    final Object key = readKey(keyType, matcher);
-                    if (key == null) {
-                        return;
-                    }
-                    final ValueMatcherWithLengthMeta newMatcher = new ValueMatcherWithLengthMeta(hasVersion.version(), key, matcher.length(), matcher.valueType(), valueCodec, matcher.valueEntity(), finalCharset, matcher.desc());
-                    final ValueMatcherWithLengthMeta existedMatcher = resultMap.get(key);
-                    if (existedMatcher == null) {
-                        resultMap.put(key, newMatcher);
-                    } else {
-                        final int existedVersion = existedMatcher.version();
-                        final int newVersion = newMatcher.version();
-                        if (existedVersion == XtreamField.ALL_VERSION) {
-                            if (newVersion == XtreamField.ALL_VERSION) {
-                                throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + key + "\n"
-                                        + "- " + existedMatcher + "\n"
-                                        + "- " + newMatcher);
-                            } else {
-                                resultMap.put(key, newMatcher);
-                            }
-                        } else {
-                            if (newVersion != XtreamField.ALL_VERSION) {
-                                throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + key + "\n"
-                                        + "- " + existedMatcher + "\n"
-                                        + "- " + newMatcher);
-                            }
-                        }
-                    }
-                });
-
-        final List<ValueMatcherWithLengthMeta> list = resultMap.values().stream().toList();
-        return new ValueMatcherWithLengthMetas(list);
-    }
-
-    ValueMatcherMetas createValueMatcherMetas(KeyType keyType, int targetVersion, Field field, ValueDecoderCommonParam[] commonParams, ValueMatcher[] valueMatchers) {
+    ValueMatcherMetas createValueMatcherMetas(KeyType keyType, int targetVersion, Field field, ValueDecoderCommonParam[] commonParams, ValueMatcher[] valueMatchers, Function<ValueMatcherMeta, ValueMatcherMeta> mapper) {
         try {
-            return this.doCreateValueDecoderMeta(keyType, targetVersion, commonParams, valueMatchers);
+            return this.doCreateValueDecoderMeta(keyType, targetVersion, commonParams, valueMatchers, mapper);
         } catch (Exception e) {
             log.error("Error while creating ValueMatcherMetas\n===> Field: {}", field.toGenericString(), e);
             throw e;
         }
     }
 
-    private ValueMatcherMetas doCreateValueDecoderMeta(KeyType keyType, int targetVersion, ValueDecoderCommonParam[] commonParams, ValueMatcher[] valueMatchers) {
+    private ValueMatcherMetas doCreateValueDecoderMeta(KeyType keyType, int targetVersion, ValueDecoderCommonParam[] commonParams, ValueMatcher[] valueMatchers, Function<ValueMatcherMeta, ValueMatcherMeta> mapper) {
         final ValueDecoderCommonParam commonParam = HasVersions.matchVersion(
                 targetVersion,
                 Arrays.stream(commonParams).map(it -> new HasVersions<>(it.version(), it)),
@@ -251,10 +209,10 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
                     if (key == null) {
                         return;
                     }
-                    final ValueMatcherMeta newMatcher = new ValueMatcherMeta(hasVersion.version(), key, matcher.valueType(), valueCodec, matcher.valueEntity(), finalCharset, matcher.desc());
+                    final ValueMatcherMeta newMatcher = new ValueMatcherMeta(hasVersion.version(), key, matcher.length(), matcher.valueType(), valueCodec, matcher.valueEntity(), finalCharset, matcher.desc());
                     final ValueMatcherMeta existedMatcher = resultMap.get(key);
                     if (existedMatcher == null) {
-                        resultMap.put(key, newMatcher);
+                        resultMap.put(key, mapper.apply(newMatcher));
                     } else {
                         final int existedVersion = existedMatcher.version();
                         final int newVersion = newMatcher.version();
@@ -264,7 +222,7 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
                                         + "- " + existedMatcher + "\n"
                                         + "- " + newMatcher);
                             } else {
-                                resultMap.put(key, newMatcher);
+                                resultMap.put(key, mapper.apply(newMatcher));
                             }
                         } else {
                             if (newVersion != XtreamField.ALL_VERSION) {
@@ -449,120 +407,38 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
         };
     }
 
-    private static @Nullable Object readKey(KeyType keyType, ValueMatcherWithLength valueMatcher) {
-        checkExclusive(valueMatcher);
-        return switch (keyType) {
-            // todo 这里先取第一个 后续优化支持多个值
-            case i8 -> valueMatcher.matchI8().length > 0 ? valueMatcher.matchI8()[0] : null;
-            case u8 -> valueMatcher.matchU8().length > 0 ? valueMatcher.matchU8()[0] : null;
-            case i16 -> valueMatcher.matchI16().length > 0 ? valueMatcher.matchI16()[0] : null;
-            case u16 -> valueMatcher.matchU16().length > 0 ? valueMatcher.matchU16()[0] : null;
-            case i32 -> valueMatcher.matchI32().length > 0 ? valueMatcher.matchI32()[0] : null;
-            case u32 -> valueMatcher.matchU32().length > 0 ? valueMatcher.matchU32()[0] : null;
-            case i64 -> valueMatcher.matchI64().length > 0 ? valueMatcher.matchI64()[0] : null;
-            case str_gbk, str_gb_2312, str_utf8, str -> valueMatcher.matchString().length > 0 ? valueMatcher.matchString() : null;
-        };
-    }
-
     private static void checkExclusive(ValueMatcher vm) {
-        final List<String> setFields = new ArrayList<>();
+        final Map<String, Integer> fields = new LinkedHashMap<>();
+        fields.put("matchI8", vm.matchI8().length);
+        fields.put("matchU8", vm.matchU8().length);
+        fields.put("matchI16", vm.matchI16().length);
+        fields.put("matchU16", vm.matchU16().length);
+        fields.put("matchI32", vm.matchI32().length);
+        fields.put("matchU32", vm.matchU32().length);
+        fields.put("matchI64", vm.matchI64().length);
+        fields.put("matchString", vm.matchString().length);
 
-        if (vm.matchI8().length > 0) {
-            setFields.add("matchI8");
-        }
-        if (vm.matchU8().length > 0) {
-            setFields.add("matchU8");
-        }
-        if (vm.matchI16().length > 0) {
-            setFields.add("matchI16");
-        }
-        if (vm.matchU16().length > 0) {
-            setFields.add("matchU16");
-        }
-        if (vm.matchI32().length > 0) {
-            setFields.add("matchI32");
-        }
-        if (vm.matchU32().length > 0) {
-            setFields.add("matchU32");
-        }
-        if (vm.matchI64().length > 0) {
-            setFields.add("matchI64");
-        }
-        if (vm.matchString().length > 0) {
-            setFields.add("matchString");
-        }
+        final Set<String> set = fields.entrySet().stream()
+                .filter(e -> e.getValue() > 0)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
 
-        final int count = setFields.size();
-
-        if (count == 0) {
+        if (set.isEmpty()) {
             throw new IllegalArgumentException("""
-                    ValueMatcher must specify exactly ONE match type.
-                    But none were set.
-                    Expected one of: matchI8, matchU8, matchI16, matchU16, matchI32, matchU32, matchI64, matchString
-                    \t==> %s
-                    """.formatted(vm));
-        }
-
-        if (count > 1) {
-            throw new IllegalArgumentException("""
-                    ValueMatcher must specify exactly ONE match type.
-                    But multiple were set.
-                    Conflicting attributes: %s
-                    Only one of them should be specified.
                     
+                    ValueMatcher must specify exactly ONE match type. But none were set.
+                    Expected one of: %s
                     \t==> %s
-                    """.formatted(String.join(", ", setFields), vm));
+                    """.stripTrailing().formatted(String.join(", ", fields.keySet()), vm));
         }
-    }
-
-    private static void checkExclusive(ValueMatcherWithLength vm) {
-        final List<String> setFields = new ArrayList<>();
-
-        if (vm.matchI8().length > 0) {
-            setFields.add("matchI8");
-        }
-        if (vm.matchU8().length > 0) {
-            setFields.add("matchU8");
-        }
-        if (vm.matchI16().length > 0) {
-            setFields.add("matchI16");
-        }
-        if (vm.matchU16().length > 0) {
-            setFields.add("matchU16");
-        }
-        if (vm.matchI32().length > 0) {
-            setFields.add("matchI32");
-        }
-        if (vm.matchU32().length > 0) {
-            setFields.add("matchU32");
-        }
-        if (vm.matchI64().length > 0) {
-            setFields.add("matchI64");
-        }
-        if (vm.matchString().length > 0) {
-            setFields.add("matchString");
-        }
-
-        final int count = setFields.size();
-
-        if (count == 0) {
+        if (set.size() > 1) {
             throw new IllegalArgumentException("""
-                    ValueMatcherWithLength must specify exactly ONE match type.
-                    But none were set.
-                    Expected one of: matchI8, matchU8, matchI16, matchU16, matchI32, matchU32, matchI64, matchString
-                    \t==> %s
-                    """.formatted(vm));
-        }
-
-        if (count > 1) {
-            throw new IllegalArgumentException("""
-                    ValueMatcherWithLength must specify exactly ONE match type.
-                    But multiple were set.
-                    Conflicting attributes: %s
-                    Only one of them should be specified.
                     
+                    ValueMatcher must specify exactly ONE match type. But multiple were set.
+                    Conflicting attributes: %s
+                    ONLY ONE of them should be specified.
                     \t==> %s
-                    """.formatted(String.join(", ", setFields), vm));
+                    """.stripTrailing().formatted(String.join(", ", set), vm));
         }
     }
 

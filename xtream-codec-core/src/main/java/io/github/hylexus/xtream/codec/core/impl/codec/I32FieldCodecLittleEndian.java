@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Function;
 
@@ -26,11 +27,13 @@ import java.util.function.Function;
  * @deprecated Use {@link I32FieldCodecs.I32FieldCodecLittleEndian} instead.
  */
 @Deprecated(forRemoval = true, since = "0.1.0")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class I32FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
     /**
      * @deprecated Use {@link I32FieldCodecs#INTEGER_INSTANCE_LE} instead.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final I32FieldCodecLittleEndian INSTANCE = new I32FieldCodecLittleEndian(Integer.class, Function.identity());
 
     private final Class<?> targetType;

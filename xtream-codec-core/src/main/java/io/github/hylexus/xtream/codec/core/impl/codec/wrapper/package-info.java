@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.core.impl.domain;
+@Deprecated(forRemoval = true, since = "0.1.0")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
+package io.github.hylexus.xtream.codec.core.impl.codec.wrapper;
 
-/**
- * @see io.github.hylexus.xtream.codec.core.annotation.pair.XtreamPairFieldSequence
- */
-public record XtreamPairFieldSequenceMeta(DecoderMeta decoder) {
-
-    public record DecoderMeta(
-            KeyMeta key,
-            ValueMatcherMetas valueMatchers) {
-    }
-
-}
+import org.jetbrains.annotations.ApiStatus;

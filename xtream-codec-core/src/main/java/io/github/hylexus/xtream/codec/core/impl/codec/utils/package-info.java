@@ -15,6 +15,8 @@
  */
 
 @NullMarked
+@ApiStatus.Internal
 package io.github.hylexus.xtream.codec.core.impl.codec.utils;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;

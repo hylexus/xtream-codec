@@ -201,6 +201,7 @@ public class DataFieldEncoder {
     private void doEncodeFieldWithTracker(FieldCodec.SerializeContext context, ByteBuf output, DataField dataField) {
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         final int indexBeforeWrite = output.writerIndex();
+        final String name = codecTracker.getFieldName(dataField.name());
         switch (dataField) {
             case DataField.I8 i8 -> output.writeByte(i8.value());
             case DataField.U8 u8 -> output.writeByte(u8.value());
@@ -221,14 +222,14 @@ public class DataFieldEncoder {
             case DataField.Struct struct -> {
                 final List<DataField> value = struct.value();
                 final DefaultSerializeContext newContext = new DefaultSerializeContext(context, value);
-                final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(dataField.name(), "", dataField.type(), this.getClass().getSimpleName());
+                final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(name, "", dataField.type(), this.getClass().getSimpleName());
                 this.encodeWithTracker(newContext, value, output);
                 nestedFieldSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
                 codecTracker.finishCurrentSpan();
             }
             case DataField.Sequence sequence -> {
                 final List<DataField> value = sequence.value();
-                final CollectionFieldSpan collectionFieldSpan = codecTracker.startNewCollectionFieldSpanForSimpleField(dataField.name());
+                final CollectionFieldSpan collectionFieldSpan = codecTracker.startNewCollectionFieldSpanForSimpleField(name);
                 final int parentIndexBeforeWrite = output.writerIndex();
                 final DefaultSerializeContext newContext = new DefaultSerializeContext(context, value);
                 this.encodeWithTracker(newContext, value, output);
@@ -259,7 +260,7 @@ public class DataFieldEncoder {
                             // 3. valueLength
                             final int valueLength = temp.writerIndex();
                             codecTracker.updateTrackerHints(MapEntryItemSpan.Type.VALUE_LENGTH);
-                            simpleMap.valueLengthType().writeToWithTracker(output, valueLength, codecTracker);
+                            simpleMap.valueLengthType().writeToWithTracker(output, valueLength, codecTracker, "valueLength");
                             output.writeBytes(temp);
                             mapEntrySpan.setHexString(FormatUtils.toHexString(output, writerIndex, output.writerIndex() - writerIndex));
                             codecTracker.finishCurrentSpan();
@@ -275,7 +276,7 @@ public class DataFieldEncoder {
             }
             case DataField.TlvDataField tlvDataField -> {
                 final DefaultSerializeContext newContext = new DefaultSerializeContext(context, tlvDataField);
-                final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(dataField.name(), "", dataField.type(), this.getClass().getSimpleName());
+                final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(name, "", dataField.type(), this.getClass().getSimpleName());
                 // 1. tag
                 final DataField.DictKey tag = tlvDataField.tag();
                 this.doEncodeFieldWithTracker(newContext, output, tag);
@@ -288,7 +289,7 @@ public class DataFieldEncoder {
 
                     // 3. length
                     final int valueLength = temp.writerIndex();
-                    tlvDataField.length().writeToWithTracker(output, valueLength, codecTracker);
+                    tlvDataField.length().writeToWithTracker(output, valueLength, codecTracker, "valueLength");
                     output.writeBytes(temp);
 
                     nestedFieldSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
@@ -304,7 +305,7 @@ public class DataFieldEncoder {
                 && !(dataField instanceof DataField.Sequence)
                 && !(dataField instanceof DataField.SimpleTlvDataField<?>)) {
             final String hexString = FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite);
-            codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), dataField.name(), dataField.value(), hexString, this.getClass().getSimpleName(), dataField.getClass().getSimpleName());
+            codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), name, dataField.value(), hexString, this.getClass().getSimpleName(), dataField.getClass().getSimpleName());
         }
     }
 

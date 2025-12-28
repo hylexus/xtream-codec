@@ -67,4 +67,10 @@ public abstract class BaseSpan {
     public String getId() {
         return id;
     }
+
+    interface HasFieldName {
+        String getFieldName();
+
+        void setFieldName(String name);
+    }
 }

@@ -77,7 +77,7 @@ public class TLVDebugEntity01 {
                     )
             )
     )
-    private List<TLV> tlvFields1;
+    private List<TLV> tlvFields;
 
     @Preset.RustStyle.str
     private String desc;

@@ -20,8 +20,8 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
-public class CollectionItemSpan extends BaseSpan {
-    private final String fieldName;
+public class CollectionItemSpan extends BaseSpan implements BaseSpan.HasFieldName {
+    private String fieldName;
     private final int offset;
     private final @Nullable String fieldType;
 
@@ -32,8 +32,14 @@ public class CollectionItemSpan extends BaseSpan {
         this.fieldType = fieldType;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void setFieldName(String name) {
+        this.fieldName = name;
     }
 
     public int getOffset() {

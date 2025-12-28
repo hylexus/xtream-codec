@@ -22,11 +22,10 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.ExtendMetaRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.pair.XtreamPairFieldSequence;
 import io.github.hylexus.xtream.codec.core.impl.DefaultExtendMetaRegistry;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.domain.KeyMeta;
-import io.github.hylexus.xtream.codec.core.impl.domain.ValueMatcherWithLengthMeta;
+import io.github.hylexus.xtream.codec.core.impl.domain.ValueMatcherMeta;
 import io.github.hylexus.xtream.codec.core.impl.domain.XtreamPairFieldSequenceMeta;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.CollectionFieldSpan;
@@ -35,7 +34,6 @@ import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.github.hylexus.xtream.codec.core.type.Pair;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.netty.buffer.ByteBuf;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -43,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@NullMarked
 public class PairCodecs {
     public static PairCodec INSTANCE = new PairCodec();
 
@@ -125,16 +122,13 @@ public class PairCodecs {
 
         @Override
         public @Nullable Iterable<@Nullable Pair> deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-            final XtreamPairFieldSequence xtreamPairField = propertyMetadata.findAnnotation(XtreamPairFieldSequence.class)
-                    .orElseThrow(() -> new IllegalArgumentException("XtreamPairFieldSequence annotation is required.\n--> Field: " + propertyMetadata.field().toGenericString()));
-
-            final XtreamPairFieldSequenceMeta meta = this.extendMetaRegistry.getXtreamPairFieldSequenceMeta(context.version(), propertyMetadata.field(), xtreamPairField);
+            final XtreamPairFieldSequenceMeta meta = this.extendMetaRegistry.getXtreamPairFieldSequenceMeta(context.version(), propertyMetadata.field());
             final List<Pair> results = new ArrayList<>();
             final ByteBuf slice = length > 0
                     ? input.readSlice(length)
                     : input; // all remaining
 
-            final Map<Object, ValueMatcherWithLengthMeta> valueMatchersByKey = meta.decoder().valueMatchers().valueMatchersByKey();
+            final Map<Object, ValueMatcherMeta> valueMatchersByKey = meta.decoder().valueMatchers().valueMatchersByKey();
             int iterationTimes = propertyMetadata.iterationTimesExtractor().extractIterationTimes(context, context.evaluationContext());
             while (slice.isReadable() && iterationTimes-- > 0) {
                 // 1. key
@@ -142,11 +136,11 @@ public class PairCodecs {
                 final DataField.DictKey key = DataField.DictKey.deserialize(keyMeta.type(), slice, keyMeta.sizeInBytes(), keyMeta.charset());
 
                 // 2. value
-                final ValueMatcherWithLengthMeta valueMatcherMeta = valueMatchersByKey.get(key.value());
+                final ValueMatcherMeta valueMatcherMeta = valueMatchersByKey.get(key.value());
                 if (valueMatcherMeta == null) {
                     final String remainingHex = StringFieldCodecs.INSTANCE_HEX.deserialize(propertyMetadata, context, slice, slice.readableBytes());
                     results.add(new Pair(key, null, remainingHex));
-                    return results;
+                    break;
                 } else {
                     final int valueLength = valueMatcherMeta.length();
                     final FieldCodec<Object> valueCodec = valueMatcherMeta.valueCodec();
@@ -159,6 +153,54 @@ public class PairCodecs {
             return results;
         }
 
+        @Override
+        public @Nullable Iterable<@Nullable Pair> deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+            final XtreamPairFieldSequenceMeta meta = this.extendMetaRegistry.getXtreamPairFieldSequenceMeta(context.version(), propertyMetadata.field());
+            final List<Pair> results = new ArrayList<>();
+            final ByteBuf slice = length > 0
+                    ? input.readSlice(length)
+                    : input; // all remaining
+
+            final Map<Object, ValueMatcherMeta> valueMatchersByKey = meta.decoder().valueMatchers().valueMatchersByKey();
+            int iterationTimes = propertyMetadata.iterationTimesExtractor().extractIterationTimes(context, context.evaluationContext());
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final CollectionFieldSpan collectionFieldSpan = codecTracker.startNewCollectionFieldSpan(propertyMetadata);
+            int sequence = 0;
+            final int parentIndexBeforeRead = slice.readerIndex();
+
+            while (slice.isReadable() && iterationTimes-- > 0) {
+                final CollectionItemSpan collectionItemSpan = codecTracker.startNewCollectionItemSpan(collectionFieldSpan, collectionFieldSpan.getFieldName(), sequence++);
+                final int indexBeforeRead = slice.readerIndex();
+
+                // 1. key
+                final KeyMeta keyMeta = meta.decoder().key();
+                final DataField.DictKey key = DataField.DictKey.deserializeWithTracker(codecTracker, keyMeta.type(), slice, keyMeta.sizeInBytes(), keyMeta.charset(), "key");
+
+                // 2. value
+                final ValueMatcherMeta valueMatcherMeta = valueMatchersByKey.get(key.value());
+                codecTracker.updateTempFieldName("value");
+                if (valueMatcherMeta == null) {
+                    final String remainingHex = StringFieldCodecs.INSTANCE_HEX.deserializeWithTracker(propertyMetadata, context, slice, slice.readableBytes());
+                    results.add(new Pair(key, null, remainingHex));
+                    collectionItemSpan.setHexString(FormatUtils.toHexString(slice, indexBeforeRead, slice.readerIndex() - indexBeforeRead));
+                    codecTracker.finishCurrentSpan();
+                    break;
+                } else {
+                    final int valueLength = valueMatcherMeta.length();
+                    final FieldCodec<Object> valueCodec = valueMatcherMeta.valueCodec();
+
+                    final Object value = valueCodec.deserializeWithTracker(propertyMetadata, context, slice.readSlice(valueLength), valueLength);
+                    final Pair pair = new Pair(key, value);
+                    results.add(pair);
+                    collectionItemSpan.setHexString(FormatUtils.toHexString(slice, indexBeforeRead, slice.readerIndex() - indexBeforeRead));
+                    codecTracker.finishCurrentSpan();
+                }
+            }
+
+            collectionFieldSpan.setHexString(FormatUtils.toHexString(slice, parentIndexBeforeRead, slice.readerIndex() - parentIndexBeforeRead));
+            codecTracker.finishCurrentSpan();
+            return results;
+        }
     }
 
     private static void encodePair(FieldCodec.SerializeContext context, ByteBuf output, Pair pair) {

@@ -22,8 +22,8 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
-public class VirtualFieldSpan extends BaseSpan {
-    private final String fieldName;
+public class VirtualFieldSpan extends BaseSpan implements BaseSpan.HasFieldName {
+    private String fieldName;
     private final String fieldDesc;
     private final String fieldType;
 
@@ -38,8 +38,14 @@ public class VirtualFieldSpan extends BaseSpan {
         this.value = fieldValue;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void setFieldName(String name) {
+        this.fieldName = name;
     }
 
     public String getFieldDesc() {

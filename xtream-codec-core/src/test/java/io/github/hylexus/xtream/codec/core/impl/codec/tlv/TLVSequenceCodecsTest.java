@@ -40,7 +40,7 @@ class TLVSequenceCodecsTest extends BaseEntityCodecTest {
     void setUp() {
         sourceEntity = new TLVDebugEntity01()
                 .setId(1L)
-                .setTlvFields1(List.of(
+                .setTlvFields(List.of(
                         new TLV(u16(1), LengthFieldType.u8, gbkString("你是谁")),
                         new TLV(u16(2), LengthFieldType.u8, utf8String("你是谁😂")),
                         new TLV(u16(3), LengthFieldType.u8, new DwordWrapper(222L)),
@@ -56,8 +56,8 @@ class TLVSequenceCodecsTest extends BaseEntityCodecTest {
     void testDefaultVersion() {
         doCodecTest(XtreamField.ALL_VERSION, sourceEntity, (source, hexString, decoded) -> {
             assertEquals(source.getId(), decoded.getId());
-            final List<TLV> sourceTlvFields = source.getTlvFields1();
-            final List<TLV> targetTlvFields = decoded.getTlvFields1();
+            final List<TLV> sourceTlvFields = source.getTlvFields();
+            final List<TLV> targetTlvFields = decoded.getTlvFields();
             assertEquals(((DataField.GbkString) sourceTlvFields.get(0).value()).value(), targetTlvFields.get(0).value());
             assertEquals(((DataField.Utf8String) sourceTlvFields.get(1).value()).value(), targetTlvFields.get(1).value());
             assertEquals(((DwordWrapper) sourceTlvFields.get(2).value()).asU32(), targetTlvFields.get(2).value());
@@ -75,8 +75,8 @@ class TLVSequenceCodecsTest extends BaseEntityCodecTest {
     void testVersion1() {
         doCodecTest(1, sourceEntity, (source, hexString, decoded) -> {
             assertEquals(source.getId(), decoded.getId());
-            final List<TLV> sourceTlvFields = source.getTlvFields1();
-            final List<TLV> targetTlvFields = decoded.getTlvFields1();
+            final List<TLV> sourceTlvFields = source.getTlvFields();
+            final List<TLV> targetTlvFields = decoded.getTlvFields();
             assertEquals(((DataField.GbkString) sourceTlvFields.get(0).value()).value(), targetTlvFields.get(0).value());
             assertEquals(((DataField.Utf8String) sourceTlvFields.get(1).value()).value(), targetTlvFields.get(1).value());
             assertEquals(((DwordWrapper) sourceTlvFields.get(2).value()).asU32(), ((U32Wrapper) targetTlvFields.get(2).value()).asU32());

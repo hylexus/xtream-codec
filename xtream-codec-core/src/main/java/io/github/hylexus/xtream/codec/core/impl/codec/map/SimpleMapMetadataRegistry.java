@@ -26,6 +26,7 @@ import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.CodecCharset;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ import static io.github.hylexus.xtream.codec.common.utils.XtreamAssertions.asser
 import static java.util.Objects.requireNonNull;
 
 // todo 移动到 BeanMetadataRegistry ?
+@ApiStatus.Internal
 public class SimpleMapMetadataRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleMapMetadataRegistry.class);

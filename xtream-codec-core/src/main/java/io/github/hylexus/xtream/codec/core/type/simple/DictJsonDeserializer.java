@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -68,7 +69,7 @@ public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? exte
             throw new JsonParseException(p, "valueLengthType is required");
         }
         final String valueLengthTypeStr = valueLengthTypeNode.asText().toLowerCase();
-        final DataField.ValueLengthType valueLengthType = DataField.ValueLengthType.valueOf(valueLengthTypeStr);
+        final LengthFieldType valueLengthType = LengthFieldType.valueOf(valueLengthTypeStr);
 
         final PrependLengthFieldType prependLengthFieldType = node.has("prependLengthFieldType")
                 ? PrependLengthFieldType.valueOf(node.get("prependLengthFieldType").asText())
@@ -103,7 +104,7 @@ public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? exte
 
     private <K extends DataField.DictKey> DataField.Dict<K> createDict(
             Class<K> keyType,
-            DataField.ValueLengthType valueLengthType,
+            LengthFieldType valueLengthType,
             Map<DataField.DictKey, DataField> rawValueMap,
             PrependLengthFieldType prependLengthFieldType) {
         @SuppressWarnings("unchecked") final Map<K, DataField> typedMap = (Map<K, DataField>) rawValueMap;

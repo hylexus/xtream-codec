@@ -21,7 +21,6 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.ExtendMetaRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.tlv.XtreamTLVFieldSequence;
 import io.github.hylexus.xtream.codec.core.impl.DefaultExtendMetaRegistry;
 import io.github.hylexus.xtream.codec.core.impl.domain.*;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
@@ -32,8 +31,6 @@ import io.github.hylexus.xtream.codec.core.type.FieldLength;
 import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -43,8 +40,6 @@ import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
-@NullMarked
-@ApiStatus.Experimental
 public class TLVCodecs {
     public static final TLVCodec INSTANCE = new TLVCodec();
 
@@ -97,10 +92,7 @@ public class TLVCodecs {
 
         @Override
         public @Nullable Iterable<TLV> deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-            final XtreamTLVFieldSequence annotation = propertyMetadata.findAnnotation(XtreamTLVFieldSequence.class)
-                    .orElseThrow(() -> new IllegalArgumentException("@" + XtreamTLVFieldSequence.class.getSimpleName() + " annotation is required.\n--> Field: " + propertyMetadata.field().toGenericString()));
-
-            final XtreamTLVFieldSequenceMeta meta = this.extendMetaRegistry.getXtreamTlvFieldSequenceMeta(context.version(), propertyMetadata.field(), annotation);
+            final XtreamTLVFieldSequenceMeta meta = this.extendMetaRegistry.getXtreamTlvFieldSequenceMeta(context.version(), propertyMetadata.field());
             final KeyMeta keyMeta = meta.decoder().key();
             final Map<Object, ValueMatcherMeta> valueMatchersByKey = meta.decoder().valueMatchers().valueMatchersByKey();
             final FallbackValueMatcherMeta fallbackValueMatcherMeta = meta.decoder().fallbackValueMatcher();
@@ -118,59 +110,9 @@ public class TLVCodecs {
             return results;
         }
 
-        static TLV decodeTlv(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf slice, KeyMeta keyMeta, ValueLengthMeta lengthMeta, Map<Object, ValueMatcherMeta> valueMatchersByKey, FallbackValueMatcherMeta fallbackValueMatcherMeta) {
-            // 1. tag
-            final DataField.DictKey keyWrapper = keyMeta.readFrom(slice);
-            final Object key = keyWrapper.value();
-            requireNonNull(key);
-
-            // 2. length
-            final Number valueLengthNumber = lengthMeta.type().readFrom(slice);
-            final int valueLength = valueLengthNumber.intValue();
-            final ValueMatcherMeta valueMatcherMeta = valueMatchersByKey.get(key);
-
-            // 3. value
-            final FieldCodec<Object> valueCodec;
-            if (valueMatcherMeta != null) {
-                valueCodec = valueMatcherMeta.valueCodec();
-            } else {
-                valueCodec = fallbackValueMatcherMeta.codec();
-            }
-            final Object value = valueCodec.deserialize(propertyMetadata, context, slice, valueLength);
-            return new TLV(keyWrapper, new FieldLength.DefaultFieldLength(lengthMeta.type()).setValue(valueLength), requireNonNull(value));
-        }
-
-
-        static TLV decodeTlvWithTracker(CodecTracker codecTracker, BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf slice, KeyMeta keyMeta, ValueLengthMeta lengthMeta, Map<Object, ValueMatcherMeta> valueMatchersByKey, FallbackValueMatcherMeta fallbackValueMatcherMeta) {
-            // 1. tag
-            final DataField.DictKey keyWrapper = keyMeta.readFromWithTracker(slice, codecTracker, "tag");
-            final Object key = keyWrapper.value();
-            requireNonNull(key);
-
-            // 2. length
-            final Number valueLengthNumber = lengthMeta.type().readFromWithTracker(slice, codecTracker, "length");
-            final int valueLength = valueLengthNumber.intValue();
-            final ValueMatcherMeta valueMatcherMeta = valueMatchersByKey.get(key);
-
-            // 3. value
-            codecTracker.updateTempFieldName("value");
-            final FieldCodec<Object> valueCodec;
-            if (valueMatcherMeta != null) {
-                valueCodec = valueMatcherMeta.valueCodec();
-            } else {
-                valueCodec = fallbackValueMatcherMeta.codec();
-            }
-            final Object value = valueCodec.deserializeWithTracker(propertyMetadata, context, slice, valueLength);
-            return new TLV(keyWrapper, new FieldLength.DefaultFieldLength(lengthMeta.type()).setValue(valueLength), requireNonNull(value));
-        }
-
-
         @Override
         public @Nullable Iterable<@Nullable TLV> deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-            final XtreamTLVFieldSequence annotation = propertyMetadata.findAnnotation(XtreamTLVFieldSequence.class)
-                    .orElseThrow(() -> new IllegalArgumentException("@" + XtreamTLVFieldSequence.class.getSimpleName() + " annotation is required.\n--> Field: " + propertyMetadata.field().toGenericString()));
-
-            final XtreamTLVFieldSequenceMeta meta = this.extendMetaRegistry.getXtreamTlvFieldSequenceMeta(context.version(), propertyMetadata.field(), annotation);
+            final XtreamTLVFieldSequenceMeta meta = this.extendMetaRegistry.getXtreamTlvFieldSequenceMeta(context.version(), propertyMetadata.field());
             final KeyMeta keyMeta = meta.decoder().key();
             final Map<Object, ValueMatcherMeta> valueMatchersByKey = meta.decoder().valueMatchers().valueMatchersByKey();
             final FallbackValueMatcherMeta fallbackValueMatcherMeta = meta.decoder().fallbackValueMatcher();
@@ -215,7 +157,6 @@ public class TLVCodecs {
                     if (value == null) {
                         continue;
                     }
-                    temp.clear();
                     encodeTlv(context, output, value, temp);
                 }
             } finally {
@@ -259,6 +200,7 @@ public class TLVCodecs {
     }
 
     private static void encodeTlv(FieldCodec.SerializeContext context, ByteBuf output, TLV value, ByteBuf temp) {
+        temp.clear();
         final DataField.DictKey tag = value.tag();
 
         // 1. 编码 tag
@@ -278,7 +220,7 @@ public class TLVCodecs {
         output.writeBytes(temp);
     }
 
-    static void encodeTlvWithTracker(FieldCodec.SerializeContext context, ByteBuf output, TLV tlv, CodecTracker codecTracker, ByteBuf temp, String fieldCodec) {
+    private static void encodeTlvWithTracker(FieldCodec.SerializeContext context, ByteBuf output, TLV tlv, CodecTracker codecTracker, ByteBuf temp, String fieldCodec) {
         temp.clear();
         final DataField.DictKey tag = tlv.tag();
 
@@ -309,6 +251,52 @@ public class TLVCodecs {
 
         // 2. 编码 value
         output.writeBytes(temp);
+    }
+
+    static TLV decodeTlv(BeanPropertyMetadata propertyMetadata, FieldCodec.DeserializeContext context, ByteBuf slice, KeyMeta keyMeta, ValueLengthMeta lengthMeta, Map<Object, ValueMatcherMeta> valueMatchersByKey, FallbackValueMatcherMeta fallbackValueMatcherMeta) {
+        // 1. tag
+        final DataField.DictKey keyWrapper = keyMeta.readFrom(slice);
+        final Object key = keyWrapper.value();
+        requireNonNull(key);
+
+        // 2. length
+        final Number valueLengthNumber = lengthMeta.type().readFrom(slice);
+        final int valueLength = valueLengthNumber.intValue();
+        final ValueMatcherMeta valueMatcherMeta = valueMatchersByKey.get(key);
+
+        // 3. value
+        final FieldCodec<Object> valueCodec;
+        if (valueMatcherMeta != null) {
+            valueCodec = valueMatcherMeta.valueCodec();
+        } else {
+            valueCodec = fallbackValueMatcherMeta.codec();
+        }
+        final Object value = valueCodec.deserialize(propertyMetadata, context, slice, valueLength);
+        return new TLV(keyWrapper, new FieldLength.DefaultFieldLength(lengthMeta.type()).setValue(valueLength), requireNonNull(value));
+    }
+
+
+    static TLV decodeTlvWithTracker(CodecTracker codecTracker, BeanPropertyMetadata propertyMetadata, FieldCodec.DeserializeContext context, ByteBuf slice, KeyMeta keyMeta, ValueLengthMeta lengthMeta, Map<Object, ValueMatcherMeta> valueMatchersByKey, FallbackValueMatcherMeta fallbackValueMatcherMeta) {
+        // 1. tag
+        final DataField.DictKey keyWrapper = keyMeta.readFromWithTracker(slice, codecTracker, "tag");
+        final Object key = keyWrapper.value();
+        requireNonNull(key);
+
+        // 2. length
+        final Number valueLengthNumber = lengthMeta.type().readFromWithTracker(slice, codecTracker, "length");
+        final int valueLength = valueLengthNumber.intValue();
+        final ValueMatcherMeta valueMatcherMeta = valueMatchersByKey.get(key);
+
+        // 3. value
+        codecTracker.updateTempFieldName("value");
+        final FieldCodec<Object> valueCodec;
+        if (valueMatcherMeta != null) {
+            valueCodec = valueMatcherMeta.valueCodec();
+        } else {
+            valueCodec = fallbackValueMatcherMeta.codec();
+        }
+        final Object value = valueCodec.deserializeWithTracker(propertyMetadata, context, slice, valueLength);
+        return new TLV(keyWrapper, new FieldLength.DefaultFieldLength(lengthMeta.type()).setValue(valueLength), requireNonNull(value));
     }
 
 }

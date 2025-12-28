@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.Padding;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
@@ -33,31 +34,37 @@ import java.nio.charset.Charset;
  * @deprecated Use {@link StringFieldCodecs.StringFieldCodec} instead. Will be removed in 1.0.0.
  */
 @Deprecated(forRemoval = true, since = "0.1.0")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class StringFieldCodec implements FieldCodec<String> {
     /**
      * @deprecated Use {@link StringFieldCodecs#INSTANCE_BCD_8421} instead.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final FieldCodec<String> INSTANCE_BCD_8421 = InternalBcdFieldCodec.INSTANCE;
     /**
      * @deprecated Use {@link StringFieldCodecs#INSTANCE_UTF8} instead.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final FieldCodec<String> INSTANCE_UTF8 = InternalSimpleStringFieldCodec.INSTANCE_UTF8;
     /**
      * @deprecated Use {@link StringFieldCodecs#INSTANCE_GBK} instead.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final FieldCodec<String> INSTANCE_GBK = InternalSimpleStringFieldCodec.INSTANCE_GBK;
     /**
      * @deprecated Use {@link StringFieldCodecs#INSTANCE_GB_2312} instead.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final FieldCodec<String> INSTANCE_GB_2312 = InternalSimpleStringFieldCodec.INSTANCE_GB_2312;
     /**
      * @deprecated Use {@link StringFieldCodecs#INSTANCE_HEX} instead.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final FieldCodec<String> INSTANCE_HEX = InternalHexStringFieldCodec.INSTANCE;
     protected final String charset;
 

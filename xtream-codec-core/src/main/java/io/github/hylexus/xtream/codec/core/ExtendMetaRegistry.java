@@ -16,8 +16,6 @@
 
 package io.github.hylexus.xtream.codec.core;
 
-import io.github.hylexus.xtream.codec.core.annotation.pair.XtreamPairFieldSequence;
-import io.github.hylexus.xtream.codec.core.annotation.tlv.XtreamTLVFieldSequence;
 import io.github.hylexus.xtream.codec.core.impl.domain.XtreamPairFieldSequenceMeta;
 import io.github.hylexus.xtream.codec.core.impl.domain.XtreamTLVFieldSequenceMeta;
 import org.jspecify.annotations.NullMarked;
@@ -27,8 +25,8 @@ import java.lang.reflect.Field;
 @NullMarked
 public interface ExtendMetaRegistry {
 
-    XtreamTLVFieldSequenceMeta getXtreamTlvFieldSequenceMeta(int targetVersion, Field field, XtreamTLVFieldSequence xtreamTlvFieldSequence);
+    XtreamTLVFieldSequenceMeta getXtreamTlvFieldSequenceMeta(int targetVersion, Field field);
 
-    XtreamPairFieldSequenceMeta getXtreamPairFieldSequenceMeta(int targetVersion, Field field, XtreamPairFieldSequence xtreamPairFieldSequence);
+    XtreamPairFieldSequenceMeta getXtreamPairFieldSequenceMeta(int targetVersion, Field field);
 
 }

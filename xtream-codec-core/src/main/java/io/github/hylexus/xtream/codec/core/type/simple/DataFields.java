@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import org.jspecify.annotations.Nullable;
 
@@ -370,35 +371,35 @@ public final class DataFields {
         return new DataField.Struct(null, PrependLengthFieldType.none, fields, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.Dict<K> dict(String name, PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(String name, PrependLengthFieldType prependLengthFieldType, Class<K> keyType, LengthFieldType valueLengthType, Map<K, DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
         return new DataField.Dict<>(name, prependLengthFieldType, keyType, valueLengthType, value, attributes);
     }
 
-    public static <K extends DataField.DictKey> DataField.Dict<K> dict(String name, PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value) {
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(String name, PrependLengthFieldType prependLengthFieldType, Class<K> keyType, LengthFieldType valueLengthType, Map<K, DataField> value) {
         return new DataField.Dict<>(name, prependLengthFieldType, keyType, valueLengthType, value, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.Dict<K> dict(PrependLengthFieldType prependLengthFieldType, Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value) {
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(PrependLengthFieldType prependLengthFieldType, Class<K> keyType, LengthFieldType valueLengthType, Map<K, DataField> value) {
         return new DataField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, value, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.Dict<K> dict(Class<K> keyType, DataField.ValueLengthType valueLengthType, Map<K, DataField> value) {
+    public static <K extends DataField.DictKey> DataField.Dict<K> dict(Class<K> keyType, LengthFieldType valueLengthType, Map<K, DataField> value) {
         return new DataField.Dict<>(null, null, keyType, valueLengthType, value, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(String name, PrependLengthFieldType prependLengthFieldType, K tag, DataField.ValueLengthType valueLengthType, DataField value, @Nullable Map<String, @Nullable Object> attributes) {
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(String name, PrependLengthFieldType prependLengthFieldType, K tag, LengthFieldType valueLengthType, DataField value, @Nullable Map<String, @Nullable Object> attributes) {
         return new DataField.SimpleTlvDataField<>(name, prependLengthFieldType, tag, valueLengthType, value, attributes);
     }
 
-    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(String name, PrependLengthFieldType prependLengthFieldType, K tag, DataField.ValueLengthType valueLengthType, DataField value) {
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(String name, PrependLengthFieldType prependLengthFieldType, K tag, LengthFieldType valueLengthType, DataField value) {
         return new DataField.SimpleTlvDataField<>(name, prependLengthFieldType, tag, valueLengthType, value, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(PrependLengthFieldType prependLengthFieldType, K tag, DataField.ValueLengthType valueLengthType, DataField value) {
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(PrependLengthFieldType prependLengthFieldType, K tag, LengthFieldType valueLengthType, DataField value) {
         return new DataField.SimpleTlvDataField<>(null, prependLengthFieldType, tag, valueLengthType, value, null);
     }
 
-    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(K tag, DataField.ValueLengthType valueLengthType, DataField value) {
+    public static <K extends DataField.DictKey> DataField.SimpleTlvDataField<K> tlv(K tag, LengthFieldType valueLengthType, DataField value) {
         return new DataField.SimpleTlvDataField<>(null, null, tag, valueLengthType, value, null);
     }
 

@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.*;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
+import org.jetbrains.annotations.ApiStatus;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -431,6 +432,7 @@ public @interface Preset {
          * @deprecated Use {@link simple_map} instead. Will be removed in 1.0.0.
          */
         @Deprecated(forRemoval = true, since = "0.1.0")
+        @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
         @SuppressWarnings("checkstyle:TypeName")
         @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
@@ -977,6 +979,7 @@ public @interface Preset {
          * @deprecated Use {@link SimpleMap} instead. Will be removed in 1.0.0.
          */
         @Deprecated(forRemoval = true, since = "0.1.0")
+        @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
         @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented

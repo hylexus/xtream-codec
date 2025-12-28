@@ -30,6 +30,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import io.netty.buffer.ByteBuf;
@@ -354,28 +355,6 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
 
     }
 
-    // todo 修改为 io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType
-    enum ValueLengthType {
-        i8, u8, i16, u16, i32, u32, i64;
-
-        public void writeToWithTracker(ByteBuf output, long value, CodecTracker codecTracker) {
-            final int writerIndex = output.writerIndex();
-            this.writeTo(output, value);
-            final String hexString = FormatUtils.toHexString(output, writerIndex, output.writerIndex() - writerIndex);
-            codecTracker.addFieldSpan(codecTracker.getCurrentSpan(), this.getDeclaringClass().getSimpleName(), value, hexString, this.getDeclaringClass().getSimpleName(), "");
-        }
-
-        public void writeTo(ByteBuf output, long value) {
-            switch (this) {
-                case i8, u8 -> output.writeByte((int) value);
-                case i16, u16 -> output.writeShort((int) value);
-                case i32, u32 -> output.writeInt((int) value);
-                case i64 -> output.writeLong(value);
-                default -> throw new IllegalArgumentException("Unsupported value length type: " + this);
-            }
-        }
-    }
-
     record I8(String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) implements IntegralDataField {
         public I8(@Nullable String name, Byte value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
@@ -489,12 +468,12 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
             @JsonSerialize(using = DictKeyTypeJsonSerializer.class)
             Class<K> keyType,
 
-            @JsonProperty("valueLengthType") ValueLengthType valueLengthType,
+            @JsonProperty("valueLengthType") LengthFieldType valueLengthType,
             @JsonProperty("value") Map<K, DataField> value,
             @Nullable Map<String, @Nullable Object> attributes
     ) implements DataField {
 
-        public Dict(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, Class<K> keyType, ValueLengthType valueLengthType, Map<K, DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
+        public Dict(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, Class<K> keyType, LengthFieldType valueLengthType, Map<K, DataField> value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.keyType = keyType;
             this.value = value;
@@ -515,7 +494,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
     sealed interface TlvDataField extends DataField permits SimpleTlvDataField {
         DictKey tag();
 
-        ValueLengthType length();
+        LengthFieldType length();
 
         @Override
         DataField value();
@@ -525,12 +504,12 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
             String name,
             PrependLengthFieldType prependLengthFieldType,
             T tag,
-            ValueLengthType length,
+            LengthFieldType length,
             DataField value,
             @Nullable Map<String, @Nullable Object> attributes
     ) implements TlvDataField {
 
-        public SimpleTlvDataField(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, T tag, ValueLengthType length, DataField value, @Nullable Map<String, @Nullable Object> attributes) {
+        public SimpleTlvDataField(@Nullable String name, @Nullable PrependLengthFieldType prependLengthFieldType, T tag, LengthFieldType length, DataField value, @Nullable Map<String, @Nullable Object> attributes) {
             this.name = fieldName(name, this);
             this.prependLengthFieldType = requireNonNullElse(prependLengthFieldType, PrependLengthFieldType.none);
             this.tag = tag;

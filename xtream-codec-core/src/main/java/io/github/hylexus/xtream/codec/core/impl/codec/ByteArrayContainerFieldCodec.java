@@ -20,16 +20,19 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @deprecated Use {@link BytesFieldCodecs.BytesFieldCodecByteArrayContainer}
  */
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class ByteArrayContainerFieldCodec extends AbstractFieldCodec<ByteArrayContainer> {
     /**
      * @deprecated Use {@link BytesFieldCodecs#INSTANCE_BYTE_ARRAY_CONTAINER}
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final ByteArrayContainerFieldCodec INSTANCE = new ByteArrayContainerFieldCodec();
 
     private ByteArrayContainerFieldCodec() {

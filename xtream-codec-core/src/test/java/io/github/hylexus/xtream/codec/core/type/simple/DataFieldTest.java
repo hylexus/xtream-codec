@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +54,7 @@ class DataFieldTest extends BaseEntityCodecTest {
 
     @Test
     void test7() throws Exception {
-        final DataField.SimpleTlvDataField<DataField.U8> tlv = tlv(u8((short) 1), DataField.ValueLengthType.u32, gbkString("111"));
+        final DataField.SimpleTlvDataField<DataField.U8> tlv = tlv(u8((short) 1), LengthFieldType.u32, gbkString("111"));
         System.out.println(objectMapper.writeValueAsString(tlv));
     }
 
@@ -102,7 +103,7 @@ class DataFieldTest extends BaseEntityCodecTest {
                 sequence(List.of(i32(111), u32(222L))),
                 dict(
                         DataField.U16.class,
-                        DataField.ValueLengthType.u8,
+                        LengthFieldType.u8,
                         Map.of(
                                 u16(1), gbkString("1111"),
                                 u16(2), gbkString("2222"),
@@ -113,7 +114,7 @@ class DataFieldTest extends BaseEntityCodecTest {
                         )
                 ),
                 byteSequence(PrependLengthFieldType.u8, new byte[]{1, 2, 3}),
-                tlv(u8((short) 1), DataField.ValueLengthType.u16, gbkString("222")),
+                tlv(u8((short) 1), LengthFieldType.u16, gbkString("222")),
                 new CustomDataField1("haha", u16(1), PrependLengthFieldType.u8)
         );
         System.out.println(DataFields.mixedListToJsonString(data1));

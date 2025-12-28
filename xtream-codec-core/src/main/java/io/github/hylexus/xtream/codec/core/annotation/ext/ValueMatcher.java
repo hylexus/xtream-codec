@@ -26,6 +26,12 @@ import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
  * @see ValueMatcherMeta
  */
 public @interface ValueMatcher {
+
+    /**
+     * 反序列化 {@link java.util.List}&lt;{@link io.github.hylexus.xtream.codec.core.type.Pair}&gt; 类型时必须指定值长度
+     */
+    int length() default -1;
+
     int[] version() default {XtreamField.ALL_VERSION};
 
     byte[] matchI8() default {};

@@ -51,6 +51,15 @@ public class CodecTracker {
         this.tempFieldName = tempFieldName;
     }
 
+    public String getFieldName(String fieldName) {
+        if (this.tempFieldName == null) {
+            return fieldName;
+        }
+        final String name = this.tempFieldName;
+        this.tempFieldName = null;
+        return name;
+    }
+
     public NestedFieldSpan startNewNestedFieldSpan(BeanPropertyMetadata metadata, FieldCodec<?> fieldCodec, String fieldType) {
         final String fieldCodecString = fieldCodec == null
                 ? null
@@ -61,14 +70,14 @@ public class CodecTracker {
     public NestedFieldSpan startNewNestedFieldSpan(BeanPropertyMetadata metadata, @Nullable String fieldCodec, @Nullable String fieldType) {
         final NestedFieldSpan span = new NestedFieldSpan(
                 this.current,
-                metadata.name(), metadata.xtreamFieldAnnotation().desc(),
+                getFieldName(metadata.name()), metadata.xtreamFieldAnnotation().desc(),
                 metadata.field().getType().getTypeName(),
                 fieldCodec);
         if (fieldType != null) {
             span.setFieldType(fieldType);
         } else if (this.current instanceof CollectionItemSpan collectionItemSpan) {
-            final String fieldName = collectionItemSpan.getFieldName() + "(" + collectionItemSpan.getOffset() + ")";
-            span.setFieldName(fieldName);
+            // final String fieldName = collectionItemSpan.getFieldName() + "(" + collectionItemSpan.getOffset() + ")";
+            // span.setFieldName(fieldName);
             span.setFieldType(collectionItemSpan.getFieldType());
         }
         return this.addSpan(span);
@@ -77,7 +86,7 @@ public class CodecTracker {
     public NestedFieldSpan startNewNestedFieldSpan(String name, String desc, String fieldType, @Nullable String fieldCodec) {
         final NestedFieldSpan span = new NestedFieldSpan(
                 this.current,
-                name, desc,
+                getFieldName(name), desc,
                 fieldType,
                 fieldCodec);
         if (fieldType != null) {
@@ -91,7 +100,7 @@ public class CodecTracker {
     }
 
     public CollectionFieldSpan startNewCollectionFieldSpan(BeanPropertyMetadata metadata) {
-        final CollectionFieldSpan span = new CollectionFieldSpan(this.current, metadata.name(), this.getFieldFirstGenericTypeName(metadata.field()), metadata.xtreamFieldAnnotation().desc());
+        final CollectionFieldSpan span = new CollectionFieldSpan(this.current, getFieldName(metadata.name()), this.getFieldFirstGenericTypeName(metadata.field()), metadata.xtreamFieldAnnotation().desc());
         return this.addSpan(span);
     }
 
@@ -104,6 +113,7 @@ public class CodecTracker {
         final String fieldType = this.current instanceof CollectionFieldSpan collectionFieldSpan
                 ? collectionFieldSpan.getFieldType()
                 : null;
+        fieldName = getFieldName(fieldName + "[" + sequence + "]");
         final CollectionItemSpan span = new CollectionItemSpan(parent, fieldName, sequence, fieldType);
         return this.addSpan(span);
     }
@@ -125,12 +135,19 @@ public class CodecTracker {
 
     public void finishCurrentSpan() {
         this.current = this.current.getParent();
+        resetTempStatus();
+    }
+
+    private void resetTempStatus() {
+        this.tempFieldName = null;
+        this.tempMapItemType = null;
     }
 
     public PrependLengthFieldSpan addPrependLengthFieldSpan(BaseSpan parent, String fieldName, @Nullable Object value, @Nullable String hexString, String fieldCodec, String fieldDesc) {
         final PrependLengthFieldSpan span = new PrependLengthFieldSpan(parent, fieldName, fieldCodec, value, hexString, fieldDesc);
         this.current.addChild(span);
         this.current = parent;
+        this.resetTempStatus();
         return span;
     }
 
@@ -144,9 +161,11 @@ public class CodecTracker {
 
     public void addFieldSpan(BaseSpan parent, String fieldName, @Nullable Object value, String hexString, FieldCodec<?> fieldCodec, String fieldDesc) {
         this.addFieldSpan(parent, fieldName, value, hexString, fieldCodec.getClass().getSimpleName(), fieldDesc);
+        this.resetTempStatus();
     }
 
     public void addFieldSpan(BaseSpan parent, String fieldName, @Nullable Object value, String hexString, String fieldCodec, String fieldDesc) {
+        fieldName = getFieldName(fieldName);
         final BaseSpan trackerItem;
         boolean needAdd = true;
         if (parent instanceof MapEntrySpan) {
@@ -159,12 +178,7 @@ public class CodecTracker {
                 this.current.addChild(children.size() - 1, trackerItem);
                 needAdd = false;
             }
-            this.tempMapItemType = null;
         } else {
-            if (this.tempFieldName != null) {
-                fieldName = this.tempFieldName;
-                this.tempFieldName = null;
-            }
             trackerItem = new BasicFieldSpan(parent, fieldName, fieldDesc)
                     .setFieldCodec(fieldCodec)
                     .setValue(value)
@@ -177,17 +191,22 @@ public class CodecTracker {
                 needAdd = false;
             } else if (parent instanceof CollectionItemSpan collectionItemSpan
                     && TLV.class.getName().equals(collectionItemSpan.getFieldType())
-                    && this.current.getChildren().size() == 2
-                    && this.current.getChildren().getLast() instanceof BasicFieldSpan basicFieldSpan
-                    && !"length".equalsIgnoreCase(basicFieldSpan.getFieldName())) {
-                this.current.addChild(this.current.getChildren().size() - 1, trackerItem);
-                needAdd = false;
+                    && this.current.getChildren().size() == 2) {
+                if (this.current.getChildren().getLast() instanceof BaseSpan.HasFieldName hasFieldName
+                        && "length".equalsIgnoreCase(fieldName)
+                        && !"length".equalsIgnoreCase(hasFieldName.getFieldName())
+                        && trackerItem instanceof BaseSpan.HasFieldName item) {
+                    item.setFieldName(fieldName);
+                    this.current.addChild(this.current.getChildren().size() - 1, trackerItem);
+                    needAdd = false;
+                }
             }
         }
         if (needAdd) {
             this.current.addChild(trackerItem);
         }
         this.current = parent;
+        this.resetTempStatus();
     }
 
     public BaseSpan getCurrentSpan() {

@@ -18,16 +18,19 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @deprecated Use {@link BytesFieldCodecs.BytesFieldCodecByteBuf} instead.
  */
 @Deprecated(forRemoval = true, since = "0.1.0")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class ByteBufFieldCodec extends AbstractFieldCodec<ByteBuf> {
     /**
      * @deprecated Use {@link BytesFieldCodecs#INSTANCE_BYTE_BUF} instead.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static ByteBufFieldCodec INSTANCE = new ByteBufFieldCodec();
 
     private ByteBufFieldCodec() {

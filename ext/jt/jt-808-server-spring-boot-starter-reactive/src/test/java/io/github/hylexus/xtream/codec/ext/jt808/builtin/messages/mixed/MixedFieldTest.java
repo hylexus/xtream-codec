@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 import static io.github.hylexus.xtream.codec.core.type.simple.DataField.U8;
-import static io.github.hylexus.xtream.codec.core.type.simple.DataField.ValueLengthType;
 import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
 
 public class MixedFieldTest extends BaseCodecTest {
@@ -74,7 +74,7 @@ public class MixedFieldTest extends BaseCodecTest {
                 // 时间
                 bcd8421String("251108223456"),
                 // 位置附加项
-                dict(U8.class, ValueLengthType.u8, extraItems)
+                dict(U8.class, LengthFieldType.u8, extraItems)
         );
 
         final ByteBuf encode = responseEncoder.encode(dataFieldList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));

@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.mixed;
 
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
@@ -44,7 +45,7 @@ class MixedEntity02Test extends BaseCodecTest {
         dataList.add(u32("状态", 222L));
         final DataField.Dict<DataField.U8> extraItems = dict(
                 DataField.U8.class,
-                DataField.ValueLengthType.u8,
+                LengthFieldType.u8,
                 Map.of(
                         // 里程，DWORD，1/10km，对应车上里程表读数
                         u8((short) 0x01), u32(123L),
@@ -61,7 +62,7 @@ class MixedEntity02Test extends BaseCodecTest {
                 .setDirection(u16(1))
                 .setTime(time)
                 .setExtraItems(extraItems)
-                .setExtraItems2(tlv(u8((short) 0x01), DataField.ValueLengthType.u8, u32(123L)));
+                .setExtraItems2(tlv(u8((short) 0x01), LengthFieldType.u8, u32(123L)));
         dataList.add(mixedEntity02);
 
         final ByteBuf encodeBuffer = responseEncoder.encode(dataList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));

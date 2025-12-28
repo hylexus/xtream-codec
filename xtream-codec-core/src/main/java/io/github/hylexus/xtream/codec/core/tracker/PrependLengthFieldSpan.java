@@ -20,8 +20,8 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
-public class PrependLengthFieldSpan extends BaseSpan {
-    private final String fieldName;
+public class PrependLengthFieldSpan extends BaseSpan implements BaseSpan.HasFieldName {
+    private String fieldName;
     private final String fieldCodec;
     private @Nullable Object value;
     private final @Nullable String fieldDesc;
@@ -46,8 +46,14 @@ public class PrependLengthFieldSpan extends BaseSpan {
         return this;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void setFieldName(String name) {
+        this.fieldName = name;
     }
 
     public String getFieldCodec() {
