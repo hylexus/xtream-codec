@@ -16,29 +16,29 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
+import io.github.hylexus.xtream.codec.base.expression.XtreamEvaluationContext;
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpression;
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import lombok.ToString;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.StringUtils;
+
+import java.util.StringJoiner;
 
 public interface IterationTimesExtractor {
 
-    int extractIterationTimes(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext);
+    int extractIterationTimes(FieldCodec.DeserializeContext context, XtreamEvaluationContext evaluationContext);
 
-    static IterationTimesExtractor from(XtreamField xtreamField) {
+    static IterationTimesExtractor from(XtreamField xtreamField, XtreamExpressionEngine expressionEngine) {
         if (xtreamField.iterationTimes() > 0) {
             return new IterationTimesExtractor.ConstantIterationTimesExtractor(xtreamField.iterationTimes());
         }
         if (StringUtils.hasText(xtreamField.iterationTimesExpression())) {
-            return new IterationTimesExtractor.ExpressionIterationTimesExtractor(xtreamField);
+            return new IterationTimesExtractor.ExpressionIterationTimesExtractor(xtreamField, expressionEngine);
         }
         return IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
     }
 
-    @ToString
     class ConstantIterationTimesExtractor implements IterationTimesExtractor {
         private final int length;
 
@@ -47,28 +47,42 @@ public interface IterationTimesExtractor {
         }
 
         @Override
-        public int extractIterationTimes(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext) {
+        public int extractIterationTimes(FieldCodec.DeserializeContext context, XtreamEvaluationContext evaluationContext) {
             return this.length;
-        }
-    }
-
-    @ToString(exclude = "expression")
-    class ExpressionIterationTimesExtractor implements IterationTimesExtractor {
-        final Expression expression;
-        private final String expressionString;
-
-        public ExpressionIterationTimesExtractor(XtreamField field) {
-            this.expressionString = field.iterationTimesExpression();
-            this.expression = new SpelExpressionParser().parseExpression(expressionString);
         }
 
         @Override
-        public int extractIterationTimes(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext) {
+        public String toString() {
+            return new StringJoiner(", ", ConstantIterationTimesExtractor.class.getSimpleName() + "[", "]")
+                    .add("length=" + length)
+                    .toString();
+        }
+    }
+
+    class ExpressionIterationTimesExtractor implements IterationTimesExtractor {
+        final XtreamExpression expression;
+        private final String expressionString;
+
+        public ExpressionIterationTimesExtractor(XtreamField field, XtreamExpressionEngine expressionEngine) {
+            this.expressionString = field.iterationTimesExpression();
+            // this.expression = new SpelExpressionParser().parseExpression(expressionString);
+            this.expression = expressionEngine.createExpression(this.expressionString);
+        }
+
+        @Override
+        public int extractIterationTimes(FieldCodec.DeserializeContext context, XtreamEvaluationContext evaluationContext) {
             final Number number = expression.getValue(evaluationContext, Number.class);
             if (number == null) {
                 throw new IllegalArgumentException("Can not determine field length with Expression[" + expressionString + "]");
             }
             return number.intValue();
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", ExpressionIterationTimesExtractor.class.getSimpleName() + "[", "]")
+                    .add("expressionString='" + expressionString + "'")
+                    .toString();
         }
     }
 
@@ -78,7 +92,7 @@ public interface IterationTimesExtractor {
         ;
 
         @Override
-        public int extractIterationTimes(FieldCodec.DeserializeContext context, EvaluationContext evaluationContext) {
+        public int extractIterationTimes(FieldCodec.DeserializeContext context, XtreamEvaluationContext evaluationContext) {
             return 1024;
         }
     }

@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.core.impl;
 
+import io.github.hylexus.xtream.codec.base.expression.SpelXtreamExpressionEngine;
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.common.bean.*;
 import io.github.hylexus.xtream.codec.common.bean.impl.BasicBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.MapBeanPropertyMetadata;
@@ -48,15 +50,22 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     protected final ConcurrentMap<Class<?>, ConcurrentMap<Integer, BeanMetadata>> multiVersionCache = new ConcurrentHashMap<>();
     protected final FieldCodecRegistry fieldCodecRegistry;
     protected final XtreamCacheableClassPredicate cacheableClassPredicate;
+    protected final XtreamExpressionEngine expressionEngine;
 
     public SimpleBeanMetadataRegistry(FieldCodecRegistry fieldCodecRegistry, XtreamCacheableClassPredicate cacheableClassPredicate) {
         this.fieldCodecRegistry = fieldCodecRegistry;
         this.cacheableClassPredicate = cacheableClassPredicate;
+        this.expressionEngine = new SpelXtreamExpressionEngine();
     }
 
     @Override
     public FieldCodecRegistry getFieldCodecRegistry() {
         return fieldCodecRegistry;
+    }
+
+    @Override
+    public XtreamExpressionEngine getExpressionEngine() {
+        return this.expressionEngine;
     }
 
     @Override

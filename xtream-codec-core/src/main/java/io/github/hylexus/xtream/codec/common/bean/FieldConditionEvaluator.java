@@ -16,10 +16,11 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpression;
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import lombok.ToString;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+
+import java.util.StringJoiner;
 
 public sealed interface FieldConditionEvaluator
         permits FieldConditionEvaluator.AlwaysFalseFieldConditionEvaluator,
@@ -47,14 +48,14 @@ public sealed interface FieldConditionEvaluator
         }
     }
 
-    @ToString(exclude = "expression")
     final class ExpressionFieldConditionEvaluator implements FieldConditionEvaluator {
-        private final Expression expression;
+        private final XtreamExpression expression;
         private final String expressionString;
 
-        public ExpressionFieldConditionEvaluator(String expressionString) {
+        public ExpressionFieldConditionEvaluator(String expressionString, XtreamExpressionEngine expressionEngine) {
             this.expressionString = expressionString;
-            this.expression = new SpelExpressionParser().parseExpression(expressionString);
+            // this.expression = new SpelExpressionParser().parseExpression(expressionString);
+            this.expression = expressionEngine.createExpression(this.expressionString);
         }
 
         @Override
@@ -67,6 +68,12 @@ public sealed interface FieldConditionEvaluator
             return expressionString;
         }
 
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", ExpressionFieldConditionEvaluator.class.getSimpleName() + "[", "]")
+                    .add("expressionString='" + expressionString + "'")
+                    .toString();
+        }
     }
 
     non-sealed interface CustomFieldConditionEvaluator extends FieldConditionEvaluator {

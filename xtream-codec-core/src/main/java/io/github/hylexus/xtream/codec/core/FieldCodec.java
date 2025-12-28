@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.github.hylexus.xtream.codec.base.expression.XtreamEvaluationContext;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.exception.NotYetImplementedException;
@@ -27,7 +28,6 @@ import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.jspecify.annotations.Nullable;
-import org.springframework.expression.EvaluationContext;
 
 import java.lang.annotation.*;
 import java.util.Objects;
@@ -102,7 +102,7 @@ public interface FieldCodec<T> {
          */
         Object containerInstance();
 
-        EvaluationContext evaluationContext();
+        XtreamEvaluationContext evaluationContext();
 
         int version();
 

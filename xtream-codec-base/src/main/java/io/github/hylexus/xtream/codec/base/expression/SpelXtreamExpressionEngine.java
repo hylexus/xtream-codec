@@ -37,9 +37,12 @@ public final class SpelXtreamExpressionEngine implements XtreamExpressionEngine 
 
     private final SpelExpressionParser parser = new SpelExpressionParser();
 
+    public SpelXtreamExpressionEngine() {
+    }
+
     @Override
-    public EngineId id() {
-        return EngineId.SpEL;
+    public XtreamExpressionEngineId id() {
+        return XtreamExpressionEngineId.SPEL;
     }
 
     @Override

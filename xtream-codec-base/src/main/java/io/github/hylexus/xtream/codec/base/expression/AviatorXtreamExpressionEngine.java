@@ -27,10 +27,12 @@ import org.jspecify.annotations.Nullable;
  * @see <a href="https://github.com/killme2008/aviatorscript">https://github.com/killme2008/aviatorscript</a>
  */
 public final class AviatorXtreamExpressionEngine implements XtreamExpressionEngine {
+    public AviatorXtreamExpressionEngine() {
+    }
 
     @Override
-    public EngineId id() {
-        return EngineId.AVIATOR;
+    public XtreamExpressionEngineId id() {
+        return XtreamExpressionEngineId.AVIATOR;
     }
 
     @Override

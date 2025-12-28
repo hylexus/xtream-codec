@@ -24,28 +24,28 @@ public sealed interface XtreamExpressionEngine permits
         MvelXtreamExpressionEngine,
         CustomXtreamExpressionEngine {
 
-    EngineId id();
+    XtreamExpressionEngineId id();
 
     XtreamExpression createExpression(String expressionString);
 
     XtreamEvaluationContext createEvaluationContext(@Nullable Object rootObject);
 
-    interface EngineId {
-        EngineId SpEL = BuiltinEngineId.SpEL;
-        EngineId AVIATOR = BuiltinEngineId.Aviator;
-        EngineId MVEL = BuiltinEngineId.MVEL;
+    interface XtreamExpressionEngineId {
+        XtreamExpressionEngineId SPEL = BuiltinXtreamExpressionEngineId.SpEL;
+        XtreamExpressionEngineId AVIATOR = BuiltinXtreamExpressionEngineId.Aviator;
+        XtreamExpressionEngineId MVEL = BuiltinXtreamExpressionEngineId.MVEL;
 
         String value();
     }
 
-    enum BuiltinEngineId implements EngineId {
+    enum BuiltinXtreamExpressionEngineId implements XtreamExpressionEngineId {
         SpEL("SpEL"),
         Aviator("Aviator"),
         MVEL("MVEL"),
         ;
         private final String value;
 
-        BuiltinEngineId(String value) {
+        BuiltinXtreamExpressionEngineId(String value) {
             this.value = value;
         }
 

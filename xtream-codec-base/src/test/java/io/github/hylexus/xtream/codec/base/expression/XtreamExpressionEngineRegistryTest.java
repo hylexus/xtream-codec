@@ -21,24 +21,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class XtreamEngineRegistryTest {
+class XtreamExpressionEngineRegistryTest {
 
-    private XtreamEngineRegistry registry;
+    private XtreamExpressionEngineRegistry registry;
 
     @BeforeEach
     void setUp() {
         // 不自动注册默认引擎
-        registry = new XtreamEngineRegistry(false);
+        registry = new XtreamExpressionEngineRegistry(false);
     }
 
     @Test
     void testConstructorWithDefaults() {
-        final XtreamEngineRegistry defaultRegistry = new XtreamEngineRegistry(true);
+        final XtreamExpressionEngineRegistry defaultRegistry = new XtreamExpressionEngineRegistry(true);
 
         // 验证默认引擎是否已注册
-        assertNotNull(defaultRegistry.getEngine(XtreamExpressionEngine.EngineId.SpEL));
-        assertNotNull(defaultRegistry.getEngine(XtreamExpressionEngine.EngineId.AVIATOR));
-        assertNotNull(defaultRegistry.getEngine(XtreamExpressionEngine.EngineId.MVEL));
+        assertNotNull(defaultRegistry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.SPEL));
+        assertNotNull(defaultRegistry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.AVIATOR));
+        assertNotNull(defaultRegistry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.MVEL));
     }
 
     @Test
@@ -46,7 +46,7 @@ class XtreamEngineRegistryTest {
         SpelXtreamExpressionEngine engine = new SpelXtreamExpressionEngine();
         registry.register(engine);
 
-        XtreamExpressionEngine retrieved = registry.getEngine(XtreamExpressionEngine.EngineId.SpEL);
+        XtreamExpressionEngine retrieved = registry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.SPEL);
         assertSame(engine, retrieved);
     }
 
@@ -61,13 +61,13 @@ class XtreamEngineRegistryTest {
         registry.register(engine);
 
         // 确认引擎已注册
-        assertNotNull(registry.getEngine(XtreamExpressionEngine.EngineId.SpEL));
+        assertNotNull(registry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.SPEL));
 
         // 注销引擎
-        registry.unregister(XtreamExpressionEngine.EngineId.SpEL);
+        registry.unregister(XtreamExpressionEngine.XtreamExpressionEngineId.SPEL);
 
         // 确认引擎已被注销
-        assertThrows(IllegalArgumentException.class, () -> registry.getEngine(XtreamExpressionEngine.EngineId.SpEL));
+        assertThrows(IllegalArgumentException.class, () -> registry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.SPEL));
     }
 
 }

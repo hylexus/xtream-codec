@@ -16,7 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl;
 
-import io.github.hylexus.xtream.codec.common.utils.XtreamSpringUtils;
+import io.github.hylexus.xtream.codec.base.expression.XtreamEvaluationContext;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.EntityDecoder;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
@@ -24,13 +24,12 @@ import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBufAllocator;
 import org.jspecify.annotations.Nullable;
-import org.springframework.expression.EvaluationContext;
 
 public class DefaultDeserializeContext implements FieldCodec.DeserializeContext {
     private final ByteBufAllocator bufferFactory;
     private final EntityDecoder entityDecoder;
     private final Object containerInstance;
-    private final EvaluationContext evaluationContext;
+    private final XtreamEvaluationContext evaluationContext;
     private final FieldCodecRegistry fieldCodecRegistry;
     private final BeanMetadataRegistry beanMetadataRegistry;
     private final int version;
@@ -44,8 +43,7 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
         this.bufferFactory = bufferFactory;
         this.entityDecoder = entityDecoder;
         this.containerInstance = containerInstance;
-        // this.evaluationContext = new StandardEvaluationContext(containerInstance);
-        this.evaluationContext = XtreamSpringUtils.createEvaluationContext(containerInstance);
+        this.evaluationContext = entityDecoder.expressionEngine().createEvaluationContext(containerInstance);
         this.version = version;
         this.codecTracker = tracker;
         this.beanMetadataRegistry = beanMetadataRegistry;
@@ -63,7 +61,7 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
     }
 
     @Override
-    public EvaluationContext evaluationContext() {
+    public XtreamEvaluationContext evaluationContext() {
         return this.evaluationContext;
     }
 

@@ -22,6 +22,10 @@ public interface XtreamExpression {
 
     <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType);
 
+    default <T> @Nullable T getValue(XtreamEvaluationContext context, @Nullable Class<T> expectedType) {
+        return this.evaluate(context, expectedType);
+    }
+
     String expressionString();
 
 }

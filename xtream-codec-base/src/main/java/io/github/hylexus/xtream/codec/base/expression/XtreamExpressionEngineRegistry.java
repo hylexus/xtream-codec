@@ -20,15 +20,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class XtreamEngineRegistry {
+public class XtreamExpressionEngineRegistry {
 
     private final Map<String, XtreamExpressionEngine> engines = new ConcurrentHashMap<>();
 
-    public XtreamEngineRegistry() {
+    public XtreamExpressionEngineRegistry() {
         this(true);
     }
 
-    public XtreamEngineRegistry(boolean registerDefaults) {
+    public XtreamExpressionEngineRegistry(boolean registerDefaults) {
         if (registerDefaults) {
             this.register(new SpelXtreamExpressionEngine());
             this.register(new AviatorXtreamExpressionEngine());
@@ -40,7 +40,7 @@ public class XtreamEngineRegistry {
         this.engines.put(engine.id().value(), Objects.requireNonNull(engine));
     }
 
-    public XtreamExpressionEngine getEngine(XtreamExpressionEngine.EngineId id) {
+    public XtreamExpressionEngine getEngine(XtreamExpressionEngine.XtreamExpressionEngineId id) {
         final XtreamExpressionEngine engine = this.engines.get(id.value());
         if (engine == null) {
             throw new IllegalArgumentException("No XtreamEngine registered for id: " + id);
@@ -48,7 +48,7 @@ public class XtreamEngineRegistry {
         return engine;
     }
 
-    public void unregister(XtreamExpressionEngine.EngineId id) {
+    public void unregister(XtreamExpressionEngine.XtreamExpressionEngineId id) {
         this.engines.remove(id.value());
     }
 }

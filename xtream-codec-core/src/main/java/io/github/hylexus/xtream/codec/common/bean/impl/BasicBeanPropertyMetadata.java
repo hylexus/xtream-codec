@@ -89,7 +89,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
                     : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
         }
         this.fieldCodec = this.detectFieldCodec();
-        this.iterationTimesExtractor = IterationTimesExtractor.from(this.xtreamField);
+        this.iterationTimesExtractor = IterationTimesExtractor.from(this.xtreamField, this.beanMetadataRegistry.getExpressionEngine());
     }
 
     private FieldCodec<?> detectFieldCodec() {
@@ -124,7 +124,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
             return FieldConditionEvaluator.AlwaysFalseFieldConditionEvaluator.INSTANCE;
         }
         if (XtreamUtils.hasElement(xtreamField.condition())) {
-            return new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(xtreamField.condition());
+            return new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(xtreamField.condition(), this.beanMetadataRegistry.getExpressionEngine());
         }
         return FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator.INSTANCE;
     }
@@ -149,7 +149,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         }
 
         if (XtreamUtils.hasElement(xtreamField.lengthExpression())) {
-            return new FieldLengthExtractor.ExpressionFieldLengthExtractor(xtreamField);
+            return new FieldLengthExtractor.ExpressionFieldLengthExtractor(xtreamField, this.beanMetadataRegistry.getExpressionEngine());
         }
 
         return XtreamTypes.getDefaultSizeInBytes(this.rawClass())

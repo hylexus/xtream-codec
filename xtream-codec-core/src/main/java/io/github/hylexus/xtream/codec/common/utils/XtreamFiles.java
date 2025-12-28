@@ -23,6 +23,7 @@ public final class XtreamFiles {
         throw new UnsupportedOperationException("This class cannot be instantiated");
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public static boolean mkdirs(String path) {
         final File file = new File(path);
         return file.mkdirs();

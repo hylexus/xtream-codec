@@ -23,16 +23,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class XtreamExpressionEngineTest {
 
-    static XtreamEngineRegistry registry;
+    static XtreamExpressionEngineRegistry registry;
 
     @BeforeAll
     static void init() {
-        registry = new XtreamEngineRegistry();
+        registry = new XtreamExpressionEngineRegistry();
     }
 
     @Test
     void testSpel() {
-        final XtreamExpressionEngine spel = registry.getEngine(XtreamExpressionEngine.EngineId.SpEL);
+        final XtreamExpressionEngine spel = registry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.SPEL);
         final XtreamEvaluationContext ctx = spel.createEvaluationContext(100);
         ctx.setVariable("a", 200);
         assertEquals(101, doEvaluate(spel.createExpression("#self + 1"), ctx, Integer.class));
@@ -43,7 +43,7 @@ class XtreamExpressionEngineTest {
 
     @Test
     void testAviator() {
-        final XtreamExpressionEngine aviator = registry.getEngine(XtreamExpressionEngine.EngineId.AVIATOR);
+        final XtreamExpressionEngine aviator = registry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.AVIATOR);
         final XtreamEvaluationContext ctx = aviator.createEvaluationContext(100);
         ctx.setVariable("a", 200);
         assertEquals(101, doEvaluate(aviator.createExpression("self + 1"), ctx, Number.class).intValue());
@@ -55,7 +55,7 @@ class XtreamExpressionEngineTest {
 
     @Test
     void testMvelVariables() {
-        final XtreamExpressionEngine mvel = registry.getEngine(XtreamExpressionEngine.EngineId.MVEL);
+        final XtreamExpressionEngine mvel = registry.getEngine(XtreamExpressionEngine.XtreamExpressionEngineId.MVEL);
         final XtreamEvaluationContext ctx = mvel.createEvaluationContext(100);
         ctx.setVariable("a", 200);
         assertEquals(101, doEvaluate(mvel.createExpression("self + 1"), ctx, Integer.class));

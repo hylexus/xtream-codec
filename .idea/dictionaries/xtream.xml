@@ -3,6 +3,8 @@
     <words>
       <w>ByteBuf</w>
       <w>GNSS</w>
+      <w>SpEL</w>
+      <w>Spel</w>
       <w>TLV</w>
       <w>TLVField</w>
       <w>Xtream</w>
@@ -11,6 +13,8 @@
       <w>fatjar</w>
       <w>hylexus</w>
       <w>jvmargs</w>
+      <w>mkdirs</w>
+      <w>spel</w>
       <w>xtream</w>
       <w>yyMMddHHmmss</w>
     </words>

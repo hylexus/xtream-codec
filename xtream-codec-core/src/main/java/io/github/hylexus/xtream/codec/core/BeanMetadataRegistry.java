@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core;
 
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
@@ -49,6 +50,8 @@ public interface BeanMetadataRegistry {
     BeanMetadata getBeanMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator);
 
     FieldCodecRegistry getFieldCodecRegistry();
+
+    XtreamExpressionEngine getExpressionEngine();
 
     @Nullable
     default FieldCodec<?> getOrCreateFieldCodec(

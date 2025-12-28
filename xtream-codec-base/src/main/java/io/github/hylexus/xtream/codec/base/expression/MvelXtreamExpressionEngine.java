@@ -28,10 +28,12 @@ import java.io.Serializable;
  * @see <a href="http://mvel.documentnode.com/">http://mvel.documentnode.com/</a>
  */
 public final class MvelXtreamExpressionEngine implements XtreamExpressionEngine {
+    public MvelXtreamExpressionEngine() {
+    }
 
     @Override
-    public EngineId id() {
-        return EngineId.MVEL;
+    public XtreamExpressionEngineId id() {
+        return XtreamExpressionEngineId.MVEL;
     }
 
     @Override
