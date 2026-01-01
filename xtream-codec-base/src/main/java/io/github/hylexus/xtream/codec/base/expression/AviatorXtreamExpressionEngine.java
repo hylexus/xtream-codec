@@ -18,6 +18,8 @@ package io.github.hylexus.xtream.codec.base.expression;
 
 import com.googlecode.aviator.*;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 基于 Aviator 的实现
@@ -26,6 +28,7 @@ import org.jspecify.annotations.Nullable;
  * @see <a href="https://github.com/killme2008/aviatorscript">https://github.com/killme2008/aviatorscript</a>
  */
 public final class AviatorXtreamExpressionEngine implements XtreamExpressionEngine {
+    private static final Logger log = LoggerFactory.getLogger(AviatorXtreamExpressionEngine.class);
     private final AviatorEvaluatorInstance defaultInstance;
 
     public AviatorXtreamExpressionEngine() {
@@ -55,19 +58,36 @@ public final class AviatorXtreamExpressionEngine implements XtreamExpressionEngi
     public record AviatorXtreamExpression(Expression expr, String expressionString) implements XtreamExpression {
 
         @Override
-        public <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) {
+        public <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) throws XtreamExpressionException {
             if (!(context instanceof AviatorXtreamEvaluationContext aviatorCtx)) {
                 throw new IllegalArgumentException(AviatorXtreamExpression.class.getSimpleName() + " requires " + AviatorXtreamEvaluationContext.class.getSimpleName());
             }
 
-            final Object result = this.expr.execute(aviatorCtx.variables);
-            if (result == null) {
-                return null;
+            try {
+                final Object result = this.expr.execute(aviatorCtx.variables);
+                if (result == null) {
+                    return null;
+                }
+                if (expectedType == null) {
+                    @SuppressWarnings("unchecked") final T cast = (T) result;
+                    return cast;
+                }
+
+                try {
+                    return expectedType.cast(result);
+                } catch (ClassCastException e) {
+                    throw new XtreamExpressionException(
+                            "Expression [" + expressionString + "] returned " + result.getClass().getName() + ", expected " + expectedType.getName(),
+                            e
+                    );
+                }
+            } catch (Exception e) {
+                if (e instanceof XtreamExpressionException) {
+                    throw e;
+                }
+                log.error("Failed to evaluate Aviator expression: {}", expressionString, e);
+                throw new XtreamExpressionException(e);
             }
-            if (expectedType != null && expectedType.isInstance(result)) {
-                return expectedType.cast(result);
-            }
-            throw new ClassCastException("Cannot cast result " + result.getClass() + " to " + expectedType);
         }
     }
 

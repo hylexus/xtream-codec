@@ -16,20 +16,23 @@
 
 package io.github.hylexus.xtream.codec.base.expression;
 
-import org.jspecify.annotations.Nullable;
-
-public sealed interface XtreamExpression
-        permits CustomXtreamExpression,
-        AviatorXtreamExpressionEngine.AviatorXtreamExpression,
-        MvelXtreamExpressionEngine.MvelXtreamExpression,
-        SpelXtreamExpressionEngine.SpelXtreamExpression {
-
-    <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) throws XtreamExpressionException;
-
-    default <T> @Nullable T getValue(XtreamEvaluationContext context, @Nullable Class<T> expectedType) {
-        return this.evaluate(context, expectedType);
+public class XtreamExpressionException extends RuntimeException {
+    public XtreamExpressionException() {
     }
 
-    String expressionString();
+    public XtreamExpressionException(String message) {
+        super(message);
+    }
 
+    public XtreamExpressionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public XtreamExpressionException(Throwable cause) {
+        super(cause);
+    }
+
+    public XtreamExpressionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

@@ -17,6 +17,8 @@
 package io.github.hylexus.xtream.codec.base.expression;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -35,6 +37,7 @@ import java.util.List;
  */
 public final class SpelXtreamExpressionEngine implements XtreamExpressionEngine {
 
+    private static final Logger log = LoggerFactory.getLogger(SpelXtreamExpressionEngine.class);
     private final SpelExpressionParser parser = new SpelExpressionParser();
 
     public SpelXtreamExpressionEngine() {
@@ -59,9 +62,17 @@ public final class SpelXtreamExpressionEngine implements XtreamExpressionEngine 
     public record SpelXtreamExpression(Expression expr, String expressionString) implements XtreamExpression {
 
         @Override
-        public <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) {
+        public <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) throws XtreamExpressionException {
             if (context instanceof SpelXtreamEvaluationContext spelCtx) {
-                return this.expr.getValue(spelCtx.delegate, expectedType);
+                try {
+                    return this.expr.getValue(spelCtx.delegate, expectedType);
+                } catch (Exception e) {
+                    if (e instanceof XtreamExpressionException) {
+                        throw e;
+                    }
+                    log.error("Failed to evaluate SpEL expression: {}", expressionString, e);
+                    throw new XtreamExpressionException(e);
+                }
             }
             throw new IllegalArgumentException(SpelXtreamExpression.class.getSimpleName() + " requires " + SpelXtreamEvaluationContext.class.getSimpleName());
         }
@@ -74,11 +85,6 @@ public final class SpelXtreamExpressionEngine implements XtreamExpressionEngine 
         public SpelXtreamEvaluationContext(@Nullable Object rootObject) {
             this.delegate = SpelXtreamExpressionEngine.createSpelEvaluationContext(rootObject);
             this.setVariable(ROOT_OBJECT_KEY, rootObject);
-        }
-
-        @Override
-        public @Nullable Object rootObject() {
-            return this.delegate.getRootObject().getValue();
         }
 
         @Override
@@ -99,7 +105,7 @@ public final class SpelXtreamExpressionEngine implements XtreamExpressionEngine 
         final StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
         context.setPropertyAccessors(STANDARD_EVALUATION_CONTEXT_PROPERTY_ACCESSORS);
         // 2. #self
-        context.setVariable("self", rootObject);
+        context.setVariable(XtreamEvaluationContext.ROOT_OBJECT_KEY, rootObject);
         return context;
     }
 }

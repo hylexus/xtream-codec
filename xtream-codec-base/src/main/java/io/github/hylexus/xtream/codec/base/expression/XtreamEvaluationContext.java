@@ -23,8 +23,6 @@ import java.util.Map;
 
 public interface XtreamEvaluationContext {
 
-    @Nullable Object rootObject();
-
     void setVariable(String name, @Nullable Object value);
 
     default Map<String, @Nullable Object> getVariables() {

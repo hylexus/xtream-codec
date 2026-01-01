@@ -25,16 +25,8 @@ public class AbstractXtreamEvaluationContext implements XtreamEvaluationContext 
 
     protected final Map<String, Object> variables = new ConcurrentHashMap<>();
 
-    protected final @Nullable Object rootObject;
-
     public AbstractXtreamEvaluationContext(@Nullable Object rootObject) {
-        this.rootObject = rootObject;
         this.setVariable(ROOT_OBJECT_KEY, rootObject);
-    }
-
-    @Override
-    public @Nullable Object rootObject() {
-        return this.rootObject;
     }
 
     @Override

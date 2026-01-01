@@ -18,6 +18,9 @@ package io.github.hylexus.xtream.codec.base.expression;
 
 import org.jspecify.annotations.Nullable;
 import org.mvel2.MVEL;
+import org.mvel2.ParserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
@@ -28,6 +31,20 @@ import java.io.Serializable;
  * @see <a href="http://mvel.documentnode.com/">http://mvel.documentnode.com/</a>
  */
 public final class MvelXtreamExpressionEngine implements XtreamExpressionEngine {
+
+    private static final Logger log = LoggerFactory.getLogger(MvelXtreamExpressionEngine.class);
+
+    private static ParserContext newParserContext() {
+        final ParserContext ctx = new ParserContext();
+        // ctx.setStrongTyping(true);
+        // ctx.setStrictTypeEnforcement(true);
+        // ctx.setAllowBootstrapBypass(false);
+        // ctx.setSourceFile("mvel-expression");
+        ctx.setIndexAllocation(true);
+        return ctx;
+    }
+
+
     public MvelXtreamExpressionEngine() {
     }
 
@@ -38,7 +55,7 @@ public final class MvelXtreamExpressionEngine implements XtreamExpressionEngine 
 
     @Override
     public XtreamExpression createExpression(String expressionString) {
-        final Serializable compiled = MVEL.compileExpression(expressionString);
+        final Serializable compiled = MVEL.compileExpression(expressionString, newParserContext());
         return new MvelXtreamExpression(compiled, expressionString);
     }
 
@@ -50,16 +67,24 @@ public final class MvelXtreamExpressionEngine implements XtreamExpressionEngine 
     public record MvelXtreamExpression(Serializable compiledExpression, String expressionString) implements XtreamExpression {
 
         @Override
-        public <T> T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) {
+        public <T> T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) throws XtreamExpressionException {
             if (!(context instanceof MvelXtreamEvaluationContext mvelCtx)) {
                 throw new IllegalArgumentException(MvelXtreamExpression.class.getSimpleName() + " requires " + MvelXtreamEvaluationContext.class.getSimpleName());
             }
-            if (expectedType == null) {
-                final Object result = MVEL.executeExpression(this.compiledExpression, mvelCtx.getVariables(), Object.class);
-                @SuppressWarnings("unchecked") final T cast = (T) result;
-                return cast;
+            try {
+                if (expectedType == null) {
+                    final Object result = MVEL.executeExpression(this.compiledExpression, mvelCtx.getVariables(), Object.class);
+                    @SuppressWarnings("unchecked") final T cast = (T) result;
+                    return cast;
+                }
+                return MVEL.executeExpression(this.compiledExpression, mvelCtx.getVariables(), expectedType);
+            } catch (Exception e) {
+                if (e instanceof XtreamExpressionException) {
+                    throw e;
+                }
+                log.error("Failed to evaluate MVEL expression: {}", expressionString, e);
+                throw new XtreamExpressionException("Failed to evaluate MVEL expression", e);
             }
-            return MVEL.executeExpression(this.compiledExpression, mvelCtx.getVariables(), expectedType);
         }
     }
 

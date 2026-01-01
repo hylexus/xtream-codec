@@ -19,7 +19,24 @@ package io.github.hylexus.xtream.codec.core.annotation;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * {@link XtreamField @XtreamField} 注解用到的表达式
+ * {@link XtreamField @XtreamField} 注解用到的表达式。
+ *
+ * <h3 color="red">使用建议</h3>
+ * 应将表达式视为 <strong color="green">逻辑路由器</strong>，而非 <strong color="red">逻辑处理器</strong>。
+ * <ol>
+ *   <li>表达式仅用于调用无副作用的方法或访问属性。</li>
+ *   <li>业务逻辑应尽量封装在 Java 方法中，而不是直接写在表达式里。</li>
+ *   <li>不建议在表达式中编写复杂运算、条件或流程控制。</li>
+ *   <li>若表达式逻辑开始变复杂，应回退为 Java 方法。</li>
+ *   <li>表达式的可读性优先于灵活性。</li>
+ * </ol>
+ *
+ * <h3 color="red">安全说明</h3>
+ * <ol>
+ *   <li>表达式应仅来自硬编码注解属性，不允许通过外部配置或用户输入注入。</li>
+ *   <li>表达式是否安全，和表达式引擎无关，取决于表达式本身(表达式引擎不保证表达式的执行是否安全可控)</li>
+ *   <li>使用方应遵守“无副作用、简单可读”的原则，避免在表达式中写业务逻辑或复杂操作。</li>
+ * </ol>
  * <p>
  * 内置三种表达式引擎的实现：
  *
