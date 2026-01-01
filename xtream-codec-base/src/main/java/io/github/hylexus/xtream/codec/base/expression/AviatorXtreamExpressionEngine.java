@@ -16,8 +16,7 @@
 
 package io.github.hylexus.xtream.codec.base.expression;
 
-import com.googlecode.aviator.AviatorEvaluator;
-import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.*;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -27,7 +26,14 @@ import org.jspecify.annotations.Nullable;
  * @see <a href="https://github.com/killme2008/aviatorscript">https://github.com/killme2008/aviatorscript</a>
  */
 public final class AviatorXtreamExpressionEngine implements XtreamExpressionEngine {
+    private final AviatorEvaluatorInstance defaultInstance;
+
     public AviatorXtreamExpressionEngine() {
+        this(createDefaultAviatorEvaluatorInstance());
+    }
+
+    public AviatorXtreamExpressionEngine(AviatorEvaluatorInstance defaultInstance) {
+        this.defaultInstance = defaultInstance;
     }
 
     @Override
@@ -37,7 +43,7 @@ public final class AviatorXtreamExpressionEngine implements XtreamExpressionEngi
 
     @Override
     public XtreamExpression createExpression(String expressionString) {
-        final Expression compiled = AviatorEvaluator.getInstance().compile(expressionString);
+        final Expression compiled = this.defaultInstance.compile(expressionString);
         return new AviatorXtreamExpression(compiled, expressionString);
     }
 
@@ -69,6 +75,20 @@ public final class AviatorXtreamExpressionEngine implements XtreamExpressionEngi
         public AviatorXtreamEvaluationContext(@Nullable Object rootObject) {
             super(rootObject);
         }
+    }
+
+    public static AviatorEvaluatorInstance createDefaultAviatorEvaluatorInstance() {
+        final AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance();
+        instance.setOption(Options.EVAL_MODE, EvalMode.ASM);
+        instance.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
+        instance.setOption(Options.ENABLE_PROPERTY_SYNTAX_SUGAR, true);
+        instance.setOption(Options.SERIALIZABLE, false);
+        instance.setOption(Options.EVAL_TIMEOUT_MS, 5000);
+        // 只对「属性访问」（如 self.prop, obj.prop）生效，对 「顶层变量」 无效
+        instance.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, false);
+        instance.setOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY, false);
+        instance.setOption(Options.MAX_LOOP_COUNT, 1024);
+        return instance;
     }
 
 }
