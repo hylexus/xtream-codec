@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.debug.codec.core.demo02;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import lombok.Getter;
@@ -36,7 +37,8 @@ public class RawStyleDebugEntity02Nested {
     private Header header;
 
     // 消息体
-    @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.struct, lengthExpression = "header.msgBodyLength()")
+    // @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.struct, lengthExpression = "header.msgBodyLength()")
+    @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.struct, lengthExpressions = @Expression(spel = "header.msgBodyLength()", mvel = "self.header.msgBodyLength()", aviator = "self.header.msgBodyLength"))
     private Body body;
 
     // 校验码
@@ -68,7 +70,8 @@ public class RawStyleDebugEntity02Nested {
         private int msgSerialNo;
 
         // byte[17-21)    消息包封装项
-        @XtreamField(length = 4, signedness = NumberSignedness.UNSIGNED, condition = "hasSubPackage()")
+        // @XtreamField(length = 4, signedness = NumberSignedness.UNSIGNED, condition = "hasSubPackage()")
+        @XtreamField(length = 4, signedness = NumberSignedness.UNSIGNED, conditions = @Expression(spel = "hasSubPackage()", mvel = "self.hasSubPackage()", aviator = "self.hasSubPackage"))
         private Long subPackageInfo;
 
         // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
@@ -76,8 +79,22 @@ public class RawStyleDebugEntity02Nested {
             return msgBodyProps & 0x3ff;
         }
 
+        // for Aviator
+        @SuppressWarnings("unused")
+        public int getMsgBodyLength() {
+            return msgBodyProps & 0x3ff;
+        }
+
         // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
+        @SuppressWarnings("unused")
         public boolean hasSubPackage() {
+            // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+            return (msgBodyProps & 0x2000) > 0;
+        }
+
+        // for aviator
+        @SuppressWarnings("unused")
+        public boolean isHasSubPackage() {
             // return ((msgBodyProperty & 0x2000) >> 13) == 1;
             return (msgBodyProps & 0x2000) > 0;
         }
@@ -133,8 +150,10 @@ public class RawStyleDebugEntity02Nested {
         // 附加信息长度   BYTE(1~255)
         @XtreamField(length = 1, signedness = NumberSignedness.UNSIGNED)
         private short contentLength;
+
         // 附加信息内容  BYTE[N]
-        @XtreamField(lengthExpression = "getContentLength()")
+        // @XtreamField(lengthExpression = "getContentLength()")
+        @XtreamField(lengthExpressions = @Expression(spel = "getContentLength()", mvel = "self.getContentLength()", aviator = "self.contentLength"))
         private byte[] content;
 
         public ExtraItem() {

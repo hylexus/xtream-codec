@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.debug.codec.core.demo01;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import lombok.Getter;
@@ -54,7 +55,8 @@ public class RawStyleDebugEntity01Flatten {
     private int usernameLength;
 
     // 用户名 String, "UTF-8"
-    @XtreamField(charset = "utf-8", lengthExpression = "getUsernameLength()")
+    // @XtreamField(charset = "utf-8", lengthExpression = "getUsernameLength()")
+    @XtreamField(charset = "utf-8", lengthExpressions = @Expression(spel = "getUsernameLength()", mvel = "self.getUsernameLength()", aviator = "self.usernameLength"))
     private String username;
 
     // 下一个字段长度 无符号数 2字节
@@ -62,7 +64,8 @@ public class RawStyleDebugEntity01Flatten {
     private int passwordLength;
 
     // 密码 String, "GBK"
-    @XtreamField(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+    // @XtreamField(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+    @XtreamField(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpressions = @Expression(spel = "getPasswordLength()", mvel = "self.getPasswordLength()", aviator = "self.passwordLength"))
     private String password;
 
     // 生日 String[8], "yyyyMMdd", "UTF-8"

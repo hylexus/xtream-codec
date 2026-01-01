@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.base.expression;
+package io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.bootstrap;
 
-public non-sealed interface CustomXtreamExpressionEngine extends XtreamExpressionEngine {
+public class XtreamExpressionFactoryCreationException extends IllegalStateException {
+    final FailureType failureType;
 
-    @Override
-    CustomXtreamExpressionEngineId id();
+    public XtreamExpressionFactoryCreationException(Throwable cause, FailureType failureType) {
+        super(cause);
+        this.failureType = failureType;
+    }
 
-    @Override
-    XtreamExpression createExpression(String expressionString);
-    // todo 这里是否有必要限制 子类型 ???
-    // CustomXtreamExpression createExpression(String expressionString);
+    public enum FailureType {
+        MISSING_CUSTOM_XTREAM_EXPRESSION_FACTORY_BEAN,
+        MISSING_AVIATOR_DEPENDENCY,
+        MISSING_MVEL_DEPENDENCY,
+    }
 
 }

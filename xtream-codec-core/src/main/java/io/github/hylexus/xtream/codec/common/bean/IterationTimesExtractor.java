@@ -16,10 +16,9 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
-import io.github.hylexus.xtream.codec.base.expression.XtreamEvaluationContext;
-import io.github.hylexus.xtream.codec.base.expression.XtreamExpression;
-import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
+import io.github.hylexus.xtream.codec.base.expression.*;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import org.springframework.util.StringUtils;
 
@@ -36,7 +35,28 @@ public interface IterationTimesExtractor {
         if (StringUtils.hasText(xtreamField.iterationTimesExpression())) {
             return new IterationTimesExtractor.ExpressionIterationTimesExtractor(xtreamField, expressionEngine);
         }
-        return IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
+        final Expression expressions = xtreamField.iterationTimesExpressions();
+        return switch (expressionEngine) {
+            case SpelXtreamExpressionEngine ignored -> {
+                if (StringUtils.hasText(expressions.spel())) {
+                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(expressions.spel(), expressionEngine);
+                }
+                yield PlaceholderIterationTimesExtractor.DEFAULT;
+            }
+            case AviatorXtreamExpressionEngine ignored -> {
+                if (StringUtils.hasText(expressions.aviator())) {
+                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(expressions.aviator(), expressionEngine);
+                }
+                yield PlaceholderIterationTimesExtractor.DEFAULT;
+            }
+            case MvelXtreamExpressionEngine ignored -> {
+                if (StringUtils.hasText(expressions.mvel())) {
+                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(expressions.mvel(), expressionEngine);
+                }
+                yield PlaceholderIterationTimesExtractor.DEFAULT;
+            }
+            default -> PlaceholderIterationTimesExtractor.DEFAULT;
+        };
     }
 
     class ConstantIterationTimesExtractor implements IterationTimesExtractor {
@@ -67,6 +87,17 @@ public interface IterationTimesExtractor {
             this.expressionString = field.iterationTimesExpression();
             // this.expression = new SpelExpressionParser().parseExpression(expressionString);
             this.expression = expressionEngine.createExpression(this.expressionString);
+        }
+
+        public ExpressionIterationTimesExtractor(String expressionString, XtreamExpressionEngine expressionEngine) {
+            this.expressionString = expressionString;
+            // this.expression = new SpelExpressionParser().parseExpression(expressionString);
+            this.expression = expressionEngine.createExpression(this.expressionString);
+        }
+
+        public ExpressionIterationTimesExtractor(XtreamExpression expression, String expressionString) {
+            this.expression = expression;
+            this.expressionString = expressionString;
         }
 
         @Override

@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.codec.impl;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.RootSpan;
 import io.github.hylexus.xtream.codec.core.tracker.VirtualEntitySpan;
@@ -163,8 +164,8 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
                 final RootSpan details = last.getDetails();
                 details.setHexString(
                         details.getChildren().get(0).getHexString()
-                        + details.getChildren().get(1).getHexString()
-                        + details.getChildren().get(2).getHexString()
+                                + details.getChildren().get(1).getHexString()
+                                + details.getChildren().get(2).getHexString()
                 );
             }
         } catch (Throwable e) {
@@ -254,6 +255,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
                 .build();
     }
 
+    @SuppressWarnings("LombokGetterMayBeUsed")
     public static class Header {
         @SuppressWarnings({"unused", "NullAway.Init"})
         public Header() {
@@ -277,6 +279,12 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
             return Jt808RequestHeader.Jt808MessageBodyProps.from(this.messageBodyProps).versionIdentifier() == 1;
         }
 
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasVersionField() {
+            return hasVersionField();
+        }
+
         @Preset.JtStyle.Word(desc = "消息 ID")
         private int messageId;
 
@@ -285,7 +293,15 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         private int messageBodyProps;
 
         // byte[4]     协议版本号
-        @Preset.JtStyle.Byte(condition = "hasVersionField()", desc = "协议版本号(V2019+)")
+        // @Preset.JtStyle.Byte(condition = "hasVersionField()", desc = "协议版本号(V2019+)")
+        @Preset.JtStyle.Byte(
+                conditions = @Expression(
+                        spel = "hasVersionField()",
+                        mvel = "self.hasVersionField()",
+                        aviator = "self.hasVersionField"
+                ),
+                desc = "协议版本号(V2019+)"
+        )
         private short protocolVersion;
 
         // byte[5-15)    终端手机号或设备ID bcd[10]
@@ -297,7 +313,15 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         private int serialNo;
 
         // byte[17-21)    消息包封装项
-        @Preset.JtStyle.Object(condition = "hasSubPackage()", desc = "消息包封装项")
+        // @Preset.JtStyle.Object(condition = "hasSubPackage()", desc = "消息包封装项")
+        @Preset.JtStyle.Object(
+                conditions = @Expression(
+                        spel = "hasSubPackage()",
+                        mvel = "self.hasSubPackage()",
+                        aviator = "self.hasSubPackage"
+                ),
+                desc = "消息包封装项"
+        )
         private @Nullable SubPackageProps subPackageProps;
 
         // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
@@ -307,6 +331,12 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
 
         // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
         public boolean hasSubPackage() {
+            // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+            return (messageBodyProps & 0x2000) > 0;
+        }
+
+        // for Aviator
+        public boolean isHasSubPackage() {
             // return ((msgBodyProperty & 0x2000) >> 13) == 1;
             return (messageBodyProps & 0x2000) > 0;
         }

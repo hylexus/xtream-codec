@@ -58,6 +58,11 @@ public sealed interface FieldConditionEvaluator
             this.expression = expressionEngine.createExpression(this.expressionString);
         }
 
+        public ExpressionFieldConditionEvaluator(XtreamExpression expression, String expressionString) {
+            this.expression = expression;
+            this.expressionString = expressionString;
+        }
+
         @Override
         public boolean evaluate(FieldCodec.CodecContext context) {
             final Boolean value = expression.getValue(context.evaluationContext(), Boolean.class);

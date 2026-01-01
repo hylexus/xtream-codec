@@ -18,4 +18,6 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("com.googlecode.aviator:aviator")
+    testImplementation("org.mvel:mvel2")
 }

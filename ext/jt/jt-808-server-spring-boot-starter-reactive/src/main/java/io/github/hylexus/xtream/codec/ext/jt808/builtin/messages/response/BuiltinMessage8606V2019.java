@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.common.utils.Numbers;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
 import lombok.Getter;
@@ -40,7 +41,7 @@ import java.util.List;
 public class BuiltinMessage8606V2019 {
 
     /**
-     * 路线ID
+     * 路线 ID
      */
     @Preset.JtStyle.Dword
     private long routeId;
@@ -63,7 +64,8 @@ public class BuiltinMessage8606V2019 {
      * <p>
      * YY-MM-DD-hh-mm-ss，若区域属性0位为0则没有该字段
      */
-    @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+    // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+    @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
     private LocalDateTime startTime;
 
     /**
@@ -71,10 +73,18 @@ public class BuiltinMessage8606V2019 {
      * <p>
      * YY-MM-DD-hh-mm-ss，若区域属性0位为0则没有该字段
      */
-    @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+    // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+    @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
     private LocalDateTime endTime;
 
+    @SuppressWarnings("unused")
     public boolean hasTimeProperty() {
+        return Numbers.getBitAt(this.routeProps, 0) == 1;
+    }
+
+    // for Aviator
+    @SuppressWarnings("unused")
+    public boolean isHasTimeProperty() {
         return Numbers.getBitAt(this.routeProps, 0) == 1;
     }
 
@@ -93,12 +103,12 @@ public class BuiltinMessage8606V2019 {
     @Accessors(chain = true)
     public static class Item {
         /**
-         * 拐点ID
+         * 拐点 ID
          */
         @Preset.JtStyle.Dword
         private long id;
         /**
-         * 路段ID
+         * 路段 ID
          */
         @Preset.JtStyle.Dword
         private long routeId;
@@ -137,17 +147,26 @@ public class BuiltinMessage8606V2019 {
          * <p>
          * 单位为秒（s），若路段属性0位为0则没有该字段
          */
-        @Preset.JtStyle.Word(condition = "hasThresholdProperty()")
+        // @Preset.JtStyle.Word(condition = "hasThresholdProperty()")
+        @Preset.JtStyle.Word(conditions = @Expression(spel = "hasThresholdProperty()", mvel = "self.hasThresholdProperty()", aviator = "self.hasThresholdProperty"))
         private Integer longDriveThreshold;
 
         /**
          * 路段行驶不足阈值
          * 单位为秒（s），若路段属性0位为0则没有该字段
          */
-        @Preset.JtStyle.Word(condition = "hasThresholdProperty()")
+        // @Preset.JtStyle.Word(condition = "hasThresholdProperty()")
+        @Preset.JtStyle.Word(conditions = @Expression(spel = "hasThresholdProperty()", mvel = "self.hasThresholdProperty()", aviator = "self.hasThresholdProperty"))
         private Integer shortDriveThreshold;
 
+        @SuppressWarnings("unused")
         public boolean hasThresholdProperty() {
+            return Numbers.getBitAt(this.routeProps, 0) == 1;
+        }
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasThresholdProperty() {
             return Numbers.getBitAt(this.routeProps, 0) == 1;
         }
 
@@ -156,7 +175,8 @@ public class BuiltinMessage8606V2019 {
          * <p>
          * 单位为公里每小时（km/h），若路段属性 1 位为 0 则没有该字段
          */
-        @Preset.JtStyle.Word(condition = "hasSpeedLimitProperty()")
+        // @Preset.JtStyle.Word(condition = "hasSpeedLimitProperty()")
+        @Preset.JtStyle.Word(conditions = @Expression(spel = "hasSpeedLimitProperty()", mvel = "self.hasSpeedLimitProperty()", aviator = "self.hasSpeedLimitProperty"))
         private Integer maxSpeedLimit;
 
         /**
@@ -164,10 +184,18 @@ public class BuiltinMessage8606V2019 {
          * <p>
          * 单位为秒（s），若路段属性1位为0则没有该字段
          */
-        @Preset.JtStyle.Byte(condition = "hasSpeedLimitProperty()")
+        // @Preset.JtStyle.Byte(condition = "hasSpeedLimitProperty()")
+        @Preset.JtStyle.Byte(conditions = @Expression(spel = "hasSpeedLimitProperty()", mvel = "self.hasSpeedLimitProperty()", aviator = "self.hasSpeedLimitProperty"))
         private Short speedingDuration;
 
+        @SuppressWarnings("unused")
         public boolean hasSpeedLimitProperty() {
+            return Numbers.getBitAt(this.routeProps, 1) == 1;
+        }
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasSpeedLimitProperty() {
             return Numbers.getBitAt(this.routeProps, 1) == 1;
         }
 

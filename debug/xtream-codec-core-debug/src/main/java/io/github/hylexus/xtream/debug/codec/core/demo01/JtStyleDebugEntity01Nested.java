@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.debug.codec.core.demo01;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Data;
 import lombok.Getter;
@@ -68,7 +69,8 @@ public class JtStyleDebugEntity01Nested {
         private int usernameLength;
 
         // 用户名 String, "UTF-8"
-        @Preset.JtStyle.Str(charset = "UTF-8", lengthExpression = "getUsernameLength()")
+        // @Preset.JtStyle.Str(charset = "UTF-8", lengthExpression = "getUsernameLength()")
+        @Preset.JtStyle.Str(charset = "UTF-8", lengthExpressions = @Expression(spel = "getUsernameLength()", mvel = "self.getUsernameLength()", aviator = "self.usernameLength"))
         private String username;
 
         // 下一个字段长度 无符号数 2字节
@@ -76,7 +78,8 @@ public class JtStyleDebugEntity01Nested {
         private int passwordLength;
 
         // 密码 String, "GBK"
-        @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+        // @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+        @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpressions = @Expression(spel = "getPasswordLength()", mvel = "self.getPasswordLength()", aviator = "self.passwordLength"))
         private String password;
 
         // 生日 String[8], "yyyyMMdd", "UTF-8"

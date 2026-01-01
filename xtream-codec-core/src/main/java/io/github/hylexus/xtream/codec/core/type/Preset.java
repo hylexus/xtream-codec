@@ -53,6 +53,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
@@ -75,6 +78,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
@@ -99,6 +105,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
@@ -121,6 +130,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
@@ -145,6 +157,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
@@ -167,6 +182,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
@@ -191,6 +209,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
@@ -213,6 +234,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
@@ -237,6 +261,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
@@ -259,6 +286,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
@@ -286,6 +316,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "charset")
             String charset() default "utf-8";
 
@@ -303,6 +336,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -333,6 +369,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -341,6 +380,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -371,6 +413,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -379,6 +424,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -409,6 +457,18 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimes")
+            int iterationTimes() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpression")
+            String iterationTimesExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpressions")
+            Expression iterationTimesExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -417,6 +477,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -455,6 +518,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -463,6 +529,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -502,6 +571,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamMapField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -510,6 +582,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "containerInstanceFactory")
             Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
@@ -540,6 +615,10 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -548,6 +627,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -607,6 +689,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -615,6 +700,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -647,6 +735,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
@@ -673,6 +764,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
@@ -698,6 +792,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -706,6 +803,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -745,6 +845,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamDateTimeField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamDateTimeField.class, attribute = "desc")
             String desc() default "";
         }
@@ -766,6 +869,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
@@ -792,6 +898,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -800,6 +909,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -830,6 +942,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "charset")
             String charset() default XtreamConstants.CHARSET_NAME_GBK;
 
@@ -847,6 +962,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -876,8 +994,14 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -913,6 +1037,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -921,6 +1048,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -950,11 +1080,17 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "iterationTimes")
             int iterationTimes() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpression")
             String iterationTimesExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpressions")
+            Expression iterationTimesExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -964,6 +1100,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -1002,6 +1141,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -1010,6 +1152,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -1048,6 +1193,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamMapField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -1056,6 +1204,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "containerInstanceFactory")
             Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
@@ -1114,6 +1265,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -1122,6 +1276,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;

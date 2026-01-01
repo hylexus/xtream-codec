@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.el;
 
 import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -176,9 +177,12 @@ public class ExpressionTest extends BaseEntityCodecTest {
         @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8)
         private String name;
 
-        @Preset.RustStyle.u16(version = 1, condition = "status == 1")
-        @Preset.RustStyle.u16(version = 2, condition = "#status == 1")
-        @Preset.RustStyle.u16(version = 3, condition = "#self.status == 1")
+        // @Preset.RustStyle.u16(version = 1, condition = "status == 1")
+        @Preset.RustStyle.u16(version = 1, conditions = @Expression(spel = "status == 1", mvel = "self.status == 1", aviator = "self.status == 1"))
+        // @Preset.RustStyle.u16(version = 2, condition = "#status == 1")
+        @Preset.RustStyle.u16(version = 2, conditions = @Expression(spel = "#status == 1", mvel = "self.status == 1", aviator = "self.status == 1"))
+        // @Preset.RustStyle.u16(version = 3, condition = "#self.status == 1")
+        @Preset.RustStyle.u16(version = 3, conditions = @Expression(spel = "#self.status == 1", mvel = "self.status == 1", aviator = "self.status == 1"))
         private Integer age;
 
         @Preset.RustStyle.struct
@@ -194,12 +198,21 @@ public class ExpressionTest extends BaseEntityCodecTest {
     public record Address1(
             @Preset.RustStyle.i32
             int status1,
-            @Preset.RustStyle.str(version = 1, condition = "status1 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
-            @Preset.RustStyle.str(version = 2, condition = "#status1 == 1", prependLengthFieldType = PrependLengthFieldType.u8)
-            @Preset.RustStyle.str(version = 3, condition = "#self.status1 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+            // @Preset.RustStyle.str(version = 1, condition = "status1 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+            @Preset.RustStyle.str(version = 1, conditions = @Expression(spel = "status1 == 1", mvel = "self.status1 == 1", aviator = "self.status1 == 1"), prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+            // @Preset.RustStyle.str(version = 2, condition = "#status1 == 1", prependLengthFieldType = PrependLengthFieldType.u8)
+            @Preset.RustStyle.str(version = 2, conditions = @Expression(spel = "#status1 == 1", mvel = "self.status1 == 1", aviator = "self.status1 == 1"), prependLengthFieldType = PrependLengthFieldType.u8)
+            // @Preset.RustStyle.str(version = 3, condition = "#self.status1 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+            @Preset.RustStyle.str(version = 3, conditions = @Expression(spel = "#self.status1 == 1", mvel = "self.status1 == 1", aviator = "self.status1 == 1"), prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
             String city,
             @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8)
             String street) {
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public int getStatus1() {
+            return status1;
+        }
     }
 
     @Getter
@@ -209,9 +222,12 @@ public class ExpressionTest extends BaseEntityCodecTest {
     public static class Address2 {
         @Preset.RustStyle.i32
         private int status2;
-        @Preset.RustStyle.str(version = 1, condition = "status2 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
-        @Preset.RustStyle.str(version = 2, condition = "#status2 == 1", prependLengthFieldType = PrependLengthFieldType.u8)
-        @Preset.RustStyle.str(version = 3, condition = "#self.status2 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+        // @Preset.RustStyle.str(version = 1, condition = "status2 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+        @Preset.RustStyle.str(version = 1, conditions = @Expression(spel = "status2 == 1", mvel = "self.status2 == 1", aviator = "self.status2 == 1"), prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+        // @Preset.RustStyle.str(version = 2, condition = "#status2 == 1", prependLengthFieldType = PrependLengthFieldType.u8)
+        @Preset.RustStyle.str(version = 2, conditions = @Expression(spel = "status2 == 1", mvel = "self.status2 == 1", aviator = "self.status2 == 1"), prependLengthFieldType = PrependLengthFieldType.u8)
+        // @Preset.RustStyle.str(version = 3, condition = "#self.status2 == 1", prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
+        @Preset.RustStyle.str(version = 3, conditions = @Expression(spel = "status2 == 1", mvel = "self.status2 == 1", aviator = "self.status2 == 1"), prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
         private String city;
         @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8)
         private String street;

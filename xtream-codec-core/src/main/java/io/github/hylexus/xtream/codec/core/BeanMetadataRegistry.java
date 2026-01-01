@@ -16,13 +16,13 @@
 
 package io.github.hylexus.xtream.codec.core;
 
-import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 import java.beans.PropertyDescriptor;
@@ -51,8 +51,6 @@ public interface BeanMetadataRegistry {
 
     FieldCodecRegistry getFieldCodecRegistry();
 
-    XtreamExpressionEngine getExpressionEngine();
-
     @Nullable
     default FieldCodec<?> getOrCreateFieldCodec(
             int version,
@@ -64,6 +62,13 @@ public interface BeanMetadataRegistry {
         return this.getFieldCodecRegistry()
                 .getOrCreateFieldCodec(version, this, targetType, codecClass, charset, targetEntityClass);
     }
+
+    /**
+     * @since 0.4.0
+     */
+    @ApiStatus.AvailableSince("0.4.0")
+    @ApiStatus.Experimental
+    XtreamExpressionFactory expressionFactory();
 
     /**
      * 当前注册器中已经注册的 Bean 的描述信息

@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.debug.codec.core.demo02;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import lombok.Getter;
@@ -53,7 +54,8 @@ public class RawStyleDebugEntity02Flatten {
     private int msgSerialNo;
 
     // byte[17-21)    消息包封装项
-    @XtreamField(condition = "hasSubPackage()", length = 4, signedness = NumberSignedness.UNSIGNED)
+    // @XtreamField(condition = "hasSubPackage()", length = 4, signedness = NumberSignedness.UNSIGNED)
+    @XtreamField(conditions = @Expression(spel = "hasSubPackage()", mvel = "self.hasSubPackage()", aviator = "self.hasSubPackage"), length = 4, signedness = NumberSignedness.UNSIGNED)
     private Long subPackageInfo;
     // endregion 消息头
 
@@ -91,7 +93,8 @@ public class RawStyleDebugEntity02Flatten {
     private String time;
 
     // 长度：消息体长度减去前面的 28 字节
-    @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence, lengthExpression = "msgBodyLength() - 28")
+    // @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence, lengthExpression = "msgBodyLength() - 28")
+    @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence, lengthExpressions = @Expression(spel = "msgBodyLength() - 28", mvel = "self.msgBodyLength() - 28", aviator = "self.msgBodyLength - 28"))
     private List<ExtraItem> extraItems;
     // endregion 消息体
 
@@ -104,8 +107,21 @@ public class RawStyleDebugEntity02Flatten {
         return msgBodyProps & 0x3ff;
     }
 
+    // for Aviator
+    @SuppressWarnings("unused")
+    public int getMsgBodyLength() {
+        return msgBodyProps & 0x3ff;
+    }
+
     // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
     public boolean hasSubPackage() {
+        // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+        return (msgBodyProps & 0x2000) > 0;
+    }
+
+    // for Aviator
+    @SuppressWarnings("unused")
+    public boolean isHasSubPackage() {
         // return ((msgBodyProperty & 0x2000) >> 13) == 1;
         return (msgBodyProps & 0x2000) > 0;
     }
@@ -121,7 +137,8 @@ public class RawStyleDebugEntity02Flatten {
         @XtreamField(length = 1, signedness = NumberSignedness.UNSIGNED)
         private short contentLength;
         // 附加信息内容  BYTE[N]
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, lengthExpression = "getContentLength()")
+        // @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, lengthExpression = "getContentLength()")
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, lengthExpressions = @Expression(spel = "getContentLength()", mvel = "self.getContentLength()", aviator = "self.contentLength"))
         private byte[] content;
 
         public ExtraItem() {

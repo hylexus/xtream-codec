@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.debug.codec.core.demo02;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,8 @@ public class RustStyleDebugEntity02Nested {
     private Header header;
 
     // 消息体
-    @Preset.RustStyle.struct(lengthExpression = "header.msgBodyLength()")
+    // @Preset.RustStyle.struct(lengthExpression = "header.msgBodyLength()")
+    @Preset.RustStyle.struct(lengthExpressions = @Expression(spel = "header.msgBodyLength()", mvel = "self.header.msgBodyLength()", aviator = "self.header.msgBodyLength"))
     private Body body;
 
     // 校验码
@@ -66,7 +68,8 @@ public class RustStyleDebugEntity02Nested {
         private int msgSerialNo;
 
         // byte[17-21)    消息包封装项
-        @Preset.RustStyle.u32(condition = "hasSubPackage()")
+        // @Preset.RustStyle.u32(condition = "hasSubPackage()")
+        @Preset.RustStyle.u32(conditions = @Expression(spel = "hasSubPackage()", mvel = "self.hasSubPackage()", aviator = "self.hasSubPackage"))
         private Long subPackageInfo;
 
         // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
@@ -74,8 +77,19 @@ public class RustStyleDebugEntity02Nested {
             return msgBodyProps & 0x3ff;
         }
 
+        // for Aviator
+        public int getMsgBodyLength() {
+            return msgBodyProps & 0x3ff;
+        }
+
         // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
         public boolean hasSubPackage() {
+            // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+            return (msgBodyProps & 0x2000) > 0;
+        }
+
+        // for Aviator
+        public boolean isHasSubPackage() {
             // return ((msgBodyProperty & 0x2000) >> 13) == 1;
             return (msgBodyProps & 0x2000) > 0;
         }
@@ -132,7 +146,8 @@ public class RustStyleDebugEntity02Nested {
         @Preset.RustStyle.u8
         private short contentLength;
         // 附加信息内容  BYTE[N]
-        @Preset.RustStyle.byte_array(lengthExpression = "getContentLength()")
+        // @Preset.RustStyle.byte_array(lengthExpression = "getContentLength()")
+        @Preset.RustStyle.byte_array(lengthExpressions = @Expression(spel = "getContentLength()", mvel = "self.getContentLength()", aviator = "self.contentLength"))
         private byte[] content;
 
         public ExtraItem() {

@@ -43,7 +43,7 @@ public class DefaultSerializeContext implements FieldCodec.SerializeContext {
         this.bufferFactory = bufferFactory;
         this.entityEncoder = entityEncoder;
         this.containerInstance = containerInstance;
-        this.evaluationContext = entityEncoder.expressionEngine().createEvaluationContext(containerInstance);
+        this.evaluationContext = entityEncoder.expressionFactory().createEvaluationContext(containerInstance);
         this.version = version;
         this.beanMetadataRegistry = beanMetadataRegistry;
         this.fieldCodecRegistry = this.beanMetadataRegistry.getFieldCodecRegistry();

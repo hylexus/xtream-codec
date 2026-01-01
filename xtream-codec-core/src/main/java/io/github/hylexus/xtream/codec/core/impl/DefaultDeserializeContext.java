@@ -43,7 +43,7 @@ public class DefaultDeserializeContext implements FieldCodec.DeserializeContext 
         this.bufferFactory = bufferFactory;
         this.entityDecoder = entityDecoder;
         this.containerInstance = containerInstance;
-        this.evaluationContext = entityDecoder.expressionEngine().createEvaluationContext(containerInstance);
+        this.evaluationContext = entityDecoder.expressionFactory().createEvaluationContext(containerInstance);
         this.version = version;
         this.codecTracker = tracker;
         this.beanMetadataRegistry = beanMetadataRegistry;

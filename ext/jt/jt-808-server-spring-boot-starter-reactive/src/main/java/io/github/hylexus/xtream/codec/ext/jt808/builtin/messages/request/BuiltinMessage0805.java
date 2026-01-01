@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DwordWrapper;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
@@ -51,16 +52,24 @@ public class BuiltinMessage0805 {
     /**
      * 拍摄成功的多媒体个数
      */
-    @Preset.JtStyle.Word(condition = "success()", desc = "多媒体ID个数")
+    // @Preset.JtStyle.Word(condition = "success()", desc = "多媒体 ID 个数")
+    @Preset.JtStyle.Word(conditions = @Expression(spel = "success()", mvel = "self.success()", aviator = "self.success"), desc = "多媒体 ID 个数")
     private int multimediaIdCount;
 
     /**
      * BYTE[4*n]
      */
-    @Preset.JtStyle.List(condition = "success()", desc = "多媒体ID列表")
+    // @Preset.JtStyle.List(condition = "success()", desc = "多媒体 ID 列表")
+    @Preset.JtStyle.List(conditions = @Expression(spel = "success()", mvel = "self.success()", aviator = "self.success"), desc = "多媒体 ID 列表")
     private List<DwordWrapper> multimediaIdList;
 
     public boolean success() {
         return result == 0;
     }
+
+    // for Aviator
+    public boolean isSuccess() {
+        return success();
+    }
+
 }

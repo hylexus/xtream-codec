@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.tracker;
 
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +50,8 @@ public class CodecDebugEntity03 {
     @Preset.JtStyle.Word
     private int multimediaDataItemCount;
 
-    @Preset.JtStyle.List(iterationTimesExpression = "getMultimediaDataItemCount()")
+    // @Preset.JtStyle.List(iterationTimesExpression = "getMultimediaDataItemCount()")
+    @Preset.JtStyle.List(iterationTimesExpressions = @Expression(spel = "getMultimediaDataItemCount()", mvel = "self.getMultimediaDataItemCount()", aviator = "self.multimediaDataItemCount"))
     private List<Item> itemList;
 
     @Getter
@@ -58,7 +60,7 @@ public class CodecDebugEntity03 {
     @Accessors(chain = true)
     public static class Item {
         /**
-         * 多媒体ID
+         * 多媒体 ID
          */
         @Preset.JtStyle.Dword
         private long multimediaId;
@@ -72,7 +74,7 @@ public class CodecDebugEntity03 {
         private short multimediaType;
 
         /**
-         * 通道ID
+         * 通道 ID
          */
         @Preset.JtStyle.Byte
         private short channelId;

@@ -22,7 +22,6 @@ import io.github.hylexus.xtream.codec.common.bean.FieldLengthExtractor;
 import io.github.hylexus.xtream.codec.common.bean.IterationTimesExtractor;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
-import io.github.hylexus.xtream.codec.common.utils.XtreamUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
@@ -89,7 +88,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
                     : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
         }
         this.fieldCodec = this.detectFieldCodec();
-        this.iterationTimesExtractor = IterationTimesExtractor.from(this.xtreamField, this.beanMetadataRegistry.getExpressionEngine());
+        this.iterationTimesExtractor = this.beanMetadataRegistry.expressionFactory().createIterationTimesExtractor(xtreamField);
     }
 
     private FieldCodec<?> detectFieldCodec() {
@@ -120,13 +119,15 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     private FieldConditionEvaluator detectFieldConditionalEvaluator(XtreamField xtreamField) {
-        if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
-            return FieldConditionEvaluator.AlwaysFalseFieldConditionEvaluator.INSTANCE;
+        final FieldConditionEvaluator evaluator = this.beanMetadataRegistry.expressionFactory().createFieldConditionEvaluator(xtreamField);
+        if (evaluator == null) {
+            throw new IllegalStateException("""
+                    
+                    Cannot determine FieldConditionEvaluator
+                    ==> Field: %s
+                    """.stripTrailing().formatted(this.field.toGenericString()));
         }
-        if (XtreamUtils.hasElement(xtreamField.condition())) {
-            return new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(xtreamField.condition(), this.beanMetadataRegistry.getExpressionEngine());
-        }
-        return FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator.INSTANCE;
+        return evaluator;
     }
 
     /**
@@ -136,22 +137,15 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
      * @see MapBeanPropertyMetadata#decodePropertyValue(FieldCodec.DeserializeContext, ByteBuf) MapBeanPropertyMetadata#decodePropertyValue
      */
     protected FieldLengthExtractor detectFieldLengthExtractor(XtreamField xtreamField) {
-        if (xtreamField.prependLengthFieldType() != PrependLengthFieldType.none) {
-            return new FieldLengthExtractor.PrependFieldLengthExtractor(xtreamField.prependLengthFieldType());
+        final FieldLengthExtractor evaluator = this.beanMetadataRegistry.expressionFactory().createFieldLengthExtractor(xtreamField);
+        if (evaluator == null) {
+            return fallbackFieldLengthExtractor();
         }
 
-        if (xtreamField.prependLengthFieldLength() > 0) {
-            return new FieldLengthExtractor.PrependFieldLengthExtractor(xtreamField.prependLengthFieldLength());
-        }
+        return evaluator;
+    }
 
-        if (xtreamField.length() > 0) {
-            return new FieldLengthExtractor.ConstantFieldLengthExtractor(xtreamField.length());
-        }
-
-        if (XtreamUtils.hasElement(xtreamField.lengthExpression())) {
-            return new FieldLengthExtractor.ExpressionFieldLengthExtractor(xtreamField, this.beanMetadataRegistry.getExpressionEngine());
-        }
-
+    private FieldLengthExtractor fallbackFieldLengthExtractor() {
         return XtreamTypes.getDefaultSizeInBytes(this.rawClass())
                 .map(FieldLengthExtractor.ConstantFieldLengthExtractor::new)
                 .map(FieldLengthExtractor.class::cast)

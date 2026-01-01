@@ -84,6 +84,11 @@ public sealed interface FieldLengthExtractor
             this.expression = expressionEngine.createExpression(this.expressionString);
         }
 
+        public ExpressionFieldLengthExtractor(XtreamExpression expression, String expressionString) {
+            this.expression = expression;
+            this.expressionString = expressionString;
+        }
+
         @Override
         public int extractFieldLength(FieldCodec.DeserializeContext context, XtreamEvaluationContext evaluationContext, ByteBuf input) {
             final Number number = expression.getValue(evaluationContext, Number.class);

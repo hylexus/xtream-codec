@@ -30,12 +30,19 @@ public sealed interface XtreamExpressionEngine permits
 
     XtreamEvaluationContext createEvaluationContext(@Nullable Object rootObject);
 
-    interface XtreamExpressionEngineId {
+    sealed interface XtreamExpressionEngineId
+            permits CustomXtreamExpressionEngineId,
+            BuiltinXtreamExpressionEngineId {
+
         XtreamExpressionEngineId SPEL = BuiltinXtreamExpressionEngineId.SpEL;
         XtreamExpressionEngineId AVIATOR = BuiltinXtreamExpressionEngineId.Aviator;
         XtreamExpressionEngineId MVEL = BuiltinXtreamExpressionEngineId.MVEL;
 
         String value();
+
+    }
+
+    non-sealed interface CustomXtreamExpressionEngineId extends XtreamExpressionEngineId {
     }
 
     enum BuiltinXtreamExpressionEngineId implements XtreamExpressionEngineId {

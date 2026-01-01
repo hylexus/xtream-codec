@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.*;
 import java.lang.reflect.AnnotatedElement;
@@ -77,6 +78,19 @@ public @interface XtreamField {
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
      */
     String lengthExpression() default "";
+
+    /**
+     * 反序列化时当前属性的长度。当长度无法直接确定时，可以指定一个表达式来确定长度。
+     * <p>
+     * 目前仅仅支持 <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL</a> 语法。
+     *
+     * @see #length()
+     * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+     * @since 0.4.0
+     */
+    @ApiStatus.Experimental
+    @ApiStatus.AvailableSince("0.4.0")
+    Expression lengthExpressions() default @Expression();
 
     /**
      * 只有 {@link String} 类型用到
@@ -150,11 +164,37 @@ public @interface XtreamField {
     String iterationTimesExpression() default "";
 
     /**
+     * List 类型的最大迭代次数表达式
+     * <p>
+     * 目前仅仅支持 <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL</a> 语法。
+     *
+     * <li>反序列化才会用到；序列化用不到</li>
+     * <li>只有 {@link java.util.List} 类型有效</li>
+     *
+     * @see #iterationTimes()
+     * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+     * @since 0.4.0
+     */
+    @ApiStatus.Experimental
+    @ApiStatus.AvailableSince("0.4.0")
+    Expression iterationTimesExpressions() default @Expression();
+
+    /**
      * 当且仅当 {@code condition} 为 {@code true} 时，当前属性才会被序列化/反序列化。
      *
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
      */
     String condition() default "";
+
+    /**
+     * 当且仅当 {@code condition} 为 {@code true} 时，当前属性才会被序列化/反序列化。
+     *
+     * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+     * @since 0.4.0
+     */
+    @ApiStatus.Experimental
+    @ApiStatus.AvailableSince("0.4.0")
+    Expression conditions() default @Expression();
 
     /**
      * 当前属性序列化/反序列化时用到的 {@link FieldCodec}。

@@ -52,7 +52,7 @@ class XtreamExpressionEngineRegistryTest {
 
     @Test
     void testGetEngineNotFound() {
-        assertThrows(IllegalArgumentException.class, () -> registry.getEngine(() -> "not-exists"));
+        assertThrows(IllegalArgumentException.class, () -> registry.getEngine((XtreamExpressionEngine.CustomXtreamExpressionEngineId) () -> "not-exists"));
     }
 
     @Test

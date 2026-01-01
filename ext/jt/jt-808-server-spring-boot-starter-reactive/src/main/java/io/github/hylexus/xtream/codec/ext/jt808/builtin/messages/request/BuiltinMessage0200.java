@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x64;
@@ -82,12 +83,19 @@ public class BuiltinMessage0200 {
      */
     public record Item0x11(
             @JtStyle.Byte short locationType,
-            @JtStyle.Dword(condition = "#locationType != 0") @Nullable Long locationId) {
+            // @JtStyle.Dword(condition = "#locationType != 0") @Nullable Long locationId,
+            @JtStyle.Dword(conditions = @Expression(spel = "locationType != 0", mvel = "self.locationType != 0", aviator = "self.locationType != 0")) @Nullable Long locationId) {
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public short getLocationType() {
+            return locationType;
+        }
     }
 
     /**
      * @param locationType 位置类型
-     * @param locationId   区域或路段ID
+     * @param locationId   区域或路段 ID
      * @param direction    方向；0：进；1：出
      */
     public record Item0x12(
@@ -97,7 +105,7 @@ public class BuiltinMessage0200 {
     }
 
     /**
-     * @param lineId     路线ID
+     * @param lineId     路线 ID
      * @param locationId 路段行驶时间（秒）
      * @param result     结果。0：不足；1：过长
      */

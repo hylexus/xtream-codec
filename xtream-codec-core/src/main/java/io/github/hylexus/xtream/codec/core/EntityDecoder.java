@@ -16,7 +16,6 @@
 
 package io.github.hylexus.xtream.codec.core;
 
-import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
@@ -37,12 +36,12 @@ public class EntityDecoder {
     protected final ByteBufAllocator bufferFactory = ByteBufAllocator.DEFAULT;
     protected final BeanMetadataRegistry beanMetadataRegistry;
     private final FieldCodecRegistry fieldCodecRegistry;
-    protected final XtreamExpressionEngine expressionEngine;
+    protected final XtreamExpressionFactory expressionFactory;
 
     public EntityDecoder(BeanMetadataRegistry beanMetadataRegistry) {
         this.beanMetadataRegistry = beanMetadataRegistry;
         this.fieldCodecRegistry = beanMetadataRegistry.getFieldCodecRegistry();
-        this.expressionEngine = this.beanMetadataRegistry.getExpressionEngine();
+        this.expressionFactory = this.beanMetadataRegistry.expressionFactory();
     }
 
     public <T> T decode(Class<T> entityClass, ByteBuf source) {
@@ -215,8 +214,8 @@ public class EntityDecoder {
         return fieldCodecRegistry;
     }
 
-    public XtreamExpressionEngine expressionEngine() {
-        return expressionEngine;
+    public XtreamExpressionFactory expressionFactory() {
+        return this.expressionFactory;
     }
 
 }

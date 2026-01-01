@@ -14,4 +14,7 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    testImplementation("com.googlecode.aviator:aviator")
+    testImplementation("org.mvel:mvel2")
 }

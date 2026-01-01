@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core;
 
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.netty.buffer.ByteBuf;
@@ -83,14 +84,16 @@ class PrependLengthFieldTest {
         @Preset.RustStyle.u8
         private Short usernameLength;
 
-        @Preset.RustStyle.str(lengthExpression = "getUsernameLength()")
+        // @Preset.RustStyle.str(lengthExpression = "getUsernameLength()")
+        @Preset.RustStyle.str(lengthExpressions = @Expression(spel = "getUsernameLength()", mvel = "self.getUsernameLength()", aviator = "self.usernameLength"))
         private String username;
 
         // 先解码出 password 的长度字段
         @Preset.RustStyle.u8
         private Short passwordLength;
 
-        @Preset.RustStyle.str(lengthExpression = "getPasswordLength()")
+        // @Preset.RustStyle.str(lengthExpression = "getPasswordLength()")
+        @Preset.RustStyle.str(lengthExpressions = @Expression(spel = "getPasswordLength()", mvel = "self.getPasswordLength()", aviator = "self.passwordLength"))
         private String password;
 
         @Preset.RustStyle.u32

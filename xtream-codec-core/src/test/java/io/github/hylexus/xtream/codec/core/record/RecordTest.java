@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.record;
 
 import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -33,10 +34,19 @@ public class RecordTest extends BaseEntityCodecTest {
             @Preset.RustStyle.str(version = 1, prependLengthFieldType = PrependLengthFieldType.u8, charset = "GBK")
             String name,
             @Preset.RustStyle.u8 Short level,
-            @Preset.RustStyle.u32(version = 1, condition = "level == 2")
-            @Preset.RustStyle.u32(version = 2, condition = "#level == 2")
-            @Preset.RustStyle.u32(version = 3, condition = "#self.level == 2")
+            // @Preset.RustStyle.u32(version = 1, condition = "level == 2")
+            @Preset.RustStyle.u32(version = 1, conditions = @Expression(spel = "level == 2", mvel = "self.level == 2", aviator = "self.level == 2"))
+            // @Preset.RustStyle.u32(version = 2, condition = "#level == 2")
+            @Preset.RustStyle.u32(version = 2, conditions = @Expression(spel = "#level == 2", mvel = "self.level == 2", aviator = "self.level == 2"))
+            // @Preset.RustStyle.u32(version = 3, condition = "#self.level == 2")
+            @Preset.RustStyle.u32(version = 3, conditions = @Expression(spel = "#self.level == 2", mvel = "self.level == 2", aviator = "self.level == 2"))
             Long age) {
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public Short getLevel() {
+            return level;
+        }
     }
 
     @Test

@@ -17,16 +17,12 @@
 package io.github.hylexus.xtream.codec.core.impl;
 
 import io.github.hylexus.xtream.codec.base.expression.SpelXtreamExpressionEngine;
-import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.common.bean.*;
 import io.github.hylexus.xtream.codec.common.bean.impl.BasicBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.MapBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.NestedBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.SequenceBeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
-import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
-import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
+import io.github.hylexus.xtream.codec.core.*;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
@@ -50,12 +46,16 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     protected final ConcurrentMap<Class<?>, ConcurrentMap<Integer, BeanMetadata>> multiVersionCache = new ConcurrentHashMap<>();
     protected final FieldCodecRegistry fieldCodecRegistry;
     protected final XtreamCacheableClassPredicate cacheableClassPredicate;
-    protected final XtreamExpressionEngine expressionEngine;
+    protected final XtreamExpressionFactory xtreamExpressionFactory;
 
     public SimpleBeanMetadataRegistry(FieldCodecRegistry fieldCodecRegistry, XtreamCacheableClassPredicate cacheableClassPredicate) {
+        this(fieldCodecRegistry, cacheableClassPredicate, new DefaultXtreamExpressionFactory(new SpelXtreamExpressionEngine()));
+    }
+
+    public SimpleBeanMetadataRegistry(FieldCodecRegistry fieldCodecRegistry, XtreamCacheableClassPredicate cacheableClassPredicate, XtreamExpressionFactory xtreamExpressionFactory) {
         this.fieldCodecRegistry = fieldCodecRegistry;
         this.cacheableClassPredicate = cacheableClassPredicate;
-        this.expressionEngine = new SpelXtreamExpressionEngine();
+        this.xtreamExpressionFactory = xtreamExpressionFactory;
     }
 
     @Override
@@ -64,8 +64,8 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     }
 
     @Override
-    public XtreamExpressionEngine getExpressionEngine() {
-        return this.expressionEngine;
+    public XtreamExpressionFactory expressionFactory() {
+        return this.xtreamExpressionFactory;
     }
 
     @Override
