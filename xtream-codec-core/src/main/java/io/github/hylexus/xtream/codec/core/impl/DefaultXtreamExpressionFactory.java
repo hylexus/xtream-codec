@@ -41,9 +41,11 @@ import java.util.Objects;
 @ApiStatus.Experimental
 public class DefaultXtreamExpressionFactory implements XtreamExpressionFactory {
     private final XtreamExpressionEngine expressionEngine;
+    private final XtreamExpressionEngine defaultExpressionEngine;
 
     public DefaultXtreamExpressionFactory(XtreamExpressionEngine expressionEngine) {
         this.expressionEngine = Objects.requireNonNull(expressionEngine);
+        this.defaultExpressionEngine = new SpelXtreamExpressionEngine();
     }
 
     @Override
@@ -57,31 +59,33 @@ public class DefaultXtreamExpressionFactory implements XtreamExpressionFactory {
             return FieldConditionEvaluator.AlwaysFalseFieldConditionEvaluator.INSTANCE;
         }
         if (XtreamUtils.hasElement(xtreamField.condition())) {
-            return new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(xtreamField.condition(), expressionEngine);
+            final XtreamExpression expression = this.defaultExpressionEngine.createExpression(xtreamField.condition());
+            return new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(expression);
         }
+
         final Expression conditions = xtreamField.conditions();
         return switch (expressionEngine) {
             case SpelXtreamExpressionEngine spel -> {
                 if (XtreamUtils.hasElement(conditions.spel())) {
-                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(spel.createExpression(conditions.spel()), conditions.spel());
+                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(spel.createExpression(conditions.spel()));
                 }
                 yield FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator.INSTANCE;
             }
             case AviatorXtreamExpressionEngine aviator -> {
                 if (XtreamUtils.hasElement(conditions.aviator())) {
-                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(aviator.createExpression(conditions.aviator()), conditions.aviator());
+                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(aviator.createExpression(conditions.aviator()));
                 }
                 yield FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator.INSTANCE;
             }
             case MvelXtreamExpressionEngine mvel -> {
                 if (XtreamUtils.hasElement(conditions.mvel())) {
-                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(mvel.createExpression(conditions.mvel()), conditions.mvel());
+                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(mvel.createExpression(conditions.mvel()));
                 }
                 yield FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator.INSTANCE;
             }
             case CustomXtreamExpressionEngine custom -> {
                 if (XtreamUtils.hasElement(conditions.custom())) {
-                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(custom.createExpression(conditions.custom()), conditions.mvel());
+                    yield new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(custom.createExpression(conditions.custom()));
                 }
                 yield FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator.INSTANCE;
             }
@@ -103,32 +107,33 @@ public class DefaultXtreamExpressionFactory implements XtreamExpressionFactory {
         }
 
         if (XtreamUtils.hasElement(xtreamField.lengthExpression())) {
-            return new FieldLengthExtractor.ExpressionFieldLengthExtractor(xtreamField, this.expressionEngine);
+            final XtreamExpression expression = this.defaultExpressionEngine.createExpression(xtreamField.lengthExpression());
+            return new FieldLengthExtractor.ExpressionFieldLengthExtractor(expression);
         }
 
         final Expression lengthExpressions = xtreamField.lengthExpressions();
         return switch (this.expressionEngine) {
             case SpelXtreamExpressionEngine spel -> {
                 if (StringUtils.hasText(lengthExpressions.spel())) {
-                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(spel.createExpression(lengthExpressions.spel()), lengthExpressions.spel());
+                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(spel.createExpression(lengthExpressions.spel()));
                 }
                 yield null;
             }
             case AviatorXtreamExpressionEngine aviator -> {
                 if (StringUtils.hasText(lengthExpressions.aviator())) {
-                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(aviator.createExpression(lengthExpressions.aviator()), lengthExpressions.aviator());
+                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(aviator.createExpression(lengthExpressions.aviator()));
                 }
                 yield null;
             }
             case MvelXtreamExpressionEngine mvel -> {
                 if (StringUtils.hasText(lengthExpressions.mvel())) {
-                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(mvel.createExpression(lengthExpressions.mvel()), lengthExpressions.mvel());
+                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(mvel.createExpression(lengthExpressions.mvel()));
                 }
                 yield null;
             }
             case CustomXtreamExpressionEngine custom -> {
                 if (StringUtils.hasText(lengthExpressions.custom())) {
-                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(custom.createExpression(lengthExpressions.custom()), lengthExpressions.custom());
+                    yield new FieldLengthExtractor.ExpressionFieldLengthExtractor(custom.createExpression(lengthExpressions.custom()));
                 }
                 yield null;
             }
@@ -141,36 +146,35 @@ public class DefaultXtreamExpressionFactory implements XtreamExpressionFactory {
             return new IterationTimesExtractor.ConstantIterationTimesExtractor(xtreamField.iterationTimes());
         }
         if (StringUtils.hasText(xtreamField.iterationTimesExpression())) {
-            return new IterationTimesExtractor.ExpressionIterationTimesExtractor(xtreamField, this.expressionEngine);
+            final XtreamExpression expression = this.defaultExpressionEngine.createExpression(xtreamField.iterationTimesExpression());
+            return new IterationTimesExtractor.ExpressionIterationTimesExtractor(expression);
         }
         final Expression expressions = xtreamField.iterationTimesExpressions();
         return switch (this.expressionEngine) {
             case SpelXtreamExpressionEngine spel -> {
                 if (StringUtils.hasText(expressions.spel())) {
-                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(spel.createExpression(expressions.spel()), expressions.spel());
+                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(spel.createExpression(expressions.spel()));
                 }
                 yield IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
             }
             case AviatorXtreamExpressionEngine aviator -> {
                 if (StringUtils.hasText(expressions.aviator())) {
-                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(aviator.createExpression(expressions.aviator()), expressions.aviator());
+                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(aviator.createExpression(expressions.aviator()));
                 }
                 yield IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
             }
             case MvelXtreamExpressionEngine mvel -> {
                 if (StringUtils.hasText(expressions.mvel())) {
-                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(mvel.createExpression(expressions.mvel()), expressions.mvel());
+                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(mvel.createExpression(expressions.mvel()));
                 }
                 yield IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
             }
             case CustomXtreamExpressionEngine custom -> {
                 if (StringUtils.hasText(expressions.custom())) {
-                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(custom.createExpression(expressions.custom()), expressions.custom());
+                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(custom.createExpression(expressions.custom()));
                 }
                 yield IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
             }
-            // noinspection UnnecessaryDefault
-            default -> IterationTimesExtractor.PlaceholderIterationTimesExtractor.DEFAULT;
         };
     }
 

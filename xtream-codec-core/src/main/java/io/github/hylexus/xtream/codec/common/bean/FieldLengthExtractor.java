@@ -18,11 +18,9 @@ package io.github.hylexus.xtream.codec.common.bean;
 
 import io.github.hylexus.xtream.codec.base.expression.XtreamEvaluationContext;
 import io.github.hylexus.xtream.codec.base.expression.XtreamExpression;
-import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.tracker.BaseSpan;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
@@ -74,19 +72,10 @@ public sealed interface FieldLengthExtractor
         }
     }
 
-    final class ExpressionFieldLengthExtractor implements FieldLengthExtractor {
-        final XtreamExpression expression;
-        private final String expressionString;
+    record ExpressionFieldLengthExtractor(XtreamExpression expression, String expressionString) implements FieldLengthExtractor {
 
-        public ExpressionFieldLengthExtractor(XtreamField field, XtreamExpressionEngine expressionEngine) {
-            this.expressionString = field.lengthExpression();
-            // this.expression = new SpelExpressionParser().parseExpression(expressionString);
-            this.expression = expressionEngine.createExpression(this.expressionString);
-        }
-
-        public ExpressionFieldLengthExtractor(XtreamExpression expression, String expressionString) {
-            this.expression = expression;
-            this.expressionString = expressionString;
+        public ExpressionFieldLengthExtractor(XtreamExpression expression) {
+            this(expression, expression.expressionString());
         }
 
         @Override
@@ -96,10 +85,6 @@ public sealed interface FieldLengthExtractor
                 throw new IllegalArgumentException("Can not determine field length with Expression[" + expressionString + "]");
             }
             return number.intValue();
-        }
-
-        public String expressionString() {
-            return this.expressionString;
         }
 
         @Override
@@ -119,8 +104,10 @@ public sealed interface FieldLengthExtractor
     }
 
     non-sealed interface CustomFieldLengthExtractor extends FieldLengthExtractor {
+
         @Override
         int extractFieldLength(FieldCodec.DeserializeContext context, XtreamEvaluationContext evaluationContext, ByteBuf input);
+
     }
 
 }

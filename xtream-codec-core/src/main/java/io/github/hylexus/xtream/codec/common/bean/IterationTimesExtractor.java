@@ -16,54 +16,25 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
-import io.github.hylexus.xtream.codec.base.expression.*;
+import io.github.hylexus.xtream.codec.base.expression.XtreamEvaluationContext;
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpression;
+import io.github.hylexus.xtream.codec.common.utils.XtreamAssertions;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.Expression;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import org.springframework.util.StringUtils;
 
 import java.util.StringJoiner;
 
-public interface IterationTimesExtractor {
+public sealed interface IterationTimesExtractor
+        permits
+        IterationTimesExtractor.ConstantIterationTimesExtractor,
+        IterationTimesExtractor.ExpressionIterationTimesExtractor,
+        IterationTimesExtractor.PlaceholderIterationTimesExtractor {
 
     int extractIterationTimes(FieldCodec.DeserializeContext context, XtreamEvaluationContext evaluationContext);
 
-    static IterationTimesExtractor from(XtreamField xtreamField, XtreamExpressionEngine expressionEngine) {
-        if (xtreamField.iterationTimes() > 0) {
-            return new IterationTimesExtractor.ConstantIterationTimesExtractor(xtreamField.iterationTimes());
-        }
-        if (StringUtils.hasText(xtreamField.iterationTimesExpression())) {
-            return new IterationTimesExtractor.ExpressionIterationTimesExtractor(xtreamField, expressionEngine);
-        }
-        final Expression expressions = xtreamField.iterationTimesExpressions();
-        return switch (expressionEngine) {
-            case SpelXtreamExpressionEngine ignored -> {
-                if (StringUtils.hasText(expressions.spel())) {
-                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(expressions.spel(), expressionEngine);
-                }
-                yield PlaceholderIterationTimesExtractor.DEFAULT;
-            }
-            case AviatorXtreamExpressionEngine ignored -> {
-                if (StringUtils.hasText(expressions.aviator())) {
-                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(expressions.aviator(), expressionEngine);
-                }
-                yield PlaceholderIterationTimesExtractor.DEFAULT;
-            }
-            case MvelXtreamExpressionEngine ignored -> {
-                if (StringUtils.hasText(expressions.mvel())) {
-                    yield new IterationTimesExtractor.ExpressionIterationTimesExtractor(expressions.mvel(), expressionEngine);
-                }
-                yield PlaceholderIterationTimesExtractor.DEFAULT;
-            }
-            default -> PlaceholderIterationTimesExtractor.DEFAULT;
-        };
-    }
+    record ConstantIterationTimesExtractor(int length) implements IterationTimesExtractor {
 
-    class ConstantIterationTimesExtractor implements IterationTimesExtractor {
-        private final int length;
-
-        public ConstantIterationTimesExtractor(int length) {
-            this.length = length;
+        public ConstantIterationTimesExtractor {
+            XtreamAssertions.assertThat(length > 0, "ConstantIterationTimesExtractor.length() must be greater than 0");
         }
 
         @Override
@@ -71,33 +42,12 @@ public interface IterationTimesExtractor {
             return this.length;
         }
 
-        @Override
-        public String toString() {
-            return new StringJoiner(", ", ConstantIterationTimesExtractor.class.getSimpleName() + "[", "]")
-                    .add("length=" + length)
-                    .toString();
-        }
     }
 
-    class ExpressionIterationTimesExtractor implements IterationTimesExtractor {
-        final XtreamExpression expression;
-        private final String expressionString;
+    record ExpressionIterationTimesExtractor(XtreamExpression expression, String expressionString) implements IterationTimesExtractor {
 
-        public ExpressionIterationTimesExtractor(XtreamField field, XtreamExpressionEngine expressionEngine) {
-            this.expressionString = field.iterationTimesExpression();
-            // this.expression = new SpelExpressionParser().parseExpression(expressionString);
-            this.expression = expressionEngine.createExpression(this.expressionString);
-        }
-
-        public ExpressionIterationTimesExtractor(String expressionString, XtreamExpressionEngine expressionEngine) {
-            this.expressionString = expressionString;
-            // this.expression = new SpelExpressionParser().parseExpression(expressionString);
-            this.expression = expressionEngine.createExpression(this.expressionString);
-        }
-
-        public ExpressionIterationTimesExtractor(XtreamExpression expression, String expressionString) {
-            this.expression = expression;
-            this.expressionString = expressionString;
+        public ExpressionIterationTimesExtractor(XtreamExpression expression) {
+            this(expression, expression.expressionString());
         }
 
         @Override

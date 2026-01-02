@@ -57,6 +57,10 @@ public final class AviatorXtreamExpressionEngine implements XtreamExpressionEngi
 
     public record AviatorXtreamExpression(Expression expr, String expressionString) implements XtreamExpression {
 
+        @SuppressWarnings("redundant")
+        public AviatorXtreamExpression {
+        }
+
         @Override
         public <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) throws XtreamExpressionException {
             if (!(context instanceof AviatorXtreamEvaluationContext aviatorCtx)) {

@@ -61,6 +61,10 @@ public final class SpelXtreamExpressionEngine implements XtreamExpressionEngine 
 
     public record SpelXtreamExpression(Expression expr, String expressionString) implements XtreamExpression {
 
+        @SuppressWarnings("redundant")
+        public SpelXtreamExpression {
+        }
+
         @Override
         public <T> @Nullable T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) throws XtreamExpressionException {
             if (context instanceof SpelXtreamEvaluationContext spelCtx) {

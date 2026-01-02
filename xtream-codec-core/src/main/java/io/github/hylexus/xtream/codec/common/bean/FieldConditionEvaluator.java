@@ -17,7 +17,6 @@
 package io.github.hylexus.xtream.codec.common.bean;
 
 import io.github.hylexus.xtream.codec.base.expression.XtreamExpression;
-import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 
 import java.util.StringJoiner;
@@ -48,29 +47,16 @@ public sealed interface FieldConditionEvaluator
         }
     }
 
-    final class ExpressionFieldConditionEvaluator implements FieldConditionEvaluator {
-        private final XtreamExpression expression;
-        private final String expressionString;
+    record ExpressionFieldConditionEvaluator(XtreamExpression expression, String expressionString) implements FieldConditionEvaluator {
 
-        public ExpressionFieldConditionEvaluator(String expressionString, XtreamExpressionEngine expressionEngine) {
-            this.expressionString = expressionString;
-            // this.expression = new SpelExpressionParser().parseExpression(expressionString);
-            this.expression = expressionEngine.createExpression(this.expressionString);
-        }
-
-        public ExpressionFieldConditionEvaluator(XtreamExpression expression, String expressionString) {
-            this.expression = expression;
-            this.expressionString = expressionString;
+        public ExpressionFieldConditionEvaluator(XtreamExpression expression) {
+            this(expression, expression.expressionString());
         }
 
         @Override
         public boolean evaluate(FieldCodec.CodecContext context) {
             final Boolean value = expression.getValue(context.evaluationContext(), Boolean.class);
             return value != null && value;
-        }
-
-        public String expressionString() {
-            return expressionString;
         }
 
         @Override

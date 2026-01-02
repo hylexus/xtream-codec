@@ -66,6 +66,10 @@ public final class MvelXtreamExpressionEngine implements XtreamExpressionEngine 
 
     public record MvelXtreamExpression(Serializable compiledExpression, String expressionString) implements XtreamExpression {
 
+        @SuppressWarnings("redundant")
+        public MvelXtreamExpression {
+        }
+
         @Override
         public <T> T evaluate(XtreamEvaluationContext context, @Nullable Class<T> expectedType) throws XtreamExpressionException {
             if (!(context instanceof MvelXtreamEvaluationContext mvelCtx)) {
