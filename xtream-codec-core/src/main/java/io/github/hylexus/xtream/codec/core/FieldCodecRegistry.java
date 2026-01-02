@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
@@ -64,6 +65,10 @@ public interface FieldCodecRegistry {
         void setFieldCodecRegistry(FieldCodecRegistry registry);
     }
 
+    /**
+     * @since 0.4.0
+     */
+    @ApiStatus.AvailableSince("0.4.0")
     Stream<CodecDescriptor> descriptors();
 
     record CodecDescriptor(

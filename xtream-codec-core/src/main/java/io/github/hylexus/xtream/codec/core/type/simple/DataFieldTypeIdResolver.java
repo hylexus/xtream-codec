@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class DataFieldTypeIdResolver implements TypeIdResolver {
 
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({"NullAway", "NotNullFieldNotInitialized"})
     private JavaType baseType;
 
     private static final Map<String, Class<? extends DataField>> TYPE_REGISTRY = new HashMap<>();

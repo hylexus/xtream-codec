@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.EntityCodec;
 import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
 import io.github.hylexus.xtream.codec.core.impl.DefaultFieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.impl.SimpleBeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808ResponseEncoder;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.impl.DefaultJt808BytesProcessor;
@@ -87,6 +88,36 @@ public class BaseCodecTest {
             final String hexString = this.encode(buffer.slice(), version, terminalId, 0x0200);
             @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
             final T decode = this.entityCodec.decode(versionValue, cls, buffer);
+            assertion.accept(instance, decode, hexString);
+        } finally {
+            XtreamBytes.releaseBuf(buffer);
+            assertEquals(0, buffer.refCnt());
+        }
+    }
+
+    protected <T> void codec(Jt808ProtocolVersion version, String terminalId, T instance, CodecValidator<T> assertion, boolean withTracker) {
+        final ByteBuf buffer = allocator.buffer();
+        try {
+            final int versionValue = version.versionValue();
+            if (withTracker) {
+                final CodecTracker encodeTracker = new CodecTracker();
+                this.entityCodec.encode(versionValue, instance, buffer.retain(), encodeTracker);
+                encodeTracker.visit();
+            } else {
+                this.entityCodec.encode(versionValue, instance, buffer.retain());
+            }
+            final String hexString = this.encode(buffer.slice(), version, terminalId, 0x0200);
+
+            @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
+            final T decode;
+            if (withTracker) {
+                final CodecTracker decodeTracker = new CodecTracker();
+                decode = this.entityCodec.decode(versionValue, cls, buffer, decodeTracker);
+                decodeTracker.visit();
+            } else {
+                decode = this.entityCodec.decode(versionValue, cls, buffer);
+            }
+
             assertion.accept(instance, decode, hexString);
         } finally {
             XtreamBytes.releaseBuf(buffer);

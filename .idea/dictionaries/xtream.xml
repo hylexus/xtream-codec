@@ -2,16 +2,18 @@
   <dictionary name="xtream">
     <words>
       <w>ByteBuf</w>
-      <w>GNSS</w>
       <w>SpEL</w>
       <w>Spel</w>
       <w>TLV</w>
       <w>TLVField</w>
       <w>Xtream</w>
       <w>XtreamField</w>
+      <w>apn</w>
       <w>errorprone</w>
       <w>fatjar</w>
+      <w>gnss</w>
       <w>hylexus</w>
+      <w>iccid</w>
       <w>jvmargs</w>
       <w>mkdirs</w>
       <w>mvel</w>

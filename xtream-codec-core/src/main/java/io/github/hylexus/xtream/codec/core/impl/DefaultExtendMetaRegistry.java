@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl;
 
+import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.ExtendMetaRegistry;
@@ -205,30 +206,32 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
                         throw new IllegalArgumentException("Unsupported valueType: " + matcher.valueType());
                     }
 
-                    final Object key = readKey(keyType, matcher);
-                    if (key == null) {
+                    final List<?> keyList = readKey(keyType, matcher);
+                    if (keyList == null) {
                         return;
                     }
-                    final ValueMatcherMeta newMatcher = new ValueMatcherMeta(hasVersion.version(), key, matcher.length(), matcher.valueType(), valueCodec, matcher.valueEntity(), finalCharset, matcher.desc());
-                    final ValueMatcherMeta existedMatcher = resultMap.get(key);
-                    if (existedMatcher == null) {
-                        resultMap.put(key, mapper.apply(newMatcher));
-                    } else {
-                        final int existedVersion = existedMatcher.version();
-                        final int newVersion = newMatcher.version();
-                        if (existedVersion == XtreamField.ALL_VERSION) {
-                            if (newVersion == XtreamField.ALL_VERSION) {
-                                throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + key + "\n"
-                                        + "- " + existedMatcher + "\n"
-                                        + "- " + newMatcher);
-                            } else {
-                                resultMap.put(key, mapper.apply(newMatcher));
-                            }
+                    for (Object key : keyList) {
+                        final ValueMatcherMeta newMatcher = new ValueMatcherMeta(hasVersion.version(), key, matcher.length(), matcher.valueType(), valueCodec, matcher.valueEntity(), finalCharset, matcher.desc());
+                        final ValueMatcherMeta existedMatcher = resultMap.get(key);
+                        if (existedMatcher == null) {
+                            resultMap.put(key, mapper.apply(newMatcher));
                         } else {
-                            if (newVersion != XtreamField.ALL_VERSION) {
-                                throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + key + "\n"
-                                        + "- " + existedMatcher + "\n"
-                                        + "- " + newMatcher);
+                            final int existedVersion = existedMatcher.version();
+                            final int newVersion = newMatcher.version();
+                            if (existedVersion == XtreamField.ALL_VERSION) {
+                                if (newVersion == XtreamField.ALL_VERSION) {
+                                    throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + formateKey(key) + "\n"
+                                            + "- " + existedMatcher + "\n"
+                                            + "- " + newMatcher);
+                                } else {
+                                    resultMap.put(key, mapper.apply(newMatcher));
+                                }
+                            } else {
+                                if (newVersion != XtreamField.ALL_VERSION) {
+                                    throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + formateKey(key) + "\n"
+                                            + "- " + existedMatcher + "\n"
+                                            + "- " + newMatcher);
+                                }
                             }
                         }
                     }
@@ -236,6 +239,13 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
 
         final List<ValueMatcherMeta> list = resultMap.values().stream().toList();
         return new ValueMatcherMetas(list);
+    }
+
+    static String formateKey(Object key) {
+        if (key instanceof Number number) {
+            return number + " (0x" + FormatUtils.toHexString(number.longValue(), 4) + ")";
+        }
+        return key.toString();
     }
 
     ValueLengthMeta createValueLengthMeta(int targetVersion, Field field, ValueLength[] valueLengths) {
@@ -392,19 +402,115 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
         return duplicates;
     }
 
-    private static @Nullable Object readKey(KeyType keyType, ValueMatcher valueMatcher) {
+    private static @Nullable List<?> readKey(KeyType keyType, ValueMatcher valueMatcher) {
         checkExclusive(valueMatcher);
         return switch (keyType) {
-            // todo 这里先取第一个 后续优化支持多个值
-            case i8 -> valueMatcher.matchI8().length > 0 ? valueMatcher.matchI8()[0] : null;
-            case u8 -> valueMatcher.matchU8().length > 0 ? valueMatcher.matchU8()[0] : null;
-            case i16 -> valueMatcher.matchI16().length > 0 ? valueMatcher.matchI16()[0] : null;
-            case u16 -> valueMatcher.matchU16().length > 0 ? valueMatcher.matchU16()[0] : null;
-            case i32 -> valueMatcher.matchI32().length > 0 ? valueMatcher.matchI32()[0] : null;
-            case u32 -> valueMatcher.matchU32().length > 0 ? valueMatcher.matchU32()[0] : null;
-            case i64 -> valueMatcher.matchI64().length > 0 ? valueMatcher.matchI64()[0] : null;
-            case str_gbk, str_gb_2312, str_utf8, str -> valueMatcher.matchString().length > 0 ? valueMatcher.matchString() : null;
+            case i8 -> readI8Key(valueMatcher);
+            case u8 -> readU8Key(valueMatcher);
+            case i16 -> readI16Key(valueMatcher);
+            case u16 -> readU16Key(valueMatcher);
+            case i32 -> readI32Key(valueMatcher);
+            case u32 -> readU32Key(valueMatcher);
+            case i64 -> readI64(valueMatcher);
+            case str_gbk, str_gb_2312, str_utf8, str -> readStringKey(valueMatcher);
         };
+    }
+
+    private static @Nullable List<String> readStringKey(ValueMatcher valueMatcher) {
+        final List<String> results = new ArrayList<>();
+        for (String v : valueMatcher.matchString()) {
+            if (results.contains(v)) {
+                log.warn("String-Matcher Duplicated. valeu={}, @ValueMatcher={}", v, valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
+    }
+
+    private static @Nullable List<Byte> readI8Key(ValueMatcher valueMatcher) {
+        final List<Byte> results = new ArrayList<>();
+        for (byte v : valueMatcher.matchI8()) {
+            if (results.contains(v)) {
+                log.warn("I8-Matcher Duplicated. valeu={}, @ValueMatcher={}", v, valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
+    }
+
+    private static @Nullable List<Short> readU8Key(ValueMatcher valueMatcher) {
+        final List<Short> results = new ArrayList<>();
+        for (short v : valueMatcher.matchU8()) {
+            if (results.contains(v)) {
+                log.warn("U8-Matcher Duplicated. valeu={}, @ValueMatcher={}", v, valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
+    }
+
+    private static @Nullable List<Short> readI16Key(ValueMatcher valueMatcher) {
+        final List<Short> results = new ArrayList<>();
+        for (short v : valueMatcher.matchI16()) {
+            if (results.contains(v)) {
+                log.warn("I16-Matcher Duplicated. valeu={}, @ValueMatcher={}", v, valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
+    }
+
+    private static @Nullable List<Integer> readU16Key(ValueMatcher valueMatcher) {
+        final List<Integer> results = new ArrayList<>();
+        for (int v : valueMatcher.matchU16()) {
+            if (results.contains(v)) {
+                log.warn("U16-Matcher Duplicated. valeu={}, @ValueMatcher={}", v, valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
+    }
+
+    private static @Nullable List<Integer> readI32Key(ValueMatcher valueMatcher) {
+        final List<Integer> results = new ArrayList<>();
+        for (int v : valueMatcher.matchI32()) {
+            if (results.contains(v)) {
+                log.warn("I32-Matcher Duplicated. valeu={}, @ValueMatcher={}", v, valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
+    }
+
+    private static @Nullable List<Long> readU32Key(ValueMatcher valueMatcher) {
+        final List<Long> results = new ArrayList<>();
+        for (long v : valueMatcher.matchU32()) {
+            if (results.contains(v)) {
+                log.warn("U32-Matcher Duplicated. valeu={}, @ValueMatcher={}", formateKey(v), valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
+    }
+
+
+    private static @Nullable List<Long> readI64(ValueMatcher valueMatcher) {
+        final List<Long> results = new ArrayList<>();
+        for (long v : valueMatcher.matchI64()) {
+            if (results.contains(v)) {
+                log.warn("I64-Matcher Duplicated. valeu={}, @ValueMatcher={}", v, valueMatcher);
+                continue;
+            }
+            results.add(v);
+        }
+        return results.isEmpty() ? null : results;
     }
 
     private static void checkExclusive(ValueMatcher vm) {

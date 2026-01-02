@@ -29,12 +29,14 @@ import java.lang.annotation.*;
 
 /**
  * @see io.github.hylexus.xtream.codec.core.impl.domain.XtreamTLVFieldSequenceMeta
+ * @since 0.4.0
  */
 @Documented
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @XtreamField(fieldCodec = TLVCodecs.TLVSequenceCodec.class)
 @ApiStatus.Experimental
+@ApiStatus.AvailableSince("0.4.0")
 public @interface XtreamTLVFieldSequence {
 
     Decoder decoder() default @Decoder(tag = {}, length = {}, value = @Value(matchers = {}));

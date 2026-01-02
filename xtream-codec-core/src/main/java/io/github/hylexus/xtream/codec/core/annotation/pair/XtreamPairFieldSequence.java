@@ -30,12 +30,14 @@ import java.lang.annotation.*;
 
 /**
  * @see io.github.hylexus.xtream.codec.core.impl.domain.XtreamPairFieldSequenceMeta
+ * @since 0.4.0
  */
 @Documented
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @XtreamField(fieldCodec = PairCodecs.PairSequenceCodec.class)
 @ApiStatus.Experimental
+@ApiStatus.AvailableSince("0.4.0")
 public @interface XtreamPairFieldSequence {
 
     Decoder decoder() default @Decoder(key = {}, value = @Value(matchers = {}));

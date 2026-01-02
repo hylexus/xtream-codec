@@ -97,6 +97,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
         @Override
         String charset();
 
+        @SuppressWarnings("unused")
         PaddingConfig paddingConfig();
     }
 

@@ -37,6 +37,10 @@ public record Pair(
         @Nullable String remainingHex
 ) implements FieldCodecRegistry.AtomicDataType {
 
+    @SuppressWarnings("unused")
+    public Pair {
+    }
+
     public Pair(DataField.DictKey key, @Nullable Object value) {
         this(key, value, null);
     }
