@@ -1,35 +1,28 @@
-/*
- * Copyright 2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+---
+article: false
+date: 2026-01-03
+icon: fa-tags
+tag:
+  - 内置
+  - 注解
+  - TLV
+---
 
-package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
+# TLV 类型
 
-import io.github.hylexus.xtream.codec.core.annotation.ext.*;
-import io.github.hylexus.xtream.codec.core.annotation.tlv.XtreamTLVFieldSequence;
-import io.github.hylexus.xtream.codec.core.type.Preset;
-import io.github.hylexus.xtream.codec.core.type.TLV;
-import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
-import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-import org.jetbrains.annotations.ApiStatus;
+## 介绍 <Badge text="0.4.0" type="tip" vertical="top"/> <Badge text="Experimental" type="danger" vertical="top" />
 
-import java.util.List;
+`TLV（Type-Length-Value）` 是一种广泛应用于二进制协议中的数据编码格式，常用于高效、灵活地序列化结构化数据。
 
+从版本 <Badge text="0.4.0" type="tip" vertical="middle" /> 开始，**xtream-codec** 引入了对 `TLV` 类型的内置支持，
+允许开发者通过注解定义 `TLV` 格式的消息体。
+
+## 示例
+
+- [GitHub](https://github.com/hylexus/xtream-codec/blob/develop/ext/jt/jt-808-server-spring-boot-starter-reactive/src/main/java/io/github/hylexus/xtream/codec/ext/jt808/builtin/messages/request/BuiltinMessage0104SampleTLV.java)
+- [Gitee](https://gitee.com/hylexus/xtream-codec/blob/develop/ext/jt/jt-808-server-spring-boot-starter-reactive/src/main/java/io/github/hylexus/xtream/codec/ext/jt808/builtin/messages/request/BuiltinMessage0104SampleTLV.java)
+
+```java {27-81}
 /**
  * 查询终端参数应答 0x0104
  *
@@ -112,3 +105,4 @@ public class BuiltinMessage0104SampleTLV {
     )
     private List<TLV> parameterItems;
 }
+```

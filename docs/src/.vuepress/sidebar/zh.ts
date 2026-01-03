@@ -40,6 +40,7 @@ export const zhSidebar = sidebar({
                                 '/guide/core/annotation-driven/annex/',
                                 '/guide/core/annotation-driven/annex/prepend-length-field.md',
                                 '/guide/core/annotation-driven/annex/padding.md',
+                                '/guide/core/annotation-driven/annex/tlv.md',
                             ]
                         }
                     ]
