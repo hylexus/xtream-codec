@@ -7,6 +7,15 @@ article: false
 
 ## 0.4.0(2026-01-03)
 
+### ⭐ New Features
+
+- 多表达式引擎支持 [#5](https://github.com/hylexus/xtream-codec/issues/5)
+- 数据类型扩展 [#6](https://github.com/hylexus/xtream-codec/issues/6)
+    - `io.github.hylexus.xtream.codec.core.type.TLV`
+    - `io.github.hylexus.xtream.codec.core.type.Pair`
+    - `io.github.hylexus.xtream.codec.core.type.simple.DataField`
+- 可观测性 - 后端 [#8](https://github.com/hylexus/xtream-codec/issues/8)
+
 ## 0.3.0(2025-10-26)
 
 ### 🎯 Highlights
