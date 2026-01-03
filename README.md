@@ -42,7 +42,7 @@
     </a>
 </p>
 
-## ProjectNaming
+## ProjectNaming / 项目命名
 
 项目名来源: `xtream-codec == xtream + codec`
 
@@ -52,7 +52,7 @@
       的流式编程([projectreactor](https://projectreactor.io))
 - `codec == Coder + Decoder`
 
-## Intro
+## Intro / 介绍
 
 该项目是一个基于 [projectreactor](https://projectreactor.io/) 的、和具体协议无关的、异步的、<span style="color:red;">非阻塞的</span>、TCP/UDP 服务端实现。
 
@@ -83,16 +83,26 @@
         - [https://sample-videos.com/index.php#sample-flv-video](https://sample-videos.com/index.php#sample-flv-video)
         - ...
 
-## Compatibility
+## Roadmap / 版本路线图
+
+通过 [GitHub Milestones](https://github.com/hylexus/xtream-codec/milestones) 管理未来的版本计划
+
+> 欢迎在 Issue 中讨论设计，或认领 `help wanted` 任务参与开发
+
+## Compatibility / 兼容性
 
 参考 : [https://start.spring.io/actuator/info](https://start.spring.io/actuator/info)
 
-| xtream-version | spring-boot | spring-cloud |
-|----------------|-------------|--------------|
-| **0.1.x**      | **3.5.6 +** | **2025.0.0** |
-| **0.0.x**      | **3.2.x +** | **2023.0.3** |
+> 非 spring 项目可以不用理会这个兼容性
+>
+> 但依然建议使用 [spring-boot-dependencies](https://central.sonatype.com/artifact/org.springframework.boot/spring-boot-dependencies) 这个 `BOM` 来管理 N 多依赖的兼容性问题
 
-## Modules
+| xtream-version | spring-boot-dependencies | spring-cloud-dependencies |
+|----------------|--------------------------|---------------------------|
+| **0.1.x**      | **3.5.6 +**              | **2025.0.0**              |
+| **0.0.x**      | **3.2.x +**              | **2023.0.3**              |
+
+## Modules / 项目模块
 
 ```shell
 .
@@ -121,13 +131,13 @@
 └── xtream-codec-server-reactive                        ## 异步非阻塞的 TCP/UDP 服务端实现
 ```
 
-## Docs
+## Docs / 文档
 
 - 国内站点: https://iotplanet.top/xtream-codec/
 - Github: https://hylexus.github.io/xtream-codec/
 - DeepWiki(**AI** 生成): https://deepwiki.com/hylexus/xtream-codec/
 
-## QuickStart
+## QuickStart / 快速入门
 
 - **Maven** 版示例: [https://github.com/iotplanet/jt-808-quick-start](https://github.com/iotplanet/jt-808-quick-start)
 - 带存储的 **JT/T 808** 服务示例
@@ -140,7 +150,7 @@
     - 国内站点:https://iotplanet.top/xtream-codec/guide/core/samples/custom-protocol-sample-02/protocol.html
     - Github: https://hylexus.github.io/xtream-codec/guide/core/samples/custom-protocol-sample-02/protocol.html
 
-## License
+## License / 开源协议
 
 `xtream-codec` 使用 [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) 开源许可证。 详情见 [LICENSE](LICENSE) 文件。
 
@@ -149,13 +159,13 @@
 - 请参考生成的 **.jar** 文件中的 `META-INF/NOTICE.txt` 文件 。
 - 或者, 执行 `./gradlew clean generateLicenseReport` 之后查看生成的 `build/reports/dependency-license/THIRD-PARTY-NOTICES.txt` 文件。
 
-## Funding
+## Funding / 打赏
 
 项目的发展离不开你的支持，请作者喝一杯🍺吧！
 
 ![有钱的捧个钱场 没钱的捧个人场](https://img.iotplanet.top/img/pay.png)
 
-## TODO
+## TODO / 待办
 
 - [JT/T 1078 扩展](ext/jt/jt-1078-server-spring-boot-starter-reactive)
     - [ ] 代码简化(80%)

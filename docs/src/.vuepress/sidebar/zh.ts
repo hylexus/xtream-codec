@@ -182,6 +182,7 @@ export const zhSidebar = sidebar({
                     text: "配置", icon: "gears", collapsible: false, children: [
                         '/ext/jt/jt808/configuration/overview.md',
                         '/ext/jt/jt808/configuration/features.md',
+                        '/ext/jt/jt808/configuration/codec.md',
                         '/ext/jt/jt808/configuration/instruction-server.md',
                         '/ext/jt/jt808/configuration/attachment-server.md',
                         '/ext/jt/jt808/configuration/schedulers.md',
@@ -198,7 +199,7 @@ export const zhSidebar = sidebar({
     ],
     "/release-notes": [
         {text: 'Latest', link: '/release-notes/latest.md', icon: 'code-branch'},
-        '/release-notes/0.1.x-latest.md',
+        '/release-notes/0.1.0-0.3.0.md',
         '/release-notes/0.0.x.md',
     ],
 });

@@ -5,6 +5,8 @@ article: false
 
 # Latest
 
+## 0.4.0(2026-01-03)
+
 ## 0.3.0(2025-10-26)
 
 ### 🎯 Highlights

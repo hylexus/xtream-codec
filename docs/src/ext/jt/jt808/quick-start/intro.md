@@ -33,6 +33,10 @@ article: false
 
 ~~**JT/T 808 V2011**~~ 已经废弃，消息体整体结构和 **JT/T 808 V2013** 一致。
 
+> 仅仅通过消息头是无法区分 2013 和 2011 版本的。只能从具体业务入手。
+> 
+> 参考 [GitHub issue#3](https://github.com/hylexus/xtream-codec/issues/3)
+
 @tab V2013#2
 
 ```text {12}

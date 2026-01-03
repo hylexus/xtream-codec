@@ -13,6 +13,11 @@ article: false
 下面是配置项概览，后续文档中会详细介绍。
 
 ```yaml
+xtream:
+  codec:
+    # 表达式引擎(v0.4.0)
+    expression:
+      type: spel
 jt808-server:
   # 总开关
   enabled: true

@@ -107,7 +107,7 @@ public class BuiltinLocationMessageExtraItemFieldCodec
         }
     }
 
-    @SuppressWarnings("NullAway.Init")
+    @SuppressWarnings({"NullAway.Init", "LombokGetterMayBeUsed"})
     public static class OverSpeedAlarmItem {
         /**
          * 位置类型
@@ -119,7 +119,7 @@ public class BuiltinLocationMessageExtraItemFieldCodec
          */
         private short locationType;
         /**
-         * 区域或路段ID
+         * 区域或路段 ID
          * <p>
          * 若位置类型为0，无该字段
          */

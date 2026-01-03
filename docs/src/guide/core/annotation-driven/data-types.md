@@ -15,7 +15,7 @@ icon: list
 | 2  | _有_ | `int/Integer` | `@Preset.RustStyle.i16` | --                      |
 | 4  | 无   | `int/Integer` | `@Preset.RustStyle.u32` | `@Preset.JtStyle.DWORD` |
 | 4  | _有_ | `long/Long`   | `@Preset.RustStyle.i32` | --                      |
-| 8  | 无   | `long/Long`   | `@Preset.RustStyle.u64` | --                      |
+| 8  | 无   | `long/Long`   | `@Preset.RustStyle.i64` | --                      |
 
 ## 2.字符串类型
 
@@ -44,6 +44,32 @@ icon: list
 
 ## 3.嵌套类型
 
-## 4.List类型
+- [内置注解 - Rust 风格 - 嵌套类型](/guide/core/annotation-driven/builtin-annotations.md#嵌套类型)
+- [内置注解 - JT 风格 - 嵌套类型](/guide/core/annotation-driven/builtin-annotations.md#嵌套类型-1)
+
+## 4.列表类型
+
+- [内置注解 - Rust 风格 - 列表类型](/guide/core/annotation-driven/builtin-annotations.md#列表类型)
+- [内置注解 - JT 风格 - 列表类型](/guide/core/annotation-driven/builtin-annotations.md#列表类型-1)
 
 ## 5.浮点数
+
+::: danger 目前不支持浮点数
+
+原因如下:
+
+- 精度问题
+- 私有协议中浮点数的操作一般都是：`编码前转为整数 --> 编码 --> 传输 --> 解码 --> 解析为整数 --> 转为浮点数`
+
+:::
+
+## 6.其他
+
+- TLV
+- Pair
+- BCD
+    - [内置注解 - Rust 风格 - BCD](/guide/core/annotation-driven/builtin-annotations.md#bcd)
+    - [内置注解 - JT 风格 - BCD](/guide/core/annotation-driven/builtin-annotations.md#bcd-1)
+- 字节序列
+    - [内置注解 - Rust 风格 - 其他](/guide/core/annotation-driven/builtin-annotations.md#其他)
+    - [内置注解 - JT 风格 - 其他](/guide/core/annotation-driven/builtin-annotations.md#其他-1)

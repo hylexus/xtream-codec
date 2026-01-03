@@ -89,6 +89,16 @@ tag:
     - 编码: 默认 `utf-8`
     - **JavaType**: `java.lang.String`
 
+### BCD
+
+- `@Preset.RustStyle.str(charset="bcd_8421")`
+    - 字符串
+    - 编码固定为: `BCD_8421`
+    - **JavaType**: `java.lang.String`
+- `@Preset.RustStyle.BcdDateTime`
+    - **N 字节**
+    - **JavaType**: `java.time.LocalDateTime/java.util.Date/String`
+
 ### 嵌套类型
 
 - `@Preset.RustStyle.struct`
@@ -105,6 +115,12 @@ tag:
 - `@Preset.RustStyle.dyn`
     - **JavaType**: `Object`
     - 运行时才能确定具体类型
+
+### 其他
+
+- `@Preset.RustStyle.byte_array`
+    - **N 字节**
+    - **JavaType**: `byte[]`
 
 ## JT/T 808 风格内置注解
 
@@ -157,10 +173,16 @@ tag:
     - 字符串
     - 编码: 默认 `GBK`
     - **JavaType**: `java.lang.String`
+
+### BCD
+
 - `@Preset.RustStyle.Bcd`
     - 字符串
     - 编码固定为: `BCD_8421`
     - **JavaType**: `java.lang.String`
+- `@Preset.JtStyle.BcdDateTime`
+    - **N 字节**
+    - **JavaType**: `java.time.LocalDateTime/java.util.Date/String`
 
 ### 嵌套类型
 
@@ -184,9 +206,6 @@ tag:
 - `@Preset.RustStyle.Bytes`
     - **N 字节**
     - **JavaType**: `byte[]`
-- `@Preset.RustStyle.BcdDateTime`
-    - **N 字节**
-    - **JavaType**: `java.time.LocalDateTime/java.util.Date/String`
 
 ## 内置类型对比
 
