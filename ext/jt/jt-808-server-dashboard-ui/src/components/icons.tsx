@@ -7,7 +7,7 @@ import {
   faChevronRight,
   faCircleCheck,
   faClone,
-  faCube,
+  faCube, faCubes,
   faDesktop,
   faEye,
   faFileCirclePlus,
@@ -21,13 +21,11 @@ import {
   faShuffle,
   faSun,
   faTags,
-  faTrash,
-  IconDefinition,
-} from "@fortawesome/free-solid-svg-icons";
-import {
   faGauge,
   faComments,
   faTerminal,
+  faTrash,
+  IconDefinition, faDatabase,
 } from "@fortawesome/free-solid-svg-icons";
 import * as React from "react";
 
@@ -117,7 +115,12 @@ export const FaCircleCheckIcon = ({ ...props }) => {
 export const FaChevronRightIcon = ({ ...props }) => {
   return <FaIcon icon={faChevronRight} {...props} />;
 };
-
+export const FaDataBaseIcon = ({...props}) => {
+  return <FaIcon icon={faDatabase} {...props} />
+}
+export const FaCubesIcon = ({...props}) => {
+  return <FaIcon icon={faCubes} {...props} />
+}
 export const LogoIcon: React.FC<IconSvgProps> = ({
   size = 36,
   height,
