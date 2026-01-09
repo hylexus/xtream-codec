@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.spec;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -108,7 +110,7 @@ public class Jt808ResponseEntity<T> {
     }
 
     static class DefaultBuilder implements Builder {
-        private Integer messageId;
+        private @Nullable Integer messageId;
         private int maxPackageSize = 1024;
         private byte reversedBit15InHeader = 0b0;
         private byte encryptionType = 0b000;
@@ -151,7 +153,7 @@ public class Jt808ResponseEntity<T> {
         public <T> Jt808ResponseEntity<T> build(T body) {
             return new Jt808ResponseEntity<>(
                     this.flowId,
-                    this.messageId,
+                    Objects.requireNonNull(this.messageId, "messageId must not be null"),
                     this.maxPackageSize,
                     this.reversedBit15InHeader,
                     this.encryptionType,

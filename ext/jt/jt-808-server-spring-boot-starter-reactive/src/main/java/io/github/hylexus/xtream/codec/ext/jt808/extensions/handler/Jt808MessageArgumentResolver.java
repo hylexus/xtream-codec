@@ -46,7 +46,8 @@ public class Jt808MessageArgumentResolver implements XtreamHandlerMethodArgument
     public Mono<Object> resolveArgument(XtreamMethodParameter parameter, XtreamExchange exchange) {
         final Object message = createMessageInstance(parameter, exchange);
 
-        final Object instance = this.messageCodec.decode(message, exchange.request().payload().slice());
+        final int version = exchange.request().version();
+        final Object instance = this.messageCodec.decode(version, message, exchange.request().payload().slice());
         return Mono.just(instance);
     }
 

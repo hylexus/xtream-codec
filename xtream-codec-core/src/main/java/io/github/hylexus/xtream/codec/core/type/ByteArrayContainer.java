@@ -115,15 +115,18 @@ public interface ByteArrayContainer extends BytesContainer {
         return new String(this.payload(), charset);
     }
 
+    @Override
     default byte asI8() {
         return this.payload()[0];
     }
 
+    @Override
     default short asI16() {
         final byte[] value = this.payload();
-        return (short) ((value[0] & 0xff) << 8 | value[1] & 0xff);
+        return (short) ((value[0] & 0xff) << 8 | (value[1] & 0xff));
     }
 
+    @Override
     default int asI32() {
         final byte[] bytes = this.payload();
         return ((bytes[0] & MASK) << 24)

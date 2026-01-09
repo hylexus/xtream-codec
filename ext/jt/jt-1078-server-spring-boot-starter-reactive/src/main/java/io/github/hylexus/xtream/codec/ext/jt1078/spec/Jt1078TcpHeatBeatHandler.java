@@ -97,7 +97,7 @@ public class Jt1078TcpHeatBeatHandler extends ChannelInboundHandlerAdapter {
     private static void closeAndIgnoreException(ChannelHandlerContext ctx, String message) {
         try {
             log.info(message, ctx.channel());
-            ctx.channel().close();
+            var ignored = ctx.channel().close();
         } catch (Exception ignored) {
             // ignored
         }

@@ -31,7 +31,7 @@ public interface XtreamOutbound {
 
     ByteBufAllocator bufferFactory();
 
-    XtreamRequest.Type type();
+    XtreamInbound.Type type();
 
     NettyOutbound outbound();
 

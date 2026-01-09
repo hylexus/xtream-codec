@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.common.utils;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Optional;
 
 public final class Numbers {
@@ -44,7 +46,7 @@ public final class Numbers {
         };
     }
 
-    public static Optional<Integer> parseInteger(Object input) {
+    public static Optional<Integer> parseInteger(@Nullable Object input) {
         return switch (input) {
             case null -> Optional.empty();
             case Number number -> Optional.of(number.intValue());
@@ -53,15 +55,18 @@ public final class Numbers {
         };
     }
 
-    public static Optional<Integer> parseInteger(String input) {
+    public static Optional<Integer> parseInteger(@Nullable String input) {
         try {
+            if (input == null) {
+                return Optional.empty();
+            }
             return Optional.of(Integer.parseInt(input.trim()));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    public static Optional<Boolean> parseBoolean(Object input) {
+    public static Optional<Boolean> parseBoolean(@Nullable Object input) {
         return switch (input) {
             case null -> Optional.empty();
             case Boolean bool -> Optional.of(bool);
@@ -70,8 +75,11 @@ public final class Numbers {
         };
     }
 
-    public static Optional<Boolean> parseBoolean(String input) {
+    public static Optional<Boolean> parseBoolean(@Nullable String input) {
         try {
+            if (input == null) {
+                return Optional.empty();
+            }
             return Optional.of(Boolean.parseBoolean(input.trim()));
         } catch (Exception e) {
             return Optional.empty();

@@ -18,7 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt1078.pubsub;
 
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Request;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078SimConverter;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
 
@@ -42,14 +42,13 @@ public interface Jt1078Channel {
         return this.doSubscribe(cls, creator).dataStream();
     }
 
-    void unsubscribe(String id, @Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason);
+    void unsubscribe(String id, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason);
 
     default void unsubscribe(String id) {
         this.unsubscribe(id, null);
     }
 
-    void close(Jt1078Subscriber.Jt1078SubscriberCloseException reason);
-
+    void close(Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason);
 
     long countSubscribers(Predicate<Jt1078SubscriberDescriptor> predicate);
 

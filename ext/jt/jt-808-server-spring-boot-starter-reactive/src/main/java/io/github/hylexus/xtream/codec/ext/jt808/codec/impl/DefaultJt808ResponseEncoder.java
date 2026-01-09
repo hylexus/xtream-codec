@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.codec.impl;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.RootSpan;
 import io.github.hylexus.xtream.codec.core.tracker.VirtualEntitySpan;
@@ -33,9 +34,11 @@ import io.github.hylexus.xtream.codec.ext.jt808.utils.JtProtocolConstant;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -73,7 +76,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         if (body instanceof ByteBuf byteBuf) {
             return this.doBuild(describer, byteBuf, tracker);
         }
-        final ByteBuf bodyBuf = this.encodeBody(body, tracker);
+        final ByteBuf bodyBuf = this.encodeBody(describer, body, tracker);
         return this.doBuild(describer, bodyBuf, tracker);
     }
 
@@ -89,9 +92,8 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
     }
 
     private Jt808FlowIdGenerator getFlowIdGenerator(Jt808MessageDescriber describer) {
-        return describer.flowIdGenerator() == null
-                ? this.flowIdGenerator
-                : describer.flowIdGenerator();
+        final Jt808FlowIdGenerator generator = describer.flowIdGenerator();
+        return generator != null ? generator : this.flowIdGenerator;
     }
 
     protected ByteBuf doBuild(Jt808MessageDescriber describer, ByteBuf body, @Nullable CodecTracker tracker) {
@@ -151,19 +153,19 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         }
         final boolean needTracker = tracker != null;
         if (needTracker) {
-            this.updateTracker(describer, totalSubPackageCount, currentPackageNo, tracker, compositeByteBuf, jt808RequestHeader, body, checkSum);
+            this.updateTracker(describer, totalSubPackageCount, currentPackageNo, Objects.requireNonNull(tracker), compositeByteBuf, jt808RequestHeader, body, checkSum);
         }
         final ByteBuf escaped;
         try {
             escaped = this.messageProcessor.doEscapeForSend(compositeByteBuf);
             if (needTracker) {
-                final Jt808MessageDescriber.Tracker last = describer.trackers().getLast();
+                final Jt808MessageDescriber.Tracker last = Objects.requireNonNull(describer.trackers()).getLast();
                 last.setEscapedHexString("7e" + FormatUtils.toHexString(escaped) + "7e");
                 final RootSpan details = last.getDetails();
                 details.setHexString(
                         details.getChildren().get(0).getHexString()
-                        + details.getChildren().get(1).getHexString()
-                        + details.getChildren().get(2).getHexString()
+                                + details.getChildren().get(1).getHexString()
+                                + details.getChildren().get(2).getHexString()
                 );
             }
         } catch (Throwable e) {
@@ -190,14 +192,14 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
             ByteBuf message, Jt808RequestHeader jt808RequestHeader, ByteBuf body, byte checkSum) {
 
         final Jt808MessageDescriber.Tracker responseTracker = new Jt808MessageDescriber.Tracker();
-        describer.trackers().add(responseTracker);
+        Objects.requireNonNull(describer.trackers()).add(responseTracker);
         responseTracker.setRawHexString("7e" + FormatUtils.toHexString(message) + "7e");
 
         final Header header = new Header(jt808RequestHeader);
         final CodecTracker headerTracker = new CodecTracker();
         final ByteBuf tempHeaderBuffer = allocator.buffer();
         try {
-            this.entityCodec.encode(header, tempHeaderBuffer, headerTracker);
+            this.entityCodec.encode(describer.version().versionValue(), header, tempHeaderBuffer, headerTracker);
         } finally {
             XtreamBytes.releaseBuf(tempHeaderBuffer);
         }
@@ -212,20 +214,22 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         if (totalSubPackageCount == 0 && currentPackageNo == 0) {
             details.getChildren().add(new VirtualEntitySpan(tracker.getRootSpan(), "body", "消息体"));
         } else {
-            details.getChildren().add(new VirtualFieldSpan("body", "消息体", "ByteBuf", body).setHexString(FormatUtils.toHexString(body)));
+            // details.getChildren().add(new VirtualFieldSpan("body", "消息体", "ByteBuf", body).setHexString(FormatUtils.toHexString(body)));
+            details.getChildren().add(new VirtualFieldSpan("body", "消息体", "ByteBuf", null).setHexString(FormatUtils.toHexString(body)));
         }
 
         // 3. checkSum
         details.getChildren().add(new VirtualFieldSpan("checkSum", "校验码", "java.lang.Byte", checkSum).setHexString(FormatUtils.toHexString(checkSum, 2)));
     }
 
-    private ByteBuf encodeBody(Object entity, @Nullable CodecTracker tracker) {
+    private ByteBuf encodeBody(Jt808MessageDescriber describer, Object entity, @Nullable CodecTracker tracker) {
         if (entity instanceof ByteBuf byteBuf) {
             return byteBuf;
         }
         final ByteBuf buffer = allocator.buffer();
         try {
-            this.entityCodec.encode(entity, buffer, tracker);
+            final int version = describer.version().versionValue();
+            this.entityCodec.encode(version, entity, buffer, tracker);
         } catch (Throwable e) {
             XtreamBytes.releaseBuf(buffer);
             throw e;
@@ -251,7 +255,11 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
                 .build();
     }
 
+    @SuppressWarnings("LombokGetterMayBeUsed")
     public static class Header {
+        @SuppressWarnings({"unused", "NullAway.Init"})
+        public Header() {
+        }
 
         public Header(Jt808RequestHeader header) {
             this.messageId = header.messageId();
@@ -271,7 +279,13 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
             return Jt808RequestHeader.Jt808MessageBodyProps.from(this.messageBodyProps).versionIdentifier() == 1;
         }
 
-        @Preset.JtStyle.Word(desc = "消息ID")
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasVersionField() {
+            return hasVersionField();
+        }
+
+        @Preset.JtStyle.Word(desc = "消息 ID")
         private int messageId;
 
         // byte[2-4)    消息体属性 word(16)
@@ -279,11 +293,19 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         private int messageBodyProps;
 
         // byte[4]     协议版本号
-        @Preset.JtStyle.Byte(condition = "hasVersionField()", desc = "协议版本号(V2019+)")
+        // @Preset.JtStyle.Byte(condition = "hasVersionField()", desc = "协议版本号(V2019+)")
+        @Preset.JtStyle.Byte(
+                conditions = @Expression(
+                        spel = "hasVersionField()",
+                        mvel = "self.hasVersionField()",
+                        aviator = "self.hasVersionField"
+                ),
+                desc = "协议版本号(V2019+)"
+        )
         private short protocolVersion;
 
         // byte[5-15)    终端手机号或设备ID bcd[10]
-        @Preset.JtStyle.Bcd(lengthExpression = "hasVersionField() ? 10 : 6", desc = "终端手机号或设备ID")
+        @Preset.JtStyle.Bcd(lengthExpression = "hasVersionField() ? 10 : 6", desc = "终端手机号或设备 ID")
         private String terminalId;
 
         // byte[15-17)    消息流水号 word(16)
@@ -291,8 +313,16 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
         private int serialNo;
 
         // byte[17-21)    消息包封装项
-        @Preset.JtStyle.Object(condition = "hasSubPackage()", desc = "消息包封装项")
-        private SubPackageProps subPackageProps;
+        // @Preset.JtStyle.Object(condition = "hasSubPackage()", desc = "消息包封装项")
+        @Preset.JtStyle.Object(
+                conditions = @Expression(
+                        spel = "hasSubPackage()",
+                        mvel = "self.hasSubPackage()",
+                        aviator = "self.hasSubPackage"
+                ),
+                desc = "消息包封装项"
+        )
+        private @Nullable SubPackageProps subPackageProps;
 
         // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
         public int msgBodyLength() {
@@ -301,6 +331,12 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
 
         // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
         public boolean hasSubPackage() {
+            // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+            return (messageBodyProps & 0x2000) > 0;
+        }
+
+        // for Aviator
+        public boolean isHasSubPackage() {
             // return ((msgBodyProperty & 0x2000) >> 13) == 1;
             return (messageBodyProps & 0x2000) > 0;
         }
@@ -350,7 +386,7 @@ public class DefaultJt808ResponseEncoder implements Jt808ResponseEncoder {
             return this;
         }
 
-        public SubPackageProps getSubPackageProps() {
+        public @Nullable SubPackageProps getSubPackageProps() {
             return subPackageProps;
         }
 

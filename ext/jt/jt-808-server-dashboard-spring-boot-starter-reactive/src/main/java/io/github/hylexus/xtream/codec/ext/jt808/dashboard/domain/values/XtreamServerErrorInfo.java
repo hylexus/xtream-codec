@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.LongAdder;
 @ToString
 @Getter
 @Setter
+@SuppressWarnings("NullAway")
 public final class XtreamServerErrorInfo {
 
     public XtreamServerErrorInfo() {
@@ -35,7 +37,7 @@ public final class XtreamServerErrorInfo {
 
     private LongAdder count = new LongAdder();
     private Serializable details;
-    private String lastErrorMessage;
+    private @Nullable String lastErrorMessage;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "GMT+8")
     private Instant lastErrorTime;
 

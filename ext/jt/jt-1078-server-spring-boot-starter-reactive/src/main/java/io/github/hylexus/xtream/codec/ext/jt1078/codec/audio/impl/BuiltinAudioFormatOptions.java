@@ -158,6 +158,7 @@ public enum BuiltinAudioFormatOptions implements AudioFormatOptions {
         return audioFamily == AudioFamily.G711;
     }
 
+    @Override
     public boolean isPcm() {
         return audioFamily == AudioFamily.PCM;
     }

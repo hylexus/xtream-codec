@@ -39,7 +39,7 @@ public class BuiltinMessage0500 {
      * 对应的车辆控制消息的流水号
      */
     @Preset.JtStyle.Word(desc = "应答流水号")
-    private short flowId;
+    private int flowId;
 
     /**
      * 位置信息汇报消息体

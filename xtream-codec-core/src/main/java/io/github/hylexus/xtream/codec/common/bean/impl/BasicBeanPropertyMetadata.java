@@ -19,26 +19,32 @@ package io.github.hylexus.xtream.codec.common.bean.impl;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.FieldConditionEvaluator;
 import io.github.hylexus.xtream.codec.common.bean.FieldLengthExtractor;
+import io.github.hylexus.xtream.codec.common.bean.IterationTimesExtractor;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
-import io.github.hylexus.xtream.codec.common.utils.XtreamUtils;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.impl.codec.RuntimeTypeFieldCodec;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.PrependLengthFieldSpan;
+import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
-import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Optional;
 
 public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     protected final BeanMetadataRegistry beanMetadataRegistry;
     private final String name;
     private final Class<?> type;
+    private final int version;
     private final FiledDataType filedValueType;
     private final Field field;
     // private final PropertyDescriptor propertyDescriptor;
@@ -50,26 +56,62 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     protected final XtreamField xtreamField;
     protected final int prependLengthFieldByteCounts;
     protected final PrependLengthFieldType prependLengthFieldType;
-    @Setter
-    private FieldCodec<?> fieldCodec;
+    private final ContainerInstanceFactory containerInstanceFactory;
+    private final FieldCodec<?> fieldCodec;
+    protected final boolean isRecordClass;
+    protected final boolean isRecordComponent;
+    protected final IterationTimesExtractor iterationTimesExtractor;
 
-    public BasicBeanPropertyMetadata(BeanMetadataRegistry registry, String name, Class<?> type, Field field, PropertyGetter getter, PropertySetter setter) {
+    public BasicBeanPropertyMetadata(BeanMetadataRegistry registry, String name, Class<?> type, int version, XtreamField xtreamField, Field field, PropertyGetter getter, PropertySetter setter) {
         this.beanMetadataRegistry = registry;
         this.name = name;
         this.type = type;
+        this.version = version;
         this.field = field;
+        this.isRecordComponent = field.getDeclaringClass().isRecord();
+        this.isRecordClass = type.isRecord();
         this.propertyGetter = getter;
         this.propertySetter = setter;
         this.order = initOrder();
         this.filedValueType = XtreamTypes.detectFieldDataType(field);
-        this.xtreamField = findAnnotation(XtreamField.class).orElseThrow();
+        this.xtreamField = xtreamField;
+        // this.xtreamField = findAnnotation(XtreamField.class).orElseThrow();
         this.fieldLengthExtractor = detectFieldLengthExtractor(this.xtreamField);
         this.fieldConditionEvaluator = detectFieldConditionalEvaluator(this.xtreamField);
         this.prependLengthFieldByteCounts = this.detectPrependLengthFieldByteCounts(xtreamField);
         this.prependLengthFieldType = PrependLengthFieldType.from(this.prependLengthFieldByteCounts);
+        if (this.xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            this.containerInstanceFactory = ContainerInstanceFactory.PLACEHOLDER;
+        } else {
+            this.containerInstanceFactory = this.xtreamField.containerInstanceFactory() == ContainerInstanceFactory.PlaceholderContainerInstanceFactory.class
+                    ? ContainerInstanceFactory.PLACEHOLDER
+                    : BeanUtils.createNewInstance(this.xtreamField.containerInstanceFactory(), (Object[]) null);
+        }
+        this.fieldCodec = this.detectFieldCodec();
+        this.iterationTimesExtractor = this.beanMetadataRegistry.expressionFactory().createIterationTimesExtractor(xtreamField);
+    }
+
+    private FieldCodec<?> detectFieldCodec() {
+        if (this.xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            return FieldCodec.NullFieldCodec.INSTANCE;
+        }
+        return this.beanMetadataRegistry.getFieldCodecRegistry().getFieldCodec(this).orElseGet(() -> {
+            // ...
+            return switch (this.filedValueType) {
+                case struct, sequence, map -> FieldCodec.NullFieldCodec.INSTANCE;
+                case dynamic -> RuntimeTypeFieldCodec.INSTANCE;
+                default -> throw new IllegalStateException("""
+                        Cannot determine FieldCodec
+                        ==> Field: %s
+                        """.strip().formatted(this.field.toGenericString()));
+            };
+        });
     }
 
     protected int detectPrependLengthFieldByteCounts(XtreamField xtreamField) {
+        if (xtreamField.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT) {
+            return PrependLengthFieldType.none.getByteCounts();
+        }
         if (xtreamField.prependLengthFieldType() != PrependLengthFieldType.none) {
             return xtreamField.prependLengthFieldType().getByteCounts();
         }
@@ -77,10 +119,15 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     private FieldConditionEvaluator detectFieldConditionalEvaluator(XtreamField xtreamField) {
-        if (XtreamUtils.hasElement(xtreamField.condition())) {
-            return new FieldConditionEvaluator.ExpressionFieldConditionEvaluator(xtreamField.condition());
+        final FieldConditionEvaluator evaluator = this.beanMetadataRegistry.expressionFactory().createFieldConditionEvaluator(xtreamField);
+        if (evaluator == null) {
+            throw new IllegalStateException("""
+                    
+                    Cannot determine FieldConditionEvaluator
+                    ==> Field: %s
+                    """.stripTrailing().formatted(this.field.toGenericString()));
         }
-        return FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator.INSTANCE;
+        return evaluator;
     }
 
     /**
@@ -90,22 +137,15 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
      * @see MapBeanPropertyMetadata#decodePropertyValue(FieldCodec.DeserializeContext, ByteBuf) MapBeanPropertyMetadata#decodePropertyValue
      */
     protected FieldLengthExtractor detectFieldLengthExtractor(XtreamField xtreamField) {
-        if (xtreamField.prependLengthFieldType() != PrependLengthFieldType.none) {
-            return new FieldLengthExtractor.PrependFieldLengthExtractor(xtreamField.prependLengthFieldType());
+        final FieldLengthExtractor evaluator = this.beanMetadataRegistry.expressionFactory().createFieldLengthExtractor(xtreamField);
+        if (evaluator == null) {
+            return fallbackFieldLengthExtractor();
         }
 
-        if (xtreamField.prependLengthFieldLength() > 0) {
-            return new FieldLengthExtractor.PrependFieldLengthExtractor(xtreamField.prependLengthFieldLength());
-        }
+        return evaluator;
+    }
 
-        if (xtreamField.length() > 0) {
-            return new FieldLengthExtractor.ConstantFieldLengthExtractor(xtreamField.length());
-        }
-
-        if (XtreamUtils.hasElement(xtreamField.lengthExpression())) {
-            return new FieldLengthExtractor.ExpressionFieldLengthExtractor(xtreamField);
-        }
-
+    private FieldLengthExtractor fallbackFieldLengthExtractor() {
         return XtreamTypes.getDefaultSizeInBytes(this.rawClass())
                 .map(FieldLengthExtractor.ConstantFieldLengthExtractor::new)
                 .map(FieldLengthExtractor.class::cast)
@@ -129,8 +169,18 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         return new FieldLengthExtractor.PlaceholderFieldLengthExtractor("Did you forget to specify length() / lengthExpression() for Field: [ " + this.field + " ]");
     }
 
+    @Override
+    public boolean isRecordClass() {
+        return this.isRecordClass;
+    }
+
+    @Override
+    public boolean isRecordComponent() {
+        return this.isRecordComponent;
+    }
+
     protected int initOrder() {
-        return this.findAnnotation(XtreamField.class).map(XtreamField::order).orElse(0);
+        return this.findAnnotation(XtreamField.class).map(XtreamField::order).orElse(XtreamField.DEFAULT_ORDER);
     }
 
     @Override
@@ -141,6 +191,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     @Override
     public Class<?> rawClass() {
         return this.type;
+    }
+
+    @Override
+    public int version() {
+        return this.version;
     }
 
     @Override
@@ -156,6 +211,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     @Override
     public XtreamField xtreamFieldAnnotation() {
         return this.xtreamField;
+    }
+
+    @Override
+    public ContainerInstanceFactory containerInstanceFactory() {
+        return this.containerInstanceFactory;
     }
 
     @Override
@@ -184,6 +244,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
+    public IterationTimesExtractor iterationTimesExtractor() {
+        return this.iterationTimesExtractor;
+    }
+
+    @Override
     public int order() {
         return this.order;
     }
@@ -195,7 +260,8 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         return Optional.ofNullable(mergedAnnotation);
     }
 
-    public Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
+    @Override
+    public @Nullable Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
         int rb = input.readableBytes();
         if (rb == 0) {
             return null;
@@ -209,17 +275,11 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
-    public void setProperty(Object instance, Object value) {
-        if (value != null) {
-            BeanPropertyMetadata.super.setProperty(instance, value);
-        }
-    }
-
-    @Override
-    public Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
+    public @Nullable Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
         if (this.fieldLengthExtractor instanceof FieldLengthExtractor.PrependFieldLengthExtractor) {
-            final PrependLengthFieldSpan prependLengthFieldSpan = context.codecTracker().addPrependLengthFieldSpan(
-                    context.codecTracker().getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final PrependLengthFieldSpan prependLengthFieldSpan = codecTracker.addPrependLengthFieldSpan(
+                    codecTracker.getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
             );
             final int indexBeforeRead = input.readerIndex();
             final int length = this.fieldLengthExtractor.extractFieldLength(context, context.evaluationContext(), input);
@@ -233,7 +293,10 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
-    public void encodePropertyValue(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
+    public void encodePropertyValue(FieldCodec.SerializeContext context, ByteBuf output, @Nullable Object value) {
+        if (value == null) {
+            return;
+        }
         if (this.prependLengthFieldByteCounts <= 0) {
             this.doEncode(context, output, value);
         } else {
@@ -255,12 +318,16 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     @Override
-    public void encodePropertyValueWithTracker(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
+    public void encodePropertyValueWithTracker(FieldCodec.SerializeContext context, ByteBuf output, @Nullable Object value) {
+        if (value == null) {
+            return;
+        }
         if (this.prependLengthFieldByteCounts <= 0) {
             this.doEncodeWithTracker(context, output, value);
         } else {
-            final PrependLengthFieldSpan prependLengthFieldSpan = context.codecTracker().addPrependLengthFieldSpan(
-                    context.codecTracker().getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
+            final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+            final PrependLengthFieldSpan prependLengthFieldSpan = codecTracker.addPrependLengthFieldSpan(
+                    codecTracker.getCurrentSpan(), "prependLengthField", null, null, prependLengthFieldType.name(), "前置长度字段"
             );
             final int lengthFieldWriterIndex = output.writerIndex();
             // 写入长度字段占位符
@@ -298,18 +365,18 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
 
     @Override
     public String toString() {
-        return "SimpleBeanPropertyMetadata{"
-               + "name='" + name + '\''
-               + ", type=" + type
-               + ", filedValueType=" + filedValueType
-               + ", field=" + field
-               + ", fieldCodec=" + fieldCodec
-               + ", propertyGetter=" + propertyGetter
-               + ", propertySetter=" + propertySetter
-               + ", order=" + order
-               + ", fieldLengthExtractor=" + fieldLengthExtractor
-               + ", xtreamField=" + xtreamField
-               + '}';
+        return "BasicBeanPropertyMetadata{"
+                + "name='" + name + '\''
+                + ", type=" + type
+                + ", filedValueType=" + filedValueType
+                + ", field=" + field
+                + ", fieldCodec=" + fieldCodec
+                + ", propertyGetter=" + propertyGetter
+                + ", propertySetter=" + propertySetter
+                + ", order=" + order
+                + ", fieldLengthExtractor=" + fieldLengthExtractor
+                + ", xtreamField=" + xtreamField
+                + '}';
     }
 
 }

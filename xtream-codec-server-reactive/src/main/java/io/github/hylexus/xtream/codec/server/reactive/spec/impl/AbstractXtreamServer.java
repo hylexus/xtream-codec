@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.NettyServerCustomizer;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamServer;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.netty.DisposableChannel;
@@ -25,6 +26,8 @@ import reactor.netty.transport.Transport;
 import reactor.netty.transport.TransportConfig;
 
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author hylexus
@@ -38,7 +41,7 @@ public abstract class AbstractXtreamServer<
         implements XtreamServer {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractXtreamServer.class);
-    protected volatile DisposableChannel disposableServer;
+    protected volatile @Nullable DisposableChannel disposableServer;
     protected final String name;
 
     protected AbstractXtreamServer(String name) {
@@ -55,13 +58,13 @@ public abstract class AbstractXtreamServer<
 
         this.doStart();
 
-        log.info("{}({}) listening on {}({})", this.getClass().getSimpleName(), this.name, this.disposableServer.address(), this.getServerType());
+        log.info("{}({}) listening on {}({})", this.getClass().getSimpleName(), this.name, requireNonNull(this.disposableServer).address(), this.getServerType());
     }
 
     private void doStart() {
         final Thread thread = new Thread(() -> {
             // ...
-            this.disposableServer.onDispose().block();
+            requireNonNull(this.disposableServer).onDispose().block();
         }, "XtreamServer");
         thread.setDaemon(false);
         thread.setContextClassLoader(this.getClass().getClassLoader());
@@ -70,8 +73,9 @@ public abstract class AbstractXtreamServer<
 
     @Override
     public void stop() {
-        if (this.disposableServer != null) {
-            this.disposableServer.disposeNow();
+        final DisposableChannel server = this.disposableServer;
+        if (server != null) {
+            server.disposeNow();
         }
         this.disposableServer = null;
     }

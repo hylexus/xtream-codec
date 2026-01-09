@@ -17,7 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt1078.dashboard.utils;
 
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078PayloadType;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.converter.Converter;
 
 public class StringToJt1078PayloadTypeConverter implements Converter<String, Jt1078PayloadType> {
@@ -26,7 +26,7 @@ public class StringToJt1078PayloadTypeConverter implements Converter<String, Jt1
     }
 
     @Override
-    public Jt1078PayloadType convert(@Nonnull String source) {
+    public @Nullable Jt1078PayloadType convert(String source) {
         return Jt1078PayloadType.jsonCreator(source);
     }
 

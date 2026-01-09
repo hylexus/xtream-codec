@@ -28,7 +28,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808MessageBod
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808Request;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808RequestHeader;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808SubPackageProps;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
@@ -61,7 +61,7 @@ public class DefaultJt808RequestDecoder implements Jt808RequestDecoder {
     }
 
     @Override
-    public Jt808Request decode(Jt808ServerType serverType, String requestId, ByteBufAllocator allocator, NettyInbound nettyInbound, XtreamRequest.Type requestType, ByteBuf payload, Channel channel, InetSocketAddress remoteAddress) {
+    public Jt808Request decode(Jt808ServerType serverType, String requestId, ByteBufAllocator allocator, NettyInbound nettyInbound, XtreamInbound.Type requestType, ByteBuf payload, Channel channel, InetSocketAddress remoteAddress) {
         if (log.isDebugEnabled()) {
             log.debug("- >>>>>>>>>>>>>>> : 7E{}7E", FormatUtils.toHexString(payload));
         }
@@ -93,6 +93,7 @@ public class DefaultJt808RequestDecoder implements Jt808RequestDecoder {
             }
 
             return new DefaultJt808Request(
+                    header.version().versionValue(),
                     serverType,
                     requestId,
                     traceId,

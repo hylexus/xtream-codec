@@ -39,11 +39,11 @@ public class DefaultJt808MessageBodyProps implements Jt808RequestHeader.Jt808Mes
     @Override
     public String toString() {
         return "MessageBodyProps{"
-                + "intValue=" + intValue
-                + ", messageBodyLength=" + messageBodyLength()
-                + ", hasSubPackage=" + hasSubPackage()
-                + ", encryptionType=" + encryptionType()
-                + '}';
+               + "intValue=" + intValue
+               + ", messageBodyLength=" + messageBodyLength()
+               + ", hasSubPackage=" + hasSubPackage()
+               + ", encryptionType=" + encryptionType()
+               + '}';
     }
 
     public static class DefaultJt808MessageBodyPropsBuilder implements Jt808RequestHeader.Jt808MessageBodyPropsBuilder {
@@ -96,6 +96,7 @@ public class DefaultJt808MessageBodyProps implements Jt808RequestHeader.Jt808Mes
             return this;
         }
 
+        @Override
         public Jt808RequestHeader.Jt808MessageBodyProps build() {
             return new DefaultJt808MessageBodyProps(intValue);
         }

@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.extensions;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
 import io.github.hylexus.xtream.codec.server.reactive.spec.InternalXtreamCommandSender;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSession;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -80,13 +81,13 @@ public interface Jt808CommandSender extends InternalXtreamCommandSender<Jt808Ses
     class DefaultJt808CommandKey implements Jt808CommandKey {
         private final String terminalId;
         private final int responseMessageId;
-        private final Integer serverFlowId;
+        private final @Nullable Integer serverFlowId;
 
         public DefaultJt808CommandKey(String terminalId, int responseMessageId) {
             this(terminalId, responseMessageId, null);
         }
 
-        public DefaultJt808CommandKey(String terminalId, int responseMessageId, Integer serverFlowId) {
+        public DefaultJt808CommandKey(String terminalId, int responseMessageId, @Nullable Integer serverFlowId) {
             this.terminalId = terminalId;
             this.responseMessageId = responseMessageId;
             this.serverFlowId = serverFlowId;
@@ -112,14 +113,13 @@ public interface Jt808CommandSender extends InternalXtreamCommandSender<Jt808Ses
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if (!(o instanceof Jt808CommandKey that)) {
                 return false;
             }
 
-            final DefaultJt808CommandKey that = (DefaultJt808CommandKey) o;
-            return responseMessageId == that.responseMessageId
-                   && terminalId.equals(that.terminalId)
-                   && Objects.equals(serverFlowId, that.serverFlowId);
+            return this.responseMessageId == that.responseMessageId()
+                   && this.terminalId.equals(that.terminalId())
+                   && Optional.ofNullable(this.serverFlowId).equals(that.serverFlowId());
         }
 
         @Override

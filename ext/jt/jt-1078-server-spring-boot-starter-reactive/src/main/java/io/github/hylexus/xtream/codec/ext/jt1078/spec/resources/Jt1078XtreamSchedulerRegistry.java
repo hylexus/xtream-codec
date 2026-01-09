@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt1078.spec.resources;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistry;
+import org.jspecify.annotations.Nullable;
 import reactor.core.scheduler.Scheduler;
 
 public interface Jt1078XtreamSchedulerRegistry extends XtreamSchedulerRegistry {
@@ -30,7 +31,7 @@ public interface Jt1078XtreamSchedulerRegistry extends XtreamSchedulerRegistry {
 
     @Override
     @Deprecated
-    default Scheduler requestDispatcherScheduler() {
+    default @Nullable Scheduler requestDispatcherScheduler() {
         throw new UnsupportedOperationException("Jt1078XtreamSchedulerRegistry does not support requestDispatcherScheduler()");
     }
 

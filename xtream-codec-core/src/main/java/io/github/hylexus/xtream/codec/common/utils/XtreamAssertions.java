@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.common.utils;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.function.Predicate;
 
 /**
@@ -70,4 +72,12 @@ public abstract class XtreamAssertions {
         }
         return t;
     }
+
+    public static String assertNotBlank(@Nullable String string, String error) {
+        if (string == null || string.isBlank()) {
+            throw new IllegalArgumentException(error);
+        }
+        return string;
+    }
+
 }

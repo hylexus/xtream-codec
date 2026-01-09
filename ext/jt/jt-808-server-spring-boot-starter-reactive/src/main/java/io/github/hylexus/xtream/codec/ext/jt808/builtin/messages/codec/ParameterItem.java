@@ -19,14 +19,12 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U32FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.U8FieldCodec;
+import io.github.hylexus.xtream.codec.core.impl.codec.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author hylexus
@@ -44,7 +42,7 @@ public class ParameterItem {
     private short parameterLength;
 
     // 自定义 FieldCodec 时就不用加 @Preset.JtStyle.RuntimeType 注解了
-    private Object parameterValue;
+    private @Nullable Object parameterValue;
 
     // 非请求参数；仅仅为了调试方便；可以忽略这个参数
     private ParameterType parameterType;
@@ -52,7 +50,7 @@ public class ParameterItem {
     public ParameterItem() {
     }
 
-    public ParameterItem(long parameterId, short parameterLength, Object parameterValue) {
+    public ParameterItem(long parameterId, short parameterLength, @Nullable Object parameterValue) {
         this.parameterId = parameterId;
         this.parameterLength = parameterLength;
         this.parameterValue = parameterValue;
@@ -76,12 +74,11 @@ public class ParameterItem {
 
         public static ParameterType fromFieldCodec(FieldCodec<?> fieldCodec) {
             return switch (fieldCodec) {
-                case U8FieldCodec ignored -> BYTE;
-                case U16FieldCodec ignored -> WORD;
-                case U32FieldCodec ignored -> DWORD;
-                case StringFieldCodec.InternalHexStringFieldCodec ignored -> STRING_HEX;
-                case StringFieldCodec stringFieldCodec -> detectStringType(stringFieldCodec.getCharset());
-                case StringFieldCodec.InternalSimpleStringFieldCodec stringFieldCodec -> detectStringType(stringFieldCodec.getCharset().name());
+                case U8FieldCodecs.U8FieldCodec ignored -> BYTE;
+                case U16FieldCodecs.U16FieldCodec ignored -> WORD;
+                case U32FieldCodecs.U32FieldCodec ignored -> DWORD;
+                case StringFieldCodecs.StringFieldCodecHex ignored -> STRING_HEX;
+                case StringFieldCodecs.StringFieldCodec stringFieldCodec -> detectStringType(stringFieldCodec.charset().name());
                 default -> UNKNOWN;
             };
         }

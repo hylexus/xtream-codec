@@ -16,15 +16,19 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.boot.configuration;
 
+import io.github.hylexus.xtream.codec.base.expression.AviatorXtreamExpressionEngine;
+import io.github.hylexus.xtream.codec.base.expression.MvelXtreamExpressionEngine;
+import io.github.hylexus.xtream.codec.base.expression.SpelXtreamExpressionEngine;
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpressionEngine;
 import io.github.hylexus.xtream.codec.common.utils.BufferFactoryHolder;
-import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
-import io.github.hylexus.xtream.codec.core.EntityCodec;
-import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
-import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
+import io.github.hylexus.xtream.codec.core.*;
 import io.github.hylexus.xtream.codec.core.annotation.OrderedComponent;
 import io.github.hylexus.xtream.codec.core.impl.DefaultFieldCodecRegistry;
+import io.github.hylexus.xtream.codec.core.impl.DefaultXtreamExpressionFactory;
 import io.github.hylexus.xtream.codec.core.impl.SimpleBeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.bootstrap.XtreamExpressionFactoryCreationException;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.listener.XtreamExtJt808ServerStartupListener;
+import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamCodecProperties;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.*;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.impl.DefaultJt808BytesProcessor;
@@ -36,7 +40,11 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriptionRegi
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageEncryptionHandler;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.impl.DefaultJt808MessageDescriptionRegistry;
 import io.netty.buffer.ByteBufAllocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -51,10 +59,37 @@ import java.util.List;
         BuiltinJt808ServerSchedulerConfiguration.class,
 })
 @EnableConfigurationProperties({
+        XtreamCodecProperties.class,
         XtreamJt808ServerProperties.class,
 })
 @ConditionalOnProperty(prefix = "jt808-server", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class XtreamExtJt808ServerAutoConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(XtreamExtJt808ServerAutoConfiguration.class);
+
+    public XtreamExtJt808ServerAutoConfiguration(XtreamCodecProperties xtreamCodecProperties, ListableBeanFactory beanFactory) {
+        final XtreamCodecProperties.ExpressionType type = xtreamCodecProperties.getExpression().getType();
+        log.info("xtream.codec.expression.type: {}", type);
+        if (type == XtreamCodecProperties.ExpressionType.CUSTOM) {
+            if (beanFactory.getBeanNamesForType(XtreamExpressionFactory.class).length == 0) {
+                throw new XtreamExpressionFactoryCreationException(new IllegalArgumentException("Custom XtreamExpressionFactory bean not found"), XtreamExpressionFactoryCreationException.FailureType.MISSING_CUSTOM_XTREAM_EXPRESSION_FACTORY_BEAN);
+            }
+        } else if (type == XtreamCodecProperties.ExpressionType.AVIATOR) {
+            try {
+                Class.forName("com.googlecode.aviator.AviatorEvaluator");
+            } catch (Exception e) {
+                log.error("Aviator dependency not found", e);
+                throw new XtreamExpressionFactoryCreationException(e, XtreamExpressionFactoryCreationException.FailureType.MISSING_AVIATOR_DEPENDENCY);
+            }
+        } else if (type == XtreamCodecProperties.ExpressionType.MVEL) {
+            try {
+                Class.forName("org.mvel2.MVEL");
+            } catch (Exception e) {
+                log.error("MVEL dependency not found", e);
+                throw new XtreamExpressionFactoryCreationException(e, XtreamExpressionFactoryCreationException.FailureType.MISSING_MVEL_DEPENDENCY);
+            }
+        }
+    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -76,8 +111,23 @@ public class XtreamExtJt808ServerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    BeanMetadataRegistry beanMetadataRegistry(FieldCodecRegistry fieldCodecRegistry, XtreamCacheableClassPredicate cacheableClassPredicate) {
-        return new SimpleBeanMetadataRegistry(fieldCodecRegistry, cacheableClassPredicate);
+    @ConditionalOnExpression("'${xtream.codec.expression.type:}'.toLowerCase() != 'custom'")
+    XtreamExpressionFactory xtreamExpressionFactory(XtreamCodecProperties properties) {
+        final XtreamExpressionEngine expressionEngine = switch (properties.getExpression().getType()) {
+            case SPEL -> new SpelXtreamExpressionEngine();
+            case MVEL -> new MvelXtreamExpressionEngine();
+            case AVIATOR -> new AviatorXtreamExpressionEngine();
+            // 自定义类型不应该走到这里
+            case CUSTOM -> throw new IllegalStateException("Invalid expression type: " + properties.getExpression().getType());
+            case null -> throw new IllegalArgumentException("Invalid expression type: " + properties.getExpression().getType());
+        };
+        return new DefaultXtreamExpressionFactory(expressionEngine);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    BeanMetadataRegistry beanMetadataRegistry(FieldCodecRegistry fieldCodecRegistry, XtreamCacheableClassPredicate cacheableClassPredicate, XtreamExpressionFactory expressionFactory) {
+        return new SimpleBeanMetadataRegistry(fieldCodecRegistry, cacheableClassPredicate, expressionFactory);
     }
 
     @Bean

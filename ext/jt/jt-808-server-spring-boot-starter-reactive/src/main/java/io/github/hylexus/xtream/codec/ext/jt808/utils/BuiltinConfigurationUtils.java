@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionManager;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.XtreamTcpHeatBeatHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.TcpSessionIdleStateCheckerProps;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.Connection;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,7 @@ public final class BuiltinConfigurationUtils {
     private BuiltinConfigurationUtils() {
     }
 
-    public static void addIdleStateHandler(TcpSessionIdleStateCheckerProps props, Jt808SessionManager sessionManager, Jt808AttachmentSessionManager attachmentSessionManager, Connection connection) {
+    public static void addIdleStateHandler(TcpSessionIdleStateCheckerProps props, @Nullable Jt808SessionManager sessionManager, @Nullable Jt808AttachmentSessionManager attachmentSessionManager, Connection connection) {
         connection.addHandlerLast(
                 BEAN_NAME_CHANNEL_INBOUND_IDLE_STATE_HANDLER,
                 new IdleStateHandler(

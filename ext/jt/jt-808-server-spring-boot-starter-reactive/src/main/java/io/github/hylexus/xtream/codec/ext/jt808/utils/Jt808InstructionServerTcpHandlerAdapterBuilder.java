@@ -22,13 +22,16 @@ import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808Instruct
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.AbstractXtreamHandlerAdapterBuilderTcp;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author hylexus
  */
 public class Jt808InstructionServerTcpHandlerAdapterBuilder extends AbstractXtreamHandlerAdapterBuilderTcp<Jt808InstructionServerTcpHandlerAdapterBuilder> {
-    Jt808RequestDecoder requestDecoder;
-    Jt808RequestLifecycleListener requestLifecycleListener;
+    @Nullable Jt808RequestDecoder requestDecoder;
+    @Nullable Jt808RequestLifecycleListener requestLifecycleListener;
 
     public Jt808InstructionServerTcpHandlerAdapterBuilder(ByteBufAllocator allocator) {
         super(allocator);
@@ -47,6 +50,12 @@ public class Jt808InstructionServerTcpHandlerAdapterBuilder extends AbstractXtre
     @Override
     public Jt808InstructionServerTcpHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808InstructionServerTcpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.requestDecoder, this.requestLifecycleListener);
+        return new Jt808InstructionServerTcpHandlerAdapter(
+                super.byteBufAllocator,
+                requireNonNull(super.sessionManager),
+                exceptionHandlingHandler,
+                requireNonNull(this.requestDecoder),
+                requireNonNull(this.requestLifecycleListener)
+        );
     }
 }

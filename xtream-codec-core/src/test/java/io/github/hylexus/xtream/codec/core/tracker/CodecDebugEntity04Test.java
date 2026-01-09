@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ public class CodecDebugEntity04Test {
             doCompare(encodeTracker, original);
 
             final CodecTracker decodeTracker = new CodecTracker();
-            final CodecDebugEntity04 decoded = entityCodec.decode(new CodecDebugEntity04().setRuntimeClass(CodecDebugEntity02.class), buffer, decodeTracker);
+            final CodecDebugEntity04 decoded = entityCodec.decode(XtreamField.ALL_VERSION, new CodecDebugEntity04().setRuntimeClass(CodecDebugEntity02.class), buffer, decodeTracker);
             // decodeTracker.visit();
             doCompare(decodeTracker, original);
             doCompare(decodeTracker, decoded);
@@ -55,7 +56,7 @@ public class CodecDebugEntity04Test {
         }
     }
 
-    private static void doCompare(CodecTracker tracker, CodecDebugEntity04 original) {
+    private void doCompare(CodecTracker tracker, CodecDebugEntity04 original) {
         final RootSpan rootSpan = tracker.getRootSpan();
         assertEquals(3, rootSpan.getChildren().size());
 
@@ -115,6 +116,7 @@ public class CodecDebugEntity04Test {
                 .setCheckSum((byte) 111);
     }
 
+    @SuppressWarnings("ErroneousBitwiseExpression")
     static int generateMsgBodyPropsForJt808(int msgBodySize, int encryptionType, boolean isSubPackage, int reversedBit15) {
         // [ 0-9 ] 0000,0011,1111,1111(3FF)(消息体长度)
         int props = (msgBodySize & 0x3FF)

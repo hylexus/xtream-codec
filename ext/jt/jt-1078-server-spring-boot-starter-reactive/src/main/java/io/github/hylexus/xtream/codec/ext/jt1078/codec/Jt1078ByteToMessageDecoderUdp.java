@@ -26,6 +26,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamNettyHandlerAda
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.socket.DatagramPacket;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
@@ -107,7 +108,7 @@ public class Jt1078ByteToMessageDecoderUdp {
         return jt1078Session;
     }
 
-    Jt1078Request tryDecodeRequest(ByteBuf in, int simLen, NettyInbound inbound, XtreamNettyHandlerAdapter.InboundInfo inboundInfo) {
+    @Nullable Jt1078Request tryDecodeRequest(ByteBuf in, int simLen, NettyInbound inbound, XtreamNettyHandlerAdapter.InboundInfo inboundInfo) {
         // 这里输入的报文没有 30316364 前缀
         // +5 = 1byte(V,P,X,CC) + 1byte(M,PT) + 2byte(sequenceNumber) + 1byte(channelNumber)
         // FIXME 重复代码

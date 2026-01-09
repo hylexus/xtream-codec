@@ -61,23 +61,23 @@ public class DefaultXtreamCommandSender implements XtreamCommandSender<XtreamSes
     }
 
     @Override
-    public Mono<Void> sendObject(String sessionId, Publisher<Object> data) {
+    public Mono<Void> sendObject(int version, String sessionId, Publisher<Object> data) {
         return this.getSession(sessionId).flatMap(session -> {
             // ...
-            return Flux.from(data).map(this::doEncode).flatMap(byteBuf -> {
+            return Flux.from(data).map(d -> this.doEncode(version, d)).flatMap(byteBuf -> {
                 // ...
                 return session.writeWith(Mono.just(byteBuf));
             }).then();
         }).then();
     }
 
-    protected ByteBuf doEncode(Object message) {
+    protected ByteBuf doEncode(int version, Object message) {
         if (message instanceof ByteBuf byteBuf) {
             return byteBuf;
         }
         final ByteBuf buffer = this.bufferFactory.buffer();
         try {
-            this.entityCodec.encode(message, buffer);
+            this.entityCodec.encode(version, message, buffer);
         } catch (Throwable e) {
             buffer.release();
             throw new RuntimeException(e);

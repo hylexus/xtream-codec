@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.sample8105.types.*;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,7 +37,7 @@ import java.util.List;
 public class Message8105CodecSample implements FieldCodec<List<CommandValue<Object>>> {
 
     @Override
-    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, List<CommandValue<Object>> value) {
+    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable List<CommandValue<Object>> value) {
         if (value == null || value.isEmpty()) {
             return;
         }
@@ -63,7 +64,7 @@ public class Message8105CodecSample implements FieldCodec<List<CommandValue<Obje
     }
 
     @Override
-    public List<CommandValue<Object>> deserialize(BeanPropertyMetadata propertyMetadata, FieldCodec.DeserializeContext context, ByteBuf input, int length) {
+    public @Nullable List<CommandValue<Object>> deserialize(BeanPropertyMetadata propertyMetadata, FieldCodec.DeserializeContext context, ByteBuf input, int length) {
         if (input.readableBytes() <= 0) {
             return null;
         }

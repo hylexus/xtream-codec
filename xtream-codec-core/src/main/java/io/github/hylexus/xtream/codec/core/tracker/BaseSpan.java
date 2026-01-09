@@ -17,19 +17,21 @@
 package io.github.hylexus.xtream.codec.core.tracker;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("NullAway")
 public abstract class BaseSpan {
     protected final String id = UUID.randomUUID().toString();
     @JsonIgnore
-    protected final BaseSpan parent;
+    protected final @Nullable BaseSpan parent;
     protected final List<BaseSpan> children = new ArrayList<>();
-    protected String hexString;
+    protected @Nullable String hexString;
 
-    public BaseSpan(BaseSpan parent) {
+    public BaseSpan(@Nullable BaseSpan parent) {
         this.parent = parent;
     }
 
@@ -37,15 +39,19 @@ public abstract class BaseSpan {
         this.children.add(child);
     }
 
+    public void addChild(int offset, BaseSpan child) {
+        this.children.add(offset, child);
+    }
+
     public List<BaseSpan> getChildren() {
         return children;
     }
 
-    public BaseSpan getParent() {
+    public @Nullable BaseSpan getParent() {
         return parent;
     }
 
-    public String getHexString() {
+    public @Nullable String getHexString() {
         return hexString;
     }
 
@@ -60,5 +66,11 @@ public abstract class BaseSpan {
 
     public String getId() {
         return id;
+    }
+
+    interface HasFieldName {
+        String getFieldName();
+
+        void setFieldName(String name);
     }
 }

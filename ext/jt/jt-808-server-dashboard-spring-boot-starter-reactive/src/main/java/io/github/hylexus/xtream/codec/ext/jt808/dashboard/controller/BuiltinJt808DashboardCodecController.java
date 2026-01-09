@@ -16,7 +16,12 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.controller;
 
+import io.github.hylexus.xtream.codec.base.web.domain.dto.PageableDto;
+import io.github.hylexus.xtream.codec.base.web.domain.vo.PageableVo;
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpException;
+import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
+import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.DecodeMessageDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.EncodeMessageDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.values.SimpleTypes;
@@ -36,9 +41,11 @@ import java.util.Objects;
 public class BuiltinJt808DashboardCodecController {
 
     private final Jt808DashboardCodecService codecService;
+    private final BeanMetadataRegistry beanMetadataRegistry;
 
-    public BuiltinJt808DashboardCodecController(Jt808DashboardCodecService codecService) {
+    public BuiltinJt808DashboardCodecController(Jt808DashboardCodecService codecService, BeanMetadataRegistry beanMetadataRegistry) {
         this.codecService = codecService;
+        this.beanMetadataRegistry = beanMetadataRegistry;
     }
 
     @GetMapping("/codec-options")
@@ -50,6 +57,34 @@ public class BuiltinJt808DashboardCodecController {
     public List<Jt808MessageDescriber.Tracker> encode(@Validated @RequestBody EncodeMessageDto dto) {
         dto.setTerminalId(this.convertTerminalId(dto.getTerminalId(), dto.getVersion()));
         return this.codecService.encodeWithTracker(dto);
+    }
+
+    @GetMapping("/codec-metadata")
+    public PageableVo<FieldCodecRegistry.CodecDescriptor> codecDescriptors(@Validated PageableDto dto) {
+        final FieldCodecRegistry codecRegistry = this.beanMetadataRegistry.getFieldCodecRegistry();
+        final long total = codecRegistry.descriptors().count();
+        if (total <= 0) {
+            return PageableVo.empty();
+        }
+
+        final List<FieldCodecRegistry.CodecDescriptor> data = codecRegistry.descriptors()
+                .skip((dto.getOffset()))
+                .limit(dto.getPageSize())
+                .toList();
+        return PageableVo.of(total, data);
+    }
+
+    @GetMapping("/bean-metadata")
+    public PageableVo<BeanDescriptor> beanMetadata(@Validated PageableDto dto) {
+        final long total = this.beanMetadataRegistry.beanDescriptors().count();
+        if (total <= 0) {
+            return PageableVo.empty();
+        }
+        final List<BeanDescriptor> data = this.beanMetadataRegistry.beanDescriptors()
+                .skip((dto.getOffset()))
+                .limit(dto.getPageSize())
+                .toList();
+        return PageableVo.of(total, data);
     }
 
     private String convertTerminalId(String original, Jt808ProtocolVersion version) {

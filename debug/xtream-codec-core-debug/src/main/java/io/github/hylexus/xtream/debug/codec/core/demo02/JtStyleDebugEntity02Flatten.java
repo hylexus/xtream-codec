@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.debug.codec.core.demo02;
 
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntityCreator;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +41,7 @@ public class JtStyleDebugEntity02Flatten {
 
     // byte[4]     协议版本号
     @Preset.JtStyle.Byte
-    private byte protocolVersion;
+    private short protocolVersion;
 
     // byte[5-15)    终端手机号或设备ID bcd[10]
     @Preset.JtStyle.Bcd(length = 10)
@@ -50,7 +52,8 @@ public class JtStyleDebugEntity02Flatten {
     private int msgSerialNo;
 
     // byte[17-21)    消息包封装项
-    @Preset.JtStyle.Dword(condition = "hasSubPackage()")
+    // @Preset.JtStyle.Dword(condition = "hasSubPackage()")
+    @Preset.JtStyle.Dword(conditions = @Expression(spel = "hasSubPackage()", mvel = "self.hasSubPackage()", aviator = "self.hasSubPackage"))
     private Long subPackageInfo;
     // endregion 消息头
 
@@ -88,21 +91,35 @@ public class JtStyleDebugEntity02Flatten {
     private String time;
 
     // 长度：消息体长度减去前面的 28 字节
-    @Preset.JtStyle.List(lengthExpression = "msgBodyLength() - 28")
+    // @Preset.JtStyle.List(lengthExpression = "msgBodyLength() - 28")
+    @Preset.JtStyle.List(lengthExpressions = @Expression(spel = "msgBodyLength() - 28", mvel = "self.msgBodyLength() - 28", aviator = "self.msgBodyLength - 28"))
     private List<ExtraItem> extraItems;
     // endregion 消息体
 
     // 校验码
     @Preset.JtStyle.Byte
-    private byte checkSum;
+    private short checkSum;
 
     // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
     public int msgBodyLength() {
         return msgBodyProps & 0x3ff;
     }
 
+    // for Aviator
+    @SuppressWarnings("unused")
+    public int getMsgBodyLength() {
+        return msgBodyProps & 0x3ff;
+    }
+
     // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
     public boolean hasSubPackage() {
+        // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+        return (msgBodyProps & 0x2000) > 0;
+    }
+
+    // for Aviator
+    @SuppressWarnings("unused")
+    public boolean isHasSubPackage() {
         // return ((msgBodyProperty & 0x2000) >> 13) == 1;
         return (msgBodyProps & 0x2000) > 0;
     }
@@ -118,9 +135,11 @@ public class JtStyleDebugEntity02Flatten {
         @Preset.JtStyle.Byte
         private short contentLength;
         // 附加信息内容  BYTE[N]
-        @Preset.JtStyle.Bytes(lengthExpression = "getContentLength()")
+        // @Preset.JtStyle.Bytes(lengthExpression = "getContentLength()")
+        @Preset.JtStyle.Bytes(lengthExpressions = @Expression(spel = "getContentLength()", mvel = "self.getContentLength()", aviator = "self.contentLength"))
         private byte[] content;
 
+        @XtreamEntityCreator
         public ExtraItem() {
         }
 

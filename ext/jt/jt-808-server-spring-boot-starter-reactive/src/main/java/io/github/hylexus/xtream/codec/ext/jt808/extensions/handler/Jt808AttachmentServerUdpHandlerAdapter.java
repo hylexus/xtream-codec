@@ -48,7 +48,7 @@ import java.time.Instant;
  */
 public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServerUdpHandlerAdapter {
 
-    private static final Logger log = LoggerFactory.getLogger(Jt808AttachmentServerUdpHandlerAdapter.class);
+    // private static final Logger log = LoggerFactory.getLogger(Jt808AttachmentServerUdpHandlerAdapter.class);
     protected final XtreamHandler attachmentHandler;
 
     public Jt808AttachmentServerUdpHandlerAdapter(ByteBufAllocator allocator, XtreamSessionManager<? extends XtreamSession> sessionManager, XtreamHandler xtreamHandler, Jt808UdpDatagramPackageSplitter splitter, XtreamHandler attachmentHandler, Jt808RequestDecoder requestDecoder, Jt808RequestLifecycleListener requestLifecycleListener) {
@@ -87,6 +87,7 @@ public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServ
                 .build();
 
         return new DefaultJt808Request(
+                session.protocolVersion().versionValue(),
                 Jt808ServerType.ATTACHMENT_SERVER,
                 this.generateRequestId(nettyInbound),
                 Jt808RequestCombiner.randomTraceId(),

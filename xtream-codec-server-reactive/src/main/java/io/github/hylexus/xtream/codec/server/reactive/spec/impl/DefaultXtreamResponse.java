@@ -16,7 +16,7 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamResponse;
 import io.netty.buffer.ByteBufAllocator;
 import reactor.netty.NettyOutbound;
@@ -28,7 +28,7 @@ import java.net.InetSocketAddress;
  */
 public class DefaultXtreamResponse extends AbstractXtreamOutbound implements XtreamResponse {
 
-    public DefaultXtreamResponse(ByteBufAllocator byteBufAllocator, NettyOutbound delegate, XtreamRequest.Type type, InetSocketAddress remoteAddress) {
+    public DefaultXtreamResponse(ByteBufAllocator byteBufAllocator, NettyOutbound delegate, XtreamInbound.Type type, InetSocketAddress remoteAddress) {
         super(byteBufAllocator, delegate, type, remoteAddress);
     }
 

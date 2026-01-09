@@ -19,8 +19,9 @@ package io.github.hylexus.xtream.codec.base.web.handler.servlet;
 
 import io.github.hylexus.xtream.codec.base.web.annotation.ClientIp;
 import io.github.hylexus.xtream.codec.base.web.utils.XtreamWebUtils;
-import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -33,6 +34,7 @@ import java.util.Optional;
 /**
  * @author hylexus
  */
+@NullMarked
 public class ClientIpArgumentResolverServlet implements HandlerMethodArgumentResolver {
 
     @Override
@@ -41,7 +43,8 @@ public class ClientIpArgumentResolverServlet implements HandlerMethodArgumentRes
     }
 
     @Override
-    public Object resolveArgument(@Nonnull MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+    @Nullable
+    public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) {
         final ClientIp annotation = Objects.requireNonNull(parameter.getParameterAnnotation(ClientIp.class));
 
         final HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);

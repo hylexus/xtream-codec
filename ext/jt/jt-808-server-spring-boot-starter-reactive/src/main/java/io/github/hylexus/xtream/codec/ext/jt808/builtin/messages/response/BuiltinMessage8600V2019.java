@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.common.utils.Numbers;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
 import lombok.Getter;
@@ -56,7 +57,8 @@ public class BuiltinMessage8600V2019 {
     @Preset.JtStyle.Byte
     private short areaCount;
 
-    @Preset.JtStyle.List(iterationTimesExpression = "getAreaCount()")
+    // @Preset.JtStyle.List(iterationTimesExpression = "getAreaCount()")
+    @Preset.JtStyle.List(iterationTimesExpressions = @Expression(spel = "getAreaCount()", mvel = "self.getAreaCount()", aviator = "self.areaCount"))
     private List<CircularArea> areaList;
 
     @Getter
@@ -65,7 +67,7 @@ public class BuiltinMessage8600V2019 {
     @ToString
     public static class CircularArea {
         /**
-         * 区域ID
+         * 区域 ID
          */
         @Preset.JtStyle.Dword
         private long areaId;
@@ -117,7 +119,8 @@ public class BuiltinMessage8600V2019 {
          * <p>
          * YY-MM-DD-hh-mm-ss，若区域属性0位为0则没有该字段
          */
-        @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+        // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+        @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
         private LocalDateTime startTime;
 
         /**
@@ -125,10 +128,18 @@ public class BuiltinMessage8600V2019 {
          * <p>
          * YY-MM-DD-hh-mm-ss，若区域属性0位为0则没有该字段
          */
-        @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+        // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
+        @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
         private LocalDateTime endTime;
 
+        @SuppressWarnings("unused")
         public boolean hasTimeProperty() {
+            return Numbers.getBitAt(this.areaProps, 0) == 1;
+        }
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasTimeProperty() {
             return Numbers.getBitAt(this.areaProps, 0) == 1;
         }
 
@@ -137,10 +148,18 @@ public class BuiltinMessage8600V2019 {
          * <p>
          * Km/h，若区域属性1位为 0 则没有该字段
          */
-        @Preset.JtStyle.Word(condition = "hasSpeedProperty()")
+        // @Preset.JtStyle.Word(condition = "hasSpeedProperty()")
+        @Preset.JtStyle.Word(conditions = @Expression(spel = "hasSpeedProperty()", mvel = "self.hasSpeedProperty()", aviator = "self.hasSpeedProperty"))
         private int topSpeed;
 
+        @SuppressWarnings("unused")
         public boolean hasSpeedProperty() {
+            return Numbers.getBitAt(this.areaProps, 1) == 1;
+        }
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasSpeedProperty() {
             return Numbers.getBitAt(this.areaProps, 1) == 1;
         }
 
@@ -149,13 +168,15 @@ public class BuiltinMessage8600V2019 {
          * <p>
          * 单位为秒（s） （类似表述，同前修改） ，若区域属性1位为0则没有该字段
          */
-        @Preset.JtStyle.Byte(condition = "hasSpeedProperty()")
+        // @Preset.JtStyle.Byte(condition = "hasSpeedProperty()")
+        @Preset.JtStyle.Byte(conditions = @Expression(spel = "hasSpeedProperty()", mvel = "self.hasSpeedProperty()", aviator = "self.hasSpeedProperty"))
         private short durationOfOverSpeed;
 
         /**
          * 夜间最高速度
          */
-        @Preset.JtStyle.Word(condition = "hasSpeedProperty()")
+        // @Preset.JtStyle.Word(condition = "hasSpeedProperty()")
+        @Preset.JtStyle.Word(conditions = @Expression(spel = "hasSpeedProperty()", mvel = "self.hasSpeedProperty()", aviator = "self.hasSpeedProperty"))
         private int topSpeedAtNight;
 
         /**
@@ -167,10 +188,11 @@ public class BuiltinMessage8600V2019 {
         /**
          * 区域名称
          */
-        @Preset.JtStyle.Str(lengthExpression = "getAreaNameLength()")
+        // @Preset.JtStyle.Str(lengthExpression = "getAreaNameLength()")
+        @Preset.JtStyle.Str(lengthExpressions = @Expression(spel = "getAreaNameLength()", mvel = "self.getAreaNameLength()", aviator = "self.areaNameLength"))
         private String areaName;
 
-        @SuppressWarnings("lombok")
+        @SuppressWarnings("unused")
         public int getAreaNameLength() {
             return areaNameLength;
         }

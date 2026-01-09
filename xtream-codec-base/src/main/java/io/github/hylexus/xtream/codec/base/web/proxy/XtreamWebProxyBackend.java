@@ -25,6 +25,10 @@ public class XtreamWebProxyBackend {
 
     protected String baseUrl;
 
+    public XtreamWebProxyBackend(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
     public String getBaseUrl() {
         return baseUrl;
     }

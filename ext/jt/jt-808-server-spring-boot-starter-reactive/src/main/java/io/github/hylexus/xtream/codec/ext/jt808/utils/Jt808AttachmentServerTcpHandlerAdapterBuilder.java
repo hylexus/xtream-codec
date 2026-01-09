@@ -22,16 +22,18 @@ import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808Attachme
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DispatcherXtreamHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.AbstractXtreamHandlerAdapterBuilderTcp;
-import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.TcpXtreamHandlerAdapterBuilder;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * @author hylexus
  */
 public class Jt808AttachmentServerTcpHandlerAdapterBuilder extends AbstractXtreamHandlerAdapterBuilderTcp<Jt808AttachmentServerTcpHandlerAdapterBuilder> {
-    protected XtreamHandler attachementdispatcherXtreamHandler;
-    Jt808RequestDecoder requestDecoder;
-    Jt808RequestLifecycleListener requestLifecycleListener;
+    protected @Nullable XtreamHandler attachementdispatcherXtreamHandler;
+    protected @Nullable Jt808RequestDecoder requestDecoder;
+    protected @Nullable Jt808RequestLifecycleListener requestLifecycleListener;
 
     public Jt808AttachmentServerTcpHandlerAdapterBuilder(ByteBufAllocator allocator) {
         super(allocator);
@@ -55,6 +57,13 @@ public class Jt808AttachmentServerTcpHandlerAdapterBuilder extends AbstractXtrea
     @Override
     public Jt808AttachmentServerTcpHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808AttachmentServerTcpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.requestDecoder, this.requestLifecycleListener, this.attachementdispatcherXtreamHandler);
+        return new Jt808AttachmentServerTcpHandlerAdapter(
+                super.byteBufAllocator,
+                Objects.requireNonNull(super.sessionManager),
+                exceptionHandlingHandler,
+                Objects.requireNonNull(this.requestDecoder),
+                Objects.requireNonNull(this.requestLifecycleListener),
+                Objects.requireNonNull(this.attachementdispatcherXtreamHandler)
+        );
     }
 }

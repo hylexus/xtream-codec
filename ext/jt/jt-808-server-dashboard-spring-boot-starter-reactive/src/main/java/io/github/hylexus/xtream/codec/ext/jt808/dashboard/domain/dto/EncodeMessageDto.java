@@ -16,14 +16,14 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto;
 
+import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.Map;
-
 public class EncodeMessageDto {
+    public static final String DATA_FIELD_BODY_CLASS_NAME = DataField.class.getSimpleName();
 
     @NotNull(message = "version is null")
     private Jt808ProtocolVersion version = Jt808ProtocolVersion.VERSION_2019;
@@ -49,7 +49,7 @@ public class EncodeMessageDto {
     private String bodyClass;
 
     @NotNull(message = "bodyData is null")
-    private Map<String, Object> bodyData;
+    private Object bodyData;
 
     public byte getEncryptionType() {
         return encryptionType;
@@ -96,11 +96,11 @@ public class EncodeMessageDto {
         return this;
     }
 
-    public Map<String, Object> getBodyData() {
+    public Object getBodyData() {
         return bodyData;
     }
 
-    public EncodeMessageDto setBodyData(Map<String, Object> bodyData) {
+    public EncodeMessageDto setBodyData(Object bodyData) {
         this.bodyData = bodyData;
         return this;
     }

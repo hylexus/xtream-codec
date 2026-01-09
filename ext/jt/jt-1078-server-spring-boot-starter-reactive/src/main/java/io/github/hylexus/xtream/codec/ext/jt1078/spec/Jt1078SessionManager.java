@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt1078.spec;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionManager;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.net.InetSocketAddress;
@@ -44,7 +45,7 @@ public interface Jt1078SessionManager extends XtreamSessionManager<Jt1078Session
         return Mono.error(new UnsupportedOperationException());
     }
 
-    Jt1078Session getUdpSession(InetSocketAddress remoteAddress);
+    @Nullable Jt1078Session getUdpSession(InetSocketAddress remoteAddress);
 
     @Override
     @Deprecated
@@ -72,18 +73,22 @@ public interface Jt1078SessionManager extends XtreamSessionManager<Jt1078Session
         });
     }
 
+    @Override
     default Stream<Jt1078Session> list(int page, int pageSize, Predicate<Jt1078Session> filter) {
         return this.list().filter(filter).sorted(Comparator.comparing(Jt1078Session::rawSim)).skip((long) (page - 1) * pageSize).limit(pageSize);
     }
 
+    @Override
     default Stream<Jt1078Session> list(int page, int pageSize) {
         return this.list().sorted(Comparator.comparing(Jt1078Session::rawSim)).skip((long) (page - 1) * pageSize).limit(pageSize);
     }
 
+    @Override
     default <T> Stream<T> list(int page, int pageSize, Predicate<Jt1078Session> filter, Function<Jt1078Session, T> converter) {
         return this.list().filter(filter).sorted(Comparator.comparing(Jt1078Session::rawSim)).skip((long) (page - 1) * pageSize).limit(pageSize).map(converter);
     }
 
+    @Override
     default <T> Stream<T> list(int page, int pageSize, Function<Jt1078Session, T> converter) {
         return this.list().sorted(Comparator.comparing(Jt1078Session::rawSim)).skip((long) (page - 1) * pageSize).map(converter).limit(pageSize);
     }

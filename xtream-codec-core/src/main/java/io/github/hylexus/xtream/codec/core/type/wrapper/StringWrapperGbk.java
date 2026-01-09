@@ -19,13 +19,14 @@ package io.github.hylexus.xtream.codec.core.type.wrapper;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
 public class StringWrapperGbk implements DataWrapper<String> {
 
     @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_GBK)
-    protected String value;
+    protected @Nullable String value;
     protected int length;
 
     public StringWrapperGbk() {
@@ -38,6 +39,9 @@ public class StringWrapperGbk implements DataWrapper<String> {
 
     @Override
     public void writeTo(ByteBuf output) {
+        if (value == null) {
+            return;
+        }
         output.writeCharSequence(value, XtreamConstants.CHARSET_GBK);
     }
 
@@ -47,7 +51,10 @@ public class StringWrapperGbk implements DataWrapper<String> {
     }
 
     @Override
-    public byte[] asBytes() {
+    public byte @Nullable [] asBytes() {
+        if (value == null) {
+            return null;
+        }
         return value.getBytes(XtreamConstants.CHARSET_GBK);
     }
 
@@ -67,7 +74,7 @@ public class StringWrapperGbk implements DataWrapper<String> {
     }
 
     @Override
-    public String asString() {
+    public @Nullable String asString() {
         return value;
     }
 

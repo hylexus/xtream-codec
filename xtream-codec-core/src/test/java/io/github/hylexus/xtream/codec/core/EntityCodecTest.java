@@ -16,55 +16,83 @@
 
 package io.github.hylexus.xtream.codec.core;
 
-import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
-import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
+import io.github.hylexus.xtream.codec.BaseEntityCodecTest;
+import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class EntityCodecTest {
+class EntityCodecTest extends BaseEntityCodecTest {
 
-    EntityCodec entityCodec = EntityCodec.DEFAULT;
+    UserEntity userEntity;
 
-    @Test
-    void testEncode() {
-        final UserEntity userEntity = new UserEntity()
+    @BeforeEach
+    void setUp() {
+        userEntity = new UserEntity()
                 .setId(100L)
                 .setName("无名氏")
                 .setAge(1024)
                 .setAddress("保密");
-        final ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
-        try {
-            this.entityCodec.encode(userEntity, buffer);
-            final String hexString = FormatUtils.toHexString(buffer);
-            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
-        } finally {
-            buffer.release();
-            assertEquals(0, buffer.refCnt());
-        }
     }
 
     @Test
-    void testDecode() {
-        final ByteBuf buffer = XtreamBytes.byteBufFromHexString(ByteBufAllocator.DEFAULT, "0000006409e697a0e5908de6b08f040006e4bf9de5af86");
-        try {
-            final UserEntity entity = this.entityCodec.decode(UserEntity.class, buffer);
-            assertEquals(100L, entity.getId());
-            assertEquals("无名氏", entity.getName());
-            assertEquals(1024, entity.getAge());
-            assertEquals("保密", entity.getAddress());
-        } finally {
-            buffer.release();
-            assertEquals(0, buffer.refCnt());
-        }
+    void testVersion2() {
+        doCodecTest(2, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+        }, false);
+
+        doCodecTest(2, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+        }, true);
+    }
+
+    @Test
+    void testVersion1() {
+        doCodecTest(1, userEntity, (source, hexString, decoded) -> {
+            doCompare(userEntity, decoded);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+        }, false);
+        doCodecTest(1, userEntity, (source, hexString, decoded) -> {
+            doCompare(userEntity, decoded);
+            assertTrue(hexString.contains(hexStringForGbk(userEntity.getName())));
+            assertEquals("0000006406cedec3fbcacf040006e4bf9de5af86", hexString);
+        }, true);
+    }
+
+    @Test
+    void testVersionDefault() {
+        doCodecTest(XtreamField.ALL_VERSION, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertTrue(hexString.contains(hexStringForUtf8(userEntity.getName())));
+            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
+        }, false);
+
+        doCodecTest(XtreamField.ALL_VERSION, userEntity, (source, hexString, decoded) -> {
+            doCompare(source, decoded);
+            assertTrue(hexString.contains(hexStringForUtf8(userEntity.getName())));
+            assertEquals("0000006409e697a0e5908de6b08f040006e4bf9de5af86", hexString);
+        }, true);
+    }
+
+    private void doCompare(UserEntity expected, UserEntity actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getAge(), actual.getAge());
+        assertEquals(expected.getAddress(), actual.getAddress());
     }
 
     @Getter
@@ -73,11 +101,12 @@ class EntityCodecTest {
     @Accessors(chain = true)
     public static class UserEntity {
 
-        @Preset.RustStyle.u32(desc = "用户ID(32位无符号数)")
+        @Preset.RustStyle.u32(desc = "用户ID(32位无符号数1)")
         private Long id;
 
         // prependLengthFieldType: 前置一个 u8 类型的字段表示当前字段的长度
-        @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "用户名")
+        @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "用户名(UTF-8)")
+        @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "用户名(GBK)", version = {1, 2}, charset = XtreamConstants.CHARSET_NAME_GBK)
         private String name;
 
         @Preset.RustStyle.u16(desc = "年龄(16位无符号数)")

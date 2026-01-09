@@ -19,9 +19,12 @@ package io.github.hylexus.xtream.codec.ext.jt808.spec;
 import io.github.hylexus.xtream.codec.core.tracker.BaseSpan;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.tracker.RootSpan;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author hylexus
@@ -34,8 +37,8 @@ public class Jt808MessageDescriber {
     protected byte reversedBit15InHeader = 0;
     protected byte encryptionType = 0b000;
     protected int flowId = -1;
-    protected Jt808FlowIdGenerator flowIdGenerator;
-    protected List<Tracker> trackers;
+    protected @Nullable Jt808FlowIdGenerator flowIdGenerator;
+    protected @Nullable List<Tracker> trackers;
     protected boolean withTracker;
 
     public Jt808MessageDescriber(Integer messageId, Jt808ProtocolVersion version, String terminalId) {
@@ -55,7 +58,7 @@ public class Jt808MessageDescriber {
         return this;
     }
 
-    public List<Tracker> trackers() {
+    public @Nullable List<Tracker> trackers() {
         return this.trackers;
     }
 
@@ -64,7 +67,7 @@ public class Jt808MessageDescriber {
     }
 
     public Jt808MessageDescriber version(Jt808ProtocolVersion version) {
-        this.version = version;
+        this.version = requireNonNull(version);
         return this;
     }
 
@@ -73,7 +76,7 @@ public class Jt808MessageDescriber {
     }
 
     public Jt808MessageDescriber terminalId(String terminalId) {
-        this.terminalId = terminalId;
+        this.terminalId = requireNonNull(terminalId);
         return this;
     }
 
@@ -82,7 +85,7 @@ public class Jt808MessageDescriber {
     }
 
     public Jt808MessageDescriber messageId(Integer messageId) {
-        this.messageId = messageId;
+        this.messageId = requireNonNull(messageId);
         return this;
     }
 
@@ -122,7 +125,7 @@ public class Jt808MessageDescriber {
         return this;
     }
 
-    public Jt808FlowIdGenerator flowIdGenerator() {
+    public @Nullable Jt808FlowIdGenerator flowIdGenerator() {
         return this.flowIdGenerator;
     }
 
@@ -132,15 +135,6 @@ public class Jt808MessageDescriber {
     }
 
     public Jt808MessageDescriber check() {
-        if (this.version() == null) {
-            throw new IllegalArgumentException("version() is null");
-        }
-        if (this.terminalId() == null) {
-            throw new IllegalArgumentException("terminalId() is null");
-        }
-        if (this.messageId() == null) {
-            throw new IllegalArgumentException("messageId() is null");
-        }
         if (this.maxPackageSize() <= 0) {
             throw new IllegalArgumentException("maxPackageSize() is invalid");
         }
@@ -155,7 +149,7 @@ public class Jt808MessageDescriber {
     }
 
     public void visitTracker(Jt808ResponseEncoderTrackerVisitor visitor) {
-        final List<Tracker> trackers = this.trackers;
+        final List<Tracker> trackers = requireNonNull(this.trackers);
         final int totalPackage = trackers.size();
         for (int i = 0; i < totalPackage; i++) {
             final Tracker tracker = trackers.get(i);
@@ -171,6 +165,7 @@ public class Jt808MessageDescriber {
         void visit(int currentPackageNo, int totalPackageNo, int level, BaseSpan span);
     }
 
+    @SuppressWarnings("NullAway")
     public static class Tracker {
         private String rawHexString;
         private String escapedHexString;

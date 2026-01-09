@@ -16,16 +16,17 @@
 
 package io.github.hylexus.xtream.codec.core.tracker;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.StringJoiner;
 
-public class PrependLengthFieldSpan extends BaseSpan {
-    private final String fieldName;
+public class PrependLengthFieldSpan extends BaseSpan implements BaseSpan.HasFieldName {
+    private String fieldName;
     private final String fieldCodec;
-    private Object value;
-    private String hexString;
-    private final String fieldDesc;
+    private @Nullable Object value;
+    private final @Nullable String fieldDesc;
 
-    public PrependLengthFieldSpan(BaseSpan parent, String fieldName, String fieldCodec, Object value, String hexString, String fieldDesc) {
+    public PrependLengthFieldSpan(BaseSpan parent, String fieldName, String fieldCodec, @Nullable Object value, @Nullable String hexString, @Nullable String fieldDesc) {
         super(parent);
         this.fieldName = fieldName;
         this.fieldCodec = fieldCodec;
@@ -45,24 +46,25 @@ public class PrependLengthFieldSpan extends BaseSpan {
         return this;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void setFieldName(String name) {
+        this.fieldName = name;
     }
 
     public String getFieldCodec() {
         return fieldCodec;
     }
 
-    public Object getValue() {
+    public @Nullable Object getValue() {
         return value;
     }
 
-    @Override
-    public String getHexString() {
-        return hexString;
-    }
-
-    public String getFieldDesc() {
+    public @Nullable String getFieldDesc() {
         return fieldDesc;
     }
 

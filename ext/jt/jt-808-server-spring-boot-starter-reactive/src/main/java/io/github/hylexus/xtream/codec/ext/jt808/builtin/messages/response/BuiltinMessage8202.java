@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
 import lombok.Getter;
@@ -51,7 +52,8 @@ public class BuiltinMessage8202 {
      * 送位置汇报
      */
     // todo 这个 condition 待确认
-    @Preset.JtStyle.Dword(condition = "getTimeDurationInSeconds() > 0", desc = "位置跟踪有效期")
+    // @Preset.JtStyle.Dword(condition = "getTimeDurationInSeconds() > 0", desc = "位置跟踪有效期")
+    @Preset.JtStyle.Dword(conditions = @Expression(spel = "getTimeDurationInSeconds() > 0", mvel = "self.getTimeDurationInSeconds() > 0", aviator = "self.timeDurationInSeconds > 0"), desc = "位置跟踪有效期")
     private long traceValidityDurationInSeconds;
 
     @SuppressWarnings("lombok")

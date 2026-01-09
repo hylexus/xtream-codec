@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class DecodeMessageDto {
     @NotEmpty(message = "bodyClass is empty")
     private String bodyClass;
 
-    public List<String> getHexString() {
+    public List<@Nullable String> getHexString() {
         return hexString;
     }
 

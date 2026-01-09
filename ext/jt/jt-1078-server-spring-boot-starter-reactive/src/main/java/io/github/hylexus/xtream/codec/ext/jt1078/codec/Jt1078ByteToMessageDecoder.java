@@ -28,12 +28,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.Connection;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -44,7 +44,7 @@ import java.util.UUID;
  */
 public class Jt1078ByteToMessageDecoder extends ByteToMessageDecoder {
 
-    private static final Logger log = LoggerFactory.getLogger(Jt1078ByteToMessageDecoder.class);
+    // private static final Logger log = LoggerFactory.getLogger(Jt1078ByteToMessageDecoder.class);
 
     private final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
     private final Jt1078SimConverter jt1078SimConverter;
@@ -52,7 +52,7 @@ public class Jt1078ByteToMessageDecoder extends ByteToMessageDecoder {
     private final Jt1078SessionManager sessionManager;
 
     private int simLength = 0;
-    private Jt1078Session session;
+    private @Nullable Jt1078Session session;
     final XtreamNettyHandlerAdapter.InboundInfo inboundInfo;
 
     public Jt1078ByteToMessageDecoder(Jt1078SimConverter jt1078SimConverter, Connection connection, Jt1078SessionManager sessionManager) {
@@ -93,12 +93,13 @@ public class Jt1078ByteToMessageDecoder extends ByteToMessageDecoder {
 
     private void emitDecodedRequest(List<Object> out, Jt1078Request request) {
         out.add(request);
-        this.session.lastCommunicateTime(Instant.now());
-        if (this.session.audioType() == null && request.header().payloadType().isAudio()) {
-            this.session.audioType(request.header().payloadType());
+        final Jt1078Session jt1078Session = Objects.requireNonNull(this.session);
+        jt1078Session.lastCommunicateTime(Instant.now());
+        if (jt1078Session.audioType() == null && request.header().payloadType().isAudio()) {
+            jt1078Session.audioType(request.header().payloadType());
         }
-        if (this.session.videoType() == null && request.header().payloadType().isVideo()) {
-            this.session.videoType(request.header().payloadType());
+        if (jt1078Session.videoType() == null && request.header().payloadType().isVideo()) {
+            jt1078Session.videoType(request.header().payloadType());
         }
     }
 
@@ -117,7 +118,7 @@ public class Jt1078ByteToMessageDecoder extends ByteToMessageDecoder {
         this.sessionManager.createSession(jt1078Session);
     }
 
-    Jt1078Request tryDecodeRequest(ByteBuf in, int simLen) {
+    @Nullable Jt1078Request tryDecodeRequest(ByteBuf in, int simLen) {
         // 这里输入的报文没有 30316364 前缀
         // +5 = 1byte(V,P,X,CC) + 1byte(M,PT) + 2byte(sequenceNumber) + 1byte(channelNumber)
         // FIXME 重复代码

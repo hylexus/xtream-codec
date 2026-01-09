@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandler
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerResultHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -46,7 +47,8 @@ public class XtreamResponseBodyHandlerResultHandler implements XtreamHandlerResu
 
     @Override
     public Mono<Void> handleResult(XtreamExchange exchange, XtreamHandlerResult result) {
-        final Flux<ByteBuf> byteBufFlux = this.encode(exchange.response().bufferFactory(), result.getReturnValue());
+        final int version = exchange.request().version();
+        final Flux<ByteBuf> byteBufFlux = this.encode(exchange.response().bufferFactory(), version, result.getReturnValue());
         return exchange.response().writeWith(byteBufFlux);
     }
 
@@ -55,22 +57,22 @@ public class XtreamResponseBodyHandlerResultHandler implements XtreamHandlerResu
         return BUILTIN_COMPONENT_PRECEDENCE;
     }
 
-    public Flux<ByteBuf> encode(ByteBufAllocator allocator, Object data) {
+    public Flux<ByteBuf> encode(ByteBufAllocator allocator, int version, @Nullable Object data) {
         return switch (data) {
             case null -> Flux.error(new IllegalArgumentException("message is null"));
-            case Mono<?> mono -> mono.map(msg -> this.doEncode(msg, allocator)).flux();
-            case Flux<?> flux -> flux.map(msg -> this.doEncode(msg, allocator));
-            case Object obj -> Flux.just(this.doEncode(obj, allocator));
+            case Mono<?> mono -> mono.map(msg -> this.doEncode(version, msg, allocator)).flux();
+            case Flux<?> flux -> flux.map(msg -> this.doEncode(version, msg, allocator));
+            case Object obj -> Flux.just(this.doEncode(version, obj, allocator));
         };
     }
 
-    protected ByteBuf doEncode(Object message, ByteBufAllocator allocator) {
+    protected ByteBuf doEncode(int version, Object message, ByteBufAllocator allocator) {
         if (message instanceof ByteBuf byteBuf) {
             return byteBuf;
         }
         final ByteBuf buffer = allocator.buffer();
         try {
-            this.entityCodec.encode(message, buffer);
+            this.entityCodec.encode(version, message, buffer);
         } catch (Throwable e) {
             buffer.release();
             throw new RuntimeException(e);
@@ -78,7 +80,7 @@ public class XtreamResponseBodyHandlerResultHandler implements XtreamHandlerResu
         return buffer;
     }
 
-    protected XtreamResponseBody getXtreamResponseBodyAnnotation(XtreamHandlerResult handlerResult) {
+    protected @Nullable XtreamResponseBody getXtreamResponseBodyAnnotation(XtreamHandlerResult handlerResult) {
         // 处理器方法所在类上的注解
         final XtreamResponseBody classLevelAnnotation = handlerResult.getReturnType().getContainerClass().getAnnotation(XtreamResponseBody.class);
         if (classLevelAnnotation != null) {

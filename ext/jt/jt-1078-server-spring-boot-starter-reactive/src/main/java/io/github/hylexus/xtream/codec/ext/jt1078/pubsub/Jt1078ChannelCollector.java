@@ -17,7 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt1078.pubsub;
 
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Request;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import reactor.core.scheduler.Scheduler;
 
 import java.util.function.Predicate;
@@ -35,9 +35,9 @@ public interface Jt1078ChannelCollector {
         this.unsubscribe(id, null);
     }
 
-    void unsubscribe(String id, @Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason);
+    void unsubscribe(String id, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason);
 
-    void close(@Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason);
+    void close(Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason);
 
     long count(Predicate<Jt1078SubscriberDescriptor> predicate);
 

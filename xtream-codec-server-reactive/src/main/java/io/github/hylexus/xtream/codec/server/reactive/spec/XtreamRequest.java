@@ -27,6 +27,8 @@ import java.util.Map;
  */
 public interface XtreamRequest extends XtreamInbound {
 
+    int version();
+
     Map<String, Object> attributes();
 
     default void release() {
@@ -44,6 +46,8 @@ public interface XtreamRequest extends XtreamInbound {
     String toString();
 
     interface XtreamRequestBuilder {
+
+        XtreamRequestBuilder version(int version);
 
         default XtreamRequestBuilder payload(ByteBuf payload) {
             return this.payload(payload, true);

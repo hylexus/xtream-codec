@@ -17,13 +17,13 @@
 package io.github.hylexus.xtream.codec.core.type;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.bean.PropertyAccessStrategy;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.Padding;
-import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamDateTimeField;
-import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.annotation.*;
+import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
+import org.jetbrains.annotations.ApiStatus;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -35,179 +35,289 @@ public @interface Preset {
     @interface RustStyle {
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
+        @Repeatable(PresetAliasContainers.RustStyleContainerI8.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1, signedness = NumberSignedness.SIGNED)
         @interface i8 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
+        @Repeatable(PresetAliasContainers.RustStyleContainerU8.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1, signedness = NumberSignedness.UNSIGNED)
         @interface u8 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
+        @Repeatable(PresetAliasContainers.RustStyleContainerI16.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, signedness = NumberSignedness.SIGNED)
         @interface i16 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true)
+        @Repeatable(PresetAliasContainers.RustStyleContainerI16Le.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true, signedness = NumberSignedness.SIGNED)
         @interface i16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
+        @Repeatable(PresetAliasContainers.RustStyleContainerU16.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, signedness = NumberSignedness.UNSIGNED)
         @interface u16 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true)
+        @Repeatable(PresetAliasContainers.RustStyleContainerU16Le.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, littleEndian = true, signedness = NumberSignedness.UNSIGNED)
         @interface u16_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
+        @Repeatable(PresetAliasContainers.RustStyleContainerI32.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, signedness = NumberSignedness.SIGNED)
         @interface i32 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true)
+        @Repeatable(PresetAliasContainers.RustStyleContainerI32Le.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true, signedness = NumberSignedness.SIGNED)
         @interface i32_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
+        @Repeatable(PresetAliasContainers.RustStyleContainerU32.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, signedness = NumberSignedness.UNSIGNED)
         @interface u32 {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true)
+        @Repeatable(PresetAliasContainers.RustStyleContainerU32Le.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true, signedness = NumberSignedness.UNSIGNED)
         @interface u32_le {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerStr.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = "utf-8")
         @interface str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "charset")
             String charset() default "utf-8";
@@ -227,6 +337,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
 
@@ -235,19 +348,29 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerStruct.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.struct)
         @interface struct {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -258,6 +381,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
 
@@ -266,19 +392,29 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerDyn.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.dynamic)
         @interface dyn {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -288,6 +424,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -297,19 +436,38 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerList.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence, containerInstanceFactory = ContainerInstanceFactory.ArrayListContainerInstanceFactory.class)
         @interface list {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimes")
+            int iterationTimes() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpression")
+            String iterationTimesExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpressions")
+            Expression iterationTimesExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -319,6 +477,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -330,20 +491,35 @@ public @interface Preset {
             String desc() default "";
         }
 
+        /**
+         * @deprecated Use {@link simple_map} instead. Will be removed in 1.0.0.
+         */
+        @Deprecated(forRemoval = true, since = "0.1.0")
+        @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerMap.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.map, containerInstanceFactory = ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class)
         @interface map {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -353,6 +529,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -365,19 +544,80 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @XtreamMapField(key = {}, valueLength = {}, value = @XtreamMapField.Value())
+        @interface simple_map {
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "key")
+            XtreamMapField.Key[] key();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "valueLength")
+            XtreamMapField.ValueLength[] valueLength();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "value")
+            XtreamMapField.Value value();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "containerInstanceFactory")
+            Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerByteArray.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
         @interface byte_array {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -387,6 +627,82 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
+            Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        /**
+         * {@code transient_rc}: TransientRecordComponent
+         * <p>
+         * 只能用于 {@link Record} 的组件上
+         *
+         * @see Record
+         * @since 0.1.0
+         */
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target(ElementType.RECORD_COMPONENT)
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerTransientRecordComponent.class)
+        @XtreamField(
+                dataType = BeanPropertyMetadata.FiledDataType.basic,
+                codecStrategy = XtreamField.CodecStrategy.TRANSIENT
+        )
+        @interface transient_rc {
+            @AliasFor(annotation = XtreamField.class, attribute = "nulls")
+            XtreamField.Nulls nulls() default XtreamField.Nulls.AS_NULL;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerBasic.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
+        @interface basic {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -397,57 +713,87 @@ public @interface Preset {
     }
 
     @interface JtStyle {
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2)
+        @Repeatable(PresetAliasContainers.JtStyleContainerWord.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 2, signedness = NumberSignedness.UNSIGNED)
         @interface Word {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "littleEndian")
             boolean littleEndian() default false;
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4)
+        @Repeatable(PresetAliasContainers.JtStyleContainerDword.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, signedness = NumberSignedness.UNSIGNED)
         @interface Dword {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "littleEndian")
             boolean littleEndian() default false;
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBcd.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = XtreamConstants.CHARSET_NAME_BCD_8421)
         @interface Bcd {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -458,6 +804,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
 
@@ -465,11 +814,19 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD, ElementType.METHOD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBcdDateTime.class)
         @XtreamDateTimeField(pattern = "yyMMddHHmmss", charset = XtreamConstants.CHARSET_NAME_BCD_8421)
         @interface BcdDateTime {
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamDateTimeField.class, attribute = "pattern")
             String pattern() default "yyMMddHHmmss";
 
@@ -488,38 +845,61 @@ public @interface Preset {
             @AliasFor(annotation = XtreamDateTimeField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamDateTimeField.class, attribute = "desc")
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
-        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1)
+        @Repeatable(PresetAliasContainers.JtStyleContainerByte.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 1, signedness = NumberSignedness.UNSIGNED)
         @interface Byte {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBytes.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
         @interface Bytes {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -530,6 +910,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
 
@@ -538,19 +921,29 @@ public @interface Preset {
         }
 
         @SuppressWarnings("checkstyle:TypeName")
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerStr.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = XtreamConstants.CHARSET_NAME_GBK)
         @interface Str {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "charset")
             String charset() default XtreamConstants.CHARSET_NAME_GBK;
@@ -570,6 +963,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
 
@@ -577,22 +973,35 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerObject.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.struct)
         @interface Object {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -607,19 +1016,29 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerRuntimeType.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.dynamic)
         @interface RuntimeType {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -630,6 +1049,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
 
@@ -637,19 +1059,29 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerList.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.sequence, containerInstanceFactory = ContainerInstanceFactory.ArrayListContainerInstanceFactory.class)
         @interface List {
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
 
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "iterationTimes")
             int iterationTimes() default -1;
@@ -657,6 +1089,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpression")
             String iterationTimesExpression() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "iterationTimesExpressions")
+            Expression iterationTimesExpressions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
 
@@ -665,6 +1100,9 @@ public @interface Preset {
 
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
@@ -676,20 +1114,35 @@ public @interface Preset {
             String desc() default "";
         }
 
-        @Target({ElementType.FIELD})
+        /**
+         * @deprecated Use {@link SimpleMap} instead. Will be removed in 1.0.0.
+         */
+        @Deprecated(forRemoval = true, since = "0.1.0")
+        @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerMap.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.map, containerInstanceFactory = ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class)
         @interface Map {
 
             @AliasFor(annotation = XtreamField.class, attribute = "order")
             int order() default -1;
 
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
             @AliasFor(annotation = XtreamField.class, attribute = "length")
             int length() default -1;
 
             @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
             String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
 
             @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
             int prependLengthFieldLength() default -1;
@@ -700,6 +1153,9 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "condition")
             String condition() default "";
 
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
             @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
             Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
 
@@ -709,5 +1165,127 @@ public @interface Preset {
             @AliasFor(annotation = XtreamField.class, attribute = "desc")
             String desc() default "";
         }
+
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @XtreamMapField(key = {}, valueLength = {}, value = @XtreamMapField.Value())
+        @interface SimpleMap {
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "key")
+            XtreamMapField.Key[] key();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "valueLength")
+            XtreamMapField.ValueLength[] valueLength();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "value")
+            XtreamMapField.Value value();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "containerInstanceFactory")
+            Class<? extends ContainerInstanceFactory> containerInstanceFactory() default ContainerInstanceFactory.LinkedHashMapContainerInstanceFactory.class;
+
+            @AliasFor(annotation = XtreamMapField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        /**
+         * {@code TransientRc}: TransientRecordComponent
+         * <p>
+         * 只能用于 {@link Record} 的组件上
+         *
+         * @see Record
+         * @since 0.1.0
+         */
+        @Target(ElementType.RECORD_COMPONENT)
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerTransientRecordComponent.class)
+        @XtreamField(
+                dataType = BeanPropertyMetadata.FiledDataType.basic,
+                codecStrategy = XtreamField.CodecStrategy.TRANSIENT
+        )
+        @interface TransientRc {
+
+            @AliasFor(annotation = XtreamField.class, attribute = "nulls")
+            XtreamField.Nulls nulls() default XtreamField.Nulls.AS_NULL;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+        }
+
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.JtStyleContainerBasic.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic)
+        @interface Basic {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "length")
+            int length() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpression")
+            String lengthExpression() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "lengthExpressions")
+            Expression lengthExpressions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldLength")
+            int prependLengthFieldLength() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "prependLengthFieldType")
+            PrependLengthFieldType prependLengthFieldType() default PrependLengthFieldType.none;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "fieldCodec")
+            Class<? extends FieldCodec<?>> fieldCodec() default FieldCodec.Placeholder.class;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
     }
+
 }

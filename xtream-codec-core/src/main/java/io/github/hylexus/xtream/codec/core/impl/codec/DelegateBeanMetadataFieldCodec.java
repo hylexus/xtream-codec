@@ -18,8 +18,15 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
+import io.github.hylexus.xtream.codec.core.tracker.NestedFieldSpan;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * 将编解码逻辑委托给上下文中的 {@link io.github.hylexus.xtream.codec.core.EntityDecoder EntityDecoder} 和 {@link io.github.hylexus.xtream.codec.core.EntityDecoder EntityDecoder}
@@ -41,22 +48,48 @@ public class DelegateBeanMetadataFieldCodec implements FieldCodec<Object> {
 
     @Override
     public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return context.entityDecoder().decode(beanMetadata, input);
+        return context.entityDecoder().decode(context.version(), beanMetadata, input);
     }
 
     @Override
     public Object deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return context.entityDecoder().decodeWithTracker(beanMetadata, input, context.codecTracker());
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        if (XtreamTypes.isBasicType(propertyMetadata.rawClass())) {
+            return context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, codecTracker);
+        } else {
+            final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(propertyMetadata, this.getClass().getSimpleName(), null);
+            final Object instance;
+            try {
+                final int indexBeforeRead = input.readerIndex();
+                instance = context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, codecTracker);
+                nestedFieldSpan.setHexString(FormatUtils.toHexString(input, indexBeforeRead, input.readerIndex() - indexBeforeRead));
+            } finally {
+                codecTracker.finishCurrentSpan();
+            }
+            return instance;
+        }
     }
 
     @Override
-    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
-        context.entityEncoder().encode(this.beanMetadata, instance, output);
+    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
+        context.entityEncoder().encode(context.version(), this.beanMetadata, instance, output);
     }
 
     @Override
-    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Object instance) {
-        context.entityEncoder().encodeWithTracker(this.beanMetadata, instance, output, context.codecTracker());
+    public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
+        final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
+        if (XtreamTypes.isBasicType(propertyMetadata.rawClass())) {
+            context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, codecTracker);
+        } else {
+            final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(propertyMetadata, this.getClass().getSimpleName(), null);
+            try {
+                final int indexBeforeWrite = output.writerIndex();
+                context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, codecTracker);
+                nestedFieldSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
+            } finally {
+                codecTracker.finishCurrentSpan();
+            }
+        }
     }
 
 }

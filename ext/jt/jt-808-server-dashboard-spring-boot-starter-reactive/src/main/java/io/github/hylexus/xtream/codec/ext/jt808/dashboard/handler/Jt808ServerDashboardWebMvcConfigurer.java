@@ -17,7 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.handler;
 
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.boot.properties.XtreamJt808ServerDashboardProperties;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -50,13 +50,13 @@ public class Jt808ServerDashboardWebMvcConfigurer implements WebMvcConfigurer {
     private static class JtDashboardStaticResourceResolver extends PathResourceResolver {
         private final boolean forward404ToIndex;
 
-        public JtDashboardStaticResourceResolver(boolean forward404ToIndex) {
+        JtDashboardStaticResourceResolver(boolean forward404ToIndex) {
             this.forward404ToIndex = forward404ToIndex;
         }
 
         @Override
-        protected Resource getResource(@Nonnull String resourcePath, @Nonnull Resource location) throws IOException {
-            Resource requestedResource = super.getResource(resourcePath, location);
+        protected @Nullable Resource getResource(String resourcePath, Resource location) throws IOException {
+            final Resource requestedResource = super.getResource(resourcePath, location);
             if (requestedResource == null || !requestedResource.exists()) {
                 if (forward404ToIndex) {
                     // 如果资源不存在，并且配置了转发404到index.html，则返回index.html

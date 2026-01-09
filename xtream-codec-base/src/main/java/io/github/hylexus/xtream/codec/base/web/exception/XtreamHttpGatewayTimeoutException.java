@@ -18,7 +18,7 @@ package io.github.hylexus.xtream.codec.base.web.exception;
 
 
 import io.github.hylexus.xtream.codec.base.web.domain.values.XtreamApiErrorCode;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class XtreamHttpGatewayTimeoutException extends XtreamHttpException {
 

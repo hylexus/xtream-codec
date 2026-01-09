@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.UdpSess
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.builtin.DelegateXtreamHandlerMethodArgumentResolver;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public abstract class AbstractXtreamHandlerAdapterBuilder<C extends AbstractXtre
     private final List<XtreamFilter> xtreamFilters;
     private final List<XtreamRequestExceptionHandler> exceptionHandlers;
 
-    protected XtreamSessionManager<? extends XtreamSession> sessionManager;
+    protected @Nullable XtreamSessionManager<? extends XtreamSession> sessionManager;
 
     public AbstractXtreamHandlerAdapterBuilder(ByteBufAllocator allocator) {
         this.handlerMappings = new ArrayList<>();
@@ -62,7 +63,8 @@ public abstract class AbstractXtreamHandlerAdapterBuilder<C extends AbstractXtre
         return (C) this;
     }
 
-    public C addHandlerMappings(XtreamHandlerMapping... handlerMappings) {
+    @SuppressWarnings("checkstyle:NoWhitespaceBefore")
+    public C addHandlerMappings(XtreamHandlerMapping @Nullable ... handlerMappings) {
         if (handlerMappings != null) {
             this.handlerMappings.addAll(Arrays.asList(handlerMappings));
         }

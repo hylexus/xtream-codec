@@ -23,10 +23,8 @@ import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.AbstractJt1078
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.BuiltinAudioFormatOptions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import jakarta.annotation.Nonnull;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -71,15 +69,14 @@ public class AdpcmImaJt1078AudioCodec extends AbstractJt1078AudioCodec {
             5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
             15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
     };
-    private static final Logger log = LoggerFactory.getLogger(AdpcmImaJt1078AudioCodec.class);
+    // private static final Logger log = LoggerFactory.getLogger(AdpcmImaJt1078AudioCodec.class);
     private final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
 
     public AdpcmImaJt1078AudioCodec() {
     }
 
-    @Nonnull
     @Override
-    protected AudioPackage doDecodeAsPcm(ByteBuf stream, AudioFormatOptions options) {
+    protected AudioPackage doDecodeAsPcm(ByteBuf stream, @Nullable AudioFormatOptions options) {
         final AdpcmImaBlockStatus status = this.readPreamble(stream);
 
         final ByteBuf buffer = this.allocator.buffer();

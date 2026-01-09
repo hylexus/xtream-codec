@@ -75,7 +75,7 @@ public class BuiltinMessage0200Sample2 {
     private LocalDateTime time;
 
     // 长度：消息体长度减去前面的 28 字节
-    @Preset.JtStyle.Map(desc = "附加项列表", fieldCodec = BuiltinLocationMessageExtraItemFieldCodec.class)
+    @Preset.JtStyle.Object(desc = "附加项", fieldCodec = BuiltinLocationMessageExtraItemFieldCodec.class)
     private Map<Short, Object> extraItems;
 
 }

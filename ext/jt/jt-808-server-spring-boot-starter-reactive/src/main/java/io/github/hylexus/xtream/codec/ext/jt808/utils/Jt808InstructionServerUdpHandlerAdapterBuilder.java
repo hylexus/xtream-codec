@@ -24,6 +24,9 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.UdpXtreamNettyHandler
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamHandler;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.udp.AbstractXtreamHandlerAdapterBuilderUdp;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author hylexus
@@ -31,8 +34,13 @@ import io.netty.buffer.ByteBufAllocator;
 public class Jt808InstructionServerUdpHandlerAdapterBuilder extends AbstractXtreamHandlerAdapterBuilderUdp<Jt808InstructionServerUdpHandlerAdapterBuilder> {
 
     protected final Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter;
-    protected Jt808RequestDecoder requestDecoder;
-    protected Jt808RequestLifecycleListener requestLifecycleListener;
+    protected @Nullable Jt808RequestDecoder requestDecoder;
+    protected @Nullable Jt808RequestLifecycleListener requestLifecycleListener;
+
+    public Jt808InstructionServerUdpHandlerAdapterBuilder(ByteBufAllocator allocator, Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter) {
+        super(allocator);
+        this.udpDatagramPackageSplitter = udpDatagramPackageSplitter;
+    }
 
     public Jt808InstructionServerUdpHandlerAdapterBuilder requestDecoder(Jt808RequestDecoder requestDecoder) {
         this.requestDecoder = requestDecoder;
@@ -44,15 +52,17 @@ public class Jt808InstructionServerUdpHandlerAdapterBuilder extends AbstractXtre
         return this;
     }
 
-    public Jt808InstructionServerUdpHandlerAdapterBuilder(ByteBufAllocator allocator, Jt808UdpDatagramPackageSplitter udpDatagramPackageSplitter) {
-        super(allocator);
-        this.udpDatagramPackageSplitter = udpDatagramPackageSplitter;
-    }
-
     @Override
     public UdpXtreamNettyHandlerAdapter build() {
         final XtreamHandler exceptionHandlingHandler = createRequestHandler();
-        return new Jt808InstructionServerUdpHandlerAdapter(super.byteBufAllocator, super.sessionManager, exceptionHandlingHandler, this.udpDatagramPackageSplitter, this.requestDecoder, this.requestLifecycleListener);
+        return new Jt808InstructionServerUdpHandlerAdapter(
+                super.byteBufAllocator,
+                requireNonNull(super.sessionManager),
+                exceptionHandlingHandler,
+                this.udpDatagramPackageSplitter,
+                requireNonNull(this.requestDecoder),
+                requireNonNull(this.requestLifecycleListener)
+        );
     }
 
 }

@@ -17,15 +17,16 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.event.builtin.disruptor;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.event.XtreamEvent;
+import org.jspecify.annotations.Nullable;
 
 public class XtreamEventDisruptorHolder {
-    private XtreamEvent event;
+    private @Nullable XtreamEvent event;
 
     public void setEvent(XtreamEvent event) {
         this.event = event;
     }
 
-    public XtreamEvent getEvent() {
+    public @Nullable XtreamEvent getEvent() {
         return event;
     }
 

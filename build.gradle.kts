@@ -1,3 +1,7 @@
+import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
+import io.github.hylexus.xtream.codec.gradle.utils.logInfo2
+import io.github.hylexus.xtream.codec.gradle.utils.logTip
+import net.ltgt.gradle.errorprone.errorprone
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -6,14 +10,15 @@ plugins {
     id("java-library")
     id("io.spring.dependency-management")
     id("maven-publish")
+    id("io.gitee.pkmer.pkmerboot-central-publisher") apply false
     id("signing")
     id("checkstyle")
-    id("com.github.joschi.licenser")
+    id("net.minecraftforge.licenser") apply false
     id("com.github.jk1.dependency-license-report")
     id("com.namics.oss.gradle.license-enforce-plugin")
+    id("net.ltgt.errorprone") apply false
 }
 
-val mavenRepoConfig = getMavenRepoConfig()
 val mavenPublications = setOf(
     "xtream-codec-base",
     "xtream-codec-core",
@@ -21,22 +26,89 @@ val mavenPublications = setOf(
     "jt-808-server-spring-boot-starter-reactive",
     "jt-808-server-dashboard-spring-boot-starter-reactive",
 )
+val errorpronePluginEnabledProjects = setOf(
+    "xtream-codec-base",
+    "xtream-codec-core",
+    "xtream-codec-server-reactive",
+    "jt-808-server-spring-boot-starter-reactive",
+    "jt-808-server-dashboard-spring-boot-starter-reactive",
+    "jt-1078-server-spring-boot-starter-reactive",
+    "jt-1078-server-dashboard-spring-boot-starter-reactive",
+)
+
+version = xtreamConfig.projectVersion
+run {
+    xtreamConfig.javaVersion
+    xtreamConfig.defaultSpringBootBomVersion
+    xtreamConfig.defaultSpringCloudBomVersion
+    xtreamConfig.needSign
+}
+val mavenRepoConfig = xtreamConfig.mavenRepoConfig
 
 // region Java
 configure(subprojects) {
+
+    version = xtreamConfig.projectVersion
+
     if (!isJavaProject(project)) {
         return@configure
     }
-    println("configure ....... " + project.name)
+    logInfo2("configuring project: ${project.name}")
 
     apply(plugin = "java-library")
-    apply(plugin = "io.spring.dependency-management")
-
+    if (project.errorPronePluginEnabled()) {
+        apply(plugin = "net.ltgt.errorprone")
+    }
     java {
-        sourceCompatibility = JavaVersion.toVersion(getJavaVersion())
-        targetCompatibility = JavaVersion.toVersion(getJavaVersion())
+        sourceCompatibility = JavaVersion.toVersion(xtreamConfig.javaVersion)
+        targetCompatibility = JavaVersion.toVersion(xtreamConfig.javaVersion)
+    }
+    tasks.test {
+        useJUnitPlatform()
+    }
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-parameters")
+        options.release.set(xtreamConfig.javaVersion.toInt())
+
+        if (project.errorPronePluginEnabled()) {
+            options.errorprone {
+                check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
+                option("NullAway:AnnotatedPackages", "io.github.hylexus.xtream.codec")
+                option(
+                    "NullAway:ExcludedClasses",
+                    listOf(
+                        "io.github.hylexus.xtream.codec.ext.jt808.builtin.messages",
+                        "io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto",
+                        "io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.vo",
+                        "io.github.hylexus.xtream.codec.ext.jt1078.dashboard.domain.dto",
+                        "io.github.hylexus.xtream.codec.ext.jt1078.dashboard.domain.vo",
+                    ).joinToString(separator = ",")
+                )
+                disable(
+                    "MissingSummary",
+                    "StringCaseLocaleUsage",
+                    "StringSplitter",
+                    "UnnecessaryParentheses",
+                    "ImmutableEnumChecker",
+                    "DefaultCharset",
+                    // todo: 有几个注解名和jdk类名冲突 后期考虑提供一个别名?
+                    "JavaLangClash",
+                    "ArrayRecordComponent",
+                    "JavaTimeDefaultTimeZone",
+                )
+            }
+
+            // Include to disable NullAway on test code
+            if (name.lowercase(Locale.getDefault()).contains("test")) {
+                options.errorprone {
+                    disable("NullAway")
+                    disable("IntLiteralCast")
+                }
+            }
+        }
     }
 
+    apply(plugin = "io.spring.dependency-management")
     dependencyManagement {
         resolutionStrategy {
             cacheChangingModulesFor(0, TimeUnit.SECONDS)
@@ -46,8 +118,8 @@ configure(subprojects) {
             enabled(false)
         }
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:${getConfigAsString("defaultSpringBootBomVersion")}")
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${getConfigAsString("defaultSpringCloudBomVersion")}")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${xtreamConfig.defaultSpringBootBomVersion}")
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${xtreamConfig.defaultSpringCloudBomVersion}")
         }
 
         dependencies {
@@ -63,26 +135,35 @@ configure(subprojects) {
             dependency("com.clickhouse:clickhouse-r2dbc:0.7.1")
             dependency("io.minio:minio:8.5.14")
             dependency("com.lmax:disruptor:4.0.0")
+            dependency("org.jspecify:jspecify:1.0.0")
+            dependency("org.jetbrains:annotations:26.0.2")
+
+            xtreamConfig.thirdpartyDependencies().forEach {
+                dependency(it.toIdentifier())
+            }
         }
 
         group = "xtream-codec"
-        version = getProjectVersion()
+        version = xtreamConfig.projectVersion
     }
+    dependencies {
+        // common start
+        compileOnly("org.projectlombok:lombok")
+        annotationProcessor("org.projectlombok:lombok")
+        testCompileOnly("org.projectlombok:lombok")
+        testAnnotationProcessor("org.projectlombok:lombok")
 
-    repositories {
-        extraMavenRepositoryUrls().forEach {
-            maven(it)
+        testImplementation("org.junit.jupiter:junit-jupiter")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+        api("org.jspecify:jspecify")
+        api("org.jetbrains:annotations")
+        if (project.errorPronePluginEnabled()) {
+            val errorprone = configurations.getByName("errorprone")
+            errorprone("com.uber.nullaway:nullaway:0.12.10")
+            errorprone("com.google.errorprone:error_prone_core:2.42.0")
         }
-        mavenCentral()
-        mavenLocal()
-    }
 
-    tasks.test {
-        useJUnitPlatform()
-    }
-
-    tasks.withType<JavaCompile> {
-        options.compilerArgs.add("-parameters")
+        // common end
     }
 
     apply(plugin = "checkstyle")
@@ -90,30 +171,42 @@ configure(subprojects) {
         toolVersion = "10.23.0"
         configDirectory.set(rootProject.file("build-script/checkstyle/"))
     }
+    tasks.withType<Checkstyle>().configureEach {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(xtreamConfig.javaVersion))
+        }
+    }
     tasks.withType<Checkstyle> {
         // 严重影响构建时间
         onlyIf {
-            val skip = (project.findProperty("xtream.skip.checkstyle") as? String).toBoolean()
-            if (skip && (project.findProperty("xtream.skip.logging.enabled") as? String).toBoolean()) {
-                println("Disabling task: checkstyle in project [${project.name}](xtream.skip.checkstyle==true)")
+            val skip = xtreamConfig.skipCheckStyle
+            if (skip) {
+                logTip("Disabling task [checkstyle] in project [${project.name}] (xtream.backend.build.checkstyle.enabled == false)")
             }
             return@onlyIf !skip
         }
     }
 
     // 本项目开源协议头
-    apply(plugin = "com.github.joschi.licenser")
-    license {
-        header = rootProject.file("build-script/license/license-header")
-        skipExistingHeaders = false
-        exclude("**/spring.factories")
-        exclude("**/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
+    if (xtreamConfig.licenseCheckerEnabled) {
+        apply(plugin = "net.minecraftforge.licenser")
+        val creationYear = DateTimeFormatter.ofPattern("yyyy").format(LocalDate.now())
+        configure<net.minecraftforge.licenser.LicenseExtension> {
+            // setHeader(rootProject.file("build-script/license/license-header"))
+            header.set(rootProject.resources.text.fromFile("build-script/license/license-header"))
+            skipExistingHeaders.set(false)
+            exclude("**/spring.factories")
+            exclude("**/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
+            properties {
+                set("creationYear", creationYear)
+            }
+        }
     }
 
     apply(plugin = "com.github.jk1.dependency-license-report")
     // 第三方依赖 license
     licenseReport {
-        // By default this plugin will collect the union of all licenses from
+        // By default, this plugin will collect the union of all licenses from
         // the immediate pom and the parent poms. If your legal team thinks this
         // is too liberal, you can restrict collected licenses to only include the
         // those found in the immediate pom file
@@ -163,8 +256,6 @@ configure(subprojects) {
     if (!isJavaProject(project)) {
         return@configure
     }
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
 
     normalization {
         runtimeClasspath {
@@ -176,11 +267,10 @@ configure(subprojects) {
         dependsOn("generateLicenseReport")
         manifest {
             manifest.attributes["Implementation-Title"] = project.name
-            manifest.attributes["Implementation-Version"] = getProjectVersion()
+            manifest.attributes["Implementation-Version"] = xtreamConfig.projectVersion
             manifest.attributes["Automatic-Module-Name"] = project.name.replace('-', '.')
-            manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
-            // manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.vendor")})"
-            manifest.attributes["Minimum-Jdk-Version"] = getJavaVersion()
+            manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.vendor")})"
+            manifest.attributes["X-Requires-Java-Version"] = xtreamConfig.javaVersion.toInt()
         }
 
         from(rootProject.projectDir) {
@@ -190,7 +280,7 @@ configure(subprojects) {
             // https://docs.gradle.org/current/userguide/working_with_files.html#sec:filtering_files
             expand(
                 "copyright" to LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy")),
-                "version" to getProjectVersion(),
+                "version" to xtreamConfig.projectVersion,
             )
         }
 
@@ -217,7 +307,7 @@ configure(subprojects) {
         docletOptions.addStringOption("Xdoclint:none", "-quiet")
 
         isFailOnError = false
-        version = getProjectVersion()
+        version = xtreamConfig.projectVersion
         logging.captureStandardError(LogLevel.INFO)
         logging.captureStandardOutput(LogLevel.INFO)
     }
@@ -233,7 +323,29 @@ configure(subprojects) {
         from(tasks.named("javadoc"))
     }
 
-    if (isMavenPublications(project)) {
+    apply(plugin = "maven-publish")
+    val stagingRepositoryPath = xtreamConfig.centralPortalArtifactsTempDir
+    if (isMavenPublications()) {
+        if (xtreamConfig.centralPortalMavenRepoEnabled) {
+            apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
+            tasks.withType<io.gitee.pkmer.tasks.BundleTask>().configureEach {
+                dependsOn(tasks.test, tasks.checkstyleTest, tasks.checkstyleMain)
+                // 只有部分模块有这两个任务
+                dependsOn(tasks.matching { it.name in setOf("compileJmhJava", "checkstyleJmh") })
+            }
+            // 延迟配置，在插件完全应用后再执行
+            afterEvaluate {
+                project.extensions.findByType<io.gitee.pkmer.extension.PkmerBootPluginExtension>()?.apply {
+                    sonatypeMavenCentral {
+                        stagingRepository.set(file(stagingRepositoryPath))
+                        username.set(mavenRepoConfig.getProperty("maven-central-portal.username"))
+                        password.set(mavenRepoConfig.getProperty("maven-central-portal.password"))
+                        publishingType.set(io.gitee.pkmer.enums.PublishingType.USER_MANAGED)
+                    }
+                }
+            }
+        }
+
         publishing {
             publications {
                 create<MavenPublication>("maven") {
@@ -242,28 +354,28 @@ configure(subprojects) {
                     artifact(sourcesJar)
                     artifact(javaDocJar)
 
-                    groupId = getConfigAsString("projectGroupId")
+                    groupId = xtreamConfig.projectGroupId
                     artifactId = project.name
-                    version = getProjectVersion()
+                    version = xtreamConfig.projectVersion
 
                     pom {
                         packaging = "jar"
                         description.set(project.name)
                         name.set(project.name)
-                        url.set(getConfigAsString("projectHomePage"))
+                        url.set(xtreamConfig.projectHomePage)
 
                         licenses {
                             license {
-                                name.set(getConfigAsString("projectLicenseName"))
-                                url.set(getConfigAsString("projectLicenseUrl"))
+                                name.set(xtreamConfig.projectLicenseName)
+                                url.set(xtreamConfig.projectLicenseUrl)
                             }
                         }
 
                         developers {
                             developer {
-                                id.set(getConfigAsString("projectDeveloperId"))
-                                name.set(getConfigAsString("projectDeveloperName"))
-                                email.set(getConfigAsString("projectDeveloperEmail"))
+                                id.set(xtreamConfig.projectDeveloperId)
+                                name.set(xtreamConfig.projectDeveloperName)
+                                email.set(xtreamConfig.projectDeveloperEmail)
                             }
                         }
 
@@ -277,38 +389,60 @@ configure(subprojects) {
                         }
 
                         scm {
-                            url.set(getConfigAsString("projectScmUrl"))
-                            connection.set(getConfigAsString("projectScmConnection"))
-                            developerConnection.set(getConfigAsString("projectScmDeveloperConnection"))
+                            url.set(xtreamConfig.projectScmUrl)
+                            connection.set(xtreamConfig.projectScmConnection)
+                            developerConnection.set(xtreamConfig.projectScmDeveloperConnection)
                         }
 
                         issueManagement {
-                            system.set(getConfigAsString("projectIssueManagementSystem"))
-                            url.set(getConfigAsString("projectIssueManagementUrl"))
+                            system.set(xtreamConfig.projectIssueManagementSystem)
+                            url.set(xtreamConfig.projectIssueManagementUrl)
                         }
                     }
 
                     repositories {
                         // 1. 发布到你自己的私有仓库
-                        // 1.1 将 build-script/maven/repo-credentials.debug-template.properties 另存到 ~/.gradle/repo-credentials.properties 然后修改用户名和密码等属性
-                        // 1.2 在 ~/.gradle/gradle.properties 中配置 signing.keyId, signing.password, signing.secretKeyRingFile
-                        maven {
-                            name = "private"
-                            url = uri(mavenRepoConfig.getProperty("privateRepo-release.url"))
-                            credentials {
-                                username = mavenRepoConfig.getProperty("privateRepo-release.username")
-                                password = mavenRepoConfig.getProperty("privateRepo-release.password")
+                        if (xtreamConfig.privateMavenRepoEnabled) {
+                            maven {
+                                name = "private"
+                                url = uri(mavenRepoConfig.getProperty("privateRepo-release.url"))
+                                credentials {
+                                    username = mavenRepoConfig.getProperty("privateRepo-release.username")
+                                    password = mavenRepoConfig.getProperty("privateRepo-release.password")
+                                }
                             }
                         }
+                        // 2. 发布到 GitHub Packages
+                        if (xtreamConfig.githubMavenRepoEnabled) {
+                            maven {
+                                name = "GitHubPackages"
+                                url = uri(mavenRepoConfig.getProperty("github-pkg.url"))
+                                credentials {
+                                    username = System.getenv("GITHUB_ACTOR")
+                                        ?: System.getProperty("gpr.user")
+                                                ?: mavenRepoConfig.getProperty("github-pkg.username")
 
-                        // 2. 发布到 Maven 中央仓库
-                        maven {
-                            name = "sonatype"
-                            url = uri(mavenRepoConfig.getProperty("sonatype-staging.url"))
-                            credentials {
-                                username = mavenRepoConfig.getProperty("sonatype-staging.username")
-                                password = mavenRepoConfig.getProperty("sonatype-staging.password")
+                                    password = System.getenv("GITHUB_TOKEN")
+                                        ?: System.getProperty("gpr.key")
+                                                ?: mavenRepoConfig.getProperty("github-pkg.password")
+                                }
                             }
+                        }
+                        // 3. 发布到 Maven 中央仓库
+                        // 已废弃: 新版中央仓库发版参考 io.gitee.pkmer.pkmerboot-central-publisher
+//                        maven {
+//                            name = "centralPortal"
+//                            url = uri(mavenRepoConfig.getProperty("sonatype-staging.url"))
+//                            credentials {
+//                                username = mavenRepoConfig.getProperty("sonatype-staging.username")
+//                                password = mavenRepoConfig.getProperty("sonatype-staging.password")
+//                            }
+//                        }
+
+                        maven {
+                            name = "centralPortalLocalArtifacts"
+                            // Specify the local staging repo path in the configuration.
+                            url = uri(stagingRepositoryPath)
                         }
                     }
                 }
@@ -316,15 +450,13 @@ configure(subprojects) {
 
         }
 
-        signing {
-            if (needSign()) {
+        if (xtreamConfig.needSign) {
+            apply(plugin = "signing")
+            signing {
+                // 如果需要签名
+                // 记得将 build-script/gradle/debug-template.gradle.properties 中的 gpg 配置放到 ~/.gradle/gradle.properties
                 sign(publishing.publications["maven"])
             }
-            ////// 在 ~/.gradle/gradle.properties 文件中配置:
-            // 具体请参考模板文件: build-script/gradle/debug-template.gradle.properties
-            // signing.keyId = ABCDEFGH
-            // signing.password = you-password
-            // signing.secretKeyRingFile = /path/to/secret.gpg
         }
     }
 
@@ -355,51 +487,10 @@ fun isJavaProject(project: Project): Boolean {
 }
 
 
-fun isMavenPublications(project: Project): Boolean {
+fun Project.isMavenPublications(): Boolean {
     return mavenPublications.contains(project.name)
 }
 
-fun needSign() = !rootProject.version.toString().lowercase().endsWith("snapshot")
-
-fun getConfigAsString(key: String) = project.ext.get(key) as String
-
-fun getConfigAsBoolean(key: String) = project.ext.get(key)?.toString()?.toBoolean() ?: false
-
-fun getProjectVersion() = getConfigAsString("projectVersion")
-
-fun getJavaVersion() = getConfigAsString("defaultJavaVersion")
-
-@JvmName("getMavenRepoConfigJvm")
-fun getMavenRepoConfig(): Properties {
-    val properties = Properties()
-    val fileName = "repo-credentials.properties"
-    val repoCredentialFile = file(System.getProperty("user.home") + "/.gradle/${fileName}")
-    if (file(repoCredentialFile).exists()) {
-        logger.quiet("The maven repository credentials file <<${fileName}>> will be load from: ${repoCredentialFile.absolutePath}")
-        properties.load(repoCredentialFile.inputStream())
-    } else {
-        logger.quiet("The maven repository credentials file <<${fileName} -> {}>> not found , use `debug-template.repo-credentials.properties` for debugging.", repoCredentialFile.absolutePath)
-        properties.load(rootProject.file("build-script/maven/debug-template.repo-credentials.properties").inputStream())
-    }
-    return properties
-}
-
-fun extraMavenRepositoryUrls(): List<String> {
-    return listOf(
-//        "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
-//        "https://repo.huaweicloud.com/repository/maven",
-        "https://maven.aliyun.com/repository/central",
-        "https://maven.aliyun.com/repository/public",
-        "https://maven.aliyun.com/repository/google",
-        "https://maven.aliyun.com/repository/spring",
-        // Central
-        "https://repo1.maven.org/maven2",
-        "https://maven.aliyun.com/repository/spring-plugin",
-        "https://maven.aliyun.com/repository/gradle-plugin",
-        "https://maven.aliyun.com/repository/grails-core",
-        "https://maven.aliyun.com/repository/apache-snapshots",
-        "https://plugins.gradle.org/m2/",
-        "https://repo.spring.io/release",
-        "https://repo.spring.io/snapshot"
-    )
+private fun Project.errorPronePluginEnabled(): Boolean {
+    return xtreamConfig.errorproneEnabled && project.name in errorpronePluginEnabledProjects
 }

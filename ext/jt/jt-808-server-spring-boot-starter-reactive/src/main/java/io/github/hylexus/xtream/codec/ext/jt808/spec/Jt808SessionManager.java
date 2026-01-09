@@ -33,18 +33,22 @@ public interface Jt808SessionManager extends XtreamSessionManager<Jt808Session> 
                 .min(Comparator.comparing(XtreamSession::lastCommunicateTime));
     }
 
+    @Override
     default Stream<Jt808Session> list(int page, int pageSize, Predicate<Jt808Session> filter) {
         return this.list().filter(filter).sorted(Comparator.comparing(Jt808Session::terminalId)).skip((long) (page - 1) * pageSize).limit(pageSize);
     }
 
+    @Override
     default Stream<Jt808Session> list(int page, int pageSize) {
         return this.list().sorted(Comparator.comparing(Jt808Session::terminalId)).skip((long) (page - 1) * pageSize).limit(pageSize);
     }
 
+    @Override
     default <T> Stream<T> list(int page, int pageSize, Predicate<Jt808Session> filter, Function<Jt808Session, T> converter) {
         return this.list().filter(filter).sorted(Comparator.comparing(Jt808Session::terminalId)).skip((long) (page - 1) * pageSize).limit(pageSize).map(converter);
     }
 
+    @Override
     default <T> Stream<T> list(int page, int pageSize, Function<Jt808Session, T> converter) {
         return this.list().sorted(Comparator.comparing(Jt808Session::terminalId)).skip((long) (page - 1) * pageSize).map(converter).limit(pageSize);
     }

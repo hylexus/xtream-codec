@@ -18,11 +18,13 @@ package io.github.hylexus.xtream.codec.ext.jt1078.spec.impl;
 
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078PayloadType;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Session;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionEventListener;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionManager;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.AbstractXtreamOutbound;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.NettyOutbound;
 
 import java.net.InetSocketAddress;
@@ -42,10 +44,10 @@ public class DefaultJt1078Session extends AbstractXtreamOutbound implements Jt10
     private final String rawSim;
     private final short channelNumber;
 
-    private Jt1078PayloadType audioType;
-    private Jt1078PayloadType videoType;
+    private @Nullable Jt1078PayloadType audioType;
+    private @Nullable Jt1078PayloadType videoType;
 
-    public DefaultJt1078Session(ByteBufAllocator byteBufAllocator, NettyOutbound delegate, XtreamSessionManager<Jt1078Session> sessionManager, String id, XtreamRequest.Type type, int simLength, String rawSim, String convertedSim, short channelNumber, InetSocketAddress remoteAddress) {
+    public DefaultJt1078Session(ByteBufAllocator byteBufAllocator, NettyOutbound delegate, XtreamSessionManager<Jt1078Session> sessionManager, String id, XtreamInbound.Type type, int simLength, String rawSim, String convertedSim, short channelNumber, InetSocketAddress remoteAddress) {
         super(byteBufAllocator, delegate, type, remoteAddress);
         this.id = id;
         this.simLength = simLength;
@@ -109,7 +111,7 @@ public class DefaultJt1078Session extends AbstractXtreamOutbound implements Jt10
     }
 
     @Override
-    public Jt1078PayloadType audioType() {
+    public @Nullable Jt1078PayloadType audioType() {
         return this.audioType;
     }
 
@@ -120,7 +122,7 @@ public class DefaultJt1078Session extends AbstractXtreamOutbound implements Jt10
     }
 
     @Override
-    public Jt1078PayloadType videoType() {
+    public @Nullable Jt1078PayloadType videoType() {
         return this.videoType;
     }
 

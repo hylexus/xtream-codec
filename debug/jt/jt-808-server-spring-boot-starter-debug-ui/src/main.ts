@@ -3,8 +3,9 @@
 // import App from './App.vue'
 import {router} from "./router";
 import 'virtual:uno.css'
-// createApp(App).mount('#app')
 
+import 'virtual:svg-icons-register'
+import SvgIcon from '@/components/svg/SvgIcon.vue'
 
 import {createApp} from 'vue'
 import ElementPlus from 'element-plus'
@@ -15,4 +16,5 @@ const app = createApp(App)
 
 app.use(router)
 app.use(ElementPlus)
+app.component('SvgIcon', SvgIcon)
 app.mount('#app')

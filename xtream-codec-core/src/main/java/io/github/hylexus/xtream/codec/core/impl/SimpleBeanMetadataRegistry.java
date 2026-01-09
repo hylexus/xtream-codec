@@ -16,41 +16,46 @@
 
 package io.github.hylexus.xtream.codec.core.impl;
 
-import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
-import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.common.bean.FieldLengthExtractor;
+import io.github.hylexus.xtream.codec.base.expression.SpelXtreamExpressionEngine;
+import io.github.hylexus.xtream.codec.common.bean.*;
 import io.github.hylexus.xtream.codec.common.bean.impl.BasicBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.MapBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.NestedBeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.impl.SequenceBeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
-import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
-import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
+import io.github.hylexus.xtream.codec.core.*;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.impl.codec.RuntimeTypeFieldCodec;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import io.github.hylexus.xtream.codec.core.utils.ReflectionUtils;
+import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
+import org.jspecify.annotations.Nullable;
+import org.springframework.core.annotation.MergedAnnotations;
 
-import java.beans.BeanDescriptor;
-import java.beans.BeanInfo;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
-// todo 重构
+/**
+ * @author hylexus
+ */
 public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
-    protected final Map<Class<?>, BeanMetadata> cache = new HashMap<>();
+    // <class, <version, metadata>>
+    protected final ConcurrentMap<Class<?>, ConcurrentMap<Integer, BeanMetadata>> multiVersionCache = new ConcurrentHashMap<>();
     protected final FieldCodecRegistry fieldCodecRegistry;
     protected final XtreamCacheableClassPredicate cacheableClassPredicate;
+    protected final XtreamExpressionFactory xtreamExpressionFactory;
 
     public SimpleBeanMetadataRegistry(FieldCodecRegistry fieldCodecRegistry, XtreamCacheableClassPredicate cacheableClassPredicate) {
+        this(fieldCodecRegistry, cacheableClassPredicate, new DefaultXtreamExpressionFactory(new SpelXtreamExpressionEngine()));
+    }
+
+    public SimpleBeanMetadataRegistry(FieldCodecRegistry fieldCodecRegistry, XtreamCacheableClassPredicate cacheableClassPredicate, XtreamExpressionFactory xtreamExpressionFactory) {
         this.fieldCodecRegistry = fieldCodecRegistry;
         this.cacheableClassPredicate = cacheableClassPredicate;
+        this.xtreamExpressionFactory = xtreamExpressionFactory;
     }
 
     @Override
@@ -59,54 +64,99 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
     }
 
     @Override
-    public BeanMetadata getBeanMetadata(Class<?> beanClass) {
-        return this.getBeanMetadata(beanClass, this::createBeanPropertyMetadata);
+    public XtreamExpressionFactory expressionFactory() {
+        return this.xtreamExpressionFactory;
     }
 
     @Override
-    public BeanMetadata getBeanMetadata(Class<?> beanClass, Function<PropertyDescriptor, BeanPropertyMetadata> creator) {
+    public Stream<BeanDescriptor> beanDescriptors() {
+        return this.multiVersionCache.values()
+                .stream()
+                .flatMap(it -> {
+                    // ...
+                    return it.values().stream().map(BeanDescriptor::of);
+                })
+                .sorted(Comparator.comparing(BeanDescriptor::rawClass));
+    }
+
+    @Override
+    public BeanMetadata getBeanMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator) {
         if (!this.cacheableClassPredicate.test(beanClass)) {
-            return this.doGetMetadata(beanClass, creator);
+            return this.doGetMetadata(beanClass, version, creator);
         }
 
-        BeanMetadata result = cache.get(beanClass);
-        if (result != null) {
-            return result;
+        Map<Integer, BeanMetadata> metadataVersionMapping = multiVersionCache.get(beanClass);
+        if (metadataVersionMapping != null) {
+            final BeanMetadata beanMetadata = metadataVersionMapping.get(version);
+            if (beanMetadata != null) {
+                return beanMetadata;
+            }
         }
 
         synchronized (SimpleBeanMetadataRegistry.class) {
-            if ((result = cache.get(beanClass)) != null) {
-                return result;
+            if ((metadataVersionMapping = multiVersionCache.get(beanClass)) != null) {
+                final BeanMetadata beanMetadata = metadataVersionMapping.get(version);
+                if (beanMetadata != null) {
+                    return beanMetadata;
+                }
             }
-            result = this.doGetMetadata(beanClass, creator);
-            cache.put(beanClass, result);
-            return result;
+            final BeanMetadata beanMetadata = this.doGetMetadata(beanClass, version, creator);
+            final Map<Integer, BeanMetadata> versionMappings = multiVersionCache.computeIfAbsent(beanClass, k -> new ConcurrentHashMap<>());
+            versionMappings.put(version, beanMetadata);
+            return beanMetadata;
         }
 
     }
 
-    public BasicBeanPropertyMetadata createBeanPropertyMetadata(PropertyDescriptor pd) {
-        final BeanUtils.BasicPropertyDescriptor basicPropertyDescriptor = (BeanUtils.BasicPropertyDescriptor) pd;
-        final BasicBeanPropertyMetadata metadata = new BasicBeanPropertyMetadata(
-                this,
-                pd.getName(),
-                pd.getPropertyType(),
-                basicPropertyDescriptor.getField(),
-                // pd,
-                BeanUtils.createGetter(basicPropertyDescriptor),
-                BeanUtils.createSetter(basicPropertyDescriptor)
-        );
-        metadata.setFieldCodec(detectFieldCodec(metadata));
-        return metadata;
+    @Override
+    public BeanMetadata getBeanMetadata(Class<?> beanClass, int version) {
+        return this.getBeanMetadata(beanClass, version, this::createBeanPropertyMetadata);
     }
 
-    public BeanMetadata doGetMetadata(Class<?> beanClass, Function<PropertyDescriptor, BeanPropertyMetadata> creator) {
-        final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> AnnotatedElementUtils.findMergedAnnotation(field, XtreamField.class) != null);
-        final BeanDescriptor beanDescriptor = beanInfo.getBeanDescriptor();
+    public BasicBeanPropertyMetadata createBeanPropertyMetadata(PropertyInfo pi) {
+        final BeanUtils.BasicPropertyDescriptor basicPropertyDescriptor = (BeanUtils.BasicPropertyDescriptor) pi.propertyDescriptor();
+
+        final BeanPropertyMetadata.PropertyAccessor propertyAccessor = PropertyAccessorFactory.createPropertyAccessor(pi);
+        return new BasicBeanPropertyMetadata(
+                this,
+                basicPropertyDescriptor.getName(),
+                basicPropertyDescriptor.getPropertyType(),
+                pi.version(),
+                pi.xtreamField(),
+                basicPropertyDescriptor.getField(),
+                // pd,
+                propertyAccessor.getter(),
+                propertyAccessor.setter()
+        );
+    }
+
+    @XtreamEntity(propertyAccessStrategy = PropertyAccessStrategy.AUTO)
+    private static class Placeholder {
+    }
+
+    public BeanMetadata doGetMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator) {
+        // final BeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> AnnotatedElementUtils.findMergedAnnotation(field, XtreamField.class) != null);
+        final BeanUtils.XtreamSimpleBeanInfo beanInfo = BeanUtils.getBeanInfo(beanClass, this.cacheableClassPredicate, field -> MergedAnnotations.from(field).isPresent(XtreamField.class));
+        final XtreamEntity xtreamEntityAnnotation = ReflectionUtils.findMergedAnnotationAndSynthesize(beanClass, XtreamEntity.class, () -> Placeholder.class.getAnnotation(XtreamEntity.class));
         final ArrayList<BeanPropertyMetadata> pdList = new ArrayList<>();
-        for (final PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-            final BeanPropertyMetadata basicPropertyMetadata = creator.apply(pd);
-            if (basicPropertyMetadata.fieldCodec() != null) {
+        final boolean isRecordClass = beanInfo.isRecordClass();
+        for (final BeanUtils.BasicPropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+            final Field field = pd.getField();
+            final List<XtreamField> xtreamFieldAnnotations;
+            if (isRecordClass) {
+                final RecordComponent recordComponent = Objects.requireNonNull(pd.getRecordComponent());
+                xtreamFieldAnnotations = XtreamFieldUtils.getOrDefault(recordComponent);
+            } else {
+                // xtreamFieldAnnotations = ReflectionUtils.findXtreamFieldAnnotations(field);
+                xtreamFieldAnnotations = XtreamFieldUtils.getOrEmpty(field);
+            }
+            final XtreamField xtreamFieldAnnotation = matchVersion(version, xtreamFieldAnnotations);
+            if (xtreamFieldAnnotation == null) {
+                continue;
+            }
+
+            final BeanPropertyMetadata basicPropertyMetadata = creator.apply(new PropertyInfo(xtreamEntityAnnotation, pd, xtreamFieldAnnotation, version));
+            if (basicPropertyMetadata.fieldCodec() != FieldCodec.NullFieldCodec.INSTANCE) {
                 // 用户自定义 FieldCodec
                 pdList.add(basicPropertyMetadata);
                 continue;
@@ -114,12 +164,13 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
             if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.basic) {
                 pdList.add(basicPropertyMetadata);
             } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.struct) {
-                final BeanMetadata nestedMetadata = doGetMetadata(pd.getPropertyType(), creator);
-                final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, null);
+                final BeanMetadata nestedMetadata = doGetMetadata(pd.getPropertyType(), version, creator);
+                // final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, null);
+                final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, nestedMetadata, basicPropertyMetadata, basicPropertyMetadata.fieldLengthExtractor());
                 pdList.add(metadata);
             } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.sequence) {
                 final List<Class<?>> genericClass = getGenericClass(basicPropertyMetadata.field());
-                final BeanMetadata valueMetadata = doGetMetadata(genericClass.getFirst(), creator);
+                final BeanMetadata valueMetadata = doGetMetadata(genericClass.getFirst(), version, creator);
                 final NestedBeanPropertyMetadata metadata = new NestedBeanPropertyMetadata(this, valueMetadata, basicPropertyMetadata, new FieldLengthExtractor.ConstantFieldLengthExtractor(-2));
                 final SequenceBeanPropertyMetadata seqMetadata = new SequenceBeanPropertyMetadata(this, basicPropertyMetadata, metadata);
                 pdList.add(seqMetadata);
@@ -131,16 +182,21 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
             } else {
                 throw new IllegalStateException("Cannot determine dataType for " + basicPropertyMetadata.field());
             }
+
         }
         pdList.sort(Comparator.comparing(BeanPropertyMetadata::order));
-        return new BeanMetadata(beanInfo.getBeanDescriptor().getBeanClass(), BeanUtils.getConstructor(beanDescriptor), pdList);
+        return new BeanMetadata(beanInfo.getBeanDescriptor().getBeanClass(), BeanUtils.getConstructor(beanInfo), pdList);
+    }
+
+    protected @Nullable XtreamField matchVersion(int targetVersion, List<XtreamField> xtreamFieldAnnotations) {
+        return XtreamFieldUtils.matchVersion(targetVersion, xtreamFieldAnnotations);
     }
 
     private List<Class<?>> getGenericClass(Field field) {
         final Type genericType = field.getGenericType();
         final List<Class<?>> list = new ArrayList<>();
-        if (genericType instanceof ParameterizedType) {
-            for (Type actualTypeArgument : ((ParameterizedType) genericType).getActualTypeArguments()) {
+        if (genericType instanceof ParameterizedType parameterizedType) {
+            for (Type actualTypeArgument : parameterizedType.getActualTypeArguments()) {
                 // ignore WildcardType
                 // ?, ? extends Number, or ? super Integer
                 if (actualTypeArgument instanceof WildcardType) {
@@ -152,14 +208,4 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
         return list;
     }
 
-    public FieldCodec<?> detectFieldCodec(BasicBeanPropertyMetadata metadata) {
-        return this.fieldCodecRegistry.getFieldCodec(metadata).orElseGet(() -> {
-            // ...
-            return switch (metadata.dataType()) {
-                case struct, sequence, map -> null;
-                case dynamic -> RuntimeTypeFieldCodec.INSTANCE;
-                default -> throw new IllegalStateException("Cannot determine FieldCodec for Field [" + metadata.field() + "]");
-            };
-        });
-    }
 }

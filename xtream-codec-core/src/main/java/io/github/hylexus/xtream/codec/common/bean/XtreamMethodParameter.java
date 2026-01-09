@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -25,10 +26,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 当前类是从 `org.springframework.core.MethodParameter` 复制过来修改的。
@@ -45,8 +43,7 @@ public class XtreamMethodParameter {
     private final List<Type> genericType = new ArrayList<>();
     private final Class<?> containerClass;
 
-    private Class<?> parameterType;
-    private volatile Annotation[] parameterAnnotations;
+    private @Nullable Class<?> parameterType;
 
     public XtreamMethodParameter(int index, Method method) {
         this.index = index;
@@ -95,15 +92,15 @@ public class XtreamMethodParameter {
         return AnnotatedElementUtils.hasAnnotation(this.method, annotationType);
     }
 
-    public <A extends Annotation> A getTypeAnnotation(Class<A> annotationType) {
+    public <A extends Annotation> @Nullable A getTypeAnnotation(Class<A> annotationType) {
         if (this.index == -1) {
-            return AnnotatedElementUtils.getMergedAnnotation(this.parameterType, annotationType);
+            return AnnotatedElementUtils.getMergedAnnotation(Objects.requireNonNull(this.parameterType), annotationType);
         } else {
             return this.getParameterAnnotation(annotationType).orElse(null);
         }
     }
 
-    public <A extends Annotation> A getMethodAnnotation(Class<A> annotationType) {
+    public <A extends Annotation> @Nullable A getMethodAnnotation(Class<A> annotationType) {
         return AnnotatedElementUtils.getMergedAnnotation(this.method, annotationType);
     }
 
@@ -112,7 +109,7 @@ public class XtreamMethodParameter {
      *
      * @param offset 第几个泛型参数
      */
-    public <A extends Annotation> A getGenericTypeAnnotation(int offset, Class<A> annotationType) {
+    public <A extends Annotation> @Nullable A getGenericTypeAnnotation(int offset, Class<A> annotationType) {
         if (this.genericType.isEmpty() || this.genericType.size() <= offset) {
             return null;
         }
@@ -129,7 +126,7 @@ public class XtreamMethodParameter {
     }
 
     public Class<?> getParameterType() {
-        return parameterType;
+        return Objects.requireNonNull(parameterType);
     }
 
     public Class<?> getContainerClass() {
@@ -145,14 +142,13 @@ public class XtreamMethodParameter {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof XtreamMethodParameter that)) {
             return false;
         }
 
-        final XtreamMethodParameter that = (XtreamMethodParameter) o;
         return index == that.index
-                && containerClass == that.containerClass
-                && method.equals(that.method);
+               && containerClass == that.containerClass
+               && method.equals(that.method);
     }
 
     @Override
@@ -163,12 +159,11 @@ public class XtreamMethodParameter {
     @Override
     public String toString() {
         return "XtreamMethodParameter{"
-                + "index=" + index
-                + ", containerClass=" + containerClass
-                + ", parameterType=" + parameterType
-                + ", genericType=" + genericType
-                + ", parameterAnnotations=" + Arrays.toString(parameterAnnotations)
-                + '}';
+               + "index=" + index
+               + ", containerClass=" + containerClass
+               + ", parameterType=" + parameterType
+               + ", genericType=" + genericType
+               + '}';
     }
 
 }

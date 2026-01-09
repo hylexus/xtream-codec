@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.spec;
 
 import io.github.hylexus.xtream.codec.core.annotation.OrderedComponent;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.NettyInbound;
 
 /**
@@ -27,7 +28,7 @@ import reactor.netty.NettyInbound;
  */
 public interface Jt808MessageDescriptionRegistry {
 
-    String getDescription(int messageId);
+    @Nullable String getDescription(int messageId);
 
     default String getDescription(int messageId, String def) {
         final String description = this.getDescription(messageId);

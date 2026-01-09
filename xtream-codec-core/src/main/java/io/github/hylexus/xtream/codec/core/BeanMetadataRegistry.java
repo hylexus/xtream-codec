@@ -16,18 +16,65 @@
 
 package io.github.hylexus.xtream.codec.core;
 
+import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 import java.beans.PropertyDescriptor;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public interface BeanMetadataRegistry {
 
-    BeanMetadata getBeanMetadata(Class<?> beanClass);
+    record PropertyInfo(XtreamEntity xtreamEntity, PropertyDescriptor propertyDescriptor, XtreamField xtreamField, int version) {
+        @SuppressWarnings("redundent")
+        public PropertyInfo {
+        }
+    }
 
-    BeanMetadata getBeanMetadata(Class<?> beanClass, Function<PropertyDescriptor, BeanPropertyMetadata> creator);
+    default BeanMetadata getBeanMetadata(Class<?> beanClass) {
+        return this.getBeanMetadata(beanClass, XtreamField.ALL_VERSION);
+    }
+
+    BeanMetadata getBeanMetadata(Class<?> beanClass, int version);
+
+    default BeanMetadata getBeanMetadata(Class<?> beanClass, Function<PropertyInfo, BeanPropertyMetadata> creator) {
+        return this.getBeanMetadata(beanClass, XtreamField.ALL_VERSION, creator);
+    }
+
+    BeanMetadata getBeanMetadata(Class<?> beanClass, int version, Function<PropertyInfo, BeanPropertyMetadata> creator);
 
     FieldCodecRegistry getFieldCodecRegistry();
+
+    @Nullable
+    default FieldCodec<?> getOrCreateFieldCodec(
+            int version,
+            @Nullable XtreamDataType targetType,
+            @Nullable Class<? extends FieldCodec<?>> codecClass,
+            @Nullable String charset,
+            @Nullable Class<?> targetEntityClass) {
+
+        return this.getFieldCodecRegistry()
+                .getOrCreateFieldCodec(version, this, targetType, codecClass, charset, targetEntityClass);
+    }
+
+    /**
+     * @since 0.4.0
+     */
+    @ApiStatus.AvailableSince("0.4.0")
+    @ApiStatus.Experimental
+    XtreamExpressionFactory expressionFactory();
+
+    /**
+     * 当前注册器中已经注册的 Bean 的描述信息
+     *
+     * @since 0.3.0
+     */
+    Stream<BeanDescriptor> beanDescriptors();
 
 }

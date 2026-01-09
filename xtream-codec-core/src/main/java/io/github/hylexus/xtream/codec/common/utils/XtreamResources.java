@@ -16,6 +16,8 @@
 
 package io.github.hylexus.xtream.codec.common.utils;
 
+import org.jspecify.annotations.Nullable;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -25,7 +27,7 @@ public final class XtreamResources {
         throw new UnsupportedOperationException("This class cannot be instantiated");
     }
 
-    public static void close(Closeable closeable) {
+    public static void close(@Nullable Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();

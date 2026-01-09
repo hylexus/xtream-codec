@@ -25,21 +25,16 @@
     <property name="log.path" value="logs/jt-808-server-spring-boot-starter-reactive-debug"/>
 
     <!--0. 日志格式和颜色渲染 -->
-    <!-- 彩色日志依赖的渲染类 -->
-    <!-- <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/> -->
-    <!-- <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/> -->
-    <!-- <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/> -->
     <!-- 彩色日志格式 -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}:%L){cyan} %clr(-){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+              value="[${PID:-}] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{50}:%L) - %msg%n"/>
     <property name="FILE_LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %msg%n"/>
 
     <!--1. 输出到控制台-->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <!-- <Pattern>${CONSOLE_LOG_PATTERN}</Pattern> -->
-            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
             <!-- 设置字符集 -->
             <charset>UTF-8</charset>
         </encoder>
@@ -55,8 +50,8 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/debug-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 2 days worth of history, but at most 2GB -->
-            <maxFileSize>100MB</maxFileSize>
+            <!-- each file should be at most 20MB, keep 2 days worth of history, but at most 2GB -->
+            <maxFileSize>20MB</maxFileSize>
             <maxHistory>2</maxHistory>
             <totalSizeCap>2GB</totalSizeCap>
         </rollingPolicy>
@@ -76,8 +71,8 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 2 days worth of history, but at most 2GB -->
-            <maxFileSize>100MB</maxFileSize>
+            <!-- each file should be at most 20MB, keep 2 days worth of history, but at most 2GB -->
+            <maxFileSize>20MB</maxFileSize>
             <maxHistory>2</maxHistory>
             <totalSizeCap>2GB</totalSizeCap>
         </rollingPolicy>
@@ -97,8 +92,8 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 2 days worth of history, but at most 2GB -->
-            <maxFileSize>100MB</maxFileSize>
+            <!-- each file should be at most 20MB, keep 2 days worth of history, but at most 2GB -->
+            <maxFileSize>20MB</maxFileSize>
             <maxHistory>2</maxHistory>
             <totalSizeCap>2GB</totalSizeCap>
         </rollingPolicy>
@@ -118,8 +113,8 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 2 days worth of history, but at most 2GB -->
-            <maxFileSize>100MB</maxFileSize>
+            <!-- each file should be at most 20MB, keep 2 days worth of history, but at most 2GB -->
+            <maxFileSize>20MB</maxFileSize>
             <maxHistory>2</maxHistory>
             <totalSizeCap>2GB</totalSizeCap>
         </rollingPolicy>

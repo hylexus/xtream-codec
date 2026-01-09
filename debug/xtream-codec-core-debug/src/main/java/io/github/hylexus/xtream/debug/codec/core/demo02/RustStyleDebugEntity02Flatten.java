@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.debug.codec.core.demo02;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +41,7 @@ public class RustStyleDebugEntity02Flatten {
 
     // byte[4]     协议版本号
     @Preset.RustStyle.u8
-    private byte protocolVersion;
+    private short protocolVersion;
 
     // byte[5-15)    终端手机号或设备ID bcd[10]
     @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_BCD_8421, length = 10)
@@ -51,7 +52,8 @@ public class RustStyleDebugEntity02Flatten {
     private int msgSerialNo;
 
     // byte[17-21)    消息包封装项
-    @Preset.RustStyle.u32(condition = "hasSubPackage()")
+    // @Preset.RustStyle.u32(condition = "hasSubPackage()")
+    @Preset.RustStyle.u32(conditions = @Expression(spel = "hasSubPackage()", mvel = "self.hasSubPackage()", aviator = "self.hasSubPackage"))
     private Long subPackageInfo;
     // endregion 消息头
 
@@ -89,7 +91,8 @@ public class RustStyleDebugEntity02Flatten {
     private String time;
 
     // 长度：消息体长度减去前面的 28 字节
-    @Preset.RustStyle.list(lengthExpression = "msgBodyLength() - 28")
+    // @Preset.RustStyle.list(lengthExpression = "msgBodyLength() - 28")
+    @Preset.RustStyle.list(lengthExpressions = @Expression(spel = "msgBodyLength() - 28", mvel = "self.msgBodyLength() - 28", aviator = "self.msgBodyLength - 28"))
     private List<ExtraItem> extraItems;
     // endregion 消息体
 
@@ -102,8 +105,21 @@ public class RustStyleDebugEntity02Flatten {
         return msgBodyProps & 0x3ff;
     }
 
+    // for Aviator
+    @SuppressWarnings("unused")
+    public int getMsgBodyLength() {
+        return msgBodyProps & 0x3ff;
+    }
+
     // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
     public boolean hasSubPackage() {
+        // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+        return (msgBodyProps & 0x2000) > 0;
+    }
+
+    // for Aviator
+    @SuppressWarnings("unused")
+    public boolean isHasSubPackage() {
         // return ((msgBodyProperty & 0x2000) >> 13) == 1;
         return (msgBodyProps & 0x2000) > 0;
     }
@@ -119,7 +135,8 @@ public class RustStyleDebugEntity02Flatten {
         @Preset.RustStyle.u8
         private short contentLength;
         // 附加信息内容  BYTE[N]
-        @Preset.RustStyle.byte_array(lengthExpression = "getContentLength()")
+        // @Preset.RustStyle.byte_array(lengthExpression = "getContentLength()")
+        @Preset.RustStyle.byte_array(lengthExpressions = @Expression(spel = "getContentLength()", mvel = "self.getContentLength()", aviator = "self.contentLength"))
         private byte[] content;
 
         public ExtraItem() {

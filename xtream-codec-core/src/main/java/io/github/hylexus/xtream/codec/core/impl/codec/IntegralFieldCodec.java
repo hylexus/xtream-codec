@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 
 /**
  * 标记接口。
@@ -26,4 +27,9 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
  * @author hylexus
  */
 public interface IntegralFieldCodec extends FieldCodec<Number> {
+
+    default NumberEndian endian() {
+        return NumberEndian.NONE;
+    }
+
 }

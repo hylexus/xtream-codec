@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.base.web.domain.values;
 
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpErrorDetails;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URI;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
 public class ExceptionDelegateXtreamApiProblemDetails extends RuntimeException implements XtreamApiProblemDetails {
     private final XtreamApiProblemDetails delegate;
 
-    public ExceptionDelegateXtreamApiProblemDetails(XtreamApiProblemDetails delegate, Throwable cause) {
+    public ExceptionDelegateXtreamApiProblemDetails(XtreamApiProblemDetails delegate, @Nullable Throwable cause) {
         super(delegate.getDetail(), cause);
         this.delegate = delegate;
     }
@@ -45,17 +46,17 @@ public class ExceptionDelegateXtreamApiProblemDetails extends RuntimeException i
     }
 
     @Override
-    public String getDetail() {
+    public @Nullable String getDetail() {
         return delegate.getDetail();
     }
 
     @Override
-    public URI getInstance() {
+    public @Nullable URI getInstance() {
         return delegate.getInstance();
     }
 
     @Override
-    public Throwable getCause() {
+    public synchronized @Nullable Throwable getCause() {
         return delegate.getCause();
     }
 
@@ -65,7 +66,7 @@ public class ExceptionDelegateXtreamApiProblemDetails extends RuntimeException i
     }
 
     @Override
-    public List<? extends XtreamHttpErrorDetails> getErrorDetails() {
+    public @Nullable List<? extends XtreamHttpErrorDetails> getErrorDetails() {
         return delegate.getErrorDetails();
     }
 }

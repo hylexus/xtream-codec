@@ -26,7 +26,7 @@ article: false
 第一次编译会比较慢。
 
 - 自动下载 **Gradle**，已经修改为使用国内镜像地址下载
-- `gradle.plugin.com.github.joschi.licenser` 插件会从 [gradlePluginPortal()](https://plugins.gradle.org) 下载
+- `net.minecraftforge.licenser` 插件会从 [gradlePluginPortal()](https://plugins.gradle.org) 下载
 - 其他插件以及 **jar** 依赖都会从国内下载
 
 :::

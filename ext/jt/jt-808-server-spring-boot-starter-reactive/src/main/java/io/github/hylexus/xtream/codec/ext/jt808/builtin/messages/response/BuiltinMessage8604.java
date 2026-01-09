@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.common.utils.Numbers;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
 import lombok.Getter;
@@ -41,7 +42,7 @@ import java.util.List;
 @Jt808ResponseBody(messageId = 0x8604, desc = "设置多边形区域")
 public class BuiltinMessage8604 {
 
-    @Preset.JtStyle.Dword(desc = "区域ID")
+    @Preset.JtStyle.Dword(desc = "区域 ID")
     private long areaId;
 
     /**
@@ -67,7 +68,15 @@ public class BuiltinMessage8604 {
      * <p>
      * YY-MM-DD-hh-mm-ss，若区域属性0位为0则没有该字段
      */
-    @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()", desc = "起始时间 BCD[6]")
+    // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()", desc = "起始时间 BCD[6]")
+    @Preset.JtStyle.BcdDateTime(
+            conditions = @Expression(
+                    spel = "hasTimeProperty()",
+                    mvel = "self.hasTimeProperty()",
+                    aviator = "self.hasTimeProperty"
+            ),
+            desc = "起始时间 BCD[6]"
+    )
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
@@ -77,7 +86,15 @@ public class BuiltinMessage8604 {
      * <p>
      * YY-MM-DD-hh-mm-ss，若区域属性0位为0则没有该字段
      */
-    @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()", desc = "结束时间 BCD[6]")
+    // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()", desc = "结束时间 BCD[6]")
+    @Preset.JtStyle.BcdDateTime(
+            conditions = @Expression(
+                    spel = "hasTimeProperty()",
+                    mvel = "self.hasTimeProperty()",
+                    aviator = "self.hasTimeProperty"
+            ),
+            desc = "结束时间 BCD[6]"
+    )
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
@@ -86,15 +103,33 @@ public class BuiltinMessage8604 {
         return Numbers.getBitAt(this.areaProps, 0) == 1;
     }
 
+    // for Aviator
+    public boolean isHasTimeProperty() {
+        return Numbers.getBitAt(this.areaProps, 0) == 1;
+    }
+
     /**
      * 最高速度
      * <p>
      * Km/h，若区域属性1位为 0 则没有该字段
      */
-    @Preset.JtStyle.Word(condition = "hasSpeedProperty()", desc = "最高速度")
+    // @Preset.JtStyle.Word(condition = "hasSpeedProperty()", desc = "最高速度")
+    @Preset.JtStyle.Word(
+            conditions = @Expression(
+                    spel = "hasSpeedProperty()",
+                    mvel = "self.hasSpeedProperty()",
+                    aviator = "self.hasSpeedProperty"
+            ),
+            desc = "最高速度"
+    )
     private int topSpeed;
 
     public boolean hasSpeedProperty() {
+        return Numbers.getBitAt(this.areaProps, 1) == 1;
+    }
+
+    // for Aviator
+    public boolean isHasSpeedProperty() {
         return Numbers.getBitAt(this.areaProps, 1) == 1;
     }
 
@@ -103,7 +138,15 @@ public class BuiltinMessage8604 {
      * <p>
      * 单位为秒（s） （类似表述，同前修改） ，若区域属性1位为0则没有该字段
      */
-    @Preset.JtStyle.Byte(condition = "hasSpeedProperty()", desc = "超速持续时间")
+    // @Preset.JtStyle.Byte(condition = "hasSpeedProperty()", desc = "超速持续时间")
+    @Preset.JtStyle.Byte(
+            conditions = @Expression(
+                    spel = "hasSpeedProperty()",
+                    mvel = "self.hasSpeedProperty()",
+                    aviator = "self.hasSpeedProperty"
+            ),
+            desc = "超速持续时间"
+    )
     private short durationOfOverSpeed;
 
     @Preset.JtStyle.Word(desc = "区域总顶点数")

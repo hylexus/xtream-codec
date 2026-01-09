@@ -7,18 +7,42 @@
 </p>
 
 <p align="center">
+    <a href="https://deepwiki.com/hylexus/xtream-codec">
+        <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+    </a>
+    <br/>
     <a href="https://www.apache.org/licenses/LICENSE-2.0">
-        <img alt="license" src="https://img.shields.io/badge/license-Apache2-blue" />
+        <img alt="license" src="https://img.shields.io/badge/License-Apache2-blue" />
     </a>
     <a href="https://openjdk.org/projects/jdk/21">
-        <img alt="JDK" src="https://img.shields.io/badge/jdk-21-red" />
+        <img alt="JDK" src="https://img.shields.io/badge/JDK-21-red" />
     </a>
-    <a href="https://search.maven.org/search?q=g:%22io.github.hylexus.xtream%22%20AND%20a:%22xtream-codec-core%22">
-            <img alt="Maven%20Central" src="https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central&color=green" />
+    <a href="https://central.sonatype.com/namespace/io.github.hylexus.xtream">
+        <img alt="Maven Central" src="https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central&color=green-light" />
+    </a>
+    <br/>
+    <a href="https://github.com/hylexus/xtream-codec/actions/workflows/gradle-build-linux-platform.yml">
+        <img alt="Gradle Build" src="https://img.shields.io/github/actions/workflow/status/hylexus/xtream-codec/gradle-build-linux-platform.yml?logo=gradle&label=Gradle%20Build">
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/hylexus/xtream-codec?logo=github&label=Last%20Commit&color=blue">
+    </a>
+    <br/>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/hylexus/xtream-codec?logo=github&label=Total%20Commits"/>
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/w/hylexus/xtream-codec?logo=github&label=Commit%20Activity"/>
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/hylexus/xtream-codec?logo=github&label=Commit%20Activity"/>
+    </a>
+    <a href="https://github.com/hylexus/xtream-codec/graphs/commit-activity">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/hylexus/xtream-codec?logo=github&label=Commit%20Activity"/>
     </a>
 </p>
 
-## ProjectNaming
+## ProjectNaming / 项目命名
 
 项目名来源: `xtream-codec == xtream + codec`
 
@@ -28,7 +52,7 @@
       的流式编程([projectreactor](https://projectreactor.io))
 - `codec == Coder + Decoder`
 
-## Intro
+## Intro / 介绍
 
 该项目是一个基于 [projectreactor](https://projectreactor.io/) 的、和具体协议无关的、异步的、<span style="color:red;">非阻塞的</span>、TCP/UDP 服务端实现。
 
@@ -59,7 +83,26 @@
         - [https://sample-videos.com/index.php#sample-flv-video](https://sample-videos.com/index.php#sample-flv-video)
         - ...
 
-## Modules
+## Roadmap / 版本路线图
+
+通过 [GitHub Milestones](https://github.com/hylexus/xtream-codec/milestones) 管理未来的版本计划
+
+> 欢迎在 Issue 中讨论设计，或认领 `help wanted` 任务参与开发
+
+## Compatibility / 兼容性
+
+参考 : [https://start.spring.io/actuator/info](https://start.spring.io/actuator/info)
+
+> 非 spring 项目可以不用理会这个兼容性
+>
+> 但依然建议使用 [spring-boot-dependencies](https://central.sonatype.com/artifact/org.springframework.boot/spring-boot-dependencies) 这个 `BOM` 来管理 N 多依赖的兼容性问题
+
+| xtream-version | spring-boot-dependencies | spring-cloud-dependencies |
+|----------------|--------------------------|---------------------------|
+| **0.1.x**      | **3.5.6 +**              | **2025.0.0**              |
+| **0.0.x**      | **3.2.x +**              | **2023.0.3**              |
+
+## Modules / 项目模块
 
 ```shell
 .
@@ -88,24 +131,26 @@
 └── xtream-codec-server-reactive                        ## 异步非阻塞的 TCP/UDP 服务端实现
 ```
 
-## Docs
+## Docs / 文档
 
+- 国内站点: https://iotplanet.top/xtream-codec/
 - Github: https://hylexus.github.io/xtream-codec/
-- ~~Gitee: https://hylexus.gitee.io/xtream-codec/~~ (Gitee 暂停 Pages 服务，尚不确定后续能否恢复服务)
+- DeepWiki(**AI** 生成): https://deepwiki.com/hylexus/xtream-codec/
 
-## QuickStart
+## QuickStart / 快速入门
 
+- **Maven** 版示例: [https://github.com/iotplanet/jt-808-quick-start](https://github.com/iotplanet/jt-808-quick-start)
 - 带存储的 **JT/T 808** 服务示例
     - 非阻塞版 [jt-808-server-quick-start-with-storage-nonblocking](quick-start/jt/jt-808-server-quick-start-with-storage-nonblocking/README.md)
     - 阻塞版 [jt-808-server-quick-start-with-storage-blocking](quick-start/jt/jt-808-server-quick-start-with-storage-blocking/README.md)
 - **自定义** 协议示例
-    - Github: https://hylexus.github.io/xtream-codec/core/samples/custom-protocol-sample-01/
-    - ~~Gitee: https://hylexus.gitee.io/xtream-codec/core/samples/custom-protocol-sample-01/~~  (Gitee 暂停 Pages 服务，尚不确定后续能否恢复服务)
+    - 国内站点: https://iotplanet.top/xtream-codec/guide/core/samples/custom-protocol-sample-01/protocol.html
+    - Github: https://hylexus.github.io/xtream-codec/guide/core/samples/custom-protocol-sample-01/protocol.html
 - **JT/T 808** 协议示例
-    - Github: https://hylexus.github.io/xtream-codec/core/samples/custom-protocol-sample-02/
-    - ~~Gitee: https://hylexus.gitee.io/xtream-codec/core/samples/custom-protocol-sample-02/~~  (Gitee 暂停 Pages 服务，尚不确定后续能否恢复服务)
+    - 国内站点:https://iotplanet.top/xtream-codec/guide/core/samples/custom-protocol-sample-02/protocol.html
+    - Github: https://hylexus.github.io/xtream-codec/guide/core/samples/custom-protocol-sample-02/protocol.html
 
-## License
+## License / 开源协议
 
 `xtream-codec` 使用 [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) 开源许可证。 详情见 [LICENSE](LICENSE) 文件。
 
@@ -114,7 +159,13 @@
 - 请参考生成的 **.jar** 文件中的 `META-INF/NOTICE.txt` 文件 。
 - 或者, 执行 `./gradlew clean generateLicenseReport` 之后查看生成的 `build/reports/dependency-license/THIRD-PARTY-NOTICES.txt` 文件。
 
-## TODO
+## Funding / 打赏
+
+项目的发展离不开你的支持，请作者喝一杯🍺吧！
+
+![有钱的捧个钱场 没钱的捧个人场](https://img.iotplanet.top/img/pay.png)
+
+## TODO / 待办
 
 - [JT/T 1078 扩展](ext/jt/jt-1078-server-spring-boot-starter-reactive)
     - [ ] 代码简化(80%)

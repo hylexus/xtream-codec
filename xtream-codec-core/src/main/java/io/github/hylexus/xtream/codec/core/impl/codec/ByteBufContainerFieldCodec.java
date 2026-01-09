@@ -19,8 +19,19 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.type.ByteBufContainer;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @deprecated Use {@link BytesFieldCodecs.BytesFieldCodecByteBufContainer} instead.
+ */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class ByteBufContainerFieldCodec extends AbstractFieldCodec<ByteBufContainer> {
+    /**
+     * @deprecated Use {@link BytesFieldCodecs#INSTANCE_BYTE_BUF_CONTAINER}
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final ByteBufContainerFieldCodec INSTANCE = new ByteBufContainerFieldCodec();
 
     private ByteBufContainerFieldCodec() {

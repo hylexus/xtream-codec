@@ -53,7 +53,7 @@ class CodecDebugEntity03Test {
         }
     }
 
-    private static void doCompare(CodecTracker tracker, CodecDebugEntity03 original) {
+    private void doCompare(CodecTracker tracker, CodecDebugEntity03 original) {
         final RootSpan rootSpan = tracker.getRootSpan();
         assertEquals(3, rootSpan.getChildren().size());
         assertEquals(original.getFlowId(), ((BasicFieldSpan) rootSpan.getChildren().get(0)).getValue());
@@ -66,7 +66,7 @@ class CodecDebugEntity03Test {
         final LocalDateTime time = LocalDateTime.of(2021, 9, 27, 15, 30, 33);
         return new CodecDebugEntity03()
                 .setFlowId(111)
-                .setMultimediaDataItemCount((short) 2)
+                .setMultimediaDataItemCount(2)
                 .setItemList(List.of(
                                 new CodecDebugEntity03.Item()
                                         .setMultimediaId(1)

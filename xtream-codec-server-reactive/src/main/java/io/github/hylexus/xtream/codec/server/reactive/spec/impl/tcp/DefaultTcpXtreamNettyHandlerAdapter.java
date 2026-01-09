@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamRequest;
@@ -77,15 +78,15 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
     }
 
     protected XtreamExchange createTcpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf byteBuf, InboundInfo inboundInfo) {
-        final XtreamRequest.Type type = XtreamRequest.Type.TCP;
+        final XtreamInbound.Type type = XtreamRequest.Type.TCP;
         final XtreamRequest request = this.doCreateTcpRequest(allocator, nettyInbound, byteBuf, inboundInfo, type);
         final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, inboundInfo.remoteAddress());
 
         return new DefaultXtreamExchange(sessionManager, request, response);
     }
 
-    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamRequest.Type type) {
-        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, type, byteBuf, inboundInfo.channel(), inboundInfo.remoteAddress());
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamInbound.Type type) {
+        return new DefaultXtreamRequest(XtreamField.ALL_VERSION, this.generateRequestId(nettyInbound), allocator, nettyInbound, type, byteBuf, inboundInfo.channel(), inboundInfo.remoteAddress());
     }
 
     protected Mono<Void> doTcpExchange(XtreamExchange exchange) {

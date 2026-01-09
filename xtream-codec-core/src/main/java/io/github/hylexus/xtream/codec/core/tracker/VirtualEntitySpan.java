@@ -18,9 +18,10 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import java.util.StringJoiner;
 
-public class VirtualEntitySpan extends BaseSpan {
+@SuppressWarnings("NullAway")
+public class VirtualEntitySpan extends BaseSpan implements BaseSpan.HasFieldName {
     private String entityClass;
-    private final String fieldName;
+    private String fieldName;
     private final String fieldDesc;
 
     public VirtualEntitySpan(String fieldName, String fieldDesc) {
@@ -47,8 +48,14 @@ public class VirtualEntitySpan extends BaseSpan {
         return this;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void setFieldName(String name) {
+        this.fieldName = name;
     }
 
     public String getFieldDesc() {

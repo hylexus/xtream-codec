@@ -11,7 +11,7 @@ create table jt_808_request_trace_log
     trace_id              varchar(36) null comment '请求ID',
     terminal_id           varchar(36) null comment '终端手机号',
     message_id            int         null comment '消息ID',
-    version               int         null comment '协议版本; 1:2019, 0:2013, -1:2011, -2:unknown',
+    version               int         null comment '协议版本; 20191:2019, 2013:2013, 2011:2011, -2:unknown',
     flow_id               int         null comment '流水号',
     message_body_length   int         null comment '消息体长度',
     message_body_property int         null comment '消息体属性',

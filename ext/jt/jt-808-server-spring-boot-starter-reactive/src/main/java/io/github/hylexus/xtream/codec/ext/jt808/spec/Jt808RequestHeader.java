@@ -88,6 +88,7 @@ public interface Jt808RequestHeader {
         return messageBodyProps().messageBodyLength();
     }
 
+    @Override
     String toString();
 
     default ByteBuf encode() {

@@ -19,15 +19,22 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractFieldCodec<T> implements FieldCodec<T> {
 
     @Override
-    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value) {
+    public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable T value) {
         if (value != null) {
             this.doSerialize(propertyMetadata, context, output, value);
         }
     }
 
     protected abstract void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, T value);
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
 }

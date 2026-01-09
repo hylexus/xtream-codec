@@ -1,2 +1,4 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
   io.github.hylexus.xtream.codec.ext.jt808.processor.BuiltinJt808ServerDefaultEnvironmentPostProcessor
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+  io.github.hylexus.xtream.codec.ext.jt808.boot.configuration.bootstrap.XtreamExpressionFactoryCreationFailureAnalyzer

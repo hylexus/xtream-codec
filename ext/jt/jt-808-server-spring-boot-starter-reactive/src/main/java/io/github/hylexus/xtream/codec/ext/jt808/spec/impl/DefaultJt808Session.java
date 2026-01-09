@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.spec.impl;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ServerType;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionEventListener;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionManager;
@@ -48,7 +49,7 @@ public class DefaultJt808Session extends AbstractXtreamOutbound implements Jt808
     private final Jt808ProtocolVersion protocolVersion;
     private final String terminalId;
 
-    public DefaultJt808Session(String id, Jt808ServerType role, XtreamRequest.Type type, Jt808ProtocolVersion protocolVersion, String terminalId, NettyOutbound outbound, InetSocketAddress remoteAddress, XtreamSessionManager<Jt808Session> sessionManager) {
+    public DefaultJt808Session(String id, Jt808ServerType role, XtreamInbound.Type type, Jt808ProtocolVersion protocolVersion, String terminalId, NettyOutbound outbound, InetSocketAddress remoteAddress, XtreamSessionManager<Jt808Session> sessionManager) {
         super(ByteBufAllocator.DEFAULT, outbound, type, remoteAddress);
         this.id = id;
         this.role = role;

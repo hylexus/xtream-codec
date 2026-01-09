@@ -35,6 +35,7 @@ public interface Jt1078Request extends XtreamRequest {
         return this.payload();
     }
 
+    @Override
     default void release() {
         XtreamBytes.releaseBuf(this.body());
     }

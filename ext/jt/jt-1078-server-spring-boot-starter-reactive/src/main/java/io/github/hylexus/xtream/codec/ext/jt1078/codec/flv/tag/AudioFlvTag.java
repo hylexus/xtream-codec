@@ -19,6 +19,9 @@ package io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.tag;
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.impl.DefaultAudioFlvFlvTagHeader;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 public interface AudioFlvTag {
 
@@ -79,16 +82,16 @@ public interface AudioFlvTag {
         /**
          * 只有 AAC 格式才有该字段
          */
-        AudioAacPacketType aacPacketType();
+        @Nullable AudioAacPacketType aacPacketType();
 
-        byte[] aacSequenceHeader();
+        byte @Nullable [] aacSequenceHeader();
 
         default int writeTo(ByteBuf byteBuf) {
             final int writerIndex = byteBuf.writerIndex();
             final int v = (this.soundType().getValue() & 0b1)
-                    | ((this.soundSize().getValue() & 0b1) << 1)
-                    | ((this.soundRate().getValue() & 0b11) << 2)
-                    | (this.soundFormat().getValue() << 4);
+                          | ((this.soundSize().getValue() & 0b1) << 1)
+                          | ((this.soundRate().getValue() & 0b11) << 2)
+                          | (this.soundFormat().getValue() << 4);
 
             byteBuf.writeByte(v);
 
@@ -97,7 +100,7 @@ public interface AudioFlvTag {
             if (aacPacketType != null) {
                 byteBuf.writeByte(aacPacketType.getValue());
                 if (aacPacketType == AudioAacPacketType.AAC_SEQ_HEADER) {
-                    byteBuf.writeBytes(this.aacSequenceHeader());
+                    byteBuf.writeBytes(Objects.requireNonNull(this.aacSequenceHeader(), "AAC"));
                 }
             }
             return byteBuf.writerIndex() - writerIndex;
@@ -422,7 +425,7 @@ public interface AudioFlvTag {
          */
         AudioFlvTagHeaderBuilder soundType(AudioSoundType soundType);
 
-        AudioFlvTagHeaderBuilder aacPacketType(AudioAacPacketType aacPacketType);
+        AudioFlvTagHeaderBuilder aacPacketType(@Nullable AudioAacPacketType aacPacketType);
 
         AudioFlvTagHeaderBuilder aacSequenceHeader(byte[] aacSequenceHeader);
 

@@ -30,7 +30,7 @@ comment on column jt_808_request_trace_log.net_type is '网络类型; 0:TCP, 1:U
 comment on column jt_808_request_trace_log.trace_id is '请求ID';
 comment on column jt_808_request_trace_log.terminal_id is '终端手机号';
 comment on column jt_808_request_trace_log.message_id is '消息ID';
-comment on column jt_808_request_trace_log.version is '协议版本; 1:2019, 0:2013, -1:2011, -2:unknown';
+comment on column jt_808_request_trace_log.version is '协议版本; 2019:2019, 2013:2013, 2011:2011, -2:unknown';
 comment on column jt_808_request_trace_log.flow_id is '流水号';
 comment on column jt_808_request_trace_log.message_body_length is '消息体长度';
 comment on column jt_808_request_trace_log.message_body_property is '消息体属性';

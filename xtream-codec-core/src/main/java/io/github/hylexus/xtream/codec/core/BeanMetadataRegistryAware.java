@@ -18,6 +18,6 @@ package io.github.hylexus.xtream.codec.core;
 
 public interface BeanMetadataRegistryAware {
 
-    void setBeanMetadataRegistry(BeanMetadataRegistry registry);
+    void setBeanMetadataRegistry(int version, BeanMetadataRegistry registry);
 
 }

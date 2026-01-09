@@ -17,57 +17,94 @@
 package io.github.hylexus.xtream.codec.core.utils;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.common.bean.impl.FieldPropertySetter;
-import io.github.hylexus.xtream.codec.common.bean.impl.FiledPropertyGetter;
-import io.github.hylexus.xtream.codec.common.bean.impl.MethodPropertyGetter;
-import io.github.hylexus.xtream.codec.common.bean.impl.MethodPropertySetter;
+import io.github.hylexus.xtream.codec.common.bean.PropertyAccessStrategy;
+import io.github.hylexus.xtream.codec.common.bean.PropertyGetters;
+import io.github.hylexus.xtream.codec.common.bean.PropertySetters;
 import io.github.hylexus.xtream.codec.common.exception.BeanIntrospectionException;
+import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntityCreator;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.beans.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.function.Predicate;
 
-public class BeanUtils {
+public final class BeanUtils {
     public static final BasicPropertyDescriptor[] EMPTY_ARRAY = {};
 
-    private static final Map<Class<?>, BeanInfo> CACHE = new HashMap<>();
+    private static final Map<Class<?>, XtreamSimpleBeanInfo> CACHE = new HashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(BeanUtils.class);
 
-    public static BeanInfo getBeanInfo(Class<?> beanClass, XtreamCacheableClassPredicate cacheableClassPredicate, Predicate<Field> fieldPredicate) throws BeanIntrospectionException {
+    public static class XtreamSimpleBeanInfo extends SimpleBeanInfo {
+        private final Class<?> beanClass;
+        private final BeanDescriptor beanDescriptor;
+        private final BasicPropertyDescriptor[] propertyDescriptors;
+        private final boolean recordClass;
 
-        BeanInfo beanInfo;
+        public XtreamSimpleBeanInfo(Class<?> beanClass, BasicPropertyDescriptor[] propertyDescriptors) {
+            this.beanDescriptor = new BeanDescriptor(beanClass);
+            this.beanClass = beanClass;
+            this.propertyDescriptors = propertyDescriptors;
+            this.recordClass = beanClass.isRecord();
+        }
+
+        @SuppressWarnings({"redundent", "unused"})
+        public boolean isRecordClass() {
+            return this.recordClass;
+        }
+
+        @SuppressWarnings({"redundent", "unused"})
+        public Class<?> getBeanClass() {
+            return this.beanClass;
+        }
+
+        @Override
+        public BeanDescriptor getBeanDescriptor() {
+            return this.beanDescriptor;
+        }
+
+        @Override
+        public BasicPropertyDescriptor[] getPropertyDescriptors() {
+            return this.propertyDescriptors;
+        }
+
+        @Override
+        public MethodDescriptor[] getMethodDescriptors() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", XtreamSimpleBeanInfo.class.getSimpleName() + "[", "]")
+                    .add("beanClass=" + beanClass.getSimpleName())
+                    .add("recordClass=" + recordClass)
+                    .add("propertyDescriptorsSize=" + propertyDescriptors.length)
+                    .toString();
+        }
+    }
+
+    public static XtreamSimpleBeanInfo getBeanInfo(Class<?> beanClass, XtreamCacheableClassPredicate cacheableClassPredicate, Predicate<AnnotatedElement> fieldPredicate) throws BeanIntrospectionException {
+
+        XtreamSimpleBeanInfo beanInfo;
         if ((beanInfo = CACHE.get(beanClass)) != null) {
             return beanInfo;
         }
 
-        final BasicPropertyDescriptor[] propertyDescriptors = determineBasicProperties(beanClass, fieldPredicate);
-
-        beanInfo = new SimpleBeanInfo() {
-            @Override
-            public BeanDescriptor getBeanDescriptor() {
-                return new BeanDescriptor(beanClass);
-            }
-
-            @Override
-            public BasicPropertyDescriptor[] getPropertyDescriptors() {
-                return propertyDescriptors;
-            }
-
-            @Override
-            public MethodDescriptor[] getMethodDescriptors() {
-                throw new UnsupportedOperationException();
-            }
-
-        };
+        if (beanClass.isRecord()) {
+            beanInfo = createRecordTypeBeanInfo(beanClass);
+        } else {
+            final BasicPropertyDescriptor[] propertyDescriptors = determineBasicProperties(beanClass, fieldPredicate);
+            beanInfo = new XtreamSimpleBeanInfo(beanClass, propertyDescriptors);
+        }
 
         if (cacheableClassPredicate.test(beanClass)) {
             CACHE.put(beanClass, beanInfo);
@@ -75,7 +112,22 @@ public class BeanUtils {
         return beanInfo;
     }
 
-    public static BasicPropertyDescriptor[] determineBasicProperties(Class<?> beanClass, Predicate<Field> fieldPredicate) {
+    private static XtreamSimpleBeanInfo createRecordTypeBeanInfo(Class<?> beanClass) {
+        XtreamSimpleBeanInfo beanInfo;
+        final Field[] declaredFields = beanClass.getDeclaredFields();
+        final BasicPropertyDescriptor[] pdList = new BasicPropertyDescriptor[declaredFields.length];
+        final RecordComponent[] recordComponents = beanClass.getRecordComponents();
+        for (int i = 0; i < recordComponents.length; i++) {
+            final RecordComponent recordComponent = recordComponents[i];
+            final Field field = declaredFields[i];
+            final BasicPropertyDescriptor pd = BasicPropertyDescriptor.ofRecord(field, recordComponent);
+            pdList[i] = pd;
+        }
+        beanInfo = new XtreamSimpleBeanInfo(beanClass, pdList);
+        return beanInfo;
+    }
+
+    public static BasicPropertyDescriptor[] determineBasicProperties(Class<?> beanClass, Predicate<AnnotatedElement> fieldPredicate) {
 
         final Map<String, BasicPropertyDescriptor> pdMap = new LinkedHashMap<>();
 
@@ -120,15 +172,14 @@ public class BeanUtils {
             final BasicPropertyDescriptor pd = pdMap.get(propertyName);
             if (pd != null) {
                 if (setter) {
-                    Method writeMethod = pd.getWriteMethod();
+                    final Method writeMethod = pd.getWriteMethod();
                     if (writeMethod == null || writeMethod.getParameterTypes()[0].isAssignableFrom(method.getParameterTypes()[0])) {
                         pd.setWriteMethod(method);
                         method.setAccessible(true);
                     }
                 } else {
-                    Method readMethod = pd.getReadMethod();
-                    if (readMethod == null
-                            || (readMethod.getReturnType() == method.getReturnType() && method.getName().startsWith("is"))) {
+                    final Method readMethod = pd.getReadMethod();
+                    if (readMethod == null || (readMethod.getReturnType() == method.getReturnType() && method.getName().startsWith("is"))) {
                         pd.setReadMethod(method);
                         method.setAccessible(true);
                     }
@@ -136,34 +187,140 @@ public class BeanUtils {
             }
         });
 
-
         return pdMap.values().toArray(EMPTY_ARRAY);
     }
 
+    /**
+     * @deprecated Use {@link io.github.hylexus.xtream.codec.common.bean.PropertyAccessorFactory#createPropertyAccessor(PropertyAccessStrategy, BasicPropertyDescriptor)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.3.0")
     public static BeanPropertyMetadata.PropertySetter createSetter(BeanUtils.BasicPropertyDescriptor pd) {
         if (pd.getWriteMethod() != null) {
-            return new MethodPropertySetter(pd.getWriteMethod());
+            // return new MethodPropertySetter(pd.getWriteMethod());
+            return PropertySetters.forMethodViaReflection(pd.getWriteMethod());
         }
-        return new FieldPropertySetter(pd.getField());
+        // return new FieldPropertySetter(pd.getField());
+        return PropertySetters.forFieldViaReflection(pd.getField());
     }
 
+    /**
+     * @deprecated Use {@link io.github.hylexus.xtream.codec.common.bean.PropertyAccessorFactory#createPropertyAccessor(PropertyAccessStrategy, BasicPropertyDescriptor)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.3.0")
     public static BeanPropertyMetadata.PropertyGetter createGetter(BeanUtils.BasicPropertyDescriptor pd) {
         if (pd.getReadMethod() != null) {
-            return new MethodPropertyGetter(pd.getReadMethod());
+            // return new MethodPropertyGetter(pd.getReadMethod());
+            return PropertyGetters.forMethodViaReflection(pd.getReadMethod());
         }
-        return new FiledPropertyGetter(pd.getField());
+        // return new FiledPropertyGetter(pd.getField());
+        return PropertyGetters.forFieldViaReflection(pd.getField());
     }
 
-    public static Constructor<?> getConstructor(BeanDescriptor beanDescriptor) {
-        try {
-            return beanDescriptor.getBeanClass().getConstructor();
-        } catch (NoSuchMethodException e) {
-            // throw new BeanIntrospectionException(e);
-            return null;
+    record InterfacePlaceholder() {
+        InterfacePlaceholder {
+            throw new UnsupportedOperationException();
+        }
+
+        @SuppressWarnings("rawtypes")
+        public static final Constructor PLACEHOLDER_CONSTRUCTOR;
+
+        static {
+            try {
+                PLACEHOLDER_CONSTRUCTOR = InterfacePlaceholder.class.getDeclaredConstructor();
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    public static <T> T createNewInstance(Class<T> cls, Object... args) {
+    public static Constructor<?> getConstructor(BeanInfo beanInfo) {
+        final Class<?> beanClass = beanInfo.getBeanDescriptor().getBeanClass();
+        if (beanClass.isInterface()) {
+            return InterfacePlaceholder.PLACEHOLDER_CONSTRUCTOR;
+        }
+        if (beanClass.isRecord()) {
+            return XtreamRecordUtils.findCanonicalRecordConstructor(beanClass);
+        }
+        final Constructor<?>[] constructors = beanClass.getConstructors();
+        if (constructors.length == 0) {
+            throw new BeanIntrospectionException("No constructor found for " + beanClass.getName());
+        } else if (constructors.length == 1) {
+            final Constructor<?> result = constructors[0];
+            result.setAccessible(true);
+            return result;
+        } else {
+            final Constructor<?> correspondingConstructor = io.github.hylexus.xtream.codec.core.utils.ReflectionUtils.findCorrespondingConstructor(beanClass, XtreamEntityCreator.class);
+            if (correspondingConstructor != null) {
+                correspondingConstructor.setAccessible(true);
+                return correspondingConstructor;
+            }
+            log.warn("Multiple constructors found for {}", beanClass.getName());
+            final Constructor<?> constructor = Arrays.stream(constructors)
+                    .filter(it -> it.getParameterCount() == 0)
+                    .findFirst()
+                    .orElseGet(() -> {
+                        log.error("No default constructor found for {}", beanClass.getName());
+                        return constructors[0];
+                    });
+            constructor.setAccessible(true);
+            return constructor;
+        }
+    }
+
+    public static <T extends FieldCodec<?>> T createFieldCodecInstance(Class<T> cls, BeanMetadataRegistry beanMetadataRegistry, int version) {
+        final Constructor<?>[] constructors = cls.getDeclaredConstructors();
+        if (constructors.length == 0) {
+            throw new IllegalStateException(
+                    "Cannot create FieldCodec instance for class [" + cls.getName() + "]"
+                            + "\nNo Constructor found");
+        }
+        if (constructors.length == 1) {
+            return createFieldCodecInstance(version, cls, constructors[0], beanMetadataRegistry);
+        }
+        final List<Constructor<?>> constructorList = Arrays.stream(constructors).filter(it -> it.getAnnotation(FieldCodec.FieldCodecCreator.class) != null).toList();
+        if (constructorList.size() == 1) {
+            return createFieldCodecInstance(version, cls, constructorList.getFirst(), beanMetadataRegistry);
+        }
+        if (constructorList.isEmpty()) {
+            throw new IllegalStateException(
+                    "Failed to create FieldCodec instance for class [" + cls.getName() + "]"
+                            + "\nMore than 1 Constructor found."
+                            + "\nConsider using the @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " annotation to mark which constructor to use.");
+        }
+        throw new IllegalStateException(
+                "Failed to create FieldCodec instance for class [" + cls.getName() + "]"
+                        + "\nMore than 1 @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " found.");
+    }
+
+    private static <T extends FieldCodec<?>> T createFieldCodecInstance(int version, Class<T> cls, Constructor<?> constructor, BeanMetadataRegistry beanMetadataRegistry) {
+        final @Nullable Object[] args = new @Nullable Object[constructor.getParameterCount()];
+        final boolean ignoreUnknownParameters = Optional.ofNullable(constructor.getAnnotation(FieldCodec.FieldCodecCreator.class)).map(FieldCodec.FieldCodecCreator::ignoreUnknownParameters).orElse(false);
+        final Parameter[] parameters = constructor.getParameters();
+        for (int i = 0; i < parameters.length; i++) {
+            final Parameter parameter = parameters[i];
+            if (BeanMetadataRegistry.class.isAssignableFrom(parameter.getType())) {
+                args[i] = beanMetadataRegistry;
+            } else if (FieldCodecRegistry.class.isAssignableFrom(parameter.getType())) {
+                args[i] = beanMetadataRegistry.getFieldCodecRegistry();
+            } else if (int.class == parameter.getType() || Integer.class == parameter.getType()) {
+                args[i] = version;
+            } else {
+                if (ignoreUnknownParameters) {
+                    args[i] = null;
+                } else {
+                    throw new IllegalStateException("Cannot create FieldCodec instance for class: " + cls);
+                }
+            }
+        }
+        @SuppressWarnings("unchecked") final T newInstance = createNewInstance((Constructor<T>) constructor, args);
+        return newInstance;
+    }
+
+    public static <T> T createNewInstance(
+            Class<T> cls,
+            @SuppressWarnings("checkstyle:NoWhitespaceBefore")
+            @Nullable Object @Nullable ... args) {
+
         try {
             final Constructor<T> constructor = cls.getConstructor();
             return createNewInstance(constructor, args);
@@ -172,7 +329,11 @@ public class BeanUtils {
         }
     }
 
-    public static <T> T createNewInstance(Constructor<T> constructor, Object... args) {
+    public static <T> T createNewInstance(
+            Constructor<T> constructor,
+            @SuppressWarnings("checkstyle:NoWhitespaceBefore")
+            @Nullable Object @Nullable ... args) {
+
         constructor.setAccessible(true);
         try {
             return constructor.newInstance(args);
@@ -185,41 +346,59 @@ public class BeanUtils {
 
         @Getter
         private final Field field;
+
+        @Nullable
         private Method readMethod;
 
+        @Nullable
         private Method writeMethod;
 
-        public BasicPropertyDescriptor(Field field, Method readMethod, Method writeMethod)
-                throws IntrospectionException {
+        @Nullable
+        private final RecordComponent recordComponent;
+
+        public BasicPropertyDescriptor(
+                Field field,
+                @Nullable Method readMethod,
+                @Nullable Method writeMethod,
+                @Nullable RecordComponent recordComponent) throws IntrospectionException {
             super(field.getName(), readMethod, writeMethod);
             this.field = field;
+            this.recordComponent = recordComponent;
         }
 
-        public static BasicPropertyDescriptor of(Field field, Method readMethod, Method writeMethod) {
+        public static BasicPropertyDescriptor of(Field field, @Nullable Method readMethod, @Nullable Method writeMethod) {
             try {
-                return new BasicPropertyDescriptor(field, readMethod, writeMethod);
+                return new BasicPropertyDescriptor(field, readMethod, writeMethod, null);
+            } catch (IntrospectionException e) {
+                throw new BeanIntrospectionException(e);
+            }
+        }
+
+        public static BasicPropertyDescriptor ofRecord(Field field, RecordComponent recordComponent) {
+            try {
+                return new BasicPropertyDescriptor(field, recordComponent.getAccessor(), null, recordComponent);
             } catch (IntrospectionException e) {
                 throw new BeanIntrospectionException(e);
             }
         }
 
         @Override
-        public Method getReadMethod() {
+        public synchronized @Nullable Method getReadMethod() {
             return this.readMethod;
         }
 
         @Override
-        public void setReadMethod(Method readMethod) {
+        public synchronized void setReadMethod(Method readMethod) {
             this.readMethod = readMethod;
         }
 
         @Override
-        public Method getWriteMethod() {
+        public synchronized @Nullable Method getWriteMethod() {
             return this.writeMethod;
         }
 
         @Override
-        public void setWriteMethod(Method writeMethod) {
+        public synchronized void setWriteMethod(Method writeMethod) {
             this.writeMethod = writeMethod;
         }
 
@@ -227,5 +406,10 @@ public class BeanUtils {
         public synchronized Class<?> getPropertyType() {
             return field.getType();
         }
+
+        public @Nullable RecordComponent getRecordComponent() {
+            return this.recordComponent;
+        }
+
     }
 }

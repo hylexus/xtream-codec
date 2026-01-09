@@ -24,14 +24,11 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.common.ReactiveXtream
 import io.github.hylexus.xtream.codec.server.reactive.spec.common.XtreamHandlerMethod;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamBlockingHandlerMethodPredicate;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.builtin.AbstractXtreamRequestMappingHandlerMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Mono;
 
@@ -45,9 +42,10 @@ import static java.util.Objects.requireNonNull;
  * @author hylexus
  */
 public class Jt808RequestMappingHandlerMapping extends AbstractXtreamRequestMappingHandlerMapping implements ApplicationContextAware, InitializingBean {
-    private static final Logger log = LoggerFactory.getLogger(Jt808RequestMappingHandlerMapping.class);
+    // private static final Logger log = LoggerFactory.getLogger(Jt808RequestMappingHandlerMapping.class);
     // <messageId,<version,handler>>
     private final Map<Integer, Map<Jt808ProtocolVersion, XtreamHandlerMethod>> mappings = new HashMap<>();
+    @SuppressWarnings("NullAway")
     protected ApplicationContext applicationContext;
 
     public Jt808RequestMappingHandlerMapping(XtreamSchedulerRegistry schedulerRegistry, XtreamBlockingHandlerMethodPredicate blockingHandlerMethodPredicate) {
@@ -110,7 +108,7 @@ public class Jt808RequestMappingHandlerMapping extends AbstractXtreamRequestMapp
     }
 
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 

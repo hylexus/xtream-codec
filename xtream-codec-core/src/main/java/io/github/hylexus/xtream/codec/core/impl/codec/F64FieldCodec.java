@@ -18,8 +18,19 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @deprecated Use {@link F64FieldCodecs.F64FieldCodec} instead.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class F64FieldCodec extends AbstractFieldCodec<Number> {
+    /**
+     * @deprecated Use {@link F64FieldCodecs#DOUBLE_INSTANCE} instead.
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final F64FieldCodec INSTANCE = new F64FieldCodec();
 
     private F64FieldCodec() {

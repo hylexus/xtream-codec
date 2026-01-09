@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.bean.XtreamMethodParameter;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerMethodArgumentResolver;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class DelegateXtreamHandlerMethodArgumentResolver implements XtreamHandle
         return resolver.resolveArgument(parameter, exchange);
     }
 
-    XtreamHandlerMethodArgumentResolver getArgumentResolver(XtreamMethodParameter parameter) {
+    @Nullable XtreamHandlerMethodArgumentResolver getArgumentResolver(XtreamMethodParameter parameter) {
         final XtreamHandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
         if (result != null) {
             return result;

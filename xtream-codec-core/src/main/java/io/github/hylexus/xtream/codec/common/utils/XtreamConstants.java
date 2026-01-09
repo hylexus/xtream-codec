@@ -27,6 +27,7 @@ public final class XtreamConstants {
 
     public static final String CHARSET_NAME_GBK = "GBK";
     public static final String CHARSET_NAME_GB_2312 = "GB2312";
+    public static final String CHARSET_NAME_UTF8 = "UTF-8";
     public static final String CHARSET_NAME_BCD_8421 = "BCD_8421";
     public static final String CHARSET_NAME_HEX = "HEX";
 

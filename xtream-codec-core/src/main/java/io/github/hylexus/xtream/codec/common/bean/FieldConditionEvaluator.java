@@ -16,18 +16,30 @@
 
 package io.github.hylexus.xtream.codec.common.bean;
 
+import io.github.hylexus.xtream.codec.base.expression.XtreamExpression;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import lombok.ToString;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-public interface FieldConditionEvaluator {
+import java.util.StringJoiner;
+
+public sealed interface FieldConditionEvaluator
+        permits FieldConditionEvaluator.AlwaysFalseFieldConditionEvaluator,
+        FieldConditionEvaluator.AlwaysTrueFieldConditionEvaluator,
+        FieldConditionEvaluator.ExpressionFieldConditionEvaluator,
+        FieldConditionEvaluator.CustomFieldConditionEvaluator {
 
     boolean evaluate(FieldCodec.CodecContext context);
 
-    class AlwaysTrueFieldConditionEvaluator implements FieldConditionEvaluator {
+    enum AlwaysFalseFieldConditionEvaluator implements FieldConditionEvaluator {
+        INSTANCE;
 
-        public static AlwaysTrueFieldConditionEvaluator INSTANCE = new AlwaysTrueFieldConditionEvaluator();
+        @Override
+        public boolean evaluate(FieldCodec.CodecContext context) {
+            return false;
+        }
+    }
+
+    enum AlwaysTrueFieldConditionEvaluator implements FieldConditionEvaluator {
+        INSTANCE;
 
         @Override
         public boolean evaluate(FieldCodec.CodecContext context) {
@@ -35,14 +47,10 @@ public interface FieldConditionEvaluator {
         }
     }
 
-    @ToString(exclude = "expression")
-    class ExpressionFieldConditionEvaluator implements FieldConditionEvaluator {
-        private final Expression expression;
-        private final String expressionString;
+    record ExpressionFieldConditionEvaluator(XtreamExpression expression, String expressionString) implements FieldConditionEvaluator {
 
-        public ExpressionFieldConditionEvaluator(String expressionString) {
-            this.expressionString = expressionString;
-            this.expression = new SpelExpressionParser().parseExpression(expressionString);
+        public ExpressionFieldConditionEvaluator(XtreamExpression expression) {
+            this(expression, expression.expressionString());
         }
 
         @Override
@@ -51,5 +59,15 @@ public interface FieldConditionEvaluator {
             return value != null && value;
         }
 
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", ExpressionFieldConditionEvaluator.class.getSimpleName() + "[", "]")
+                    .add("expressionString='" + expressionString + "'")
+                    .toString();
+        }
     }
+
+    non-sealed interface CustomFieldConditionEvaluator extends FieldConditionEvaluator {
+    }
+
 }

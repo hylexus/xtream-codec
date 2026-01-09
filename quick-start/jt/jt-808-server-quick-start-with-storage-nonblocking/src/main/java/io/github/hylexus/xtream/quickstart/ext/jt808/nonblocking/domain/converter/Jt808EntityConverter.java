@@ -45,7 +45,7 @@ public class Jt808EntityConverter {
                 .setTraceId(event.traceId())
                 .setTerminalId(event.terminalId())
                 .setMessageId(event.messageId())
-                .setVersion(Jt808Version.fromValue((int) event.version().versionIdentifier()))
+                .setVersion(Jt808Version.fromValue(event.version().versionValue()))
                 .setFlowId(event.flowId())
                 .setMessageBodyLength(event.messageBodyLength())
                 .setMessageBodyProperty(event.messageBodyProperty())

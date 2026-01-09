@@ -45,30 +45,6 @@ public class DefaultJt1078XtreamSchedulerRegistry
     }
 
     @Override
-    @Deprecated
-    public Scheduler requestDispatcherScheduler() {
-        throw new UnsupportedOperationException("Jt1078XtreamSchedulerRegistry does not support requestDispatcherScheduler");
-    }
-
-    @Override
-    @Deprecated
-    public Scheduler defaultNonBlockingScheduler() {
-        throw new UnsupportedOperationException("Jt1078XtreamSchedulerRegistry does not support defaultNonBlockingScheduler");
-    }
-
-    @Override
-    @Deprecated
-    public Scheduler defaultBlockingScheduler() {
-        throw new UnsupportedOperationException("Jt1078XtreamSchedulerRegistry does not support defaultBlockingScheduler");
-    }
-
-    @Override
-    @Deprecated
-    public Scheduler eventPublisherScheduler() {
-        throw new UnsupportedOperationException("Jt1078XtreamSchedulerRegistry does not support eventPublisherScheduler");
-    }
-
-    @Override
     public Scheduler audioVideoCodecScheduler() {
         return this.avCodecScheduler;
     }

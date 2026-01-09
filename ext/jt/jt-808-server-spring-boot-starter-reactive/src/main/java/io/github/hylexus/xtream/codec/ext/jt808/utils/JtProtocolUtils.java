@@ -22,7 +22,7 @@ public final class JtProtocolUtils {
     private JtProtocolUtils() {
     }
 
-    public static final byte[] ATTACHMENT_REQUEST_PREFIX = {0x30, 0x31, 0x63, 0x64};
+    private static final byte[] ATTACHMENT_REQUEST_PREFIX = {0x30, 0x31, 0x63, 0x64};
 
     public static boolean isAttachmentRequest(ByteBuf originalPayload) {
         if (originalPayload.readableBytes() < ATTACHMENT_REQUEST_PREFIX.length) {

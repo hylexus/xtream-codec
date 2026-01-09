@@ -16,10 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.utils;
 
-import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
-import io.netty.util.AttributeKey;
 
-import java.net.InetSocketAddress;
 import java.time.format.DateTimeFormatter;
 
 /**

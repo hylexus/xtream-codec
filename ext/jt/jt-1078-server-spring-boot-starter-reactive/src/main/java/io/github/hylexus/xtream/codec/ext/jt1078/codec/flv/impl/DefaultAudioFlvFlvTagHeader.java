@@ -18,16 +18,18 @@ package io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.impl;
 
 
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.tag.AudioFlvTag;
+import org.jspecify.annotations.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
+@SuppressWarnings("NullAway")
 public class DefaultAudioFlvFlvTagHeader implements AudioFlvTag.AudioFlvTagHeader, AudioFlvTag.AudioFlvTagHeaderBuilder {
     private AudioFlvTag.AudioSoundFormat soundFormat;
     private AudioFlvTag.AudioSoundRate soundRate;
     private AudioFlvTag.AudioSoundSize soundSize;
     private AudioFlvTag.AudioSoundType soundType;
-    private AudioFlvTag.AudioAacPacketType aacPacketType;
-    private byte[] aacSequenceHeader;
+    private AudioFlvTag.@Nullable AudioAacPacketType aacPacketType;
+    private byte @Nullable [] aacSequenceHeader;
 
     public DefaultAudioFlvFlvTagHeader() {
     }
@@ -77,18 +79,18 @@ public class DefaultAudioFlvFlvTagHeader implements AudioFlvTag.AudioFlvTagHeade
     }
 
     @Override
-    public AudioFlvTag.AudioAacPacketType aacPacketType() {
+    public AudioFlvTag.@Nullable AudioAacPacketType aacPacketType() {
         return this.aacPacketType;
     }
 
     @Override
-    public AudioFlvTag.AudioFlvTagHeaderBuilder aacPacketType(AudioFlvTag.AudioAacPacketType aacPacketType) {
+    public AudioFlvTag.AudioFlvTagHeaderBuilder aacPacketType(AudioFlvTag.@Nullable AudioAacPacketType aacPacketType) {
         this.aacPacketType = aacPacketType;
         return this;
     }
 
     @Override
-    public byte[] aacSequenceHeader() {
+    public byte @Nullable [] aacSequenceHeader() {
         return this.aacSequenceHeader;
     }
 

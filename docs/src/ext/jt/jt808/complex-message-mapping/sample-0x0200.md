@@ -5,7 +5,7 @@ article: false
 
 # 0x0200-位置信息汇报
 
-## 示例1
+## 示例1 - Map
 
 使用 `@XtreamFieldMapDescriptor` 来描述附加项。
 
@@ -23,7 +23,7 @@ article: false
 - [GitHub](https://github.com/hylexus/xtream-codec/blob/main/ext/jt/jt-808-server-spring-boot-starter-reactive/src/main/java/io/github/hylexus/xtream/codec/ext/jt808/builtin/messages/request/BuiltinMessage0200.java)
 - [Gitee](https://gitee.com/hylexus/xtream-codec/blob/main/ext/jt/jt-808-server-spring-boot-starter-reactive/src/main/java/io/github/hylexus/xtream/codec/ext/jt808/builtin/messages/request/BuiltinMessage0200.java)
 
-## 示例2
+## 示例2 - 自定义编解码器
 
 本示例中使用自定义的 `BuiltinLocationMessageExtraItemFieldCodec` 来解析附加项，该类继承自
 `io.github.hylexus.xtream.codec.core.impl.codec.AbstractMapFieldCodec`。

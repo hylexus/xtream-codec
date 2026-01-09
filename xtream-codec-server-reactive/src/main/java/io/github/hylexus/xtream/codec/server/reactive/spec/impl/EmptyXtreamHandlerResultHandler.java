@@ -33,7 +33,7 @@ import java.lang.reflect.Type;
  * @author hylexus
  */
 public class EmptyXtreamHandlerResultHandler implements XtreamHandlerResultHandler {
-    private static final Logger log = LoggerFactory.getLogger(EmptyXtreamHandlerResultHandler.class);
+    // private static final Logger log = LoggerFactory.getLogger(EmptyXtreamHandlerResultHandler.class);
 
     public EmptyXtreamHandlerResultHandler() {
     }

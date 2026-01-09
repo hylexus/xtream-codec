@@ -19,7 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ServerType;
-import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -36,7 +36,7 @@ public class Jt808SessionVo {
     private String terminalId;
     private Jt808ServerType serverType;
     private Jt808ProtocolVersion protocolVersion;
-    private XtreamRequest.Type protocolType;
+    private XtreamInbound.Type protocolType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "GMT+8")
     private Instant creationTime;

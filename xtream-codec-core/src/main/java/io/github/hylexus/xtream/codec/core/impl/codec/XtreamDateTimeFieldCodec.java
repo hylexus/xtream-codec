@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.common.exception.XtreamWrappedRuntimeExcep
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamDateTimeField;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,16 +44,19 @@ public class XtreamDateTimeFieldCodec extends AbstractFieldCodec<Object> {
             case String string -> string;
             default -> throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
         };
-        final FieldCodec<String> stringFieldCodec = StringFieldCodec.createStringCodec(annotation.charset());
+        final FieldCodec<String> stringFieldCodec = StringFieldCodecs.createStringCodec(annotation.charset());
         stringFieldCodec.serialize(propertyMetadata, context, output, bcdString);
     }
 
     @Override
-    public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+    public @Nullable Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
         final XtreamDateTimeField annotation = propertyMetadata.findAnnotation(XtreamDateTimeField.class).orElseThrow();
 
-        final FieldCodec<String> stringFieldCodec = StringFieldCodec.createStringCodec(annotation.charset());
+        final FieldCodec<String> stringFieldCodec = StringFieldCodecs.createStringCodec(annotation.charset());
         final String dateString = stringFieldCodec.deserialize(propertyMetadata, context, input, length);
+        if (dateString == null) {
+            return null;
+        }
 
         final Class<?> targetType = propertyMetadata.rawClass();
         if (targetType.equals(LocalDateTime.class)) {

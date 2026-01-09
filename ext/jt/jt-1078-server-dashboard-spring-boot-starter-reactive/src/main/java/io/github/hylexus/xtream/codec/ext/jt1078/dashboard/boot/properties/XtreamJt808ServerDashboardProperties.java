@@ -29,6 +29,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@SuppressWarnings("NullAway")
 @ConfigurationProperties(prefix = "jt1078-server.features.dashboard")
 public class XtreamJt808ServerDashboardProperties {
 

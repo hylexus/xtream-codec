@@ -20,7 +20,8 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.socket.DatagramPacket;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 
@@ -28,16 +29,17 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
         implements XtreamRequest.XtreamRequestBuilder {
 
     protected final R delegateRequest;
-
-    protected ByteBuf payload;
-    protected InetSocketAddress remoteAddress;
-    protected Channel channel;
+    protected int version;
+    protected @Nullable ByteBuf payload;
+    protected @Nullable InetSocketAddress remoteAddress;
+    protected @Nullable Channel channel;
 
     public AbstractXtreamRequestBuilder(R delegateRequest) {
         this.delegateRequest = delegateRequest;
         this.payload = delegateRequest.payload();
         this.channel = delegateRequest.underlyingChannel();
         this.remoteAddress = delegateRequest.remoteAddress();
+        this.version = delegateRequest.version();
     }
 
     @SuppressWarnings("unchecked")
@@ -46,7 +48,7 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
     }
 
     @Override
-    public B payload(ByteBuf payload, boolean autoRelease) {
+    public @NonNull B payload(ByteBuf payload, boolean autoRelease) {
         final ByteBuf old = this.payload;
         try {
             this.payload = payload;
@@ -59,18 +61,18 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
     }
 
     @Override
-    public B remoteAddress(InetSocketAddress remoteAddress) {
+    public @NonNull B remoteAddress(InetSocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
         return self();
     }
 
-    public abstract R build();
-
-    protected DatagramPacket createDatagramPacket(ByteBuf payload) {
-        return new DatagramPacket(
-                payload != null ? payload : this.delegateRequest.payload(),
-                null,
-                this.remoteAddress != null ? this.remoteAddress : this.delegateRequest.remoteAddress()
-        );
+    @Override
+    public XtreamRequest.XtreamRequestBuilder version(int version) {
+        this.version = version;
+        return self();
     }
+
+    @Override
+    public abstract @NonNull R build();
+
 }

@@ -33,7 +33,7 @@ import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078DataType;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078PayloadType;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Request;
 import io.netty.buffer.ByteBuf;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -71,7 +71,7 @@ public class H264ToFlvJt1078ChannelCollector implements Jt1078ChannelCollector {
     protected final Scheduler scheduler;
     protected final H264Jt1078SubscriberCreator subscriberCreator;
 
-    protected Jt1078AudioCodec audioCodec;
+    protected @Nullable Jt1078AudioCodec audioCodec;
     protected long firstVideoTimestamp = -1L;
     protected FlvEncoder flvEncoder;
 
@@ -186,7 +186,7 @@ public class H264ToFlvJt1078ChannelCollector implements Jt1078ChannelCollector {
     }
 
     @Override
-    public void unsubscribe(String id, @Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    public void unsubscribe(String id, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         final H264ToFlvSubscriber subscriber = this.subscribers.get(id);
         if (subscriber != null) {
             if (reason == null) {
@@ -198,7 +198,7 @@ public class H264ToFlvJt1078ChannelCollector implements Jt1078ChannelCollector {
     }
 
     @Override
-    public void close(@Nullable Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    public void close(Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         final var iterator = this.subscribers.entrySet().iterator();
         while (iterator.hasNext()) {
             final Map.Entry<String, H264ToFlvSubscriber> entry = iterator.next();

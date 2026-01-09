@@ -35,6 +35,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -69,7 +70,7 @@ public class BaseXtreamInternalRfc7807StyleWebExceptionHandlerReactive {
                         .map(List::getFirst)
                         .map(DefaultMessageSourceResolvable::getDefaultMessage)
                         .orElse(ex.getMessage());
-                yield render(XtreamApiProblemDetails.badRequest(XtreamHttpErrorDetails.ParameterErrorDetails.ofSingleList(message)));
+                yield render(XtreamApiProblemDetails.badRequest(XtreamHttpErrorDetails.ParameterErrorDetails.ofSingleList(Objects.requireNonNull(message))));
             }
             case ResponseStatusException statusException -> {
                 final HttpStatusCode statusCode = statusException.getStatusCode();
@@ -80,7 +81,7 @@ public class BaseXtreamInternalRfc7807StyleWebExceptionHandlerReactive {
             default -> {
                 log.error("Internal Server Error", error);
                 final XtreamApiProblemDetails problemDetails = XtreamApiProblemDetails.newBuilderFrom(XtreamApiErrorCode.SERVER_ERROR)
-                        .detail(error.getMessage()).build();
+                        .detail(Objects.requireNonNullElse(error.getMessage(),"Internal Server Error")).build();
                 yield render(problemDetails);
             }
         };

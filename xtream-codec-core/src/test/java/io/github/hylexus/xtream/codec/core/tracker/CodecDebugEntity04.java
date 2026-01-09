@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.tracker;
 
 import io.github.hylexus.xtream.codec.core.RuntimeTypeSupplier;
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,11 +36,12 @@ public class CodecDebugEntity04 implements RuntimeTypeSupplier {
     @Preset.JtStyle.Object(desc = "消息头")
     private Header header;
 
-    @Preset.JtStyle.RuntimeType(lengthExpression = "header.msgBodyLength()",desc = "消息体")
+    // @Preset.JtStyle.RuntimeType(lengthExpression = "header.msgBodyLength()",desc = "消息体")
+    @Preset.JtStyle.RuntimeType(lengthExpressions = @Expression(spel = "header.msgBodyLength()", mvel = "self.header.msgBodyLength()", aviator = "self.header.msgBodyLength"), desc = "消息体")
     private Object body;
 
     @Preset.JtStyle.Byte(desc = "校验码")
-    private byte checkSum;
+    private short checkSum;
 
     @Override
     public Class<?> getRuntimeType(String name) {
@@ -60,6 +62,12 @@ public class CodecDebugEntity04 implements RuntimeTypeSupplier {
             return (msgBodyProps & 0x4000) >> 14 == 1;
         }
 
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasVersionField() {
+            return (msgBodyProps & 0x4000) >> 14 == 1;
+        }
+
         @Preset.JtStyle.Word
         private int msgId;
 
@@ -68,11 +76,13 @@ public class CodecDebugEntity04 implements RuntimeTypeSupplier {
         private int msgBodyProps;
 
         // byte[4]     协议版本号
-        @Preset.JtStyle.Byte(condition = "hasVersionField()", desc = "协议版本号(V2019+)")
-        private byte protocolVersion;
+        // @Preset.JtStyle.Byte(condition = "hasVersionField()", desc = "协议版本号(V2019+)")
+        @Preset.JtStyle.Byte(conditions = @Expression(spel = "hasVersionField()", mvel = "self.hasVersionField()", aviator = "self.hasVersionField"), desc = "协议版本号(V2019+)")
+        private short protocolVersion;
 
         // byte[5-15)    终端手机号或设备ID bcd[10]
-        @Preset.JtStyle.Bcd(lengthExpression = "hasVersionField() ? 10: 6")
+        // @Preset.JtStyle.Bcd(lengthExpression = "hasVersionField() ? 10: 6")
+        @Preset.JtStyle.Bcd(lengthExpressions = @Expression(spel = "hasVersionField() ? 10: 6", mvel = "self.hasVersionField() ? 10: 6", aviator = "self.hasVersionField ? 10: 6"))
         private String terminalId;
 
         // byte[15-17)    消息流水号 word(16)
@@ -80,7 +90,8 @@ public class CodecDebugEntity04 implements RuntimeTypeSupplier {
         private int msgSerialNo;
 
         // byte[17-21)    消息包封装项
-        @Preset.JtStyle.Dword(condition = "hasSubPackage()")
+        // @Preset.JtStyle.Dword(condition = "hasSubPackage()")
+        @Preset.JtStyle.Dword(conditions = @Expression(spel = "hasSubPackage()", mvel = "self.hasSubPackage()", aviator = "self.hasSubPackage"))
         private Long subPackageInfo;
 
         // bit[0-9] 0000,0011,1111,1111(3FF)(消息体长度)
@@ -88,8 +99,21 @@ public class CodecDebugEntity04 implements RuntimeTypeSupplier {
             return msgBodyProps & 0x3ff;
         }
 
+        // for Aviator
+        @SuppressWarnings("unused")
+        public int getMsgBodyLength() {
+            return msgBodyProps & 0x3ff;
+        }
+
         // bit[13] 0010,0000,0000,0000(2000)(是否有子包)
         public boolean hasSubPackage() {
+            // return ((msgBodyProperty & 0x2000) >> 13) == 1;
+            return (msgBodyProps & 0x2000) > 0;
+        }
+
+        // for Aviator
+        @SuppressWarnings("unused")
+        public boolean isHasSubPackage() {
             // return ((msgBodyProperty & 0x2000) >> 13) == 1;
             return (msgBodyProps & 0x2000) > 0;
         }

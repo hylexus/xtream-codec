@@ -18,8 +18,8 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import java.util.StringJoiner;
 
-public class CollectionFieldSpan extends BaseSpan {
-    private final String fieldName;
+public class CollectionFieldSpan extends BaseSpan implements BaseSpan.HasFieldName {
+    private String fieldName;
     private final String fieldType;
     private final String fieldDesc;
 
@@ -30,8 +30,14 @@ public class CollectionFieldSpan extends BaseSpan {
         this.fieldDesc = fieldDesc;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void setFieldName(String name) {
+        this.fieldName = name;
     }
 
     public String getFieldDesc() {

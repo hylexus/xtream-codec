@@ -16,7 +16,6 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.boot.condition;
 
-import jakarta.annotation.Nonnull;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Environment;
@@ -28,7 +27,7 @@ class OnJt808ServerCondition implements Condition {
 
     @Override
     @SuppressWarnings("checkstyle:indentation")
-    public boolean matches(@Nonnull ConditionContext context, @Nonnull AnnotatedTypeMetadata metadata) {
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         final Map<String, Object> annotationAttributes = metadata.getAnnotationAttributes(ConditionalOnJt808Server.class.getName());
         if (annotationAttributes == null || annotationAttributes.isEmpty()) {
             return false;

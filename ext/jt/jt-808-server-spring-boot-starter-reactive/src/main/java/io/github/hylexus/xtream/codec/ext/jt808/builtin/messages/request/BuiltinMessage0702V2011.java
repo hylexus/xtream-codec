@@ -50,7 +50,7 @@ public class BuiltinMessage0702V2011 {
     /**
      * 从业资格证编码
      */
-    @Preset.JtStyle.Str(length = 20)
+    @Preset.JtStyle.Str(length = 40)
     private String professionalLicenseNo;
 
     // prependLengthFieldType: 前置一个 u8类型的字段 表示 发证机构名称长度

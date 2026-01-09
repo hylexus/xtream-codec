@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl.udp;
 
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamRequest;
@@ -74,7 +75,7 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
     }
 
     protected XtreamExchange createUdpExchange(ByteBufAllocator allocator, NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {
-        final XtreamRequest.Type type = XtreamRequest.Type.UDP;
+        final XtreamInbound.Type type = XtreamRequest.Type.UDP;
         final XtreamRequest request = this.doCreateUdpRequest(allocator, nettyInbound, payload, inboundInfo);
         final DefaultXtreamResponse response = new DefaultXtreamResponse(allocator, nettyOutbound, type, inboundInfo.remoteAddress());
 
@@ -82,7 +83,7 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
     }
 
     protected XtreamRequest doCreateUdpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf payload, InboundInfo inboundInfo) {
-        return new DefaultXtreamRequest(this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.UDP, payload, inboundInfo.channel(), inboundInfo.remoteAddress());
+        return new DefaultXtreamRequest(XtreamField.ALL_VERSION, this.generateRequestId(nettyInbound), allocator, nettyInbound, XtreamInbound.Type.UDP, payload, inboundInfo.channel(), inboundInfo.remoteAddress());
     }
 
     protected Mono<Void> doUdpExchange(XtreamExchange exchange) {

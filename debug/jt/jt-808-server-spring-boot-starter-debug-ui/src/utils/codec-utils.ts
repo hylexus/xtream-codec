@@ -1,5 +1,5 @@
 export const toHexString = (n: number, pad: number = 4): string => {
-    return "0x" + n.toString(16).padStart(pad, "0")
+    return "0x" + n.toString(16).padStart(pad, "0").toUpperCase()
 }
 
 export const toBinaryString = (n: number, pad: number = 4): string => {

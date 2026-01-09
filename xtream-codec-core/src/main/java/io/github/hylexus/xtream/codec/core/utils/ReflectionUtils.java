@@ -1,0 +1,100 @@
+/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.github.hylexus.xtream.codec.core.utils;
+
+import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import org.jspecify.annotations.Nullable;
+import org.springframework.core.annotation.MergedAnnotation;
+import org.springframework.core.annotation.MergedAnnotations;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
+public final class ReflectionUtils {
+    private ReflectionUtils() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static List<XtreamField> findXtreamFieldAnnotations(Field field) {
+        final MergedAnnotations mergedAnnotations = MergedAnnotations.from(field);
+        final List<XtreamField> result = new ArrayList<>();
+        for (final MergedAnnotation<Annotation> mergedAnnotation : mergedAnnotations) {
+            final Class<Annotation> type = mergedAnnotation.getType();
+            if (type.equals(XtreamField.class)) {
+                final Annotation annotation = mergedAnnotation.synthesize();
+                final XtreamField xtreamFieldAnnotation = (XtreamField) annotation;
+                result.add(xtreamFieldAnnotation);
+            }
+        }
+        return result;
+    }
+
+    public static <T extends Annotation> T findMergedAnnotationAndSynthesize(AnnotatedElement annotatedElement, Class<T> annotationClass, Supplier<T> callback) {
+        final MergedAnnotations mergedAnnotations = MergedAnnotations.from(annotatedElement);
+        final MergedAnnotation<T> mergedAnnotation = mergedAnnotations.get(annotationClass);
+        if (mergedAnnotation.isPresent()) {
+            return mergedAnnotation.synthesize();
+        }
+
+        return callback.get();
+    }
+
+    /**
+     * 在指定类及其父类中查找带有指定注解的构造函数，
+     * 并返回在目标类（clazz）中“参数类型相同”的构造函数。
+     *
+     * @return 对应的子类构造函数，若无匹配则返回 null
+     */
+    public static @Nullable Constructor<?> findCorrespondingConstructor(
+            Class<?> clazz,
+            Class<? extends Annotation> annotationType) {
+
+        Class<?> targetClass = clazz;
+
+        // 从当前类向上查找，找到第一个带有注解的构造函数
+        while (targetClass != null && !targetClass.equals(Object.class)) {
+            for (Constructor<?> constructor : targetClass.getDeclaredConstructors()) {
+                if (constructor.isAnnotationPresent(annotationType)) {
+                    // 找到了带注解的构造函数
+                    // 查找子类中参数类型相同的构造函数
+                    final Class<?>[] paramTypes = constructor.getParameterTypes();
+                    return findConstructorInClass(clazz, paramTypes);
+                }
+            }
+            targetClass = targetClass.getSuperclass();
+        }
+
+        return null;
+    }
+
+    /**
+     * 在指定类中查找参数类型完全匹配的构造函数
+     */
+    private static @Nullable Constructor<?> findConstructorInClass(Class<?> clazz, Class<?>[] paramTypes) {
+        try {
+            return clazz.getDeclaredConstructor(paramTypes);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+}

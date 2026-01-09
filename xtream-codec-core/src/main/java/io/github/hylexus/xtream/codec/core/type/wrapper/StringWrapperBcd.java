@@ -20,29 +20,35 @@ import io.github.hylexus.xtream.codec.common.utils.BcdOps;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
+
+import static java.util.Objects.requireNonNullElse;
 
 public class StringWrapperBcd implements DataWrapper<String> {
 
     public static final Charset UTF_8 = StandardCharsets.UTF_8;
 
     @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_BCD_8421)
-    protected String value;
+    protected @Nullable String value;
     protected int length;
 
     public StringWrapperBcd() {
     }
 
-    public StringWrapperBcd(String value) {
+    public StringWrapperBcd(@Nullable String value) {
         this.value = value;
-        this.length = BcdOps.encodeBcd8421AsBytes(value).length;
+        this.length = BcdOps.encodeBcd8421AsBytes(requireNonNullElse(value, "")).length;
     }
 
     @Override
     public void writeTo(ByteBuf output) {
+        if (value == null) {
+            return;
+        }
         BcdOps.encodeBcd8421StringIntoByteBuf(value, output);
     }
 
@@ -52,7 +58,10 @@ public class StringWrapperBcd implements DataWrapper<String> {
     }
 
     @Override
-    public byte[] asBytes() {
+    public byte @Nullable [] asBytes() {
+        if (value == null) {
+            return null;
+        }
         return BcdOps.encodeBcd8421AsBytes(value);
     }
 
@@ -72,13 +81,13 @@ public class StringWrapperBcd implements DataWrapper<String> {
     }
 
     @Override
-    public String asString() {
+    public @Nullable String asString() {
         return value;
     }
 
-    public StringWrapperBcd setValue(String value) {
+    public StringWrapperBcd setValue(@Nullable String value) {
         this.value = value;
-        this.length = BcdOps.encodeBcd8421AsBytes(value).length;
+        this.length = BcdOps.encodeBcd8421AsBytes(requireNonNullElse(value, "")).length;
         return this;
     }
 

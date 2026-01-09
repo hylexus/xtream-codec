@@ -17,17 +17,38 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
+import java.util.function.Function;
+
+/**
+ * @deprecated Use {@link U8FieldCodecs.U8FieldCodec} instead. Will be removed in 1.0.0.
+ *
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class U8FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
-    public static final U8FieldCodec INSTANCE = new U8FieldCodec();
+    /**
+     * @deprecated Use {@link U8FieldCodecs#SHORT_INSTANCE} instead.
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
+    public static final U8FieldCodec INSTANCE = new U8FieldCodec(Short.class, Function.identity());
 
-    private U8FieldCodec() {
+    private final Class<?> targetType;
+    private final Function<Short, ? extends Number> converter;
+
+    private U8FieldCodec(Class<?> targetType, Function<Short, ? extends Number> converter) {
+        this.targetType = targetType;
+        this.converter = converter;
     }
 
     @Override
-    public Short deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return input.readUnsignedByte();
+    public Number deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
+        final short value = input.readUnsignedByte();
+        return this.converter.apply(value);
     }
 
     @Override
@@ -37,6 +58,12 @@ public class U8FieldCodec extends AbstractFieldCodec<Number> implements Integral
 
     @Override
     public Class<?> underlyingJavaType() {
-        return Short.class;
+        return this.targetType;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.UNSIGNED;
+    }
+
 }

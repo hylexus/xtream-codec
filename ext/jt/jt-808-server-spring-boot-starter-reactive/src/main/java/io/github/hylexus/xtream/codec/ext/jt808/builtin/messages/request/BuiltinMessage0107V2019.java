@@ -45,7 +45,7 @@ public class BuiltinMessage0107V2019 {
      * <li>bit8，0：不适用挂车，1：适用挂车</li>
      */
     @Preset.JtStyle.Word(desc = "终端类型")
-    private short type;
+    private int type;
 
     @Preset.JtStyle.Bytes(length = 11, desc = "制造商ID(11)")
     private String manufacturerId;

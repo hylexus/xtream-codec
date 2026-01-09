@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.bo;
 
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808RequestHeader;
 
+@SuppressWarnings("NullAway")
 public class DecodedMessageMetadata {
     private Jt808RequestHeader header;
     private String originalHexString;

@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.spec;
 
+import io.github.hylexus.xtream.codec.core.annotation.XtreamEntityCreator;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 
 import java.util.StringJoiner;
@@ -33,6 +34,7 @@ public abstract class AbstractJt808Message {
     protected final int calculatedCheckSum;
     protected final int originalCheckSum;
 
+    @XtreamEntityCreator
     public AbstractJt808Message(Jt808Request request) {
         this.protocolType = request.type();
         this.requestId = request.requestId();

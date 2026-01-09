@@ -30,6 +30,7 @@ import java.util.Map;
  * @author hylexus
  */
 public class DefaultXtreamRequest implements XtreamRequest {
+    protected final int version;
     protected final ByteBufAllocator allocator;
     protected final NettyInbound delegate;
     protected final ByteBuf payload;
@@ -38,7 +39,8 @@ public class DefaultXtreamRequest implements XtreamRequest {
     protected InetSocketAddress remoteAddress;
     protected final Channel channel;
 
-    public DefaultXtreamRequest(String requestId, ByteBufAllocator allocator, NettyInbound delegate, Type type, ByteBuf payload, Channel channel, InetSocketAddress remoteAddress) {
+    public DefaultXtreamRequest(int version, String requestId, ByteBufAllocator allocator, NettyInbound delegate, Type type, ByteBuf payload, Channel channel, InetSocketAddress remoteAddress) {
+        this.version = version;
         this.requestId = requestId;
         this.allocator = allocator;
         this.delegate = delegate;
@@ -86,6 +88,11 @@ public class DefaultXtreamRequest implements XtreamRequest {
     @Override
     public Map<String, Object> attributes() {
         return Map.of();
+    }
+
+    @Override
+    public int version() {
+        return this.version;
     }
 
     @Override

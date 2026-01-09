@@ -20,8 +20,7 @@ import io.github.hylexus.xtream.codec.ext.jt1078.pubsub.*;
 import io.github.hylexus.xtream.codec.ext.jt1078.pubsub.impl.collector.H264ToFlvJt1078ChannelCollector;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Request;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078SimConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 import reactor.core.scheduler.Scheduler;
 
 import java.util.Map;
@@ -32,7 +31,7 @@ import java.util.stream.Stream;
 
 public class DefaultJt1078Channel implements Jt1078Channel {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultJt1078Channel.class);
+    // private static final Logger log = LoggerFactory.getLogger(DefaultJt1078Channel.class);
     private final ChannelKey key;
     private final Jt1078SimConverter jt1078SimConverter;
     // <TypeOfJt1078ChannelCollector, Jt1078ChannelCollector>
@@ -76,7 +75,7 @@ public class DefaultJt1078Channel implements Jt1078Channel {
     }
 
     @Override
-    public void unsubscribe(String id, Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    public void unsubscribe(String id, Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         for (Map.Entry<Class<? extends Jt1078ChannelCollector>, Jt1078ChannelCollector> entry : this.collectors.entrySet()) {
             final Jt1078ChannelCollector collector = entry.getValue();
             collector.unsubscribe(id, reason);
@@ -84,7 +83,7 @@ public class DefaultJt1078Channel implements Jt1078Channel {
     }
 
     @Override
-    public synchronized void close(Jt1078Subscriber.Jt1078SubscriberCloseException reason) {
+    public synchronized void close(Jt1078Subscriber.@Nullable Jt1078SubscriberCloseException reason) {
         final var iterator = this.collectors.entrySet().iterator();
         while (iterator.hasNext()) {
             final var entry = iterator.next();

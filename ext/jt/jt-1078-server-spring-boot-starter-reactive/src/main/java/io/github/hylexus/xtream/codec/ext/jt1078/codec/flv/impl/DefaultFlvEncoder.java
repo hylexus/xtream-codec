@@ -48,6 +48,7 @@ import java.util.Optional;
  * @see <a href="https://gitee.com/matrixy/jtt1078-video-server">https://gitee.com/matrixy/jtt1078-video-server</a>
  * @see <a href="https://sample-videos.com/index.php#sample-flv-video">https://sample-videos.com/index.php#sample-flv-video</a>
  */
+@SuppressWarnings("NullAway")
 public class DefaultFlvEncoder implements FlvEncoder {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultFlvEncoder.class);
@@ -76,6 +77,7 @@ public class DefaultFlvEncoder implements FlvEncoder {
     }
 
     @Override
+    @SuppressWarnings("MixedMutabilityReturnType")
     public List<ByteBuf> encodeVideoTag(long timestamp, ByteBuf naluStream) {
         final List<H264Nalu> h264NaluList;
         try {

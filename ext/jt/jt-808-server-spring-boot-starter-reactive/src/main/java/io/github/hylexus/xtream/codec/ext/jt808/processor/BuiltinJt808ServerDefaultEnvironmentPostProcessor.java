@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.processor;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.env.PropertiesPropertySourceLoader;
@@ -44,6 +45,7 @@ public class BuiltinJt808ServerDefaultEnvironmentPostProcessor implements Enviro
     private final YamlPropertySourceLoader yamlPropertySourceLoader = new YamlPropertySourceLoader();
     private final PropertiesPropertySourceLoader propertiesPropertySourceLoader = new PropertiesPropertySourceLoader();
 
+    @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE - 1;
     }
@@ -84,7 +86,7 @@ public class BuiltinJt808ServerDefaultEnvironmentPostProcessor implements Enviro
         return compositePropertySource;
     }
 
-    private List<PropertySource<?>> parseProperty(Resource resource) throws IOException {
+    private @Nullable List<PropertySource<?>> parseProperty(Resource resource) throws IOException {
         final String filename = resource.getURI().toString().toLowerCase();
         if (filename.endsWith(".properties")) {
             return propertiesPropertySourceLoader.load(filename, resource);

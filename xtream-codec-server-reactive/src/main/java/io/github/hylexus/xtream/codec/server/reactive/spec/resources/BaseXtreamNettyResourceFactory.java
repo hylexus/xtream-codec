@@ -33,6 +33,7 @@ public abstract non-sealed class BaseXtreamNettyResourceFactory implements Xtrea
         this.preferNative = property.preferNative();
     }
 
+    @Override
     public LoopResources loopResources() {
         return this.loopResources;
     }

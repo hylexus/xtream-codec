@@ -17,9 +17,21 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @deprecated Use {@link U32FieldCodecs.U32FieldCodec} instead.
+ */
+@Deprecated(forRemoval = true, since = "0.1.0")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
 public class U32FieldCodec extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
+    /**
+     * @deprecated Use {@link U32FieldCodecs#LONG_INSTANCE} instead.
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
     public static final U32FieldCodec INSTANCE = new U32FieldCodec();
 
     private U32FieldCodec() {
@@ -39,4 +51,11 @@ public class U32FieldCodec extends AbstractFieldCodec<Number> implements Integra
     public Class<?> underlyingJavaType() {
         return Long.class;
     }
+
+    @Override
+    public NumberSignedness signedness() {
+        return NumberSignedness.UNSIGNED;
+    }
+
+
 }

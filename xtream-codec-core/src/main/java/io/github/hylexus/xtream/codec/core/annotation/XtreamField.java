@@ -17,12 +17,16 @@
 package io.github.hylexus.xtream.codec.core.annotation;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.bean.PropertyAccessStrategy;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.*;
+import java.lang.reflect.AnnotatedElement;
 
 /**
  * @author hylexus
@@ -31,13 +35,18 @@ import java.lang.annotation.*;
  * @see io.github.hylexus.xtream.codec.core.EntityCodec
  * @see io.github.hylexus.xtream.codec.core.type.Preset.RustStyle
  * @see io.github.hylexus.xtream.codec.core.type.Preset.JtStyle
- * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+ * @see <a href="https://docs.spring.io/spring-framework/reference/core/expressions.html">SpEL 官方文档</a>
  * @see <a href="https://stackoverflow.com/questions/5001172/java-reflection-getting-fields-and-methods-in-declaration-order">java-reflection-getting-fields-and-methods-in-declaration-order</a>
  */
 @Documented
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(XtreamFieldContainer.class)
 public @interface XtreamField {
+
+    int ALL_VERSION = Integer.MIN_VALUE;
+
+    int DEFAULT_ORDER = -1;
 
     /**
      * 指定被当前注解标记的属性的类型: 基础类型、嵌套类型、List 类型。
@@ -51,7 +60,7 @@ public @interface XtreamField {
      *
      * @see <a href="https://stackoverflow.com/questions/5001172/java-reflection-getting-fields-and-methods-in-declaration-order">java-reflection-getting-fields-and-methods-in-declaration-order</a>
      */
-    int order() default -1;
+    int order() default DEFAULT_ORDER;
 
     /**
      * 反序列化时当前属性的长度。
@@ -69,6 +78,19 @@ public @interface XtreamField {
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
      */
     String lengthExpression() default "";
+
+    /**
+     * 反序列化时当前属性的长度。当长度无法直接确定时，可以指定一个表达式来确定长度。
+     * <p>
+     * 目前仅仅支持 <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL</a> 语法。
+     *
+     * @see #length()
+     * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+     * @since 0.4.0
+     */
+    @ApiStatus.Experimental
+    @ApiStatus.AvailableSince("0.4.0")
+    Expression lengthExpressions() default @Expression();
 
     /**
      * 只有 {@link String} 类型用到
@@ -115,6 +137,13 @@ public @interface XtreamField {
     boolean littleEndian() default false;
 
     /**
+     * 符号位(只对数字类型有效)
+     *
+     * @since 0.1.0
+     */
+    NumberSignedness signedness() default NumberSignedness.NONE;
+
+    /**
      * List 类型的最大迭代次数
      * <li>反序列化才会用到；序列化用不到</li>
      * <li>只有 {@link java.util.List} 类型有效</li>
@@ -135,11 +164,37 @@ public @interface XtreamField {
     String iterationTimesExpression() default "";
 
     /**
+     * List 类型的最大迭代次数表达式
+     * <p>
+     * 目前仅仅支持 <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL</a> 语法。
+     *
+     * <li>反序列化才会用到；序列化用不到</li>
+     * <li>只有 {@link java.util.List} 类型有效</li>
+     *
+     * @see #iterationTimes()
+     * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+     * @since 0.4.0
+     */
+    @ApiStatus.Experimental
+    @ApiStatus.AvailableSince("0.4.0")
+    Expression iterationTimesExpressions() default @Expression();
+
+    /**
      * 当且仅当 {@code condition} 为 {@code true} 时，当前属性才会被序列化/反序列化。
      *
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
      */
     String condition() default "";
+
+    /**
+     * 当且仅当 {@code condition} 为 {@code true} 时，当前属性才会被序列化/反序列化。
+     *
+     * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+     * @since 0.4.0
+     */
+    @ApiStatus.Experimental
+    @ApiStatus.AvailableSince("0.4.0")
+    Expression conditions() default @Expression();
 
     /**
      * 当前属性序列化/反序列化时用到的 {@link FieldCodec}。
@@ -164,5 +219,99 @@ public @interface XtreamField {
      * 描述字段；和 jt-framework 保持一致，没有特殊作用。
      */
     String desc() default "";
+
+    /**
+     * @since 0.1.0
+     */
+    int[] version() default {ALL_VERSION};
+
+    /**
+     * 仅仅对 {@link Record} 类型有效
+     *
+     * @since 0.1.0
+     */
+    CodecStrategy codecStrategy() default CodecStrategy.DEFAULT;
+
+    /**
+     * 当前字段的属性访问策略。
+     * <p>
+     * 可以覆盖 {@link XtreamEntity#propertyAccessStrategy()} 的类级别配置。
+     *
+     * @see XtreamEntity#propertyAccessStrategy()
+     * @since 0.3.0
+     */
+    PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+    /**
+     * 仅仅对 {@link Record} 类型有效
+     *
+     * @see io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils#getOrDefault(AnnotatedElement)
+     * @see XtreamFieldUtils#createDefaultValueForNulls(Nulls, Class)
+     * @since 0.1.0
+     */
+    Nulls nulls() default Nulls.AS_NULL;
+
+    /**
+     * 这个定义参考 {@link com.fasterxml.jackson.annotation.Nulls jackson} 的处理逻辑
+     * <p>
+     * 字段默认值生成规则：
+     * <table style="border-collapse: collapse;">
+     *   <thead>
+     *     <tr>
+     *       <th style="border: 1px solid #777; padding: 4px;">字段类型</th>
+     *       <th style="border: 1px solid #777; padding: 4px;">AS_NULL 默认值</th>
+     *       <th style="border: 1px solid #777; padding: 4px;">AS_EMPTY 默认值</th>
+     *       <th style="border: 1px solid #777; padding: 4px;">说明</th>
+     *     </tr>
+     *   </thead>
+     *   <tbody>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">基础类型</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code 0} / {@code false} / {@code '\0'}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code 0} / {@code false} / {@code '\0'}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">零值，保证 Record 构造器合法</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code String}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code ""}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code List} / {@code Set}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code new ArrayList()} / {@code new HashSet()}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code Map}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code new HashMap()}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
+     *     </tr>
+     *     <tr>
+     *       <td style="border: 1px solid #777; padding: 4px;">自定义对象类型</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">{@code null}</td>
+     *       <td style="border: 1px solid #777; padding: 4px;"> {@code new} 一个空实例</td>
+     *       <td style="border: 1px solid #777; padding: 4px;">--</td>
+     *     </tr>
+     *   </tbody>
+     * </table>
+     *
+     * @see XtreamFieldUtils#createDefaultValueForNulls(Nulls, Class)
+     * @see com.fasterxml.jackson.annotation.Nulls
+     */
+    enum Nulls {
+        AS_EMPTY,
+        AS_NULL,
+    }
+
+    enum CodecStrategy {
+        /**
+         * 忽略字段的 序列化 和 反序列化; 目前仅仅用于 {@link Record} 类型
+         */
+        TRANSIENT,
+        DEFAULT,
+    }
 
 }

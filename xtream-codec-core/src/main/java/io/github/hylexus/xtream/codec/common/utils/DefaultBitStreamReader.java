@@ -34,6 +34,7 @@ public class DefaultBitStreamReader implements BitStreamReader {
         this.bitOffset = 7;
     }
 
+    @Override
     public int readBit() {
         final int result = (buffer.getByte(byteOffset) >> (bitOffset--)) & 0b01;
         if (bitOffset == -1) {

@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.boot.configuration;
 
+import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.condition.ConditionalOnJt808Server;
 import io.github.hylexus.xtream.codec.ext.jt808.boot.properties.XtreamJt808ServerProperties;
@@ -45,6 +46,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriptionRegi
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionManager;
 import io.github.hylexus.xtream.codec.server.reactive.spec.event.XtreamEventPublisher;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerMapping;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -105,7 +107,7 @@ public class BuiltinJt808DashboardConfiguration {
 
     @Bean
     BuiltinJt808DashboardMetricsController builtinJt808DashboardMetricsController(
-            @Autowired(required = false) Jt808DashboardMetricsServiceWithMicroMeter metricsServiceWithMicroMeter,
+            @Nullable @Autowired(required = false) Jt808DashboardMetricsServiceWithMicroMeter metricsServiceWithMicroMeter,
             Jt808DashboardMetricsService metricsService) {
         return new BuiltinJt808DashboardMetricsController(metricsService, metricsServiceWithMicroMeter);
     }
@@ -155,8 +157,8 @@ public class BuiltinJt808DashboardConfiguration {
     }
 
     @Bean
-    BuiltinJt808DashboardCodecController builtinJt808DashboardCodecController(Jt808DashboardCodecService service) {
-        return new BuiltinJt808DashboardCodecController(service);
+    BuiltinJt808DashboardCodecController builtinJt808DashboardCodecController(Jt808DashboardCodecService service, BeanMetadataRegistry beanMetadataRegistry) {
+        return new BuiltinJt808DashboardCodecController(service, beanMetadataRegistry);
     }
 
     @Bean

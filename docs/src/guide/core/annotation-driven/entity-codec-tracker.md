@@ -13,7 +13,7 @@ icon: arrows-spin
 
 ::: danger
 
-`CodecTracker` 的设计目的仅仅是用来调试。 会对编解码性能产生一定影响。
+`CodecTracker` 的设计目的仅仅是用来调试。 会对编解码性能产生 **严重** 影响。
 
 :::
 

@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.common;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.Disposable;
@@ -44,9 +45,9 @@ public class XtreamIntervalChecker {
 
     private Duration interval;
     private Duration maxBackoff;
-    private Disposable subscription;
+    private @Nullable Disposable subscription;
 
-    private Scheduler scheduler;
+    private @Nullable Scheduler scheduler;
     private final BiFunction<String, Long, Mono<Void>> checkFn;
 
     public XtreamIntervalChecker(String name, Duration interval, Duration maxBackoff, BiFunction<String, Long, Mono<Void>> checkFn) {

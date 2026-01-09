@@ -20,7 +20,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.common.XtreamRequestH
 import io.github.hylexus.xtream.codec.server.reactive.spec.common.XtreamRequestHandlerMapping;
 import io.github.hylexus.xtream.codec.server.reactive.spec.common.XtreamServerConstants;
 import io.github.hylexus.xtream.codec.server.reactive.spec.resources.DefaultSchedulerConfig;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import reactor.core.scheduler.Scheduler;
 
 import java.io.Serializable;
@@ -41,8 +41,7 @@ public interface XtreamSchedulerRegistry {
      *
      * @see io.github.hylexus.xtream.codec.server.reactive.spec.impl.RequestDispatcherSchedulerFilter
      */
-    @Nullable
-    default Scheduler requestDispatcherScheduler() {
+    default @Nullable Scheduler requestDispatcherScheduler() {
         return this.getScheduler(SCHEDULER_NAME_REQUEST_DISPATCHER).orElse(null);
     }
 

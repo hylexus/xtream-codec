@@ -18,8 +18,8 @@ package io.github.hylexus.xtream.codec.core.tracker;
 
 import java.util.StringJoiner;
 
-public class MapFieldSpan extends BaseSpan {
-    private final String fieldName;
+public class MapFieldSpan extends BaseSpan implements BaseSpan.HasFieldName {
+    private String fieldName;
     private final String fieldDesc;
     private final String fieldCodec;
 
@@ -30,8 +30,14 @@ public class MapFieldSpan extends BaseSpan {
         this.fieldCodec = fieldCodec;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void setFieldName(String name) {
+        this.fieldName = name;
     }
 
     public String getFieldDesc() {

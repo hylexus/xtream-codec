@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionIdGenerator;
 import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.UdpSessionIdleStateCheckerProps;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.AbstractXtreamSessionManager;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.net.InetSocketAddress;
@@ -42,7 +43,7 @@ public class DefaultJt1078SessionManager
     }
 
     @Override
-    public Jt1078Session getUdpSession(InetSocketAddress remoteAddress) {
+    public @Nullable Jt1078Session getUdpSession(InetSocketAddress remoteAddress) {
         final String sessionId = this.sessionIdGenerator.generateUdpSessionId(remoteAddress);
         return this.sessions.get(sessionId);
     }

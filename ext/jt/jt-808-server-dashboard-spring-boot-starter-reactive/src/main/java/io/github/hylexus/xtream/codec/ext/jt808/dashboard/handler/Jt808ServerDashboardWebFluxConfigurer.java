@@ -17,7 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.handler;
 
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.boot.properties.XtreamJt808ServerDashboardProperties;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
@@ -55,13 +55,12 @@ public class Jt808ServerDashboardWebFluxConfigurer implements WebFluxConfigurer 
         private final PathResourceResolver defaultResolver = new PathResourceResolver();
         private final boolean forward404ToIndex;
 
-        public JtDashboardStaticResourceResolver(boolean forward404ToIndex) {
+        JtDashboardStaticResourceResolver(boolean forward404ToIndex) {
             this.forward404ToIndex = forward404ToIndex;
         }
 
         @Override
-        @Nonnull
-        public Mono<Resource> resolveResource(ServerWebExchange exchange, @Nonnull String requestPath, @Nonnull List<? extends Resource> locations, @Nonnull ResourceResolverChain chain) {
+        public Mono<Resource> resolveResource(@Nullable ServerWebExchange exchange, String requestPath, List<? extends Resource> locations, ResourceResolverChain chain) {
             final Mono<Resource> resource = defaultResolver.resolveResource(exchange, requestPath, locations, chain);
             if (this.forward404ToIndex) {
                 // 404 ==> index.html
@@ -71,8 +70,7 @@ public class Jt808ServerDashboardWebFluxConfigurer implements WebFluxConfigurer 
         }
 
         @Override
-        @Nonnull
-        public Mono<String> resolveUrlPath(@Nonnull String resourcePath, @Nonnull List<? extends Resource> locations, @Nonnull ResourceResolverChain chain) {
+        public Mono<String> resolveUrlPath(String resourcePath, List<? extends Resource> locations, ResourceResolverChain chain) {
             return defaultResolver.resolveUrlPath(resourcePath, locations, chain);
         }
     }

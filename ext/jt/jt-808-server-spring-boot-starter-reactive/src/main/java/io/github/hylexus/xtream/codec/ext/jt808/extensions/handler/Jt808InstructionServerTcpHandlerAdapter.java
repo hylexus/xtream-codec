@@ -33,8 +33,11 @@ import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
 import java.net.InetSocketAddress;
+import java.net.SocketException;
+import java.util.function.Consumer;
 
 /**
+ * @author <a href="https://gitee.com/qinglang1208">何事惊慌</a>
  * @author hylexus
  */
 public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNettyHandlerAdapter {
@@ -60,10 +63,44 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
                         log.error("Unexpected Exception", throwable);
                         return Mono.empty();
                     });
+        }).doOnError(SocketException.class, throwable -> {
+            this.doWithSessionManager(manager -> {
+                boolean closed = false;
+                Channel channel = inboundInfo.channel();
+                if (channel == null) {
+                    return;
+                }
+                try {
+                    final String sessionId = sessionManager.sessionIdGenerator().generateTcpSessionId(channel);
+                    closed = sessionManager.closeSessionById(sessionId, XtreamSessionEventListener.DefaultSessionCloseReason.CLOSED_BY_CLIENT);
+                } finally {
+                    if (!closed) {
+                        closeAndIgnoreException(channel, "Close channel because of [Socket Exception]: {}");
+                    }
+                }
+            });
         }).onErrorResume(throwable -> {
             log.error("Unexpected Error", throwable);
             return Mono.empty();
         });
+    }
+
+    protected void doWithSessionManager(Consumer<XtreamSessionManager<? extends XtreamSession>> consumer) {
+        if (this.sessionManager != null) {
+            consumer.accept(this.sessionManager);
+        } else {
+            throw new IllegalStateException("No session manager found");
+        }
+    }
+
+    @SuppressWarnings("FutureReturnValueIgnored")
+    private static void closeAndIgnoreException(Channel channel, String message) {
+        try {
+            log.info(message, channel);
+            channel.close();
+        } catch (Exception ignored) {
+            // ignored
+        }
     }
 
     @Override
@@ -76,7 +113,7 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
     }
 
     @Override
-    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamRequest.Type type) {
+    protected XtreamRequest doCreateTcpRequest(ByteBufAllocator allocator, NettyInbound nettyInbound, ByteBuf byteBuf, InboundInfo inboundInfo, XtreamInbound.Type type) {
         final Channel channel = inboundInfo.channel();
         final InetSocketAddress remoteAddress = inboundInfo.remoteAddress();
         final String requestId = this.generateRequestId(nettyInbound);

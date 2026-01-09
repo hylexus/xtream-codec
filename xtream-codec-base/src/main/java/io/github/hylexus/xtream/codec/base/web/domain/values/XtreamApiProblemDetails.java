@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.base.web.domain.values;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpErrorDetails;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -51,24 +52,24 @@ public interface XtreamApiProblemDetails {
 
     int getStatus();
 
-    String getDetail();
+    @Nullable String getDetail();
 
     /**
      * 目前暂时用不到这个属性(不会输出到客户端)
      */
-    default URI getInstance() {
+    default @Nullable URI getInstance() {
         return null;
     }
     // endregion RFC-7807 标准字段
 
     // region RFC-7807 的基础上扩展的字段
-    default Throwable getCause() {
+    default @Nullable Throwable getCause() {
         return null;
     }
 
     String getErrorCode();
 
-    List<? extends XtreamHttpErrorDetails> getErrorDetails();
+    @Nullable List<? extends XtreamHttpErrorDetails> getErrorDetails();
     // endregion RFC-7807 的基础上扩展的字段
 
     @JsonValue
@@ -103,7 +104,7 @@ public interface XtreamApiProblemDetails {
         return new DefaultXtreamApiProblemDetails(XtreamApiErrorCode.BAD_REQUEST, message, details);
     }
 
-    static XtreamApiProblemDetails of(HttpStatusCode httpStatusCode, String code, String message, List<? extends XtreamHttpErrorDetails> details) {
+    static XtreamApiProblemDetails of(HttpStatusCode httpStatusCode, String code, String message, @Nullable List<? extends XtreamHttpErrorDetails> details) {
         return new DefaultXtreamApiProblemDetails(
                 httpStatusCode.value(),
                 httpStatusCode.toString(),

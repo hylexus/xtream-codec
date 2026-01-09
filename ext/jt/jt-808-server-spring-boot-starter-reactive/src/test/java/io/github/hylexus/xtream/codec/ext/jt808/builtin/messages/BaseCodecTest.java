@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.EntityCodec;
 import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
 import io.github.hylexus.xtream.codec.core.impl.DefaultFieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.impl.SimpleBeanMetadataRegistry;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestDecoder;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808ResponseEncoder;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.impl.DefaultJt808BytesProcessor;
@@ -33,7 +34,6 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import reactor.netty.NettyInbound;
@@ -41,6 +41,7 @@ import reactor.netty.NettyInbound;
 import java.time.Duration;
 import java.util.Objects;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,8 +54,8 @@ public class BaseCodecTest {
     protected String terminalId2013 = "013912344323";
     protected String terminalId2019 = "00000000013912344329";
 
-    ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
-    Jt808RequestDecoder decoder = new DefaultJt808RequestDecoder(new DefaultJt808BytesProcessor(allocator), new Jt808MessageEncryptionHandler.NoOps(), new DefaultJt808RequestCombiner(allocator, 100, Duration.ofSeconds(100)));
+    protected ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
+    protected Jt808RequestDecoder decoder = new DefaultJt808RequestDecoder(new DefaultJt808BytesProcessor(allocator), new Jt808MessageEncryptionHandler.NoOps(), new DefaultJt808RequestCombiner(allocator, 100, Duration.ofSeconds(100)));
     NettyInbound nettyInbound;
     protected EntityCodec entityCodec = new EntityCodec(new SimpleBeanMetadataRegistry(
             new DefaultFieldCodecRegistry(),
@@ -75,6 +76,55 @@ public class BaseCodecTest {
         when(nettyInbound.withConnection(any())).thenReturn(nettyInbound);
     }
 
+    protected interface CodecValidator<T> {
+        void accept(T expected, T actual, String hexString);
+    }
+
+    protected <T> void codec(Jt808ProtocolVersion version, String terminalId, T instance, CodecValidator<T> assertion) {
+        final ByteBuf buffer = allocator.buffer();
+        try {
+            final int versionValue = version.versionValue();
+            this.entityCodec.encode(versionValue, instance, buffer.retain());
+            final String hexString = this.encode(buffer.slice(), version, terminalId, 0x0200);
+            @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
+            final T decode = this.entityCodec.decode(versionValue, cls, buffer);
+            assertion.accept(instance, decode, hexString);
+        } finally {
+            XtreamBytes.releaseBuf(buffer);
+            assertEquals(0, buffer.refCnt());
+        }
+    }
+
+    protected <T> void codec(Jt808ProtocolVersion version, String terminalId, T instance, CodecValidator<T> assertion, boolean withTracker) {
+        final ByteBuf buffer = allocator.buffer();
+        try {
+            final int versionValue = version.versionValue();
+            if (withTracker) {
+                final CodecTracker encodeTracker = new CodecTracker();
+                this.entityCodec.encode(versionValue, instance, buffer.retain(), encodeTracker);
+                encodeTracker.visit();
+            } else {
+                this.entityCodec.encode(versionValue, instance, buffer.retain());
+            }
+            final String hexString = this.encode(buffer.slice(), version, terminalId, 0x0200);
+
+            @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
+            final T decode;
+            if (withTracker) {
+                final CodecTracker decodeTracker = new CodecTracker();
+                decode = this.entityCodec.decode(versionValue, cls, buffer, decodeTracker);
+                decodeTracker.visit();
+            } else {
+                decode = this.entityCodec.decode(versionValue, cls, buffer);
+            }
+
+            assertion.accept(instance, decode, hexString);
+        } finally {
+            XtreamBytes.releaseBuf(buffer);
+            assertEquals(0, buffer.refCnt());
+        }
+    }
+
     protected Jt808Request decodeAsRequest(String hex) {
         final ByteBuf payload = XtreamBytes.byteBufFromHexString(allocator, hex);
         try {
@@ -85,14 +135,28 @@ public class BaseCodecTest {
     }
 
     protected <T> T decodeAsEntity(Class<T> entityClass, String hex) {
+        return decodeAsEntity(null, entityClass, hex);
+    }
+
+    protected <T> T decodeAsEntity(Jt808ProtocolVersion protocolVersion, Class<T> entityClass, String hex) {
         Jt808Request jt808Request = null;
+        hex = hex.toLowerCase();
+        if (hex.startsWith("7e")) {
+            hex = hex.substring(2);
+        }
+        if (hex.endsWith("7e")) {
+            hex = hex.substring(0, hex.length() - 2);
+        }
         try {
             jt808Request = this.decodeAsRequest(hex);
-            return entityCodec.decode(entityClass, jt808Request.payload());
+            final int version = protocolVersion != null
+                    ? protocolVersion.versionValue()
+                    : jt808Request.version();
+            return entityCodec.decode(version, entityClass, jt808Request.payload().slice());
         } finally {
             if (jt808Request != null) {
                 jt808Request.release();
-                Assertions.assertEquals(0, jt808Request.payload().refCnt());
+                assertEquals(0, jt808Request.payload().refCnt());
             }
         }
     }
@@ -105,14 +169,68 @@ public class BaseCodecTest {
     protected String encode(Object instance, Jt808ProtocolVersion version, String terminalId, int messageId) {
         ByteBuf encoded = null;
         try {
-            final Jt808MessageDescriber describer = new Jt808MessageDescriber(messageId, version, terminalId);
+            final Jt808MessageDescriber describer = new Jt808MessageDescriber(messageId, version, terminalId).enableTracker();
             encoded = responseEncoder.encode(instance, describer);
+            describer.visitTracker();
             return FormatUtils.toHexString(encoded);
         } finally {
             if (encoded != null) {
                 XtreamBytes.releaseBuf(encoded);
-                Assertions.assertEquals(0, encoded.refCnt());
+                assertEquals(0, encoded.refCnt());
             }
         }
     }
+
+    protected interface Validator<T> {
+        void accept(T expected, Jt808MessageForTest<T> decodedEntity, String hexString);
+    }
+
+    protected <T> void codecTestV2019(int messageId, T instance, Validator<T> validator) {
+        this.codecTest(Jt808ProtocolVersion.VERSION_2019, terminalId2019, messageId, instance, validator);
+    }
+
+    protected <T> void codecTestV2013(int messageId, T instance, Validator<T> validator) {
+        this.codecTest(Jt808ProtocolVersion.VERSION_2013, terminalId2013, messageId, instance, validator);
+    }
+
+    protected <T> void codecTestV2011(int messageId, T instance, Validator<T> validator) {
+        this.codecTest(Jt808ProtocolVersion.VERSION_2011, terminalId2011, messageId, instance, validator);
+    }
+
+    protected <T> void codecTest(Jt808ProtocolVersion version, String terminalId, int messageId, T instance,
+                                 Validator<T> validator) {
+        ByteBuf encoded = null;
+        Jt808Request request = null;
+        try {
+            final Jt808MessageDescriber describer = new Jt808MessageDescriber(messageId, version, terminalId);
+            encoded = responseEncoder.encode(instance, describer);
+
+            final String hexString = FormatUtils.toHexString(encoded);
+            request = this.decodeAsRequest(hexString.substring(2, hexString.length() - 2));
+
+            @SuppressWarnings("unchecked") final T entityBody = (T) entityCodec.decode(instance.getClass(), request.body().slice());
+            final Jt808MessageForTest<T> decoded = new Jt808MessageForTest<>(request.header(), entityBody, request.originalCheckSum());
+
+            assertEquals(messageId, request.header().messageId());
+
+            validator.accept(instance, decoded, hexString);
+        } finally {
+            if (encoded != null) {
+                XtreamBytes.releaseBuf(encoded);
+                assertEquals(0, encoded.refCnt());
+            }
+            if (request != null) {
+                request.release();
+                assertEquals(0, request.payload().refCnt());
+            }
+        }
+    }
+
+    protected record Jt808MessageForTest<T>(
+            Jt808RequestHeader header,
+            T body,
+            int checkSum
+    ) {
+    }
+
 }

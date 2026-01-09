@@ -30,6 +30,7 @@ import java.time.Duration;
 @Getter
 @Setter
 @ToString
+@SuppressWarnings("NullAway")
 @ConfigurationProperties(prefix = "jt1078-server")
 public class XtreamJt1078ServerProperties {
 

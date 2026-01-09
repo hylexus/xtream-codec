@@ -81,13 +81,13 @@ class JtStyleDebugEntity01NestedTest extends BaseEntityCodecTest {
         body.setAge(9999);
         msgBodyLength += 2;
 
-        body.setStatus((short) -100);
+        body.setStatus(288);
         msgBodyLength += 2;
 
         entity.setMsgBodyLength(msgBodyLength);
 
         entity.setHeader(header);
-        header.setMagicNumber(0x80901234);
+        header.setMagicNumber(0x80901234L);
         header.setMajorVersion((short) 2);
         header.setMinorVersion((short) 3);
         header.setMsgType(0x0007);

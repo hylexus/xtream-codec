@@ -25,10 +25,16 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * @author hylexus
+ * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes.DataWrapperFieldCodec} instead.
  */
 @SuppressWarnings("rawtypes")
+@Deprecated
 public class DataWrapperFieldCodec extends AbstractFieldCodec<DataWrapper> {
 
+    /**
+     * @deprecated Use {@link io.github.hylexus.xtream.codec.core.impl.codec.DataWrapperFieldCodes#INSTANCE} instead.
+     */
+    @Deprecated
     public static final DataWrapperFieldCodec INSTANCE = new DataWrapperFieldCodec();
 
     private DataWrapperFieldCodec() {

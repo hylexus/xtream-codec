@@ -45,7 +45,7 @@ public class DefaultJt808ProxyServiceReactive implements Jt808ProxyServiceReacti
                 .webClient(WebClient.builder().build())
                 .filterFunction(new Jt1078ProxyRewritePathFilter())
                 .build();
-        this.jt808DashboardBackend = new XtreamWebProxyBackend().setBaseUrl(dashboardProperties.getJt808DashboardProxy().getBaseUrl());
+        this.jt808DashboardBackend = new XtreamWebProxyBackend(dashboardProperties.getJt808DashboardProxy().getBaseUrl());
     }
 
     @Override

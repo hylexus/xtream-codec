@@ -17,12 +17,18 @@
 package io.github.hylexus.xtream.codec.common.bean.impl;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.common.bean.PropertyGetters;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
+/**
+ * @deprecated Use {@link PropertyGetters.ReflectionFieldPropertyGetter} instead.
+ */
 @ToString
+@Deprecated(since = "0.2.0", forRemoval = true)
 public class FiledPropertyGetter implements BeanPropertyMetadata.PropertyGetter {
     private final Field field;
 
@@ -31,7 +37,7 @@ public class FiledPropertyGetter implements BeanPropertyMetadata.PropertyGetter 
     }
 
     @Override
-    public Object getProperty(BeanPropertyMetadata metadata, Object instance) {
+    public @Nullable Object getProperty(BeanPropertyMetadata metadata, Object instance) {
         return ReflectionUtils.getField(field, instance);
     }
 }
