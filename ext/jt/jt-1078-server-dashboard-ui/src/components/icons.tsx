@@ -4,7 +4,6 @@ import { IconSvgProps } from "@/types";
 
 export const Logo: React.FC<IconSvgProps> = ({
   size = 36,
-  width,
   height,
   ...props
 }) => (
@@ -12,7 +11,7 @@ export const Logo: React.FC<IconSvgProps> = ({
     fill="none"
     height={size || height}
     viewBox="0 0 32 32"
-    width={size || width}
+    width={size || height}
     {...props}
   >
     <path
