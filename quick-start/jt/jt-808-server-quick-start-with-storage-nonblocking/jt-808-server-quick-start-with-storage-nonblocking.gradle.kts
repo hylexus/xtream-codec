@@ -1,4 +1,5 @@
 import io.github.hylexus.xtream.codec.gradle.plugins.XtreamCodecFastModePlugin
+import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
 
 plugins {
     id("org.springframework.boot")

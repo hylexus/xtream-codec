@@ -1,3 +1,5 @@
+import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
+
 dependencies {
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

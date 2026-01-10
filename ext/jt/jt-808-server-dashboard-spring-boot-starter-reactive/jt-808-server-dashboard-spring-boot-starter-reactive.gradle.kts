@@ -1,3 +1,5 @@
+import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
+
 plugins {
     id("xtream-codec-frontend-build-plugin")
 }
