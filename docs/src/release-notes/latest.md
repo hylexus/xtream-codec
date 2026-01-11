@@ -5,6 +5,12 @@ article: false
 
 # Latest
 
+## 0.5.0-rc.1(2026-01-11)
+
+### ⭐ New Features
+
+- 兼容低版本 `spring-boot` [#11](https://github.com/hylexus/xtream-codec/issues/11)
+
 ## 0.4.0(2026-01-03)
 
 ### ⭐ New Features
