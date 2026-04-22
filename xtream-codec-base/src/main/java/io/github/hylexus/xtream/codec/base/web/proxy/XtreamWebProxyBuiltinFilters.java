@@ -17,8 +17,6 @@
 package io.github.hylexus.xtream.codec.base.web.proxy;
 
 import org.jspecify.annotations.NullMarked;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -81,7 +79,7 @@ public final class XtreamWebProxyBuiltinFilters {
         }
 
         static ClientRequest setBackend(ClientRequest request, XtreamWebProxyBackend webBackend) {
-            final URI newUrl = UriComponentsBuilder.fromHttpUrl(webBackend.getBaseUrl())
+            final URI newUrl = UriComponentsBuilder.fromUriString(webBackend.getBaseUrl())
                     .path(request.url().getPath())
                     .query(request.url().getQuery())
                     .build(true)
