@@ -170,7 +170,11 @@
 
 项目的发展离不开你的支持，请作者喝一杯🍺吧！
 
-![有钱的捧个钱场 没钱的捧个人场](https://img.iotplanet.top/img/pay.png)
+![有钱的捧个钱场 没钱的捧个人场](https://hylexus.github.io/xtream-codec/img/pay.png)
+
+## References / 参考资料
+
+- [https://github.com/forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
 
 ## TODO / 待办
 
