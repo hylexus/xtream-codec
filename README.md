@@ -42,6 +42,13 @@
     </a>
 </p>
 
+## Tips / 提示
+
+> 2026.1 版的 idea 中打开项目可能会报错
+
+- 临时解决方案: 临时禁用掉 idea 内置的 `Spark` 插件
+- 详情参考: [https://youtrack.jetbrains.com/issue/IDEA-386409](https://youtrack.jetbrains.com/issue/IDEA-386409)
+
 ## ProjectNaming / 项目命名
 
 项目名来源: `xtream-codec == xtream + codec`
@@ -163,7 +170,11 @@
 
 项目的发展离不开你的支持，请作者喝一杯🍺吧！
 
-![有钱的捧个钱场 没钱的捧个人场](https://img.iotplanet.top/img/pay.png)
+![有钱的捧个钱场 没钱的捧个人场](https://hylexus.github.io/xtream-codec/img/pay.png)
+
+## References / 参考资料
+
+- [https://github.com/forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
 
 ## TODO / 待办
 

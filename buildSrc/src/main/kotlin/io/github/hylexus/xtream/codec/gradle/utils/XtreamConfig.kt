@@ -16,8 +16,8 @@ object XtreamConfig {
      */
     val Project.xtreamConfig: Config
         get() {
-            return extensions.findByType(Config::class.java)
-                ?: Config(this).also { extensions.add("xtreamConfig", it) }
+            return rootProject.extensions.findByType(Config::class.java)
+                ?: Config(this).also { rootProject.extensions.add("xtreamConfig", it) }
         }
 
     private val thirdpartyDependencies: List<ThirdPartyDependency> = listOf(
@@ -54,37 +54,42 @@ object XtreamConfig {
 
         /** 读取布尔配置，支持缓存 */
         fun getOrLoadConfigAsBoolean(key: String, default: Boolean? = null): Boolean {
-            return getOrLoadConfig(key) {
-                loadConfigAsString(key, (default ?: false).toString())
-            }.toBoolean()
+            val strValue = getOrLoadConfig(key) { loadConfigAsString(key, (default ?: "false").toString()) }
+            @Suppress("UNNECESSARY_SAFE_CALL")
+            return when (strValue?.lowercase()) {
+                "true", "on", "yes" -> true
+                "false", "off", "no" -> false
+                null -> default ?: false
+                else -> error("Invalid boolean value for $key: '$strValue'")
+            }
         }
 
         /**
          * 读取配置的最终逻辑：
-         * 1. Gradle properties (-Pkey=val 或 gradle.properties)
-         * 2. System properties (-Dkey=val)
-         * 3. 环境变量（自动将 key 转换为 ENV_KEY）
+         * 1. 环境变量（自动将 key 转换为 ENV_KEY）
+         * 2. Gradle properties (-Pkey=val 或 gradle.properties)
+         * 3. System properties (-Dkey=val)
          */
         fun loadConfigAsString(key: String, default: String? = null): String {
-            // 1. Gradle properties
-            project.findProperty(key)?.toString()?.let { value ->
-                project.logDebug("Loading config [Gradle property]: $key = ${filterValue(key, value)}")
-                return value
-            }
-
-            // 2. System properties
-            System.getProperty(key)?.let { value ->
-                project.logDebug("Loading config [System property]: $key = ${filterValue(key, value)}")
-                return value
-            }
-
-            // 3. 环境变量（自动转换 key → ENV_KEY）
+            // 1. 环境变量（自动转换 key → ENV_KEY）
             val envKey = key.replace('.', '_')
                 .replace('-', '_')
                 .uppercase()
 
             System.getenv(envKey)?.let { value ->
                 project.logDebug("Loading config [Environment variable]: $envKey = ${filterValue(envKey, value)} (mapped from $key)")
+                return value
+            }
+
+            // 2. Gradle properties
+            project.findProperty(key)?.toString()?.let { value ->
+                project.logDebug("Loading config [Gradle property]: $key = ${filterValue(key, value)}")
+                return value
+            }
+
+            // 3. System properties
+            System.getProperty(key)?.let { value ->
+                project.logDebug("Loading config [System property]: $key = ${filterValue(key, value)}")
                 return value
             }
 

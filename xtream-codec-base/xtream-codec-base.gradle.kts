@@ -20,6 +20,7 @@ dependencies {
     testCompileOnly("org.springframework.boot:spring-boot-starter-json")
     testCompileOnly("org.springframework.boot:spring-boot-starter-web")
     testCompileOnly("org.springframework.boot:spring-boot-starter-webflux")
+    testRuntimeOnly("org.springframework.boot:spring-boot-starter-web")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

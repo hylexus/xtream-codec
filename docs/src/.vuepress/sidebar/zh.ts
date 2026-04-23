@@ -29,10 +29,12 @@ export const zhSidebar = sidebar({
                         '/guide/core/annotation-driven/data-types.md',
                         // '/guide/core/annotation-driven/index.md',
                         '/guide/core/annotation-driven/xtream-field-annotation.md',
+                        '/guide/core/annotation-driven/expression.md',
                         '/guide/core/annotation-driven/builtin-annotations.md',
                         '/guide/core/annotation-driven/custom-annotation.md',
                         '/guide/core/annotation-driven/entity-codec.md',
                         '/guide/core/annotation-driven/entity-codec-tracker.md',
+                        '/guide/core/annotation-driven/multi-version.md',
                         {
                             text: "附录(建议阅读)",
                             icon: "fa-solid fa-book-open-reader", collapsible: false,

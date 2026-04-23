@@ -65,6 +65,8 @@ configure(subprojects) {
     }
     tasks.test {
         useJUnitPlatform()
+        // https://github.com/gradle/gradle/issues/7773
+        // systemProperties(System.getProperties().map { (k, v) -> k.toString() to v }.toMap())
     }
     tasks.withType<JavaCompile> {
         options.compilerArgs.add("-parameters")

@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.utils;
 
+import io.github.hylexus.xtream.codec.base.utils.XtreamInternalStringUtils;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.PropertyAccessStrategy;
 import io.github.hylexus.xtream.codec.common.bean.PropertyGetters;
@@ -31,7 +32,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.beans.*;
 import java.lang.reflect.*;
@@ -164,7 +164,9 @@ public final class BeanUtils {
                 return;
             }
 
-            final String propertyName = StringUtils.uncapitalizeAsProperty(methodName.substring(nameIndex));
+            // @see https://github.com/hylexus/xtream-codec/issues/11
+            // final String propertyName = StringUtils.uncapitalizeAsProperty(methodName.substring(nameIndex));
+            final String propertyName = XtreamInternalStringUtils.uncapitalizeAsProperty(methodName.substring(nameIndex));
             if (propertyName.isEmpty()) {
                 return;
             }
@@ -272,7 +274,7 @@ public final class BeanUtils {
         if (constructors.length == 0) {
             throw new IllegalStateException(
                     "Cannot create FieldCodec instance for class [" + cls.getName() + "]"
-                            + "\nNo Constructor found");
+                    + "\nNo Constructor found");
         }
         if (constructors.length == 1) {
             return createFieldCodecInstance(version, cls, constructors[0], beanMetadataRegistry);
@@ -284,12 +286,12 @@ public final class BeanUtils {
         if (constructorList.isEmpty()) {
             throw new IllegalStateException(
                     "Failed to create FieldCodec instance for class [" + cls.getName() + "]"
-                            + "\nMore than 1 Constructor found."
-                            + "\nConsider using the @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " annotation to mark which constructor to use.");
+                    + "\nMore than 1 Constructor found."
+                    + "\nConsider using the @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " annotation to mark which constructor to use.");
         }
         throw new IllegalStateException(
                 "Failed to create FieldCodec instance for class [" + cls.getName() + "]"
-                        + "\nMore than 1 @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " found.");
+                + "\nMore than 1 @" + FieldCodec.FieldCodecCreator.class.getSimpleName() + " found.");
     }
 
     private static <T extends FieldCodec<?>> T createFieldCodecInstance(int version, Class<T> cls, Constructor<?> constructor, BeanMetadataRegistry beanMetadataRegistry) {
