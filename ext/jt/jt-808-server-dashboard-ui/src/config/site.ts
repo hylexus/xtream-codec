@@ -29,8 +29,8 @@ export const siteConfig = {
     { name: "映射", href: "/mappings", icon: FaShuffleIcon },
     { name: "线程转储", href: "/dump", icon: FaCloneIcon },
     { name: "线程监控", href: "/threads", icon: FaChartSimpleIcon },
+    { name: "编解码器", href: "/codec-metadata", icon: FaDataBaseIcon },
     { name: "bean-metadata", href: "/bean-metadata", icon: FaCubesIcon },
-    { name: "codec-metadata", href: "/codec-metadata", icon: FaDataBaseIcon },
     { name: "调试", href: "/debug", icon: FaBugIcon },
   ],
   links: {

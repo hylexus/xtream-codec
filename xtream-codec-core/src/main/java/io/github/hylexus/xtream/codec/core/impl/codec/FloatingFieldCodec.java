@@ -16,13 +16,6 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
-/**
- * 标记接口。
- * <p>
- * 用来表示整数类型的编解码器(不含小数部分)。
- *
- * @author hylexus
- */
-public interface IntegralFieldCodec extends NumberFieldCodec {
+public interface FloatingFieldCodec extends NumberFieldCodec {
 
 }

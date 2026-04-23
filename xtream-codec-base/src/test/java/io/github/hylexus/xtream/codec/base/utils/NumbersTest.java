@@ -20,7 +20,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class NumbersTest {
 
@@ -225,8 +226,8 @@ class NumbersTest {
 
     @Test
     void testParseBooleanFromBoolean() {
-        assertEquals(Optional.of(true), Numbers.parseBoolean((Object) Boolean.TRUE));
-        assertEquals(Optional.of(false), Numbers.parseBoolean((Object) Boolean.FALSE));
+        assertEquals(Optional.of(true), Numbers.parseBoolean(true));
+        assertEquals(Optional.of(false), Numbers.parseBoolean(false));
     }
 
     @Test

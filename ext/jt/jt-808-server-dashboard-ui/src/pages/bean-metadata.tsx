@@ -7,111 +7,82 @@ import {
   TableRow,
 } from "@heroui/table";
 import { Spinner } from "@heroui/spinner";
-import React, { FC } from "react";
-import useSWR from "swr";
-import { Tooltip } from "@heroui/tooltip";
-import { Chip } from "@heroui/chip";
+import { Pagination } from "@heroui/pagination";
+import React, { FC, useMemo } from "react";
 
-import { request } from "@/utils/request.ts";
+import { Dic } from "@/types";
+import { usePageList } from "@/hooks/use-page-list.ts";
+
+const columns = [
+  { key: "rawClass", label: "类名" },
+  { key: "constructor", label: "构造函数" },
+  { key: "properties", label: "属性数" },
+];
+
+const RenderCell: FC<{ item: Dic; columnKey: React.Key }> = ({
+  item,
+  columnKey,
+}) => {
+  switch (columnKey) {
+    case "properties":
+      return item.properties?.length ?? 0;
+    default:
+      return item[columnKey as keyof Dic];
+  }
+};
 
 export const BeanMetadataPage = () => {
-  const { data, isLoading } = useSWR<{
-    dispatcherXtreamHandler: any[];
-  }>(
-    "bean-metadata",
-    () =>
-      request({
-        path: "codec/bean-metadata",
-        method: "GET",
-      }),
-    {},
+  const { setPage, page, pages, tableData, isLoading } = usePageList<Dic>(
+    "codec/bean-metadata",
+    10,
   );
-  const columns = [
-    { key: "rawClass", label: "rawClass" },
-    { key: "constructor", label: "constructor" },
-    { key: "properties", label: "properties" },
-  ];
-  const tableData = (data?.data ?? []).map((e, i) => ({
-    key: i,
-    ...e,
-  }));
+
   const loadingState =
-    isLoading && tableData?.length === 0 ? "loading" : "idle";
+    isLoading && tableData?.data?.length === 0 ? "loading" : "idle";
 
-  interface CellProps {
-    item: any;
-    columnKey: React.Key;
-  }
-  const calcStatus = (item: any) => {
-    const { virtualThread, nonBlocking, rejectBlockingTask } = item;
-    let color: "success" | "warning" | "danger";
-    let label: string;
-
-    if (virtualThread) {
-      color = "success";
-      label = "虚拟线程";
-    } else {
-      if (nonBlocking) {
-        if (rejectBlockingTask) {
-          color = "success";
-          label = "非阻塞";
-        } else {
-          color = "warning";
-          label = "非阻塞(可执行同步任务)";
-        }
-      } else {
-        if (rejectBlockingTask) {
-          color = "danger";
-          label = "请检查调度器配置";
-        } else {
-          color = "success";
-          label = "阻塞";
-        }
-      }
-    }
-
-    return {
-      color,
-      label,
-    };
-  };
-  const RenderCell: FC<CellProps> = ({ item, columnKey }) => {
-    const cellValue = item[columnKey as keyof typeof item];
-
-    switch (columnKey) {
-      case "properties":
-        return item.properties.length;
-      case "status":
-        return (
-          <Chip color={calcStatus(item).color} size="sm" variant="dot">
-            {calcStatus(item).label}
-          </Chip>
-        );
-      default:
-        return cellValue;
-    }
-  };
+  const bottomContent = useMemo(() => {
+    return (
+      <div className="flex w-full items-center justify-center gap-3">
+        <p className="text-small text-default-400">
+          总数：{tableData?.total ?? 0}
+        </p>
+        {pages > 0 && (
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="secondary"
+            page={page}
+            total={pages}
+            onChange={(page) => setPage(page)}
+          />
+        )}
+      </div>
+    );
+  }, [page, pages, tableData?.total]);
 
   return (
-    <Table aria-label="table">
+    <Table
+      isHeaderSticky
+      aria-label="Bean Metadata"
+      bottomContent={bottomContent}
+      bottomContentPlacement="outside"
+      classNames={{
+        wrapper: "max-h-[80vh]",
+        td: "whitespace-nowrap",
+      }}
+    >
       <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn
-            key={column.key}
-            align={["nonBlocking"].includes(column.key) ? "center" : "start"}
-          >
-            {column.label}
-          </TableColumn>
-        )}
+        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
       </TableHeader>
       <TableBody
         emptyContent={"暂无数据"}
-        items={tableData}
+        items={tableData?.data ?? []}
         loadingContent={<Spinner />}
         loadingState={loadingState}
       >
         {(item) => (
-          <TableRow key={item.key}>
+          <TableRow key={item.rawClass}>
             {(columnKey) => (
               <TableCell>
                 <RenderCell columnKey={columnKey} item={item} />

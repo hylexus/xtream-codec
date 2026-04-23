@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.ApiStatus;
@@ -58,4 +59,8 @@ public class U32FieldCodec extends AbstractFieldCodec<Number> implements Integra
     }
 
 
+    @Override
+    public NumberEndian endian() {
+        return NumberEndian.BIG_ENDIAN;
+    }
 }

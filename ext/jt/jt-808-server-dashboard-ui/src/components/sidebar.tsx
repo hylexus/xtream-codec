@@ -51,7 +51,7 @@ export const Sidebar = () => {
           "relative flex h-full flex-col !border-r-small border-divider p-6 transition-width items-center",
           isOpen ? "w-56" : "w-16 px-2 py-6",
         )}
-        disabledKeys={["/debug"]}
+        disabledKeys={["/debug", "/bean-metadata"]}
         topContent={<TopContent />}
       >
         {sideNavList.map((link) => {

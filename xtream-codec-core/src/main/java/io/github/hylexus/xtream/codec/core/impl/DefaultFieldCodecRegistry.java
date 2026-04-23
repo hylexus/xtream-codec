@@ -301,8 +301,8 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
                             ? charSequenceFieldCodec.encoding()
                             : "NONE";
                     final boolean isBuiltin = isBuiltinFieldCodec(value);
-                    final NumberEndian endian = value instanceof IntegralFieldCodec integralFieldCodec
-                            ? integralFieldCodec.endian()
+                    final NumberEndian endian = value instanceof NumberFieldCodec numberFieldCodec
+                            ? numberFieldCodec.endian()
                             : NumberEndian.NONE;
                     return new CodecDescriptor(key, rawClassName, signedness, charset, isBuiltin, endian);
                 });

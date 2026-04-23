@@ -17,6 +17,8 @@
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.netty.buffer.ByteBuf;
 
 public class F32FieldCodecs {
@@ -27,7 +29,7 @@ public class F32FieldCodecs {
         throw new UnsupportedOperationException();
     }
 
-    public static final class F32FieldCodec extends AbstractFieldCodec<Number> {
+    public static final class F32FieldCodec extends AbstractFieldCodec<Number> implements FloatingFieldCodec {
         private F32FieldCodec() {
         }
 
@@ -40,9 +42,19 @@ public class F32FieldCodecs {
         protected void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Number value) {
             output.writeFloat(value.floatValue());
         }
+
+        @Override
+        public NumberSignedness signedness() {
+            return NumberSignedness.SIGNED;
+        }
+
+        @Override
+        public NumberEndian endian() {
+            return NumberEndian.BIG_ENDIAN;
+        }
     }
 
-    public static final class F32FieldCodecLittleEndian extends AbstractFieldCodec<Number> {
+    public static final class F32FieldCodecLittleEndian extends AbstractFieldCodec<Number> implements FloatingFieldCodec {
         private F32FieldCodecLittleEndian() {
         }
 
@@ -55,6 +67,16 @@ public class F32FieldCodecs {
         @Override
         protected void doSerialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, Number value) {
             output.writeFloatLE(value.floatValue());
+        }
+
+        @Override
+        public NumberSignedness signedness() {
+            return NumberSignedness.SIGNED;
+        }
+
+        @Override
+        public NumberEndian endian() {
+            return NumberEndian.LITTLE_ENDIAN;
         }
     }
 

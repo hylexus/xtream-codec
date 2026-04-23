@@ -22,6 +22,9 @@ import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpException;
 import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
+import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
+import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
+import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.CodecMetadataDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.DecodeMessageDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.EncodeMessageDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.values.SimpleTypes;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @RestController
 @RequestMapping("/dashboard-api/jt808/v1/codec")
@@ -60,18 +64,50 @@ public class BuiltinJt808DashboardCodecController {
     }
 
     @GetMapping("/codec-metadata")
-    public PageableVo<FieldCodecRegistry.CodecDescriptor> codecDescriptors(@Validated PageableDto dto) {
+    public PageableVo<FieldCodecRegistry.CodecDescriptor> codecDescriptors(@Validated CodecMetadataDto dto) {
         final FieldCodecRegistry codecRegistry = this.beanMetadataRegistry.getFieldCodecRegistry();
-        final long total = codecRegistry.descriptors().count();
+
+        final Predicate<FieldCodecRegistry.CodecDescriptor> filter = createFilter(dto);
+        final long total = codecRegistry.descriptors().filter(filter).count();
         if (total <= 0) {
             return PageableVo.empty();
         }
 
         final List<FieldCodecRegistry.CodecDescriptor> data = codecRegistry.descriptors()
+                .filter(filter)
                 .skip((dto.getOffset()))
                 .limit(dto.getPageSize())
                 .toList();
         return PageableVo.of(total, data);
+    }
+
+    static Predicate<FieldCodecRegistry.CodecDescriptor> createFilter(CodecMetadataDto dto) {
+        Predicate<FieldCodecRegistry.CodecDescriptor> filter = x -> true;
+        final String key = dto.getKey();
+        if (StringUtils.hasText(key)) {
+            filter = filter.and(x -> x.key().toLowerCase().contains(key.toLowerCase().trim()));
+        }
+        final String className = dto.getClassName();
+        if (StringUtils.hasText(className)) {
+            filter = filter.and(x -> x.rawClassName().toLowerCase().contains(className.toLowerCase().trim()));
+        }
+        final String charset = dto.getCharset();
+        if (StringUtils.hasText(charset)) {
+            filter = filter.and(x -> x.charset().toLowerCase().contains(charset.toLowerCase().trim()));
+        }
+        final NumberSignedness signedness = dto.getSignedness();
+        if (signedness != null) {
+            filter = filter.and(x -> x.signedness() == signedness);
+        }
+        final NumberEndian endian = dto.getEndian();
+        if (endian != null) {
+            filter = filter.and(x -> x.endian() == endian);
+        }
+        final Boolean builtin = dto.getBuiltin();
+        if (builtin != null) {
+            filter = filter.and(x -> x.isBuiltin() == builtin);
+        }
+        return filter;
     }
 
     @GetMapping("/bean-metadata")

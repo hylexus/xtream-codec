@@ -91,6 +91,11 @@ public class U16FieldCodecs {
         public NumberSignedness signedness() {
             return NumberSignedness.UNSIGNED;
         }
+
+        @Override
+        public NumberEndian endian() {
+            return NumberEndian.BIG_ENDIAN;
+        }
     }
 
     private static class BaseU16FieldCodecLittleEndian<T extends Number> extends AbstractFieldCodec<Number> implements IntegralFieldCodec {
@@ -125,7 +130,7 @@ public class U16FieldCodecs {
 
         @Override
         public NumberEndian endian() {
-            return NumberEndian.BIG_ENDIAN;
+            return NumberEndian.LITTLE_ENDIAN;
         }
     }
 

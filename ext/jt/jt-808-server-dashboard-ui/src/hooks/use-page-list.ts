@@ -4,14 +4,19 @@ import useSWR from "swr";
 import { Session } from "@/types";
 import { request } from "@/utils/request.ts";
 
-export const usePageList = (path: string, initPerPage?: number) => {
+export const usePageList = <T = Session>(
+  path: string,
+  initPerPage?: number,
+  extraParams?: Record<string, string | boolean | undefined>,
+) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = initPerPage || 10;
+  const extraKey = extraParams ? JSON.stringify(extraParams) : "";
   const { data, isLoading, mutate } = useSWR<{
     total: number;
-    data: Session[];
+    data: T[];
   }>(
-    `${path}${page}${rowsPerPage}`,
+    `${path}${page}${rowsPerPage}${extraKey}`,
     () =>
       request({
         path,
@@ -19,6 +24,7 @@ export const usePageList = (path: string, initPerPage?: number) => {
         params: {
           pageNumber: page,
           pageSize: rowsPerPage,
+          ...extraParams,
         },
       }),
     {
