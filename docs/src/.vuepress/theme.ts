@@ -94,7 +94,7 @@ export default hopeTheme({
         vPre: true,
     },
     plugins: {
-        search: true,
+        slimsearch: true,
         icon: {
             // https://theme-hope.vuejs.press/zh/guide/interface/icon.html
             assets: "fontawesome-with-brands"
