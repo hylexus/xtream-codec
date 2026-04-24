@@ -1,27 +1,13 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/table";
 import { Spinner } from "@heroui/spinner";
 import { Pagination } from "@heroui/pagination";
-import React, { FC, useCallback, useMemo, useState } from "react";
-import { Chip } from "@heroui/chip";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
-import { Tooltip } from "@heroui/tooltip";
+import { Chip } from "@heroui/chip";
+import { Card, CardBody } from "@heroui/card";
+import { FC, useCallback, useMemo, useState } from "react";
 
 import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
-
-const columns = [
-  { key: "key", label: "key" },
-  { key: "rawClassName", label: "实现类" },
-  { key: "tags", label: "备注" },
-];
 
 const signednessOptions = [
   { key: "", label: "全部" },
@@ -41,89 +27,113 @@ const builtinOptions = [
   { key: "false", label: "自定义" },
 ];
 
-const signednessMap: Record<
-  string,
-  { label: string; color: "success" | "warning" }
-> = {
-  SIGNED: { label: "有符号", color: "success" },
-  UNSIGNED: { label: "无符号", color: "warning" },
+const getSimpleClassName = (fullName: string) => {
+  return fullName.includes(".") ? fullName.slice(fullName.lastIndexOf(".") + 1) : fullName;
 };
 
-const endianMap: Record<
-  string,
-  { label: string; color: "secondary" | "warning" }
-> = {
-  BIG_ENDIAN: { label: "大端", color: "secondary" },
-  LITTLE_ENDIAN: { label: "小端", color: "warning" },
+const CodecDetail: FC<{ item: Dic }> = ({ item }) => {
+  return (
+    <div className="flex flex-col gap-2 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-md font-mono text-xs overflow-x-auto">
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        <span>
+          <span className="text-blue-600 dark:text-blue-400">key</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-amber-600 dark:text-amber-400">{item.key}</span>
+        </span>
+        <span>
+          <span className="text-blue-600 dark:text-blue-400">implementation</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-emerald-600 dark:text-emerald-400">{getSimpleClassName(item.rawClassName)}</span>
+        </span>
+        <span>
+          <span className="text-blue-600 dark:text-blue-400">signedness</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-purple-600 dark:text-purple-400">{item.signedness}</span>
+        </span>
+        <span>
+          <span className="text-blue-600 dark:text-blue-400">endian</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-cyan-600 dark:text-cyan-400">{item.endian}</span>
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        <span>
+          <span className="text-blue-600 dark:text-blue-400">charset</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-pink-600 dark:text-pink-400">{item.charset}</span>
+        </span>
+        <span>
+          <span className="text-blue-600 dark:text-blue-400">isBuiltin</span>
+          <span className="text-zinc-500">=</span>
+          <span className={item.isBuiltin ? "text-green-600" : "text-zinc-400"}>
+            {String(item.isBuiltin)}
+          </span>
+        </span>
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-zinc-500">Full Class Name:</span>
+        <span className="text-xs text-zinc-600 dark:text-zinc-300 break-all">
+          {item.rawClassName}
+        </span>
+      </div>
+    </div>
+  );
 };
 
-const RenderCell: FC<{ item: Dic; columnKey: React.Key }> = ({
-  item,
-  columnKey,
-}) => {
-  switch (columnKey) {
-    case "key":
-      return <span>{item.key}</span>;
-    case "rawClassName": {
-      const fullName: string = item.rawClassName ?? "";
-      const simpleName = fullName.includes(".")
-        ? fullName.slice(fullName.lastIndexOf(".") + 1)
-        : fullName;
+const CodecCard: FC<{ item: Dic; idx: number }> = ({ item, idx }) => {
+  const [expanded, setExpanded] = useState(false);
 
-      return (
-        <Tooltip
-          content={<span className="text-xs font-mono">{fullName}</span>}
+  return (
+    <Card className="mb-2 flex-shrink-0" key={`${item.key}-${idx}`}>
+      <CardBody className="p-0">
+        <Button
+          className="w-full justify-between h-auto min-h-10 py-2 px-3 rounded-none"
+          variant="flat"
+          onPress={() => setExpanded(!expanded)}
         >
-          <span className="text-xs font-mono cursor-default">{simpleName}</span>
-        </Tooltip>
-      );
-    }
-    case "tags": {
-      const tags: React.ReactNode[] = [];
-
-      if (item.isBuiltin) {
-        tags.push(
-          <Chip key="builtin" color="success" size="sm" variant="flat">
-            内置
-          </Chip>,
-        );
-      }
-
-      const sig = signednessMap[item.signedness];
-
-      if (sig) {
-        tags.push(
-          <Chip key="sign" color={sig.color} size="sm" variant="flat">
-            {sig.label}
-          </Chip>,
-        );
-      }
-
-      const end = endianMap[item.endian];
-
-      if (end) {
-        tags.push(
-          <Chip key="endian" color={end.color} size="sm" variant="flat">
-            {end.label}
-          </Chip>,
-        );
-      }
-
-      if (item.charset && item.charset !== "NONE") {
-        tags.push(
-          <Chip key="charset" color="primary" size="sm" variant="flat">
-            {item.charset}
-          </Chip>,
-        );
-      }
-
-      return (
-        <div className="flex gap-1 flex-nowrap overflow-hidden">{tags}</div>
-      );
-    }
-    default:
-      return item[columnKey as keyof Dic];
-  }
+          <div className="flex items-center gap-2">
+            <span
+              className={`transition-transform ${expanded ? "rotate-90" : ""} text-xs`}
+            >
+              ▶
+            </span>
+            <span className="text-xs font-mono font-semibold">{item.key}</span>
+          </div>
+          <div className="flex gap-1 flex-wrap">
+            {item.isBuiltin && (
+              <Chip color="success" size="sm" variant="flat">
+                内置
+              </Chip>
+            )}
+            <Chip
+              color={item.signedness === "SIGNED" ? "success" : "warning"}
+              size="sm"
+              variant="flat"
+            >
+              {item.signedness === "SIGNED" ? "有符号" : "无符号"}
+            </Chip>
+            <Chip
+              color={item.endian === "BIG_ENDIAN" ? "secondary" : "warning"}
+              size="sm"
+              variant="flat"
+            >
+              {item.endian === "BIG_ENDIAN" ? "大端" : "小端"}
+            </Chip>
+            {item.charset && item.charset !== "NONE" && (
+              <Chip color="primary" size="sm" variant="flat">
+                {item.charset}
+              </Chip>
+            )}
+          </div>
+        </Button>
+        {expanded && (
+          <div className="p-2 bg-zinc-50 dark:bg-zinc-900/30 border-t border-zinc-200 dark:border-zinc-700">
+            <CodecDetail item={item} />
+          </div>
+        )}
+      </CardBody>
+    </Card>
+  );
 };
 
 export const CodecMetadataPage = () => {
@@ -160,9 +170,6 @@ export const CodecMetadataPage = () => {
     extraParams,
   );
 
-  const loadingState =
-    isLoading && tableData?.data?.length === 0 ? "loading" : "idle";
-
   const onFilterChange = useCallback(
     (setter: (v: string) => void) => (value: string) => {
       setter(value);
@@ -171,30 +178,9 @@ export const CodecMetadataPage = () => {
     [setPage],
   );
 
-  const bottomContent = useMemo(() => {
-    return (
-      <div className="flex w-full items-center justify-center gap-3">
-        <p className="text-small text-default-400">
-          总数：{tableData?.total ?? 0}
-        </p>
-        {pages > 0 && (
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
-        )}
-      </div>
-    );
-  }, [page, pages, tableData?.total]);
-
   const topContent = useMemo(() => {
     return (
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-wrap gap-3 items-center mb-4 shrink-0">
         <Input
           className="w-40"
           placeholder="输入 key"
@@ -276,38 +262,41 @@ export const CodecMetadataPage = () => {
     onFilterChange,
   ]);
 
+  if (isLoading && tableData?.data?.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
-    <Table
-      isHeaderSticky
-      aria-label="Codec Metadata"
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: "max-h-[80vh]",
-        td: "whitespace-nowrap",
-      }}
-      topContent={topContent}
-      topContentPlacement="outside"
-    >
-      <TableHeader columns={columns}>
-        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-      </TableHeader>
-      <TableBody
-        emptyContent={"暂无数据"}
-        items={tableData?.data ?? []}
-        loadingContent={<Spinner />}
-        loadingState={loadingState}
-      >
-        {(item) => (
-          <TableRow key={item.key}>
-            {(columnKey) => (
-              <TableCell>
-                <RenderCell columnKey={columnKey} item={item} />
-              </TableCell>
-            )}
-          </TableRow>
+    <div className="flex flex-col h-full p-4 box-border">
+      {topContent}
+      <div className="flex-1 overflow-y-auto flex flex-col gap-2">
+        {tableData?.data?.map((item, idx) => (
+          <CodecCard key={`${item.key}-${idx}`} item={item} idx={idx} />
+        ))}
+        {(!tableData?.data || tableData.data.length === 0) && (
+          <div className="text-center text-default-400 py-8">暂无数据</div>
         )}
-      </TableBody>
-    </Table>
+      </div>
+      <div className="flex w-full items-center justify-center gap-3 mt-4 shrink-0">
+        <p className="text-small text-default-400">
+          总数：{tableData?.total ?? 0}
+        </p>
+        {pages > 0 && (
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="secondary"
+            page={page}
+            total={pages}
+            onChange={(page) => setPage(page)}
+          />
+        )}
+      </div>
+    </div>
   );
 };

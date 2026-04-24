@@ -16,7 +16,6 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.controller;
 
-import io.github.hylexus.xtream.codec.base.web.domain.dto.PageableDto;
 import io.github.hylexus.xtream.codec.base.web.domain.vo.PageableVo;
 import io.github.hylexus.xtream.codec.base.web.exception.XtreamHttpException;
 import io.github.hylexus.xtream.codec.common.bean.BeanDescriptor;
@@ -24,6 +23,7 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
+import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.BeanMetadataDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.CodecMetadataDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.DecodeMessageDto;
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto.EncodeMessageDto;
@@ -111,16 +111,35 @@ public class BuiltinJt808DashboardCodecController {
     }
 
     @GetMapping("/bean-metadata")
-    public PageableVo<BeanDescriptor> beanMetadata(@Validated PageableDto dto) {
-        final long total = this.beanMetadataRegistry.beanDescriptors().count();
+    public PageableVo<BeanDescriptor> beanMetadata(@Validated BeanMetadataDto dto) {
+        final Predicate<BeanDescriptor> filter = createBeanFilter(dto);
+        final long total = this.beanMetadataRegistry.beanDescriptors().filter(filter).count();
         if (total <= 0) {
             return PageableVo.empty();
         }
         final List<BeanDescriptor> data = this.beanMetadataRegistry.beanDescriptors()
+                .filter(filter)
                 .skip((dto.getOffset()))
                 .limit(dto.getPageSize())
                 .toList();
         return PageableVo.of(total, data);
+    }
+
+    static Predicate<BeanDescriptor> createBeanFilter(BeanMetadataDto dto) {
+        Predicate<BeanDescriptor> filter = x -> true;
+        final String className = dto.getClassName();
+        if (StringUtils.hasText(className)) {
+            filter = filter.and(x -> x.rawClass().toLowerCase().contains(className.toLowerCase().trim()));
+        }
+        final Integer version = dto.getVersion();
+        if (version != null) {
+            filter = filter.and(x -> x.properties().stream().anyMatch(p -> p.getVersionValue() == version));
+        }
+        final String dataType = dto.getDataType();
+        if (StringUtils.hasText(dataType)) {
+            filter = filter.and(x -> x.properties().stream().anyMatch(p -> p.getDataTypeName().equalsIgnoreCase(dataType.trim())));
+        }
+        return filter;
     }
 
     private String convertTerminalId(String original, Jt808ProtocolVersion version) {

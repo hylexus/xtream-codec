@@ -18,19 +18,19 @@ export const siteConfig = {
   description: "Xtream",
   sidenav: [
     { name: "仪表盘", href: "/dashboard", icon: FaGaugeIcon },
-    { name: "808服务", href: "/instruction", icon: FaCommentsIcon },
+    { name: "指令服务客户端", href: "/instruction", icon: FaCommentsIcon },
     {
-      name: "附件服务",
+      name: "附件服务客户端",
       href: "/attachment",
       icon: FaFileCirclePlusIcon,
     },
     { name: "订阅", href: "/subscriber", icon: FaTagsIcon },
-    { name: "配置", href: "/configuration", icon: FaGearIcon },
     { name: "映射", href: "/mappings", icon: FaShuffleIcon },
     { name: "线程转储", href: "/dump", icon: FaCloneIcon },
     { name: "线程监控", href: "/threads", icon: FaChartSimpleIcon },
     { name: "编解码器", href: "/codec-metadata", icon: FaDataBaseIcon },
-    { name: "bean-metadata", href: "/bean-metadata", icon: FaCubesIcon },
+    { name: "类元信息", href: "/bean-metadata", icon: FaCubesIcon },
+    { name: "配置", href: "/configuration", icon: FaGearIcon },
     { name: "调试", href: "/debug", icon: FaBugIcon },
   ],
   links: {

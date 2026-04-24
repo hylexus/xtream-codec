@@ -56,6 +56,18 @@ public record BeanDescriptor(String rawClass, String constructor, List<BeanPrope
         private FieldCodecDescriptor codec;
         private FieldLengthDescriptor length;
         private FieldConditionDescriptor condition;
+
+        public int getVersionValue() {
+            return this.version.value();
+        }
+
+        public boolean isVersionDefault() {
+            return this.version.isDefault();
+        }
+
+        public String getDataTypeName() {
+            return this.dataType.name();
+        }
     }
 
     public static BeanDescriptor of(BeanMetadata metadata) {

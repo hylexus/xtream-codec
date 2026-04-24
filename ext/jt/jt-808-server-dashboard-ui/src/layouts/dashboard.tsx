@@ -9,11 +9,11 @@ export const DashboardLayout = () => {
   return (
     <Provider>
       <AwesomeBg />
-      <div className=" flex h-screen max-w-8xl mx-auto">
+      <div className="flex h-screen max-w-8xl mx-auto overflow-hidden">
         <Sidebar />
-        <div className=" w-full flex-1 flex-col p-4">
+        <div className="flex w-full flex-1 flex-col p-4 box-border overflow-hidden">
           <Navbar />
-          <main className="m-4 h-[90%] w-full overflow-visible relative overflow-x-auto overflow-y-auto">
+          <main className="m-4 flex-1 w-full overflow-y-auto relative">
             <Outlet />
           </main>
         </div>
