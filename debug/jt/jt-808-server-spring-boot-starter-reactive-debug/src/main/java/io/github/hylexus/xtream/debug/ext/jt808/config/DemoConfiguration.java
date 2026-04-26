@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListe
 import io.github.hylexus.xtream.codec.server.reactive.spec.event.XtreamEventPublisher;
 import io.github.hylexus.xtream.debug.ext.jt808.domain.properties.DemoAppConfigProperties;
 import io.github.hylexus.xtream.debug.ext.jt808.handler.DemoJt808RequestLifecycleListener;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -31,6 +32,7 @@ import java.util.Map;
 /**
  * @author hylexus
  */
+@NullMarked
 @Configuration
 @EnableConfigurationProperties({
         DemoAppConfigProperties.class,

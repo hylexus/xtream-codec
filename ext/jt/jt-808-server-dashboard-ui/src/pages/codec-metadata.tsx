@@ -28,7 +28,9 @@ const builtinOptions = [
 ];
 
 const getSimpleClassName = (fullName: string) => {
-  return fullName.includes(".") ? fullName.slice(fullName.lastIndexOf(".") + 1) : fullName;
+  return fullName.includes(".")
+    ? fullName.slice(fullName.lastIndexOf(".") + 1)
+    : fullName;
 };
 
 const CodecDetail: FC<{ item: Dic }> = ({ item }) => {
@@ -41,26 +43,36 @@ const CodecDetail: FC<{ item: Dic }> = ({ item }) => {
           <span className="text-amber-600 dark:text-amber-400">{item.key}</span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">implementation</span>
+          <span className="text-blue-600 dark:text-blue-400">
+            implementation
+          </span>
           <span className="text-zinc-500">=</span>
-          <span className="text-emerald-600 dark:text-emerald-400">{getSimpleClassName(item.rawClassName)}</span>
+          <span className="text-emerald-600 dark:text-emerald-400">
+            {getSimpleClassName(item.rawClassName)}
+          </span>
         </span>
         <span>
           <span className="text-blue-600 dark:text-blue-400">signedness</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-purple-600 dark:text-purple-400">{item.signedness}</span>
+          <span className="text-purple-600 dark:text-purple-400">
+            {item.signedness}
+          </span>
         </span>
         <span>
           <span className="text-blue-600 dark:text-blue-400">endian</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-cyan-600 dark:text-cyan-400">{item.endian}</span>
+          <span className="text-cyan-600 dark:text-cyan-400">
+            {item.endian}
+          </span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
           <span className="text-blue-600 dark:text-blue-400">charset</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-pink-600 dark:text-pink-400">{item.charset}</span>
+          <span className="text-pink-600 dark:text-pink-400">
+            {item.charset}
+          </span>
         </span>
         <span>
           <span className="text-blue-600 dark:text-blue-400">isBuiltin</span>
@@ -84,7 +96,7 @@ const CodecCard: FC<{ item: Dic; idx: number }> = ({ item, idx }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Card className="mb-2 flex-shrink-0" key={`${item.key}-${idx}`}>
+    <Card key={`${item.key}-${idx}`} className="mb-2 flex-shrink-0">
       <CardBody className="p-0">
         <Button
           className="w-full justify-between h-auto min-h-10 py-2 px-3 rounded-none"
@@ -275,7 +287,7 @@ export const CodecMetadataPage = () => {
       {topContent}
       <div className="flex-1 overflow-y-auto flex flex-col gap-2">
         {tableData?.data?.map((item, idx) => (
-          <CodecCard key={`${item.key}-${idx}`} item={item} idx={idx} />
+          <CodecCard key={`${item.key}-${idx}`} idx={idx} item={item} />
         ))}
         {(!tableData?.data || tableData.data.length === 0) && (
           <div className="text-center text-default-400 py-8">暂无数据</div>

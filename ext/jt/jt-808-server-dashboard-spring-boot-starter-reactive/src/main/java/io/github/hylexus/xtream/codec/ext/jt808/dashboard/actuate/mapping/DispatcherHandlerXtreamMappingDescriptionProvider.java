@@ -51,7 +51,7 @@ public class DispatcherHandlerXtreamMappingDescriptionProvider implements Xtream
     }
 
     @Override
-    public Object description() {
+    public List<Jt808RequestHandlerMappingDescription> description() {
         return this.handlerMappingList.stream().flatMap(handlerMapping -> {
             if (handlerMapping instanceof Jt808RequestMappingHandlerMapping jt808RequestMappingHandlerMapping) {
                 return this.describe(jt808RequestMappingHandlerMapping)

@@ -10,7 +10,9 @@ import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
 
 const getSimpleClassName = (fullName: string) => {
-  return fullName.includes(".") ? fullName.slice(fullName.lastIndexOf(".") + 1) : fullName;
+  return fullName.includes(".")
+    ? fullName.slice(fullName.lastIndexOf(".") + 1)
+    : fullName;
 };
 
 const getSimpleTypeName = (type: string) => {
@@ -23,6 +25,7 @@ const getSimpleTypeName = (type: string) => {
   if (type.startsWith("[")) {
     return type.slice(1) + "[]";
   }
+
   return type;
 };
 
@@ -32,6 +35,7 @@ const getImplDetail = (
 ): string | undefined => {
   if (!detail || !impl) return undefined;
   const d = detail as Dic;
+
   switch (impl) {
     case "LambdaMetaFactory":
       return d?.method as string | undefined;
@@ -55,6 +59,7 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
 
   const lengthDesc = useMemo(() => {
     const length = p.length as Dic;
+
     if (!length) return "-";
     switch (length.type) {
       case "constant":
@@ -74,6 +79,7 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
 
   const conditionDesc = useMemo(() => {
     const cond = p.condition as Dic;
+
     if (!cond) return "-";
     switch (cond.type) {
       case "always":
@@ -100,7 +106,9 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         <span>
           <span className="text-blue-600 dark:text-blue-400">type</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-rose-600 dark:text-rose-400">{getSimpleTypeName(p.type as string)}</span>
+          <span className="text-rose-600 dark:text-rose-400">
+            {getSimpleTypeName(p.type as string)}
+          </span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -115,7 +123,9 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         <span>
           <span className="text-blue-600 dark:text-blue-400">length</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-purple-600 dark:text-purple-400">{lengthDesc}</span>
+          <span className="text-purple-600 dark:text-purple-400">
+            {lengthDesc}
+          </span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -136,9 +146,7 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
           <span className="text-blue-600 dark:text-blue-400">order</span>
           <span className="text-zinc-500">=</span>
           <span className="text-zinc-600 dark:text-zinc-300">
-            {p.order?.isDefault === true
-              ? "default"
-              : p.order?.value}
+            {p.order?.isDefault === true ? "default" : p.order?.value}
           </span>
         </span>
         <span>
@@ -161,7 +169,9 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         <span>
           <span className="text-blue-600 dark:text-blue-400">condition</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-pink-600 dark:text-pink-400">{conditionDesc}</span>
+          <span className="text-pink-600 dark:text-pink-400">
+            {conditionDesc}
+          </span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -196,8 +206,8 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
     <div className="border-b border-zinc-200 dark:border-zinc-700 last:border-b-0">
       <Button
         className="w-full justify-between h-auto min-h-8 py-1 px-2"
-        variant="light"
         size="sm"
+        variant="light"
         onPress={() => setExpanded(!expanded)}
       >
         <span className="font-mono text-sm">

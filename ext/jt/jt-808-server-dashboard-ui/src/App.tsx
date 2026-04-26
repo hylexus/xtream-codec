@@ -11,8 +11,8 @@ import { MappingsPage } from "@/pages/mappings.tsx";
 import { DumpPage } from "@/pages/dump.tsx";
 import { loader as rootLoader } from "@/routes/root.tsx";
 import { ThreadsPage } from "@/pages/threads.tsx";
-import {BeanMetadataPage} from "@/pages/bean-metadata.tsx";
-import {CodecMetadataPage} from "@/pages/codec-metadata.tsx";
+import { BeanMetadataPage } from "@/pages/bean-metadata.tsx";
+import { CodecMetadataPage } from "@/pages/codec-metadata.tsx";
 
 const router = createBrowserRouter(
   [

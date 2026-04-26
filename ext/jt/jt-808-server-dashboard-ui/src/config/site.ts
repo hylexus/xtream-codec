@@ -10,7 +10,8 @@ import {
   FaCloneIcon,
   FaChartSimpleIcon,
   FaBugIcon,
-  FaCubesIcon, FaDataBaseIcon
+  FaCubesIcon,
+  FaDataBaseIcon,
 } from "@/components/icons.tsx";
 
 export const siteConfig = {
@@ -24,8 +25,8 @@ export const siteConfig = {
       href: "/attachment",
       icon: FaFileCirclePlusIcon,
     },
-    { name: "订阅", href: "/subscriber", icon: FaTagsIcon },
-    { name: "映射", href: "/mappings", icon: FaShuffleIcon },
+    { name: "数据订阅", href: "/subscriber", icon: FaTagsIcon },
+    { name: "请求映射", href: "/mappings", icon: FaShuffleIcon },
     { name: "线程转储", href: "/dump", icon: FaCloneIcon },
     { name: "线程监控", href: "/threads", icon: FaChartSimpleIcon },
     { name: "编解码器", href: "/codec-metadata", icon: FaDataBaseIcon },
