@@ -112,27 +112,34 @@ const CodecCard: FC<{ item: Dic; idx: number }> = ({ item, idx }) => {
             <span className="text-xs font-mono font-semibold">{item.key}</span>
           </div>
           <div className="flex gap-1 flex-wrap">
+            <Chip color="primary" size="sm" variant="flat">
+              {getSimpleClassName(item.rawClassName)}
+            </Chip>
             {item.isBuiltin && (
               <Chip color="success" size="sm" variant="flat">
                 内置
               </Chip>
             )}
-            <Chip
-              color={item.signedness === "SIGNED" ? "success" : "warning"}
-              size="sm"
-              variant="flat"
-            >
-              {item.signedness === "SIGNED" ? "有符号" : "无符号"}
-            </Chip>
-            <Chip
-              color={item.endian === "BIG_ENDIAN" ? "secondary" : "warning"}
-              size="sm"
-              variant="flat"
-            >
-              {item.endian === "BIG_ENDIAN" ? "大端" : "小端"}
-            </Chip>
+            {item.signedness !== "NONE" && (
+              <Chip
+                color={item.signedness === "SIGNED" ? "secondary" : "primary"}
+                size="sm"
+                variant="flat"
+              >
+                {item.signedness === "SIGNED" ? "有符号" : "无符号"}
+              </Chip>
+            )}
+            {item.endian !== "NONE" && (
+              <Chip
+                color={item.endian === "BIG_ENDIAN" ? "primary" : "secondary"}
+                size="sm"
+                variant="flat"
+              >
+                {item.endian === "BIG_ENDIAN" ? "大端" : "小端"}
+              </Chip>
+            )}
             {item.charset && item.charset !== "NONE" && (
-              <Chip color="primary" size="sm" variant="flat">
+              <Chip color="secondary" size="sm" variant="flat">
                 {item.charset}
               </Chip>
             )}
