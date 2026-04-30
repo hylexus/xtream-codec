@@ -19,8 +19,8 @@ pluginManagement {
             "https://maven.aliyun.com/repository/public",
             "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
             "https://repo.huaweicloud.com/repository/maven",
-//            "https://maven.aliyun.com/repository/gradle-plugin",
-        ).map {
+            // "https://maven.aliyun.com/repository/gradle-plugin",
+        ).forEach {
             maven {
                 url = uri(it)
                 name = it
@@ -29,9 +29,9 @@ pluginManagement {
                     excludeGroup("net.minecraftforge.licenser")
                     excludeGroup("com.github.jk1")
                     // 排除腾讯云 404 的依赖
-//                    if (it.contains("tencent")) {
-//                        excludeGroup("com.github.jk1")
-//                    }
+                    // if (it.contains("tencent")) {
+                    //     excludeGroup("com.github.jk1")
+                    // }
                 }
             }
         }
@@ -74,9 +74,16 @@ include("quick-start:jt:jt-1078-server-quick-start-nonblocking")
 include("quick-start:jt:jt-1078-server-quick-start-blocking")
 
 dependencyResolutionManagement {
+    @Suppress("unstableApiUsage")
     repositories {
         extraMavenRepositoryUrls().forEach {
-            maven(it)
+            maven(url = it) {
+                content {
+                    if (it.contains("aliyun")) {
+                        excludeModule("io.projectreactor", "reactor-core-micrometer")
+                    }
+                }
+            }
         }
         mavenCentral()
         mavenLocal()
@@ -97,12 +104,12 @@ fun setBuildFileName(project: ProjectDescriptor) {
 }
 
 fun extraMavenRepositoryUrls() = listOf(
-//        "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
-//        "https://repo.huaweicloud.com/repository/maven",
     "https://maven.aliyun.com/repository/central",
     "https://maven.aliyun.com/repository/public",
     "https://maven.aliyun.com/repository/google",
     "https://maven.aliyun.com/repository/spring",
+    "https://repo.huaweicloud.com/repository/maven",
+    "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
     // Central
     "https://repo1.maven.org/maven2",
     "https://maven.aliyun.com/repository/spring-plugin",
@@ -110,6 +117,6 @@ fun extraMavenRepositoryUrls() = listOf(
     "https://maven.aliyun.com/repository/grails-core",
     "https://maven.aliyun.com/repository/apache-snapshots",
     "https://plugins.gradle.org/m2/",
-//    "https://repo.spring.io/release",
-//    "https://repo.spring.io/snapshot"
+    "https://repo.spring.io/release",
+    "https://repo.spring.io/snapshot"
 )
