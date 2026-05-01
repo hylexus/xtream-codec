@@ -4,7 +4,7 @@ import { ThemeProps, useTheme } from "@heroui/use-theme";
 import { FaMoonIcon, FaSunIcon } from "@/components/icons.tsx";
 
 export const ThemeSwitch = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme(ThemeProps.DARK);
 
   return (
     <Switch

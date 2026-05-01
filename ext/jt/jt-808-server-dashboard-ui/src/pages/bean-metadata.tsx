@@ -4,7 +4,8 @@ import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Card, CardBody } from "@heroui/card";
-import { FC, useCallback, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { FC, useCallback, useMemo } from "react";
 
 import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
@@ -29,6 +30,46 @@ const getSimpleTypeName = (type: string) => {
   return type;
 };
 
+const ECLIPSE_COLORS = {
+  keyword: "text-[#0000FF]",
+  type: "text-[#0000FF]",
+  field: "text-[#000000]",
+  string: "text-[#3F7F5F]",
+  number: "text-[#3F7F5F]",
+  comment: "text-[#808080]",
+  annotation: "text-[#3F7F5F]",
+} as const;
+
+const INTELLIJ_COLORS = {
+  keyword: "text-[#CC7832]",
+  type: "text-[#FF8020]",
+  field: "text-[#A9B7C6]",
+  string: "text-[#A9B7C6]",
+  number: "text-[#6897BB]",
+  comment: "text-[#808080]",
+  annotation: "text-[#A9B7C6]",
+} as const;
+
+const useCodeColors = () => {
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return document.documentElement.classList.contains('dark');
+  });
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark ? INTELLIJ_COLORS : ECLIPSE_COLORS;
+};
+
 const getImplDetail = (
   impl: string,
   detail: Dic | undefined,
@@ -51,6 +92,8 @@ const getImplDetail = (
 };
 
 const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
+  const codeColors = useCodeColors();
+  const { keyword, type, field, number, annotation, comment } = codeColors;
   const p = property as Dic;
   const getterImpl = p.getter?.implementation as string;
   const setterImpl = p.setter?.implementation as string;
@@ -97,68 +140,69 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
 
   return (
     <div className="flex flex-col gap-2 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-md font-mono text-xs overflow-x-auto">
+      {p.desc && <div className={comment + " italic"}>// {p.desc}</div>}
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
-          <span className="text-blue-600 dark:text-blue-400">name</span>
+          <span className={keyword}>name</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-amber-600 dark:text-amber-400">{p.name}</span>
+          <span className={field}>{p.name}</span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">type</span>
+          <span className={keyword}>type</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-rose-600 dark:text-rose-400">
+          <span className={type}>
             {getSimpleTypeName(p.type as string)}
           </span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
-          <span className="text-blue-600 dark:text-blue-400">codec</span>
+          <span className={keyword}>codec</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-emerald-600 dark:text-emerald-400">
+          <span className={type}>
             {getSimpleClassName(p.codec?.name)}
             {p.codec?.isBuiltIn !== true && " (custom)"}
           </span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">length</span>
+          <span className={keyword}>length</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-purple-600 dark:text-purple-400">
+          <span className={annotation}>
             {lengthDesc}
           </span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
-          <span className="text-blue-600 dark:text-blue-400">version</span>
+          <span className={keyword}>version</span>
           <span className="text-zinc-500">=</span>
           <span
             className={
               p.version?.isDefault === true
                 ? "text-zinc-400"
-                : "text-orange-600 dark:text-orange-400 font-semibold"
+                : number + " font-semibold"
             }
           >
             {p.version?.isDefault === true ? "default" : p.version?.value}
           </span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">order</span>
+          <span className={keyword}>order</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-zinc-600 dark:text-zinc-300">
+          <span className={field}>
             {p.order?.isDefault === true ? "default" : p.order?.value}
           </span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">dataType</span>
+          <span className={keyword}>dataType</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-cyan-600 dark:text-cyan-400">{p.dataType}</span>
+          <span className={annotation}>{p.dataType}</span>
         </span>
         {(p.recordClass || p.recordComponent) && (
           <span>
-            <span className="text-blue-600 dark:text-blue-400">record</span>
+            <span className={keyword}>record</span>
             <span className="text-zinc-500">=</span>
-            <span className="text-red-600 dark:text-red-400">
+            <span className={number}>
               {p.recordComponent ? "component" : ""}
               {p.recordClass ? " class" : ""}
             </span>
@@ -167,25 +211,25 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
-          <span className="text-blue-600 dark:text-blue-400">condition</span>
+          <span className={keyword}>condition</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-pink-600 dark:text-pink-400">
+          <span className={number}>
             {conditionDesc}
           </span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
-          <span className="text-blue-600 dark:text-blue-400">getter</span>
+          <span className={keyword}>getter</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-indigo-600 dark:text-indigo-400">
+          <span className={annotation}>
             {getterImpl}({getterDetail || "-"})
           </span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">setter</span>
+          <span className={keyword}>setter</span>
           <span className="text-zinc-500">=</span>
-          <span className="text-indigo-600 dark:text-indigo-400">
+          <span className={annotation}>
             {setterImpl}({setterDetail || "-"})
           </span>
         </span>
@@ -196,10 +240,12 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
 
 const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
   const [expanded, setExpanded] = useState(false);
+  const codeColors = useCodeColors();
+  const { keyword, type, field, comment: commentColor } = codeColors;
 
   const typeName = getSimpleTypeName(property.type as string);
   const propName = property.name as string;
-
+  const desc = property.desc as string | undefined;
   const getterImpl = property.getter?.implementation as string;
 
   return (
@@ -211,8 +257,12 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
         onPress={() => setExpanded(!expanded)}
       >
         <span className="font-mono text-sm">
-          <span className="text-rose-600 dark:text-rose-400">{typeName}</span>{" "}
-          <span className="text-amber-600 dark:text-amber-400">{propName}</span>
+          <span className={keyword}>private</span>{" "}
+          <span className={type}>{typeName}</span>{" "}
+          <span className={field}>{propName}</span>
+          {desc && (
+            <span className={`text-xs italic ${commentColor}`}> // {desc}</span>
+          )}
         </span>
         <div className="flex gap-1 flex-wrap">
           {getterImpl && (
@@ -259,11 +309,6 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
               v{property.version?.value}
             </Chip>
           )}
-          {(property.recordClass || property.recordComponent) && (
-            <Chip color="secondary" size="sm" variant="flat">
-              {property.recordComponent ? "comp" : "record"}
-            </Chip>
-          )}
           {property.condition?.type !== "always" && (
             <Chip color="warning" size="sm" variant="flat">
               {property.condition?.type}
@@ -271,16 +316,23 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
           )}
         </div>
       </Button>
-      {expanded && <PropertyDetail property={property} />}
+      {expanded && (
+        <div className="pl-4">
+          <PropertyDetail property={property} />
+        </div>
+      )}
     </div>
   );
 };
 
 const BeanCard: FC<{ item: Dic }> = ({ item }) => {
   const [expanded, setExpanded] = useState(false);
+  const codeColors = useCodeColors();
+  const { keyword, field } = codeColors;
   const properties = (item.properties as Dic[]) || [];
   const typeName = getSimpleClassName(item.rawClass as string);
   const fullClassName = item.rawClass as string;
+  const isRecord = item.type === "RECORD";
 
   return (
     <Card className="mb-2 flex-shrink-0 w-full">
@@ -296,26 +348,34 @@ const BeanCard: FC<{ item: Dic }> = ({ item }) => {
             >
               ▶
             </span>
-            <span className="text-xs font-mono font-semibold">{typeName}</span>
-            {fullClassName.includes("xtream.debug") && (
-              <Chip color="warning" size="sm" variant="flat">
-                debug
+            <span className="font-mono text-sm">
+              <span className={keyword}>public</span>{" "}
+              <span className={keyword}>
+                {isRecord ? "record" : "class"}
+              </span>{" "}
+              <span className={field}>{typeName}</span>
+            </span>
+            {fullClassName.includes("io.github.hylexus.xtream.debug") && (
+              <Chip color="danger" size="sm" variant="flat">
+                DEBUG
+              </Chip>
+            )}
+            {fullClassName.includes(
+              "io.github.hylexus.xtream.codec.ext.jt808.builtin.messages",
+            ) && (
+              <Chip color="secondary" size="sm" variant="flat">
+                内置
               </Chip>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-zinc-500 font-mono">
-              {String(item.constructor)}
-            </span>
-            <Chip color="primary" size="sm" variant="flat">
-              {properties.length} 个属性
-            </Chip>
-          </div>
+          <Chip color="primary" size="sm" variant="flat">
+            {properties.length} 个属性
+          </Chip>
         </Button>
         {expanded && (
-          <div className="p-2 bg-zinc-50 dark:bg-zinc-900/30 border-t border-zinc-200 dark:border-zinc-700">
-            <div className="text-xs font-mono text-zinc-500 mb-2 truncate">
-              {fullClassName}
+          <div className="pl-4 p-2 bg-zinc-50 dark:bg-zinc-900/30 border-t border-zinc-200 dark:border-zinc-700">
+            <div className="text-xs font-mono text-zinc-500 mb-2 pl-2 truncate">
+              {String(item.constructor)}
             </div>
             <div className="flex flex-col gap-1">
               {properties.map((prop, idx) => (
@@ -331,8 +391,9 @@ const BeanCard: FC<{ item: Dic }> = ({ item }) => {
 
 const versionOptions = [
   { key: "", label: "全部" },
-  { key: "2013", label: "2013" },
   { key: "2019", label: "2019" },
+  { key: "2013", label: "2013" },
+  { key: "2011", label: "2011" },
 ];
 
 const dataTypeOptions = [

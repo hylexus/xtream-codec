@@ -33,9 +33,18 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("NullAway")
-public record BeanDescriptor(String rawClass, String constructor, List<BeanPropertyDescriptor> properties) {
+public record BeanDescriptor(String rawClass, BeanType type, String constructor, List<BeanPropertyDescriptor> properties) {
     public BeanDescriptor(Class<?> rawType, Constructor<?> constructor, List<BeanPropertyDescriptor> propertyMetadataList) {
-        this(rawType.getName(), constructor.toGenericString(), propertyMetadataList);
+        this(rawType.getName(), determineBeanType(rawType), constructor.toGenericString(), propertyMetadataList);
+    }
+
+    public enum BeanType {
+        RECORD,
+        CLASS,
+    }
+
+    private static BeanType determineBeanType(Class<?> rawType) {
+        return rawType.isRecord() ? BeanType.RECORD : BeanType.CLASS;
     }
 
     @Getter
@@ -56,6 +65,7 @@ public record BeanDescriptor(String rawClass, String constructor, List<BeanPrope
         private FieldCodecDescriptor codec;
         private FieldLengthDescriptor length;
         private FieldConditionDescriptor condition;
+        private String desc;
 
         public int getVersionValue() {
             return this.version.value();
@@ -87,9 +97,11 @@ public record BeanDescriptor(String rawClass, String constructor, List<BeanPrope
                     .setDataType(it.dataType())
                     .setGetter(GetterDescriptor.of(it.propertyGetter()))
                     .setSetter(SetterDescriptor.of(it.propertySetter()))
+                    .setDesc(it.xtreamFieldAnnotation().desc())
                     ;
         }).toList();
-        return new BeanDescriptor(metadata.getRawType(), metadata.getConstructor(), propertyDescriptorList);
+        final Class<?> rawType = metadata.getRawType();
+        return new BeanDescriptor(rawType, metadata.getConstructor(), propertyDescriptorList);
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
