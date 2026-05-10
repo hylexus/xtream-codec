@@ -5,6 +5,8 @@ build/
 !**/src/test/**/build/
 /buildSrc/.kotlin/
 
+.zed/
+
 ### IntelliJ IDEA ###
 !.idea/dictionaries/*
 !.idea/icon.png
