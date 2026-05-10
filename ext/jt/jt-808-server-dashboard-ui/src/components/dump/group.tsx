@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem } from "@heroui/accordion";
+import { Accordion, Chip, useTheme } from "@heroui/react";
 import {
   EventSourceMessage,
   fetchEventSource,
@@ -7,13 +7,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Axis } from "@visx/axis";
 import { timeFormat } from "@visx/vendor/d3-time-format";
 import { coerceNumber, scaleUtc } from "@visx/scale";
-import { Chip } from "@heroui/chip";
 import { ParentSize } from "@visx/responsive";
 import { NumberValue } from "@visx/vendor/d3-scale";
-import { semanticColors } from "@heroui/theme";
-import { useTheme } from "@heroui/use-theme";
 
 import { Dump, Group } from "./types.ts";
+
 const types = {
   NEW: { color: "#7b9ce1" },
   RUNNABLE: { color: "#bd6d6c" },
@@ -29,10 +27,10 @@ export const DumpGroup = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [timeValues, setTimeValues] = useState<NumberValue[]>([]);
   const { theme } = useTheme();
-  const strokeColor = useMemo(() => {
-    // @ts-ignore
-    return semanticColors[theme].foreground.DEFAULT;
-  }, [theme]);
+  const strokeColor = useMemo(
+    () => (theme === "dark" ? "#e4e4e7" : "#18181b"),
+    [theme],
+  );
   const calcTimeValues = (time: string) => {
     const dateTime = +new Date(time.slice(0, -4));
     let _tempTimes = [...timeValues];
@@ -139,7 +137,7 @@ export const DumpGroup = () => {
 
   return (
     <div className="w-full">
-      <div className="w-full ml-32 h-10">
+      <div className="ml-32 h-10 w-full">
         <ParentSize>
           {({ width, height }) => {
             const [start, end] = getMinMax(timeValues);
@@ -172,72 +170,82 @@ export const DumpGroup = () => {
           }}
         </ParentSize>
       </div>
-      <Accordion isCompact selectionMode="multiple">
+      <Accordion allowsMultipleExpanded className="w-full">
         {groups.map((group) => (
-          <AccordionItem
-            key={group.name}
-            aria-label={group.name}
-            title={
-              <div className="flex justify-between">
-                <h2>{group.name}</h2> <Chip>{group.threads.length}</Chip>
-              </div>
-            }
-          >
-            {group.threads.map((thread) => (
-              <Accordion
-                key={thread.threadName}
-                hideIndicator
-                isCompact
-                showDivider={false}
-              >
-                <AccordionItem
-                  title={
-                    <div className="flex">
-                      <div className="w-40 line-clamp-1">
-                        {thread.threadName}
-                      </div>
-                      <div className="flex-1">
-                        <ParentSize>
-                          {({ width, height }) => {
-                            const reactWidth = width - 128;
-
-                            return (
-                              <svg height={height} width={reactWidth}>
-                                {thread.dumps.map((e, i) => (
-                                  <rect
-                                    key={i}
-                                    className="transition-width duration-150"
-                                    fill={types[e.threadState].color}
-                                    height={20}
-                                    width={20}
-                                    x={i * 20}
-                                    y={10}
-                                  />
-                                ))}
-                              </svg>
-                            );
-                          }}
-                        </ParentSize>
-                      </div>
-                    </div>
-                  }
+          <Accordion.Item key={group.name} id={group.name}>
+            <Accordion.Heading>
+              <Accordion.Trigger className="flex w-full items-center justify-between gap-2">
+                <h2>{group.name}</h2>
+                <div className="flex items-center gap-2">
+                  <Chip size="sm" variant="soft">
+                    {group.threads.length}
+                  </Chip>
+                  <Accordion.Indicator />
+                </div>
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+              {group.threads.map((thread) => (
+                <Accordion
+                  key={thread.threadName}
+                  allowsMultipleExpanded
+                  className="w-full"
                 >
-                  <ul>
-                    <li>
-                      <span>ID: </span>
-                      <span>{thread.threadId}</span>
-                    </li>
-                    <li>
-                      <span>StackTrance: </span>
-                      <span>
-                        <pre>{JSON.stringify(thread.stackTrace, null, 2)}</pre>
-                      </span>
-                    </li>
-                  </ul>
-                </AccordionItem>
-              </Accordion>
-            ))}
-          </AccordionItem>
+                  <Accordion.Item id={`${group.name}-${thread.threadName}`}>
+                    <Accordion.Heading>
+                      <Accordion.Trigger className="flex w-full items-stretch gap-2">
+                        <div className="flex min-w-0 flex-1">
+                          <div className="line-clamp-1 w-40 shrink-0">
+                            {thread.threadName}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <ParentSize>
+                              {({ width, height }) => {
+                                const reactWidth = width - 128;
+
+                                return (
+                                  <svg height={height} width={reactWidth}>
+                                    {thread.dumps.map((e, i) => (
+                                      <rect
+                                        key={i}
+                                        className="duration-150 transition-width"
+                                        fill={types[e.threadState].color}
+                                        height={20}
+                                        width={20}
+                                        x={i * 20}
+                                        y={10}
+                                      />
+                                    ))}
+                                  </svg>
+                                );
+                              }}
+                            </ParentSize>
+                          </div>
+                        </div>
+                        <Accordion.Indicator className="hidden" />
+                      </Accordion.Trigger>
+                    </Accordion.Heading>
+                    <Accordion.Panel>
+                      <ul>
+                        <li>
+                          <span>ID: </span>
+                          <span>{thread.threadId}</span>
+                        </li>
+                        <li>
+                          <span>StackTrance: </span>
+                          <span>
+                            <pre>
+                              {JSON.stringify(thread.stackTrace, null, 2)}
+                            </pre>
+                          </span>
+                        </li>
+                      </ul>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                </Accordion>
+              ))}
+            </Accordion.Panel>
+          </Accordion.Item>
         ))}
       </Accordion>
     </div>

@@ -1,12 +1,16 @@
-import { Spinner } from "@heroui/spinner";
-import { Pagination } from "@heroui/pagination";
-import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Card, CardBody } from "@heroui/card";
+import {
+  Button,
+  Card,
+  Chip,
+  Input,
+  Label,
+  Spinner,
+  TextField,
+} from "@heroui/react";
 import { useEffect, useState } from "react";
 import { FC, useCallback, useMemo } from "react";
 
+import { PagePagination } from "@/components/page-pagination.tsx";
 import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
 
@@ -52,18 +56,21 @@ const INTELLIJ_COLORS = {
 
 const useCodeColors = () => {
   const [isDark, setIsDark] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
+    if (typeof window === "undefined") return false;
+
+    return document.documentElement.classList.contains("dark");
   });
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
+      setIsDark(document.documentElement.classList.contains("dark"));
     });
+
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ["class"],
     });
+
     return () => observer.disconnect();
   }, []);
 
@@ -150,9 +157,7 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         <span>
           <span className={keyword}>type</span>
           <span className="text-zinc-500">=</span>
-          <span className={type}>
-            {getSimpleTypeName(p.type as string)}
-          </span>
+          <span className={type}>{getSimpleTypeName(p.type as string)}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -167,9 +172,7 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         <span>
           <span className={keyword}>length</span>
           <span className="text-zinc-500">=</span>
-          <span className={annotation}>
-            {lengthDesc}
-          </span>
+          <span className={annotation}>{lengthDesc}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -213,9 +216,7 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         <span>
           <span className={keyword}>condition</span>
           <span className="text-zinc-500">=</span>
-          <span className={number}>
-            {conditionDesc}
-          </span>
+          <span className={number}>{conditionDesc}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -251,9 +252,9 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
   return (
     <div className="border-b border-zinc-200 dark:border-zinc-700 last:border-b-0">
       <Button
-        className="w-full justify-between h-auto min-h-8 py-1 px-2"
+        className="h-auto min-h-8 w-full justify-between px-2 py-1"
         size="sm"
-        variant="light"
+        variant="ghost"
         onPress={() => setExpanded(!expanded)}
       >
         <span className="font-mono text-sm">
@@ -266,7 +267,7 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
         </span>
         <div className="flex gap-1 flex-wrap">
           {getterImpl && (
-            <Chip color="primary" size="sm" variant="flat">
+            <Chip color="accent" size="sm" variant="soft">
               {getterImpl}
             </Chip>
           )}
@@ -274,43 +275,43 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
             <Chip
               color={property.codec?.isBuiltIn === true ? "success" : "warning"}
               size="sm"
-              variant="flat"
+              variant="soft"
             >
               {getSimpleClassName(property.codec.name)}
             </Chip>
           )}
           {property.length?.type === "constant" && (
-            <Chip color="success" size="sm" variant="flat">
+            <Chip color="success" size="sm" variant="soft">
               {property.length.constant?.value}B
             </Chip>
           )}
           {property.length?.type === "placeholder" && (
-            <Chip color="primary" size="sm" variant="flat">
+            <Chip color="accent" size="sm" variant="soft">
               placeholder
             </Chip>
           )}
           {property.length?.type === "expression" && (
-            <Chip color="secondary" size="sm" variant="flat">
+            <Chip color="default" size="sm" variant="soft">
               expr
             </Chip>
           )}
           {property.length?.type === "prepend" && (
-            <Chip color="warning" size="sm" variant="flat">
+            <Chip color="warning" size="sm" variant="soft">
               prepend
             </Chip>
           )}
           {property.length?.type === "custom" && (
-            <Chip color="danger" size="sm" variant="flat">
+            <Chip color="danger" size="sm" variant="soft">
               custom
             </Chip>
           )}
           {property.version?.isDefault !== true && (
-            <Chip color="danger" size="sm" variant="flat">
+            <Chip color="danger" size="sm" variant="soft">
               v{property.version?.value}
             </Chip>
           )}
           {property.condition?.type !== "always" && (
-            <Chip color="warning" size="sm" variant="flat">
+            <Chip color="warning" size="sm" variant="soft">
               {property.condition?.type}
             </Chip>
           )}
@@ -335,11 +336,11 @@ const BeanCard: FC<{ item: Dic }> = ({ item }) => {
   const isRecord = item.type === "RECORD";
 
   return (
-    <Card className="mb-2 flex-shrink-0 w-full">
-      <CardBody className="p-0 w-full">
+    <Card className="mb-2 w-full flex-shrink-0">
+      <Card.Content className="w-full p-0">
         <Button
-          className="w-full justify-between h-auto min-h-12 py-2 px-3 rounded-none"
-          variant="flat"
+          className="h-auto min-h-12 w-full justify-between rounded-none px-3 py-2"
+          variant="secondary"
           onPress={() => setExpanded(!expanded)}
         >
           <div className="flex items-center gap-2">
@@ -350,30 +351,28 @@ const BeanCard: FC<{ item: Dic }> = ({ item }) => {
             </span>
             <span className="font-mono text-sm">
               <span className={keyword}>public</span>{" "}
-              <span className={keyword}>
-                {isRecord ? "record" : "class"}
-              </span>{" "}
+              <span className={keyword}>{isRecord ? "record" : "class"}</span>{" "}
               <span className={field}>{typeName}</span>
             </span>
             {fullClassName.includes("io.github.hylexus.xtream.debug") && (
-              <Chip color="danger" size="sm" variant="flat">
+              <Chip color="danger" size="sm" variant="soft">
                 DEBUG
               </Chip>
             )}
             {fullClassName.includes(
               "io.github.hylexus.xtream.codec.ext.jt808.builtin.messages",
             ) && (
-              <Chip color="secondary" size="sm" variant="flat">
+              <Chip color="default" size="sm" variant="soft">
                 内置
               </Chip>
             )}
           </div>
-          <Chip color="primary" size="sm" variant="flat">
+          <Chip color="accent" size="sm" variant="soft">
             {properties.length} 个属性
           </Chip>
         </Button>
         {expanded && (
-          <div className="pl-4 p-2 bg-zinc-50 dark:bg-zinc-900/30 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="border-t border-zinc-200 bg-zinc-50 p-2 pl-4 dark:border-zinc-700 dark:bg-zinc-900/30">
             <div className="text-xs font-mono text-zinc-500 mb-2 pl-2 truncate">
               {String(item.constructor)}
             </div>
@@ -384,7 +383,7 @@ const BeanCard: FC<{ item: Dic }> = ({ item }) => {
             </div>
           </div>
         )}
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 };
@@ -436,22 +435,22 @@ export const BeanMetadataPage = () => {
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-wrap gap-3 items-center mb-4 shrink-0">
-        <Input
+        <TextField
           className="w-56"
-          placeholder="输入类名"
-          size="sm"
           value={filterClassName}
-          onValueChange={onFilterChange(setFilterClassName)}
-        />
+          onChange={onFilterChange(setFilterClassName)}
+        >
+          <Label className="sr-only">类名</Label>
+          <Input placeholder="输入类名" />
+        </TextField>
         <div className="flex items-center gap-1">
           <span className="text-xs text-default-500">版本:</span>
           <div className="flex">
             {versionOptions.map((o) => (
               <Button
                 key={o.key}
-                color={filterVersion === o.key ? "primary" : "default"}
                 size="sm"
-                variant={filterVersion === o.key ? "flat" : "light"}
+                variant={filterVersion === o.key ? "primary" : "ghost"}
                 onPress={() => onFilterChange(setFilterVersion)(o.key)}
               >
                 {o.label}
@@ -465,9 +464,8 @@ export const BeanMetadataPage = () => {
             {dataTypeOptions.map((o) => (
               <Button
                 key={o.key}
-                color={filterDataType === o.key ? "primary" : "default"}
                 size="sm"
-                variant={filterDataType === o.key ? "flat" : "light"}
+                variant={filterDataType === o.key ? "primary" : "ghost"}
                 onPress={() => onFilterChange(setFilterDataType)(o.key)}
               >
                 {o.label}
@@ -503,15 +501,7 @@ export const BeanMetadataPage = () => {
           总数：{tableData?.total ?? 0}
         </p>
         {pages > 0 && (
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
+          <PagePagination page={page} total={pages} onChange={setPage} />
         )}
       </div>
     </div>

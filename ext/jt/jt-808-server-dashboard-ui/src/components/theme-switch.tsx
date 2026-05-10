@@ -1,26 +1,41 @@
-import { Switch } from "@heroui/switch";
-import { ThemeProps, useTheme } from "@heroui/use-theme";
+import { Switch, useTheme } from "@heroui/react";
 
 import { FaMoonIcon, FaSunIcon } from "@/components/icons.tsx";
 
+function resolveUiTheme(theme: string) {
+  if (theme === "system") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+
+  return theme === "dark" ? "dark" : "light";
+}
+
 export const ThemeSwitch = () => {
-  const { theme, setTheme } = useTheme(ThemeProps.DARK);
+  const { theme, setTheme } = useTheme("dark");
+  const resolved = resolveUiTheme(theme);
 
   return (
     <Switch
-      color="primary"
-      isSelected={theme === ThemeProps.LIGHT}
+      className="scale-110"
+      isSelected={resolved === "light"}
       size="lg"
-      thumbIcon={({ isSelected, className }) =>
-        isSelected ? (
-          <FaSunIcon className={className} />
-        ) : (
-          <FaMoonIcon className={className} />
-        )
-      }
-      onChange={(e) => {
-        setTheme(e.currentTarget.checked ? ThemeProps.LIGHT : ThemeProps.DARK);
+      onChange={(isSelected) => {
+        setTheme(isSelected ? "light" : "dark");
       }}
-    />
+    >
+      <Switch.Content>
+        <Switch.Control>
+          <Switch.Thumb>
+            {resolved === "light" ? (
+              <FaSunIcon className="text-sm" />
+            ) : (
+              <FaMoonIcon className="text-sm" />
+            )}
+          </Switch.Thumb>
+        </Switch.Control>
+      </Switch.Content>
+    </Switch>
   );
 };

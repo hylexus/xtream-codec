@@ -1,9 +1,6 @@
-import { Link } from "@heroui/link";
+import { Button, Link, ListBox, Tooltip } from "@heroui/react";
 import { useState } from "react";
-import { Listbox, ListboxItem } from "@heroui/listbox";
 import clsx from "clsx";
-import { Tooltip } from "@heroui/tooltip";
-import { Button } from "@heroui/button";
 import { useRouteLoaderData } from "react-router-dom";
 
 import { FaChevronRightIcon, LogoIcon } from "@/components/icons";
@@ -13,8 +10,10 @@ import { ServerInfo } from "@/types";
 const TopContent = () => {
   return (
     <Link
-      className="flex items-center px-3 justify-center gap-0 mb-8"
+      className="mb-8 flex items-center justify-center gap-0 px-3"
       href={siteConfig.links.github}
+      rel="noopener noreferrer"
+      target="_blank"
     >
       <LogoIcon className="flex h-8 w-8 items-center justify-center rounded-full" />
     </Link>
@@ -43,55 +42,67 @@ export const Sidebar = () => {
   });
 
   return (
-    <div className="relative flex flex-col h-full">
-      <div className="overflow-y-auto flex-1">
-        <Listbox
-          aria-label="sideBar"
-          bottomContent={<div className="mt-28 flex-1" />}
+    <div className="relative flex h-full flex-col">
+      <div className="flex-1 overflow-y-auto">
+        <div
           className={clsx(
-            "relative flex h-full flex-col !border-r-small border-divider p-6 transition-width items-center",
+            "relative flex flex-col items-center border-r border-default-200 p-6 transition-[width]",
             isOpen ? "w-56" : "w-16 px-2 py-6",
           )}
-          // disabledKeys={["/debug", "/bean-metadata"]}
-          disabledKeys={["/debug"]}
-          topContent={<TopContent />}
         >
-          {sideNavList.map((link) => {
-            const LinkIcon = link.icon;
-            const iconClasses =
-              "pointer-events-none flex-shrink-0 xw-6 mx-1 fa-fw text-xl";
+          <TopContent />
+          <ListBox
+            aria-label="sideBar"
+            className="flex w-full flex-1 flex-col gap-0.5 overflow-visible"
+            selectionMode="none"
+          >
+            {sideNavList.map((link) => {
+              const LinkIcon = link.icon;
+              const iconClasses =
+                "pointer-events-none mx-1 flex-shrink-0 text-xl fa-fw";
 
-            return (
-              <ListboxItem
-                key={link.href}
-                className="py-2 min-h-11 group text-default-500 active:bg-default-100 hover:transition-colors relative selected:bg-default-100 selected:text-foreground"
-                color={link.href === "/debug" ? "danger" : "default"}
-                href={link.href}
-              >
-                {!isOpen ? (
-                  <Tooltip content={link.name} placement="right">
-                    <div className="truncate flex items-center justify-between gap-2">
+              return (
+                <ListBox.Item
+                  key={link.href}
+                  className={clsx(
+                    "group relative min-h-11 rounded-medium py-2 text-default-500 hover:bg-default-100",
+                    link.href === "/debug" && "text-danger",
+                  )}
+                  href={link.href}
+                  id={link.href}
+                  isDisabled={link.href === "/debug"}
+                  textValue={link.name}
+                >
+                  {!isOpen ? (
+                    <Tooltip>
+                      <Tooltip.Trigger>
+                        <span className="flex w-full items-center justify-between gap-2 truncate">
+                          <LinkIcon className={iconClasses} />
+                          <span className="flex-1 truncate text-base font-medium" />
+                        </span>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content placement="right">
+                        {link.name}
+                      </Tooltip.Content>
+                    </Tooltip>
+                  ) : (
+                    <div className="flex w-full items-center justify-between gap-2 truncate">
                       <LinkIcon className={iconClasses} />
-                      <span className="flex-1 truncate font-medium text-base" />
+                      <span className="flex-1 truncate text-base font-medium">
+                        {link.name}
+                      </span>
                     </div>
-                  </Tooltip>
-                ) : (
-                  <div className="truncate flex items-center justify-between gap-2">
-                    <LinkIcon className={iconClasses} />
-                    <span className="flex-1 truncate font-medium text-base">
-                      {link.name}
-                    </span>
-                  </div>
-                )}
-              </ListboxItem>
-            );
-          })}
-        </Listbox>
+                  )}
+                </ListBox.Item>
+              );
+            })}
+          </ListBox>
+          <div className="mt-28 flex-1" />
+        </div>
       </div>
       <Button
         isIconOnly
-        className="absolute top-[30px] -right-2.5 z-10 text-white shadow-lg text-small min-w-5 w-5 h-5"
-        radius="full"
+        className="absolute right-[-10px] top-[30px] z-10 h-5 min-w-5 w-5 rounded-full text-small text-white shadow-lg"
         size="sm"
         onPress={() => setIsOpen(!isOpen)}
       >

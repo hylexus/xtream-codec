@@ -1,10 +1,4 @@
-import { Button } from "@heroui/button";
-import { Link } from "@heroui/link";
-import {
-  Navbar as NextUINavbar,
-  NavbarContent,
-  NavbarItem,
-} from "@heroui/navbar";
+import { Button, Link } from "@heroui/react";
 import confetti from "canvas-confetti";
 
 import { siteConfig } from "@/config/site";
@@ -21,42 +15,64 @@ export const Navbar = () => {
   };
 
   return (
-    <NextUINavbar
-      className="flex bg-transparent items-center gap-3 px-4"
-      maxWidth="full"
-      position="sticky"
-    >
-      <NavbarContent className="hidden sm:flex" justify="end">
-        <NavbarItem className="hidden sm:flex gap-2">
-          <Link isExternal href={siteConfig.links.github} title="GitHub">
-            <FaGithubIcon className="text-default-500" size="xl" />
-          </Link>
-          <Link isExternal href={siteConfig.links.gitee} title="Gitee">
-            <GiteeIcon className="text-default-500" />
-          </Link>
-          <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            className="text-sm font-normal text-default-600 bg-default-100"
-            startContent={<FaHeatIcon className="text-danger text-2xl" />}
-            variant="flat"
-            onPress={handleConfetti}
+    <header className="sticky top-0 z-20 flex w-full max-w-full items-center justify-end gap-3 bg-transparent px-4 py-2">
+      <div className="hidden items-center gap-2 sm:flex">
+        <span title="GitHub">
+          <Link
+            className="text-default-500"
+            href={siteConfig.links.github}
+            rel="noopener noreferrer"
+            target="_blank"
           >
-            Sponsor
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <Link isExternal href={siteConfig.links.github}>
-          <FaGithubIcon className="text-default-500" size="xl" />
-        </Link>
-        <Link isExternal href={siteConfig.links.gitee} title="Gitee">
-          <GiteeIcon className="text-default-500" />
-        </Link>
+            <FaGithubIcon size="xl" />
+          </Link>
+        </span>
+        <span title="Gitee">
+          <Link
+            className="text-default-500"
+            href={siteConfig.links.gitee}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <GiteeIcon />
+          </Link>
+        </span>
         <ThemeSwitch />
-      </NavbarContent>
-    </NextUINavbar>
+      </div>
+      <div className="hidden md:flex">
+        <Button
+          className="text-sm font-normal text-default-600 bg-default-100"
+          variant="secondary"
+          onPress={handleConfetti}
+        >
+          <span className="flex items-center gap-2">
+            <FaHeatIcon className="text-danger text-2xl" />
+            Sponsor
+          </span>
+        </Button>
+      </div>
+
+      <div className="flex basis-1 items-center justify-end gap-2 pl-4 sm:hidden">
+        <Link
+          className="text-default-500"
+          href={siteConfig.links.github}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <FaGithubIcon size="xl" />
+        </Link>
+        <span title="Gitee">
+          <Link
+            className="text-default-500"
+            href={siteConfig.links.gitee}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <GiteeIcon />
+          </Link>
+        </span>
+        <ThemeSwitch />
+      </div>
+    </header>
   );
 };

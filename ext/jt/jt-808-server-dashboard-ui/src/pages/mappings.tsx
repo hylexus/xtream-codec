@@ -1,20 +1,16 @@
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/table";
-import { Spinner } from "@heroui/spinner";
+  Button,
+  Card,
+  Chip,
+  Input,
+  Label,
+  Spinner,
+  Tabs,
+  TextField,
+  Tooltip,
+} from "@heroui/react";
 import React, { FC, useMemo, useState } from "react";
 import useSWR from "swr";
-import { Tooltip } from "@heroui/tooltip";
-import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
-import { Card, CardBody } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { Tabs, Tab } from "@heroui/tabs";
 
 import { request } from "@/utils/request.ts";
 
@@ -82,16 +78,16 @@ const getVersionLabel = (version: string) => {
   return map[version] ?? version;
 };
 
-const getVersionColor = (
+const getVersionChipColor = (
   version: string,
-): "primary" | "secondary" | "success" | "warning" | "danger" => {
+): "accent" | "default" | "success" | "warning" | "danger" => {
   const map: Record<
     string,
-    "primary" | "secondary" | "success" | "warning" | "danger"
+    "accent" | "default" | "success" | "warning" | "danger"
   > = {
     VERSION_2011: "warning",
-    VERSION_2013: "secondary",
-    VERSION_2019: "primary",
+    VERSION_2013: "default",
+    VERSION_2019: "accent",
     AUTO_DETECTION: "success",
   };
 
@@ -102,7 +98,7 @@ const StatusChip: FC<{ item: HandlerInfo }> = ({ item }) => {
   const { color, label } = calcStatus(item);
 
   return (
-    <Chip color={color} size="sm" variant="dot">
+    <Chip color={color} size="sm" variant="soft">
       {label}
     </Chip>
   );
@@ -110,7 +106,7 @@ const StatusChip: FC<{ item: HandlerInfo }> = ({ item }) => {
 
 const VersionChip: FC<{ version: string }> = ({ version }) => {
   return (
-    <Chip color={getVersionColor(version)} size="sm" variant="flat">
+    <Chip color={getVersionChipColor(version)} size="sm" variant="soft">
       {getVersionLabel(version)}
     </Chip>
   );
@@ -261,14 +257,14 @@ export const MappingsPage = () => {
       };
 
       return (
-        <Chip color={colors[group.label] || "default"} size="sm" variant="flat">
+        <Chip color={colors[group.label] || "default"} size="sm" variant="soft">
           {group.label}
         </Chip>
       );
     }
     if (groupBy === "version") {
       return (
-        <Chip color={getVersionColor(group.key)} size="sm" variant="flat">
+        <Chip color={getVersionChipColor(group.key)} size="sm" variant="soft">
           {group.label}
         </Chip>
       );
@@ -282,16 +278,17 @@ export const MappingsPage = () => {
       return (
         <div className="flex items-center gap-2">
           <button
-            className="w-5 h-5 flex items-center justify-center text-xs text-default-400 hover:text-default-600 transition-colors"
+            className="flex h-5 w-5 items-center justify-center text-xs text-default-400 transition-colors hover:text-default-600"
+            type="button"
             onClick={() => toggleExpand(group.key)}
           >
             {expanded.has(group.key) ? "▼" : "▶"}
           </button>
-          <Chip className="font-mono" size="sm" variant="flat">
+          <Chip className="font-mono" size="sm" variant="soft">
             {group.label}
           </Chip>
           <span className="text-sm">{group.subLabel}</span>
-          <Chip color="default" size="sm" variant="shadow">
+          <Chip color="default" size="sm" variant="tertiary">
             {group.handlers.length} 个
           </Chip>
         </div>
@@ -301,13 +298,14 @@ export const MappingsPage = () => {
     return (
       <div className="flex items-center gap-2">
         <button
-          className="w-5 h-5 flex items-center justify-center text-xs text-default-400 hover:text-default-600 transition-colors"
+          className="flex h-5 w-5 items-center justify-center text-xs text-default-400 transition-colors hover:text-default-600"
+          type="button"
           onClick={() => toggleExpand(group.key)}
         >
           {expanded.has(group.key) ? "▼" : "▶"}
         </button>
         {getGroupLabel(group)}
-        <Chip color="default" size="sm" variant="shadow">
+        <Chip color="default" size="sm" variant="tertiary">
           {group.handlers.length} 个
         </Chip>
       </div>
@@ -315,153 +313,193 @@ export const MappingsPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 gap-4 box-border">
-      <div className="flex flex-wrap gap-4 items-center shrink-0">
+    <div className="box-border flex h-full flex-col gap-4 p-4">
+      <div className="flex shrink-0 flex-wrap items-center gap-4">
         <Tabs
           selectedKey={groupBy}
-          size="md"
           onSelectionChange={(key) => setGroupBy(String(key))}
         >
-          <Tab key="messageId" title="消息ID" />
-          <Tab key="version" title="协议版本" />
-          <Tab key="className" title="处理器" />
-          <Tab key="status" title="状态" />
-          <Tab key="scheduler" title="调度器" />
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="分组方式">
+              <Tabs.Tab id="messageId">消息ID</Tabs.Tab>
+              <Tabs.Tab id="version">协议版本</Tabs.Tab>
+              <Tabs.Tab id="className">处理器</Tabs.Tab>
+              <Tabs.Tab id="status">状态</Tabs.Tab>
+              <Tabs.Tab id="scheduler">调度器</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListContainer>
+          <Tabs.Panel className="sr-only" id="messageId">
+            .
+          </Tabs.Panel>
+          <Tabs.Panel className="sr-only" id="version">
+            .
+          </Tabs.Panel>
+          <Tabs.Panel className="sr-only" id="className">
+            .
+          </Tabs.Panel>
+          <Tabs.Panel className="sr-only" id="status">
+            .
+          </Tabs.Panel>
+          <Tabs.Panel className="sr-only" id="scheduler">
+            .
+          </Tabs.Panel>
         </Tabs>
-        <Input
-          className="w-96"
-          placeholder="搜索消息ID、描述、处理器、调度器..."
-          size="md"
-          startContent={<span className="text-default-400 text-xs">🔍</span>}
-          value={searchKey}
-          onValueChange={setSearchKey}
-        />
-        <div className="flex gap-2 ml-auto">
-          <Button size="sm" variant="light" onPress={expandAll}>
+        <div className="flex w-96 max-w-full items-center gap-2">
+          <span aria-hidden className="shrink-0 text-xs text-default-400">
+            🔍
+          </span>
+          <TextField
+            className="min-w-0 flex-1"
+            value={searchKey}
+            onChange={setSearchKey}
+          >
+            <Label className="sr-only">搜索</Label>
+            <Input placeholder="搜索消息ID、描述、处理器、调度器..." />
+          </TextField>
+        </div>
+        <div className="ml-auto flex gap-2">
+          <Button size="sm" variant="ghost" onPress={expandAll}>
             展开全部
           </Button>
-          <Button size="sm" variant="light" onPress={collapseAll}>
+          <Button size="sm" variant="ghost" onPress={collapseAll}>
             折叠全部
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-4 shrink-0">
+      <div className="flex shrink-0 gap-4">
         <Card className="flex-1">
-          <CardBody className="py-2 px-4 flex flex-row items-center justify-between">
+          <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">总计</span>
-            <Chip color="primary" variant="flat">
+            <Chip color="accent" variant="soft">
               {stats.total}
             </Chip>
-          </CardBody>
+          </Card.Content>
         </Card>
         <Card className="flex-1">
-          <CardBody className="py-2 px-4 flex flex-row items-center justify-between">
+          <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">非阻塞</span>
-            <Chip color="success" variant="flat">
+            <Chip color="success" variant="soft">
               {stats.nonBlocking}
             </Chip>
-          </CardBody>
+          </Card.Content>
         </Card>
         <Card className="flex-1">
-          <CardBody className="py-2 px-4 flex flex-row items-center justify-between">
+          <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">阻塞</span>
-            <Chip color="warning" variant="flat">
+            <Chip color="warning" variant="soft">
               {stats.blocking}
             </Chip>
-          </CardBody>
+          </Card.Content>
         </Card>
         <Card className="flex-1">
-          <CardBody className="py-2 px-4 flex flex-row items-center justify-between">
+          <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">虚拟线程</span>
-            <Chip color="secondary" variant="flat">
+            <Chip color="default" variant="soft">
               {stats.virtualThread}
             </Chip>
-          </CardBody>
+          </Card.Content>
         </Card>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {isLoading && rawData.length === 0 ? (
-          <div className="flex items-center justify-center min-h-[200px]">
+          <div className="flex min-h-[200px] items-center justify-center">
             <Spinner />
           </div>
         ) : groupedData.length === 0 ? (
-          <div className="text-center text-default-400 py-8">暂无数据</div>
+          <div className="py-8 text-center text-default-400">暂无数据</div>
         ) : (
-          <Table hideHeader aria-label="mappings table">
-            <TableHeader>
-              <TableColumn>分组</TableColumn>
-            </TableHeader>
-            <TableBody loadingContent={<Spinner />} loadingState={loadingState}>
-              {groupedData.map((group) => (
-                <React.Fragment key={group.key}>
-                  <TableRow>
-                    <TableCell>{getGroupHeader(group)}</TableCell>
-                  </TableRow>
-                  {expanded.has(group.key) && (
-                    <TableRow>
-                      <TableCell className="pl-8 bg-zinc-50 dark:bg-zinc-900/30">
-                        <Table aria-label="inner table">
-                          <TableHeader>
-                            <TableColumn>消息ID</TableColumn>
-                            <TableColumn>状态</TableColumn>
-                            <TableColumn>处理器</TableColumn>
-                            <TableColumn>协议版本</TableColumn>
-                            <TableColumn>调度器</TableColumn>
-                            <TableColumn>备注</TableColumn>
-                          </TableHeader>
-                          <TableBody>
-                            {group.handlers.map((handler, idx) => (
-                              <TableRow key={`${group.key}-${idx}`}>
-                                <TableCell>
-                                  <div className="flex items-center gap-1">
-                                    <Chip
-                                      className="font-mono text-xs"
-                                      size="sm"
-                                      variant="flat"
-                                    >
-                                      {handler.messageIdAsHexString}
-                                    </Chip>
-                                    <span className="text-xs text-default-500 whitespace-nowrap">
-                                      {handler.messageIdDesc}
-                                    </span>
-                                  </div>
-                                </TableCell>
-                                <TableCell>
-                                  <StatusChip item={handler} />
-                                </TableCell>
-                                <TableCell>
-                                  <Tooltip content={handler.handler}>
-                                    <span className="cursor-pointer font-mono text-xs">
-                                      {handler.handler.replace(/^.*\./, "")}
-                                    </span>
-                                  </Tooltip>
-                                </TableCell>
-                                <TableCell>
-                                  <VersionChip version={handler.version} />
-                                </TableCell>
-                                <TableCell>
-                                  <span className="text-xs text-default-500 font-mono">
-                                    {handler.scheduler}
+          <div
+            aria-label="mappings table"
+            className="flex flex-col gap-2"
+            role="table"
+          >
+            {loadingState === "loading" && (
+              <div className="flex justify-center py-2">
+                <Spinner />
+              </div>
+            )}
+            {groupedData.map((group) => (
+              <div
+                key={group.key}
+                className="rounded-medium border border-default-200"
+              >
+                <div className="border-b border-default-200 px-3 py-2">
+                  {getGroupHeader(group)}
+                </div>
+                {expanded.has(group.key) && (
+                  <div className="bg-zinc-50 px-2 py-2 dark:bg-zinc-900/30">
+                    <table className="w-full border-collapse text-sm">
+                      <thead>
+                        <tr className="text-left text-default-500">
+                          <th className="p-2 font-medium">消息ID</th>
+                          <th className="p-2 font-medium">状态</th>
+                          <th className="p-2 font-medium">处理器</th>
+                          <th className="p-2 font-medium">协议版本</th>
+                          <th className="p-2 font-medium">调度器</th>
+                          <th className="p-2 font-medium">备注</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {group.handlers.map((handler, idx) => (
+                          <tr
+                            key={`${group.key}-${idx}`}
+                            className="border-t border-default-100"
+                          >
+                            <td className="p-2 align-top">
+                              <div className="flex items-center gap-1">
+                                <Chip
+                                  className="font-mono text-xs"
+                                  size="sm"
+                                  variant="soft"
+                                >
+                                  {handler.messageIdAsHexString}
+                                </Chip>
+                                <span className="whitespace-nowrap text-xs text-default-500">
+                                  {handler.messageIdDesc}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="p-2 align-top">
+                              <StatusChip item={handler} />
+                            </td>
+                            <td className="p-2 align-top">
+                              <Tooltip>
+                                <Tooltip.Trigger>
+                                  <span className="cursor-pointer font-mono text-xs">
+                                    {handler.handler.replace(/^.*\./, "")}
                                   </span>
-                                </TableCell>
-                                <TableCell>
-                                  <span className="text-xs text-default-400">
-                                    {handler.handlerDesc || "-"}
+                                </Tooltip.Trigger>
+                                <Tooltip.Content>
+                                  <span className="max-w-md break-all text-xs">
+                                    {handler.handler}
                                   </span>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </td>
+                            <td className="p-2 align-top">
+                              <VersionChip version={handler.version} />
+                            </td>
+                            <td className="p-2 align-top">
+                              <span className="font-mono text-xs text-default-500">
+                                {handler.scheduler}
+                              </span>
+                            </td>
+                            <td className="p-2 align-top">
+                              <span className="text-xs text-default-400">
+                                {handler.handlerDesc || "-"}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -1,18 +1,18 @@
-import { CardBody, CardHeader } from "@heroui/card";
-import { Chip } from "@heroui/chip";
+import {
+  Accordion,
+  Button,
+  Card,
+  Chip,
+  Link,
+  Popover,
+  Tabs,
+} from "@heroui/react";
 import { useEffect, useState } from "react";
 import {
   EventSourceMessage,
   fetchEventSource,
 } from "@microsoft/fetch-event-source";
 import { useRouteLoaderData } from "react-router-dom";
-import { Spacer } from "@heroui/spacer";
-import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
-import { getKeyValue } from "@heroui/table";
-import { Button } from "@heroui/button";
-import { Link } from "@heroui/link";
-import { Tab, Tabs } from "@heroui/tabs";
-import { Accordion, AccordionItem } from "@heroui/accordion";
 
 import { CountNumber } from "./count-number.tsx";
 import { CountTime } from "./count-time.tsx";
@@ -22,6 +22,23 @@ import { Metrics, ServerInfo } from "@/types";
 import { FaServerIcon } from "@/components/icons.tsx";
 import { ThreadsCharts } from "@/components/dashboard/threads-charts.tsx";
 import { MsgMiniTable } from "@/components/dashboard/msg-mini-table.tsx";
+import { getKeyValue } from "@/utils/get-key-value.ts";
+
+type MetricSlice = {
+  current?: number;
+  max?: number;
+  total?: number;
+  details?: unknown;
+};
+
+const asMetricSlice = (value: unknown): MetricSlice => {
+  if (value != null && typeof value === "object") {
+    return value as MetricSlice;
+  }
+
+  return {};
+};
+
 export const CardBox = () => {
   const { config } = useRouteLoaderData("root") as { config: ServerInfo };
   const [data, setData] = useState<{ time: string; value: Metrics }>({
@@ -102,168 +119,195 @@ export const CardBox = () => {
 
   return (
     <>
-      <div className="gap-4 grid grid-cols-1 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <SpotlightCard>
-          <CardHeader>
+          <Card.Header>
             <b>服务器信息</b>
-          </CardHeader>
-          <CardBody className="overflow-visible p-4 min-h-48">
-            <Tabs fullWidth aria-label="Tabs sizes" variant="light">
-              <Tab key="version" title="版本">
-                <p className="text-default-500 text-xl">
+          </Card.Header>
+          <Card.Content className="min-h-48 overflow-visible p-4">
+            <Tabs className="w-full">
+              <Tabs.ListContainer>
+                <Tabs.List aria-label="服务器信息">
+                  <Tabs.Tab id="version">版本</Tabs.Tab>
+                  <Tabs.Tab id="java">java</Tabs.Tab>
+                  <Tabs.Tab id="os">os</Tabs.Tab>
+                </Tabs.List>
+              </Tabs.ListContainer>
+              <Tabs.Panel className="pt-2" id="version">
+                <p className="text-xl text-muted">
                   {config.dependencies?.xtreamCodec?.version}
                 </p>
-              </Tab>
-              <Tab key="java" title="java">
-                <Accordion variant="light">
-                  <AccordionItem
-                    aria-label="Accordion 1"
-                    title={`version: ${config.java.version}`}
-                  >
-                    <pre>
-                      {JSON.stringify(config.java, null, 2)
-                        .replace(/["{},]/g, "")
-                        .replace(/\n {2}\n/g, "\n")}
-                    </pre>
-                  </AccordionItem>
+              </Tabs.Panel>
+              <Tabs.Panel className="pt-2" id="java">
+                <Accordion>
+                  <Accordion.Item id="java-info">
+                    <Accordion.Heading>
+                      <Accordion.Trigger className="flex w-full items-center justify-between gap-2">
+                        <span>version: {config.java.version}</span>
+                        <Accordion.Indicator />
+                      </Accordion.Trigger>
+                    </Accordion.Heading>
+                    <Accordion.Panel>
+                      <pre>
+                        {JSON.stringify(config.java, null, 2)
+                          .replace(/["{},]/g, "")
+                          .replace(/\n {2}\n/g, "\n")}
+                      </pre>
+                    </Accordion.Panel>
+                  </Accordion.Item>
                 </Accordion>
-              </Tab>
-              <Tab key="os" title="os">
+              </Tabs.Panel>
+              <Tabs.Panel className="pt-2" id="os">
                 {Object.keys(config.os).map((key) => (
                   <p key={key}>
-                    {key}: {getKeyValue(config.os, key)}
+                    {key}: {String(getKeyValue(config.os, key))}
                   </p>
                 ))}
-              </Tab>
+              </Tabs.Panel>
             </Tabs>
-          </CardBody>
+          </Card.Content>
         </SpotlightCard>
         <SpotlightCard>
-          <CardBody className="overflow-visible p-4 min-h-48">
+          <Card.Content className="min-h-48 overflow-visible p-4">
             <p>服务启动时间</p>
-            <p className="text-default-500 text-xl">
-              {config.serverStartupTime}
-            </p>
-            <Spacer y={4} />
+            <p className="text-xl text-muted">{config.serverStartupTime}</p>
+            <div className="h-4" />
             <p>运行时间</p>
-            <div className="text-default-500 text-xl">
+            <div className="text-xl text-muted">
               <CountTime start={new Date(config.serverStartupTime)} />
             </div>
-          </CardBody>
+          </Card.Content>
         </SpotlightCard>
         <SpotlightCard>
-          <CardBody className="overflow-visible p-4  min-h-48">
+          <Card.Content className="min-h-48 overflow-visible p-4">
             <p>订阅者</p>
             <div className="flex justify-between">
-              <p className="text-default-500 text-2xl">
+              <p className="text-2xl text-muted">
                 <CountNumber
-                  end={getKeyValue(
-                    data.value.eventPublisher?.subscriber,
-                    "total",
-                  )}
+                  end={
+                    Number(
+                      getKeyValue(
+                        (data.value.eventPublisher?.subscriber ?? {}) as object,
+                        "total",
+                      ),
+                    ) || 0
+                  }
                 />
               </p>
-              <Button
-                as={Link}
-                color="primary"
-                href={"/subscriber"}
-                variant="light"
+              <Link
+                className="text-sm font-medium text-accent underline-offset-4 hover:underline"
+                href="/subscriber"
               >
                 详情
-              </Button>
+              </Link>
             </div>
-          </CardBody>
+          </Card.Content>
         </SpotlightCard>
       </div>
-      <Spacer y={4} />
-      <div className="gap-4 grid grid-cols-2 sm:grid-cols-4">
+      <div className="h-4" />
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {listCount.map((item, index) => (
           <SpotlightCard key={index} className="min-h-32">
-            <CardHeader className="text-small">
+            <Card.Header className="text-small flex flex-wrap items-center gap-2">
               <b>会话数</b>
-              <Spacer x={4} />
               <FaServerIcon />
-              <Spacer x={1} />
               <Chip
                 color={item.serverRole === "附件服务器" ? "warning" : "success"}
                 size="sm"
+                variant="soft"
               >
                 {item.serverRole === "附件服务器" ? "附件" : "指令"}
               </Chip>
-              <Spacer x={4} />
               <Chip
-                color={item.protocolType === "TCP" ? "primary" : "secondary"}
+                color={item.protocolType === "TCP" ? "accent" : "default"}
                 size="sm"
+                variant="soft"
               >
                 {item.protocolType}
               </Chip>
-            </CardHeader>
-            <CardBody className="overflow-visible p-4">
-              <p className="text-default-500">
+            </Card.Header>
+            <Card.Content className="overflow-visible p-4">
+              <p className="text-muted">
                 当前:{" "}
-                <CountNumber end={getKeyValue(data.value, item.key)?.current} />
+                <CountNumber
+                  end={
+                    asMetricSlice(getKeyValue(data.value, item.key))?.current ??
+                    0
+                  }
+                />
               </p>
-              <b>峰值: {getKeyValue(data.value, item.key)?.max}</b>
-            </CardBody>
+              <b>
+                峰值:{" "}
+                {asMetricSlice(getKeyValue(data.value, item.key)).max ?? "—"}
+              </b>
+            </Card.Content>
           </SpotlightCard>
         ))}
         {listRequest.map((item, index) => (
           <SpotlightCard key={index} className="min-h-32">
-            <CardHeader className="text-small">
+            <Card.Header className="text-small flex flex-wrap items-center gap-2">
               <b>请求数</b>
-              <Spacer x={4} />
               <FaServerIcon />
-              <Spacer x={1} />
               <Chip
                 color={item.serverRole === "附件服务器" ? "warning" : "success"}
                 size="sm"
+                variant="soft"
               >
                 {item.serverRole === "附件服务器" ? "附件" : "指令"}
               </Chip>
-              <Spacer x={4} />
               <Chip
-                color={item.protocolType === "TCP" ? "primary" : "secondary"}
+                color={item.protocolType === "TCP" ? "accent" : "default"}
                 size="sm"
+                variant="soft"
               >
                 {item.protocolType}
               </Chip>
-            </CardHeader>
-            <CardBody className="overflow-visible flex p-4">
-              <div className="flex justify-between items-center">
+            </Card.Header>
+            <Card.Content className="flex overflow-visible p-4">
+              <div className="flex items-center justify-between">
                 <p>总请求数:</p>
-                <CountNumber end={getKeyValue(data.value, item.key)?.total} />
-                <Spacer x={4} />
-                {getKeyValue(data.value, item.key)?.total > 0 && (
-                  <Popover placement="right">
-                    <PopoverTrigger>
-                      <Button color="primary" variant="light">
-                        详情
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
+                <CountNumber
+                  end={
+                    asMetricSlice(getKeyValue(data.value, item.key)).total ?? 0
+                  }
+                />
+                <div className="w-4 shrink-0" />
+                {(asMetricSlice(getKeyValue(data.value, item.key)).total ?? 0) >
+                  0 && (
+                  <Popover>
+                    <Popover.Trigger>
+                      <Button variant="ghost">详情</Button>
+                    </Popover.Trigger>
+                    <Popover.Content className="p-2">
                       <MsgMiniTable
-                        data={getKeyValue(data.value, item.key)?.details}
+                        data={
+                          asMetricSlice(getKeyValue(data.value, item.key))
+                            .details
+                        }
                       />
-                    </PopoverContent>
+                    </Popover.Content>
                   </Popover>
                 )}
               </div>
-            </CardBody>
+            </Card.Content>
           </SpotlightCard>
         ))}
       </div>
-      <Spacer y={4} />
-      <div className="gap-2 grid grid-cols-1">
+      <div className="h-4" />
+      <div className="grid grid-cols-1 gap-2">
         <SpotlightCard>
-          <CardHeader>线程</CardHeader>
-          <CardBody className="h-96">
+          <Card.Header>线程</Card.Header>
+          <Card.Content className="h-96">
             <ThreadsCharts
               data={{
-                date: data.time.slice(11, 19),
-                ...data.value.threads,
+                date: data.time ? data.time.slice(11, 19) : "",
+                ...(typeof data.value.threads === "object" &&
+                data.value.threads !== null
+                  ? data.value.threads
+                  : {}),
               }}
             />
-          </CardBody>
+          </Card.Content>
         </SpotlightCard>
       </div>
     </>

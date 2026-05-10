@@ -7,7 +7,7 @@ import {
 } from "@visx/xychart";
 import { lightTheme, darkTheme, XYChartTheme, Tooltip } from "@visx/xychart";
 import { FC, useEffect, useState } from "react";
-import { ThemeProps, useTheme } from "@heroui/use-theme";
+import { useTheme } from "@heroui/react";
 import { curveLinear } from "@visx/curve";
 
 interface Threads {
@@ -32,13 +32,15 @@ const getDate = (d: Threads) => d.date;
 
 export const LineCharts = ({ width, height, data }: XYChartProps) => {
   const [theme, setTheme] = useState<XYChartTheme>(darkTheme);
-  const WebTheme = useTheme();
+  const { theme: webTheme } = useTheme();
 
   useEffect(() => {
-    if (WebTheme.theme === ThemeProps.LIGHT) {
+    if (webTheme === "light") {
       setTheme(lightTheme);
+    } else {
+      setTheme(darkTheme);
     }
-  }, [WebTheme]);
+  }, [webTheme]);
 
   const config = {
     x: { type: "band", paddingInner: 0.3 } as const,
@@ -48,121 +50,89 @@ export const LineCharts = ({ width, height, data }: XYChartProps) => {
   return (
     <XYChart
       captureEvents={true}
-      height={height}
+      height={Math.min(400, height)}
       theme={theme}
       width={width}
       xScale={config.x}
       yScale={config.y}
     >
-      <AnimatedGrid
-        key="grid-min" // force animate on update
-        animationTrajectory="min"
-        columns={false}
-        numTicks={4}
-        rows={true}
+      <AnimatedGrid columns={false} numTicks={4} />
+      <AnimatedAxis orientation="bottom" tickFormat={getDate} />
+      <AnimatedAxis numTicks={4} orientation="left" />
+      <AnimatedLineSeries
+        curve={curveLinear}
+        data={data}
+        dataKey="started"
+        xAccessor={getDate}
+        yAccessor={(d) => d.started}
       />
-      <>
-        <AnimatedLineSeries
-          curve={curveLinear}
-          data={data}
-          dataKey="started"
-          xAccessor={getDate}
-          yAccessor={(d: Threads) => d.started}
-        />
-        <AnimatedLineSeries
-          curve={curveLinear}
-          data={data}
-          dataKey="live"
-          xAccessor={getDate}
-          yAccessor={(d: Threads) => d.live}
-        />
-        <AnimatedLineSeries
-          curve={curveLinear}
-          data={data}
-          dataKey="daemon"
-          xAccessor={getDate}
-          yAccessor={(d: Threads) => d.daemon}
-        />
-        <AnimatedLineSeries
-          curve={curveLinear}
-          data={data}
-          dataKey="peak"
-          xAccessor={getDate}
-          yAccessor={(d: Threads) => d.peak}
-        />
-      </>
-      <AnimatedAxis
-        key="time-axis-min-false"
-        animationTrajectory="min"
-        numTicks={4}
-        orientation="bottom"
+      <AnimatedLineSeries
+        curve={curveLinear}
+        data={data}
+        dataKey="peak"
+        xAccessor={getDate}
+        yAccessor={(d) => d.peak}
       />
-      <AnimatedAxis
-        key="temp-axis-min-false"
-        animationTrajectory="min"
-        numTicks={4}
-        orientation="left"
+      <AnimatedLineSeries
+        curve={curveLinear}
+        data={data}
+        dataKey="live"
+        xAccessor={getDate}
+        yAccessor={(d) => d.live}
       />
-      <Tooltip<Threads>
-        renderTooltip={({ tooltipData, colorScale }) => (
-          <>
-            {tooltipData?.nearestDatum?.datum.date || "No date"}
-            <br />
-            <br />
-            {Object.keys(tooltipData?.datumByKey ?? {})
-              .filter((type) => type)
-              .map((type) => {
-                const count =
-                  tooltipData?.nearestDatum?.datum[type as keyof Threads];
+      <AnimatedLineSeries
+        curve={curveLinear}
+        data={data}
+        dataKey="daemon"
+        xAccessor={getDate}
+        yAccessor={(d) => d.daemon}
+      />
+      <Tooltip
+        detectBounds
+        showDatumGlyph
+        showSeriesGlyphs
+        snapTooltipToDatumX
+        snapTooltipToDatumY
+        renderTooltip={({ tooltipData }) => {
+          const datum = tooltipData?.nearestDatum?.datum as Threads | undefined;
+          const seriesKey = tooltipData?.nearestDatum?.key as
+            | keyof Threads
+            | undefined;
 
-                return (
-                  <div key={type}>
-                    <em
-                      style={{
-                        color: colorScale?.(type),
-                        textDecoration:
-                          tooltipData?.nearestDatum?.key === type
-                            ? "underline"
-                            : undefined,
-                      }}
-                    >
-                      {type}
-                    </em>{" "}
-                    {count == null || Number.isNaN(count) ? "–" : `${count}`}
-                  </div>
-                );
-              })}
-          </>
-        )}
-        showDatumGlyph={true}
-        showHorizontalCrosshair={true}
-        showSeriesGlyphs={true}
-        showVerticalCrosshair={true}
-        snapTooltipToDatumX={true}
-        snapTooltipToDatumY={true}
+          return (
+            <div>
+              <div>{datum?.date}</div>
+              {seriesKey && datum && (
+                <div>
+                  <strong>{String(seriesKey)}</strong>{" "}
+                  {datum[seriesKey] as number}
+                </div>
+              )}
+            </div>
+          );
+        }}
       />
     </XYChart>
   );
 };
 
-export const ThreadsCharts: FC<chartProps> = ({ data, maxLength = 500 }) => {
-  const [chartData, setChartData] = useState<Threads[]>([]);
+export const ThreadsCharts: FC<chartProps> = ({ data, maxLength = 20 }) => {
+  const [threads, setThreads] = useState<Threads[]>([]);
 
   useEffect(() => {
-    if (!data) return;
-    setChartData((prevState) => {
-      return prevState.toSpliced(
-        -1,
-        prevState.length > maxLength ? 1 : 0,
-        data,
-      );
+    setThreads((pre) => {
+      if (pre.length > maxLength) {
+        pre.shift();
+      }
+
+      return pre.concat([data]);
     });
-  }, [data]);
+  }, [data, maxLength]);
 
   return (
     <ParentSize>
       {({ width, height }) => (
-        <LineCharts data={chartData} height={height} width={width} />
+        <LineCharts data={threads} height={height} width={width} />
       )}
     </ParentSize>
   );

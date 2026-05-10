@@ -1,16 +1,7 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/table";
-import { Spinner } from "@heroui/spinner";
-import { Pagination } from "@heroui/pagination";
+import { Spinner, Table, Tooltip } from "@heroui/react";
 import React, { FC, useMemo } from "react";
-import { Tooltip } from "@heroui/tooltip";
 
+import { PagePagination } from "@/components/page-pagination.tsx";
 import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
 
@@ -26,12 +17,19 @@ const RenderCell: FC<CellProps> = ({ item, columnKey }) => {
     case "interestedEvents":
     case "metadata":
       return (
-        <Tooltip content={<pre>{JSON.stringify(cellValue, null, 2)}</pre>}>
-          <p className="line-clamp-1">{JSON.stringify(cellValue)}</p>
+        <Tooltip>
+          <Tooltip.Trigger>
+            <p className="line-clamp-1">{JSON.stringify(cellValue)}</p>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
+            <pre className="max-w-md whitespace-pre-wrap text-xs">
+              {JSON.stringify(cellValue, null, 2)}
+            </pre>
+          </Tooltip.Content>
         </Tooltip>
       );
     case "createdAt":
-      return cellValue.slice(0, -4);
+      return String(cellValue).slice(0, -4);
     default:
       return cellValue;
   }
@@ -54,61 +52,61 @@ export const SubscribePage = () => {
   const bottomContent = useMemo(() => {
     return (
       pages > 0 && (
-        <div className="flex w-full justify-center">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
+        <div className="flex w-full justify-center py-4">
+          <PagePagination page={page} total={pages} onChange={setPage} />
         </div>
       )
     );
-  }, [page, pages]);
+  }, [page, pages, setPage]);
 
   const topContent = useMemo(() => {
-    // TODO 筛选
     return <p>总数： {tableData?.total}</p>;
   }, [tableData?.total]);
 
+  const items = tableData?.data ?? [];
+
+  if (loadingState === "loading" && items.length === 0) {
+    return (
+      <div className="flex flex-col gap-4">
+        {topContent}
+        <div className="flex justify-center p-12">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Table
-      isHeaderSticky
-      aria-label="Subscribe"
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: "max-h-[80vh]",
-      }}
-      topContent={topContent}
-      topContentPlacement="outside"
-    >
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn key={column.key} width={column.width as `${number}%`}>
-            {column.label}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody
-        emptyContent={"暂无数据"}
-        items={tableData?.data ?? []}
-        loadingContent={<Spinner />}
-        loadingState={loadingState}
-      >
-        {(item) => (
-          <TableRow key={item?.id}>
-            {(columnKey) => (
-              <TableCell>
-                <RenderCell columnKey={columnKey} item={item} />
-              </TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div className="flex flex-col gap-2">
+      {topContent}
+      <Table.Root className="w-full">
+        <Table.ScrollContainer className="max-h-[80vh]">
+          <Table.Content aria-label="Subscribe">
+            <Table.Header>
+              {columns.map((column) => (
+                <Table.Column
+                  key={String(column.key)}
+                  isRowHeader={column.key === "id"}
+                >
+                  {column.label}
+                </Table.Column>
+              ))}
+            </Table.Header>
+            <Table.Body items={items}>
+              {(item) => (
+                <Table.Row id={String(item?.id)}>
+                  {columns.map((column) => (
+                    <Table.Cell key={String(column.key)}>
+                      <RenderCell columnKey={column.key} item={item} />
+                    </Table.Cell>
+                  ))}
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
+      </Table.Root>
+      {bottomContent}
+    </div>
   );
 };

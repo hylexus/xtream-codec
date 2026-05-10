@@ -4,7 +4,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import { visualizer } from "rollup-plugin-visualizer";
 import tailwindcss from "@tailwindcss/vite";
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tsconfigPaths(), visualizer(), tailwindcss()],
   base: process.env.VITE_BASE_PATH || "/dashboard-ui/",
@@ -23,12 +23,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (
-            ["@heroui/accordion", "@heroui/avatar"].some((e) => id.includes(e))
-          ) {
-            return "vendors1";
-          } else if (id.includes("@visx/")) {
-            return "vendors2";
+          if (id.includes("@heroui/react")) {
+            return "heroui";
+          }
+          if (id.includes("@visx/")) {
+            return "visx";
           }
         },
       },

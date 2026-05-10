@@ -3,7 +3,7 @@ import {
   EventSourceMessage,
   fetchEventSource,
 } from "@microsoft/fetch-event-source";
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Card } from "@heroui/react";
 
 import { Thread } from "@/types";
 import { JsonPreview } from "@/components/json-preview.tsx";
@@ -48,14 +48,14 @@ export const ThreadsPage = () => {
   }, []);
 
   return (
-    <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {threads.map((thread: Thread) => (
         <Card key={thread.name}>
-          <CardHeader>{thread.name}</CardHeader>
-          <CardBody>
+          <Card.Header>{thread.name}</Card.Header>
+          <Card.Content>
             <p className="mb-2">time: {thread.time.slice(0, -4)}</p>
             <JsonPreview json={thread.value} page="threads" />
-          </CardBody>
+          </Card.Content>
         </Card>
       ))}
     </div>

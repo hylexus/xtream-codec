@@ -1,21 +1,16 @@
-import type { SharedSelection } from "@heroui/system";
-
 import {
+  Avatar,
+  Button,
+  Card,
   Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerHeader,
-} from "@heroui/drawer";
-import { Input } from "@heroui/input";
-import { Spacer } from "@heroui/spacer";
-import {
   Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
-import { Button } from "@heroui/button";
-import { ScrollShadow } from "@heroui/scroll-shadow";
+  Input,
+  Label,
+  ScrollShadow,
+  type Selection,
+  TextField,
+  useOverlayState,
+} from "@heroui/react";
 import {
   Dispatch,
   FC,
@@ -29,9 +24,7 @@ import {
   EventSourceMessage,
   fetchEventSource,
 } from "@microsoft/fetch-event-source";
-import { Card, CardBody } from "@heroui/card";
 import clsx from "clsx";
-import { Avatar } from "@heroui/avatar";
 
 import {
   FaChevronDownIcon,
@@ -84,22 +77,30 @@ const Message: FC<MessageProps> = ({ item, className }) => {
   ].includes(Number(item.type)) ? (
     <div className="flex gap-3">
       <div className="w-12">
-        <Avatar icon={<FaRobotIcon className="text-primary" />} />
+        <Avatar>
+          <Avatar.Fallback>
+            <FaRobotIcon className="text-primary" />
+          </Avatar.Fallback>
+        </Avatar>
       </div>
-      <Card className=" flex-grow-0 w-full">
-        <CardBody className="text-center">
+      <Card className="w-full flex-grow-0">
+        <Card.Content className="text-center">
           <p className="text-primary line-clamp-2 text-sm">{`Session${EventType.BEFORE_SESSION_CLOSED ? " closed" : " opened"} at: ${item.eventTime} remoteAddress: ${item.remoteAddress} reason: ${item.reason}`}</p>
-        </CardBody>
+        </Card.Content>
       </Card>
       <div className="w-12" />
     </div>
   ) : (
     <div className={clsx(className, "flex gap-3")}>
       <div className="w-12">
-        {rowDisplay.name === "C" && <Avatar icon={rowDisplay.avatar} />}
+        {rowDisplay.name === "C" && (
+          <Avatar>
+            <Avatar.Fallback>{rowDisplay.avatar}</Avatar.Fallback>
+          </Avatar>
+        )}
       </div>
-      <Card className={clsx("flex-grow-0 w-full", rowDisplay.bg)}>
-        <CardBody>
+      <Card className={clsx("w-full flex-grow-0", rowDisplay.bg)}>
+        <Card.Content>
           {Object.keys(item)
             .filter((k) => ["messageId", "hexString", "eventTime"].includes(k))
             .map((e, i) => {
@@ -113,10 +114,14 @@ const Message: FC<MessageProps> = ({ item, className }) => {
                 >{`${eventKeyDesc(e)}: ${e === "messageId" ? "0x" + item[e as keyof Event].toString(16).padStart(4, "0") + messageDescText : item[e as keyof Event]}`}</p>
               );
             })}
-        </CardBody>
+        </Card.Content>
       </Card>
       <div className="w-12">
-        {rowDisplay.name === "S" && <Avatar icon={rowDisplay.avatar} />}
+        {rowDisplay.name === "S" && (
+          <Avatar>
+            <Avatar.Fallback>{rowDisplay.avatar}</Avatar.Fallback>
+          </Avatar>
+        )}
       </div>
     </div>
   );
@@ -133,8 +138,12 @@ export const SessionMonitor: FC<SessionMonitorProps> = ({
   setIsOpen,
 }) => {
   const [max, setMax] = useState(SESSION_MAX_LENGTH);
-  const [selected, setSelected] = useState<SharedSelection>("all");
+  const [selected, setSelected] = useState<Selection>("all");
   const [linkData, setLinkData] = useState<Event[]>([]);
+  const drawerState = useOverlayState({
+    isOpen,
+    onOpenChange: setIsOpen,
+  });
 
   useEffect(() => {
     if (!isOpen || !row?.terminalId) {
@@ -169,7 +178,7 @@ export const SessionMonitor: FC<SessionMonitorProps> = ({
     return () => {
       ctrl.abort();
     };
-  }, [isOpen]);
+  }, [isOpen, row?.terminalId, max]);
 
   useEffect(() => {
     setLinkData((pre) => {
@@ -190,9 +199,6 @@ export const SessionMonitor: FC<SessionMonitorProps> = ({
       inline: "center",
     });
   };
-  const onClose = () => {
-    setIsOpen(false);
-  };
   const eventList = [];
 
   for (const key in EventType) {
@@ -201,78 +207,83 @@ export const SessionMonitor: FC<SessionMonitorProps> = ({
     }
   }
   const filteredLinkData = useMemo(() => {
-    if (
-      selected === "all" ||
-      Array.from(selected).length === eventList.length
-    ) {
+    if (selected === "all") {
+      return linkData;
+    }
+    const keys = selected as Set<React.Key>;
+
+    if (keys.size === eventList.length) {
       return linkData;
     }
 
-    return linkData.filter((e) => Array.from(selected).includes(e.type)) || [];
-  }, [linkData, selected]);
+    return linkData.filter((e) => keys.has(String(e.type))) || [];
+  }, [linkData, selected, eventList.length]);
 
   useEffect(() => {
     scrollToIndex();
   }, [filteredLinkData, isOpen]);
 
   return (
-    <Drawer
-      backdrop="blur"
-      isOpen={isOpen}
-      scrollBehavior="inside"
-      size="5xl"
-      onClose={onClose}
-    >
-      <DrawerContent>
-        <>
-          <DrawerHeader className="flex justify-between gap-1">
+    <Drawer state={drawerState}>
+      <Drawer.Backdrop isDismissable variant="blur" />
+      <Drawer.Content className="max-w-[min(100vw,56rem)]" placement="right">
+        <Drawer.Dialog>
+          <Drawer.Header className="flex justify-between gap-1">
             <div className={subtitle()}>terminalId: {row?.terminalId}</div>
-          </DrawerHeader>
-          <DrawerBody>
-            <div className=" flex items-center">
-              <Input
-                className="w-1/6"
-                label="Max"
-                labelPlacement="outside-left"
-                type="number"
+          </Drawer.Header>
+          <Drawer.Body>
+            <div className="flex items-center gap-4">
+              <TextField
+                className="w-1/6 min-w-32"
                 value={max}
-                onValueChange={setMax}
-              />
-              <Spacer x={4} />
+                onChange={setMax}
+              >
+                <Label>Max</Label>
+                <Input type="number" />
+              </TextField>
               <Dropdown>
-                <DropdownTrigger className="hidden sm:flex">
-                  <Button
-                    endContent={<FaChevronDownIcon className="text-small" />}
-                    variant="flat"
-                  >
-                    Event
+                <Dropdown.Trigger className="hidden sm:flex">
+                  <Button variant="secondary">
+                    <span className="flex items-center gap-2">
+                      Event
+                      <FaChevronDownIcon className="text-small" />
+                    </span>
                   </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  disallowEmptySelection
-                  aria-label="Event"
-                  closeOnSelect={false}
-                  selectedKeys={selected}
-                  selectionMode="multiple"
-                  onSelectionChange={setSelected}
-                >
-                  {eventList.map((event) => (
-                    <DropdownItem key={event.key} className="capitalize">
-                      {event.name}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
+                </Dropdown.Trigger>
+                <Dropdown.Popover>
+                  <Dropdown.Menu
+                    disallowEmptySelection
+                    aria-label="Event"
+                    selectedKeys={selected}
+                    selectionMode="multiple"
+                    onSelectionChange={setSelected}
+                  >
+                    {eventList.map((event) => (
+                      <Dropdown.Item
+                        key={event.key}
+                        className="capitalize"
+                        id={event.key}
+                        textValue={event.name}
+                      >
+                        {event.name}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown.Popover>
               </Dropdown>
             </div>
-            <ScrollShadow hideScrollBar className="flex flex-col gap-4 px-1">
+            <ScrollShadow
+              hideScrollBar
+              className="mt-4 flex flex-col gap-4 px-1"
+            >
               {filteredLinkData?.map((item: any, index: number) => (
                 <Message key={index} className="message-card" item={item} />
               ))}
               <div ref={listBottomRef} />
             </ScrollShadow>
-          </DrawerBody>
-        </>
-      </DrawerContent>
+          </Drawer.Body>
+        </Drawer.Dialog>
+      </Drawer.Content>
     </Drawer>
   );
 };

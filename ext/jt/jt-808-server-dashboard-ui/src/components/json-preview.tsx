@@ -113,10 +113,10 @@ export const JsonPreview: FC<JSONPreviewProps> = ({ json, page }) => {
       theme={{
         token: {
           // @ts-ignore
-          fontSize: "var(--xc-font-size-medium)",
-          colorBgContainer: "var(--xc-background)",
-          titleHeight: "var(--xc-line-height-large)",
-          colorText: "var(--xc-content1)",
+          fontSize: "0.875rem",
+          colorBgContainer: "var(--background)",
+          titleHeight: "1.5rem",
+          colorText: "var(--foreground)",
         },
       }}
     >

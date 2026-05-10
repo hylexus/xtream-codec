@@ -1,19 +1,9 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/table";
-import { Spinner } from "@heroui/spinner";
-import { Pagination } from "@heroui/pagination";
+import { Chip, Spinner, Table, Tooltip } from "@heroui/react";
 import React, { FC, useMemo, useState } from "react";
-import { Tooltip } from "@heroui/tooltip";
-import { Chip } from "@heroui/chip";
 
 import { SessionMonitor } from "./monitor.tsx";
 
+import { PagePagination } from "@/components/page-pagination.tsx";
 import { usePageList } from "@/hooks/use-page-list.ts";
 import { Session, SessionType } from "@/types";
 import { request } from "@/utils/request.ts";
@@ -42,27 +32,53 @@ const SessionCell: FC<CellProps> = ({
     case "serverType":
       return ServerMap[cellValue as keyof typeof ServerMap];
     case "protocolVersion":
-      return cellValue.replace("VERSION_", "");
+      return String(cellValue).replace("VERSION_", "");
     case "protocolType":
       return (
-        <Chip color="primary" size="sm">
+        <Chip color="accent" size="sm">
           {cellValue}
         </Chip>
       );
     case "operation":
       return (
         <div className="relative flex items-center gap-2">
-          <Tooltip content="链路监控">
-            <FaEyeIcon
-              className="text-lg text-default-400 cursor-pointer active:opacity-50"
-              onClick={() => handleMonitor(session)}
-            />
+          <Tooltip>
+            <Tooltip.Trigger>
+              <span
+                className="inline-flex cursor-pointer text-lg text-default-400 active:opacity-50"
+                role="button"
+                tabIndex={0}
+                onClick={() => handleMonitor(session)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleMonitor(session);
+                  }
+                }}
+              >
+                <FaEyeIcon />
+              </span>
+            </Tooltip.Trigger>
+            <Tooltip.Content>链路监控</Tooltip.Content>
           </Tooltip>
-          <Tooltip content="删除会话">
-            <FaTrashIcon
-              className="text-lg text-danger cursor-pointer active:opacity-50"
-              onClick={() => handleDel(session)}
-            />
+          <Tooltip>
+            <Tooltip.Trigger>
+              <span
+                className="inline-flex cursor-pointer text-lg text-danger active:opacity-50"
+                role="button"
+                tabIndex={0}
+                onClick={() => handleDel(session)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleDel(session);
+                  }
+                }}
+              >
+                <FaTrashIcon />
+              </span>
+            </Tooltip.Trigger>
+            <Tooltip.Content>删除会话</Tooltip.Content>
           </Tooltip>
         </div>
       );
@@ -87,7 +103,6 @@ export const SessionTable: FC<SessionTableProps> = ({ type }) => {
   const columns = [
     { key: "id", label: "会话ID" },
     { key: "terminalId", label: "终端手机号" },
-    // { key: "serverType", label: "服务类型" },
     { key: "protocolVersion", label: "808协议版本" },
     { key: "protocolType", label: "协议" },
     { key: "creationTime", label: "创建时间" },
@@ -110,83 +125,81 @@ export const SessionTable: FC<SessionTableProps> = ({ type }) => {
         await mutate();
       }
     } catch (_e) {
-      // TODO
       console.error(_e);
     }
   };
   const bottomContent = useMemo(() => {
     return (
       pages > 0 && (
-        <div className="flex w-full justify-center">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
+        <div className="flex w-full justify-center py-4">
+          <PagePagination page={page} total={pages} onChange={setPage} />
         </div>
       )
     );
-  }, [page, pages]);
+  }, [page, pages, setPage]);
 
   const topContent = useMemo(() => {
-    // TODO 筛选
     return <p>总数： {tableData?.total}</p>;
   }, [tableData?.total]);
 
+  const items = tableData?.data ?? [];
+
+  if (loadingState === "loading" && items.length === 0) {
+    return (
+      <>
+        <div className="flex flex-col gap-4">
+          {topContent}
+          <div className="flex justify-center p-12">
+            <Spinner />
+          </div>
+        </div>
+        <SessionMonitor
+          isOpen={isOpen}
+          row={selectedRow}
+          setIsOpen={setIsOpen}
+        />
+      </>
+    );
+  }
+
   return (
     <>
-      <Table
-        aria-label="Example table with dynamic content"
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        topContent={topContent}
-        topContentPlacement="outside"
-      >
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              align={
-                [
-                  "serverType",
-                  "protocolVersion",
-                  "protocolType",
-                  "operation",
-                ].includes(column.key)
-                  ? "center"
-                  : "start"
-              }
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          emptyContent={"暂无数据"}
-          items={tableData?.data ?? []}
-          loadingContent={<Spinner />}
-          loadingState={loadingState}
-        >
-          {(item) => (
-            <TableRow key={item?.id}>
-              {(columnKey) => (
-                <TableCell>
-                  <SessionCell
-                    columnKey={columnKey}
-                    handleDel={handleDel}
-                    handleMonitor={handleMonitor}
-                    session={item}
-                  />
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <div className="flex flex-col gap-2">
+        {topContent}
+        <Table.Root className="w-full">
+          <Table.ScrollContainer>
+            <Table.Content aria-label="Example table with dynamic content">
+              <Table.Header>
+                {columns.map((column) => (
+                  <Table.Column
+                    key={String(column.key)}
+                    isRowHeader={column.key === "id"}
+                  >
+                    {column.label}
+                  </Table.Column>
+                ))}
+              </Table.Header>
+              <Table.Body items={items}>
+                {(item) => (
+                  <Table.Row id={String(item?.id)}>
+                    {columns.map((column) => (
+                      <Table.Cell key={String(column.key)}>
+                        <SessionCell
+                          columnKey={column.key}
+                          handleDel={handleDel}
+                          handleMonitor={handleMonitor}
+                          session={item}
+                        />
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table.Root>
+        {bottomContent}
+      </div>
       <SessionMonitor isOpen={isOpen} row={selectedRow} setIsOpen={setIsOpen} />
     </>
   );

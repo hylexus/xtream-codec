@@ -1,11 +1,15 @@
-import { Spinner } from "@heroui/spinner";
-import { Pagination } from "@heroui/pagination";
-import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Card, CardBody } from "@heroui/card";
+import {
+  Button,
+  Card,
+  Chip,
+  Input,
+  Label,
+  Spinner,
+  TextField,
+} from "@heroui/react";
 import { FC, useCallback, useMemo, useState } from "react";
 
+import { PagePagination } from "@/components/page-pagination.tsx";
 import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
 
@@ -97,10 +101,10 @@ const CodecCard: FC<{ item: Dic; idx: number }> = ({ item, idx }) => {
 
   return (
     <Card key={`${item.key}-${idx}`} className="mb-2 flex-shrink-0">
-      <CardBody className="p-0">
+      <Card.Content className="p-0">
         <Button
-          className="w-full justify-between h-auto min-h-10 py-2 px-3 rounded-none"
-          variant="flat"
+          className="h-auto min-h-10 w-full justify-between rounded-none px-3 py-2"
+          variant="secondary"
           onPress={() => setExpanded(!expanded)}
         >
           <div className="flex items-center gap-2">
@@ -111,46 +115,46 @@ const CodecCard: FC<{ item: Dic; idx: number }> = ({ item, idx }) => {
             </span>
             <span className="text-xs font-mono font-semibold">{item.key}</span>
           </div>
-          <div className="flex gap-1 flex-wrap">
-            <Chip color="primary" size="sm" variant="flat">
+          <div className="flex flex-wrap gap-1">
+            <Chip color="accent" size="sm" variant="soft">
               {getSimpleClassName(item.rawClassName)}
             </Chip>
             {item.isBuiltin && (
-              <Chip color="success" size="sm" variant="flat">
+              <Chip color="success" size="sm" variant="soft">
                 内置
               </Chip>
             )}
             {item.signedness !== "NONE" && (
               <Chip
-                color={item.signedness === "SIGNED" ? "secondary" : "primary"}
+                color={item.signedness === "SIGNED" ? "default" : "accent"}
                 size="sm"
-                variant="flat"
+                variant="soft"
               >
                 {item.signedness === "SIGNED" ? "有符号" : "无符号"}
               </Chip>
             )}
             {item.endian !== "NONE" && (
               <Chip
-                color={item.endian === "BIG_ENDIAN" ? "primary" : "secondary"}
+                color={item.endian === "BIG_ENDIAN" ? "accent" : "default"}
                 size="sm"
-                variant="flat"
+                variant="soft"
               >
                 {item.endian === "BIG_ENDIAN" ? "大端" : "小端"}
               </Chip>
             )}
             {item.charset && item.charset !== "NONE" && (
-              <Chip color="secondary" size="sm" variant="flat">
+              <Chip color="default" size="sm" variant="soft">
                 {item.charset}
               </Chip>
             )}
           </div>
         </Button>
         {expanded && (
-          <div className="p-2 bg-zinc-50 dark:bg-zinc-900/30 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="border-t border-zinc-200 bg-zinc-50 p-2 dark:border-zinc-700 dark:bg-zinc-900/30">
             <CodecDetail item={item} />
           </div>
         )}
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 };
@@ -200,36 +204,38 @@ export const CodecMetadataPage = () => {
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-wrap gap-3 items-center mb-4 shrink-0">
-        <Input
+        <TextField
           className="w-40"
-          placeholder="输入 key"
-          size="sm"
           value={filterKey}
-          onValueChange={onFilterChange(setFilterKey)}
-        />
-        <Input
+          onChange={onFilterChange(setFilterKey)}
+        >
+          <Label className="sr-only">key</Label>
+          <Input placeholder="输入 key" />
+        </TextField>
+        <TextField
           className="w-52"
-          placeholder="输入实现类"
-          size="sm"
           value={filterClassName}
-          onValueChange={onFilterChange(setFilterClassName)}
-        />
-        <Input
+          onChange={onFilterChange(setFilterClassName)}
+        >
+          <Label className="sr-only">实现类</Label>
+          <Input placeholder="输入实现类" />
+        </TextField>
+        <TextField
           className="w-32"
-          placeholder="输入字符集"
-          size="sm"
           value={filterCharset}
-          onValueChange={onFilterChange(setFilterCharset)}
-        />
+          onChange={onFilterChange(setFilterCharset)}
+        >
+          <Label className="sr-only">字符集</Label>
+          <Input placeholder="输入字符集" />
+        </TextField>
         <div className="flex items-center gap-1">
           <span className="text-xs text-default-500">符号:</span>
           <div className="flex">
             {signednessOptions.map((o) => (
               <Button
                 key={o.key}
-                color={filterSignedness === o.key ? "primary" : "default"}
                 size="sm"
-                variant={filterSignedness === o.key ? "flat" : "light"}
+                variant={filterSignedness === o.key ? "primary" : "ghost"}
                 onPress={() => onFilterChange(setFilterSignedness)(o.key)}
               >
                 {o.label}
@@ -243,9 +249,8 @@ export const CodecMetadataPage = () => {
             {endianOptions.map((o) => (
               <Button
                 key={o.key}
-                color={filterEndian === o.key ? "primary" : "default"}
                 size="sm"
-                variant={filterEndian === o.key ? "flat" : "light"}
+                variant={filterEndian === o.key ? "primary" : "ghost"}
                 onPress={() => onFilterChange(setFilterEndian)(o.key)}
               >
                 {o.label}
@@ -259,9 +264,8 @@ export const CodecMetadataPage = () => {
             {builtinOptions.map((o) => (
               <Button
                 key={o.key}
-                color={filterBuiltin === o.key ? "primary" : "default"}
                 size="sm"
-                variant={filterBuiltin === o.key ? "flat" : "light"}
+                variant={filterBuiltin === o.key ? "primary" : "ghost"}
                 onPress={() => onFilterChange(setFilterBuiltin)(o.key)}
               >
                 {o.label}
@@ -305,15 +309,7 @@ export const CodecMetadataPage = () => {
           总数：{tableData?.total ?? 0}
         </p>
         {pages > 0 && (
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
+          <PagePagination page={page} total={pages} onChange={setPage} />
         )}
       </div>
     </div>
