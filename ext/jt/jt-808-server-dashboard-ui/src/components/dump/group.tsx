@@ -1,9 +1,9 @@
-import { Accordion, Chip, useTheme } from "@heroui/react";
+import { Accordion, Chip } from "@heroui/react";
 import {
   EventSourceMessage,
   fetchEventSource,
 } from "@microsoft/fetch-event-source";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Axis } from "@visx/axis";
 import { timeFormat } from "@visx/vendor/d3-time-format";
 import { coerceNumber, scaleUtc } from "@visx/scale";
@@ -26,11 +26,6 @@ const maxPixelsPerSeconds = 15;
 export const DumpGroup = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [timeValues, setTimeValues] = useState<NumberValue[]>([]);
-  const { theme } = useTheme();
-  const strokeColor = useMemo(
-    () => (theme === "dark" ? "#e4e4e7" : "#18181b"),
-    [theme],
-  );
   const calcTimeValues = (time: string) => {
     const dateTime = +new Date(time.slice(0, -4));
     let _tempTimes = [...timeValues];
@@ -145,7 +140,7 @@ export const DumpGroup = () => {
             const axisWidth = width - 128 - 40 + 10;
 
             return (
-              <svg height={height} width={axisWidth}>
+              <svg className="text-muted" height={height} width={axisWidth}>
                 <Axis
                   hideAxisLine
                   left={40}
@@ -159,11 +154,11 @@ export const DumpGroup = () => {
                   })}
                   tickFormat={(v: NumberValue) => format(v as Date)}
                   tickLabelProps={{
-                    fill: strokeColor,
+                    fill: "currentColor",
                     fontSize: 12,
                     textAnchor: "middle",
                   }}
-                  tickStroke={strokeColor}
+                  tickStroke="currentColor"
                 />
               </svg>
             );
@@ -175,7 +170,9 @@ export const DumpGroup = () => {
           <Accordion.Item key={group.name} id={group.name}>
             <Accordion.Heading>
               <Accordion.Trigger className="flex w-full items-center justify-between gap-2">
-                <h2>{group.name}</h2>
+                <h2 className="text-lg font-semibold text-foreground">
+                  {group.name}
+                </h2>
                 <div className="flex items-center gap-2">
                   <Chip size="sm" variant="soft">
                     {group.threads.length}
@@ -195,7 +192,7 @@ export const DumpGroup = () => {
                     <Accordion.Heading>
                       <Accordion.Trigger className="flex w-full items-stretch gap-2">
                         <div className="flex min-w-0 flex-1">
-                          <div className="line-clamp-1 w-40 shrink-0">
+                          <div className="w-40 shrink-0 truncate font-medium text-foreground">
                             {thread.threadName}
                           </div>
                           <div className="min-w-0 flex-1">
@@ -226,18 +223,16 @@ export const DumpGroup = () => {
                       </Accordion.Trigger>
                     </Accordion.Heading>
                     <Accordion.Panel>
-                      <ul>
-                        <li>
-                          <span>ID: </span>
+                      <ul className="space-y-2 text-sm">
+                        <li className="text-foreground">
+                          <span className="text-muted">ID: </span>
                           <span>{thread.threadId}</span>
                         </li>
-                        <li>
-                          <span>StackTrance: </span>
-                          <span>
-                            <pre>
-                              {JSON.stringify(thread.stackTrace, null, 2)}
-                            </pre>
-                          </span>
+                        <li className="text-foreground">
+                          <span className="text-muted">Stack trace: </span>
+                          <pre className="mt-1 overflow-x-auto rounded-md border border-border bg-background-tertiary/80 p-3 font-mono text-xs">
+                            {JSON.stringify(thread.stackTrace, null, 2)}
+                          </pre>
                         </li>
                       </ul>
                     </Accordion.Panel>

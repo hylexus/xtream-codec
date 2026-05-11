@@ -35,6 +35,17 @@ const RenderCell: FC<CellProps> = ({ item, columnKey }) => {
   }
 };
 
+const pageIntro = (
+  <div>
+    <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+      事件订阅者
+    </h2>
+    <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+      事件发布器上的订阅方列表及元数据。
+    </p>
+  </div>
+);
+
 export const SubscribePage = () => {
   const path = "event-publisher/subscribers";
   const { setPage, page, pages, tableData, isLoading } = usePageList(path, 10);
@@ -60,53 +71,61 @@ export const SubscribePage = () => {
   }, [page, pages, setPage]);
 
   const topContent = useMemo(() => {
-    return <p>总数： {tableData?.total}</p>;
+    return (
+      <p className="text-sm text-muted">总数：{tableData?.total ?? "—"}</p>
+    );
   }, [tableData?.total]);
 
   const items = tableData?.data ?? [];
 
   if (loadingState === "loading" && items.length === 0) {
     return (
-      <div className="flex flex-col gap-4">
-        {topContent}
-        <div className="flex justify-center p-12">
-          <Spinner />
+      <div className="flex flex-col gap-6">
+        {pageIntro}
+        <div className="flex flex-col gap-4">
+          {topContent}
+          <div className="flex justify-center p-12">
+            <Spinner />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {topContent}
-      <Table.Root className="w-full">
-        <Table.ScrollContainer className="max-h-[80vh]">
-          <Table.Content aria-label="Subscribe">
-            <Table.Header>
-              {columns.map((column) => (
-                <Table.Column
-                  key={String(column.key)}
-                  isRowHeader={column.key === "id"}
-                >
-                  {column.label}
-                </Table.Column>
-              ))}
-            </Table.Header>
-            <Table.Body items={items}>
-              {(item) => (
-                <Table.Row id={String(item?.id)}>
-                  {columns.map((column) => (
-                    <Table.Cell key={String(column.key)}>
-                      <RenderCell columnKey={column.key} item={item} />
-                    </Table.Cell>
-                  ))}
-                </Table.Row>
-              )}
-            </Table.Body>
-          </Table.Content>
-        </Table.ScrollContainer>
-      </Table.Root>
-      {bottomContent}
+    <div className="flex flex-col gap-6">
+      {pageIntro}
+      <div className="flex flex-col gap-2">
+        {topContent}
+        <Table.Root className="w-full">
+          <Table.ScrollContainer className="max-h-[80vh]">
+            <Table.Content aria-label="Subscribe">
+              <Table.Header>
+                {columns.map((column) => (
+                  <Table.Column
+                    key={String(column.key)}
+                    isRowHeader={column.key === "id"}
+                  >
+                    {column.label}
+                  </Table.Column>
+                ))}
+              </Table.Header>
+              <Table.Body items={items}>
+                {(item) => (
+                  <Table.Row id={String(item?.id)}>
+                    {columns.map((column) => (
+                      <Table.Cell key={String(column.key)}>
+                        <RenderCell columnKey={column.key} item={item} />
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table.Root>
+        {bottomContent}
+      </div>
     </div>
   );
 };

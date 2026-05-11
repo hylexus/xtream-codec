@@ -36,6 +36,9 @@ interface GroupData {
   handlers: HandlerInfo[];
 }
 
+/** 避免 `?? []` 每次渲染新引用，触发 groupedData / expandedKeys 连锁更新与 effect 死循环 */
+const EMPTY_HANDLER_LIST: HandlerInfo[] = [];
+
 const calcStatus = (item: HandlerInfo) => {
   const { virtualThread, nonBlocking, rejectBlockingTask } = item;
   let color: "success" | "warning" | "danger";
@@ -134,7 +137,7 @@ export const MappingsPage = () => {
     {},
   );
 
-  const rawData = data?.dispatcherXtreamHandler ?? [];
+  const rawData = data?.dispatcherXtreamHandler ?? EMPTY_HANDLER_LIST;
 
   const filteredData = useMemo(() => {
     if (!searchKey.trim()) return rawData;
@@ -313,7 +316,16 @@ export const MappingsPage = () => {
   };
 
   return (
-    <div className="box-border flex h-full flex-col gap-4 p-4">
+    <div className="box-border flex h-full flex-col gap-4">
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          消息映射
+        </h2>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+          按消息 ID、协议版本、处理器等维度查看 JT808
+          处理器注册情况；表格区域使用与主题一致的表面色与分割线。
+        </p>
+      </div>
       <div className="flex shrink-0 flex-wrap items-center gap-4">
         <Tabs
           selectedKey={groupBy}
@@ -367,8 +379,8 @@ export const MappingsPage = () => {
         </div>
       </div>
 
-      <div className="flex shrink-0 gap-4">
-        <Card className="flex-1">
+      <div className="flex shrink-0 flex-wrap gap-4">
+        <Card className="flex-1 min-w-[140px] border border-border">
           <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">总计</span>
             <Chip color="accent" variant="soft">
@@ -376,7 +388,7 @@ export const MappingsPage = () => {
             </Chip>
           </Card.Content>
         </Card>
-        <Card className="flex-1">
+        <Card className="flex-1 min-w-[140px] border border-border">
           <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">非阻塞</span>
             <Chip color="success" variant="soft">
@@ -384,7 +396,7 @@ export const MappingsPage = () => {
             </Chip>
           </Card.Content>
         </Card>
-        <Card className="flex-1">
+        <Card className="flex-1 min-w-[140px] border border-border">
           <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">阻塞</span>
             <Chip color="warning" variant="soft">
@@ -392,7 +404,7 @@ export const MappingsPage = () => {
             </Chip>
           </Card.Content>
         </Card>
-        <Card className="flex-1">
+        <Card className="flex-1 min-w-[140px] border border-border">
           <Card.Content className="flex flex-row items-center justify-between px-4 py-2">
             <span className="text-sm text-default-500">虚拟线程</span>
             <Chip color="default" variant="soft">
@@ -423,13 +435,13 @@ export const MappingsPage = () => {
             {groupedData.map((group) => (
               <div
                 key={group.key}
-                className="rounded-medium border border-default-200"
+                className="rounded-medium border border-border"
               >
-                <div className="border-b border-default-200 px-3 py-2">
+                <div className="border-b border-border px-3 py-2">
                   {getGroupHeader(group)}
                 </div>
                 {expanded.has(group.key) && (
-                  <div className="bg-zinc-50 px-2 py-2 dark:bg-zinc-900/30">
+                  <div className="bg-background-tertiary/50 px-2 py-2">
                     <table className="w-full border-collapse text-sm">
                       <thead>
                         <tr className="text-left text-default-500">
@@ -445,7 +457,7 @@ export const MappingsPage = () => {
                         {group.handlers.map((handler, idx) => (
                           <tr
                             key={`${group.key}-${idx}`}
-                            className="border-t border-default-100"
+                            className="border-t border-separator"
                           >
                             <td className="p-2 align-top">
                               <div className="flex items-center gap-1">

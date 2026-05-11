@@ -7,8 +7,7 @@ import {
   Spinner,
   TextField,
 } from "@heroui/react";
-import { useEffect, useState } from "react";
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 
 import { PagePagination } from "@/components/page-pagination.tsx";
 import { Dic } from "@/types";
@@ -34,48 +33,15 @@ const getSimpleTypeName = (type: string) => {
   return type;
 };
 
-const ECLIPSE_COLORS = {
-  keyword: "text-[#0000FF]",
-  type: "text-[#0000FF]",
-  field: "text-[#000000]",
-  string: "text-[#3F7F5F]",
-  number: "text-[#3F7F5F]",
-  comment: "text-[#808080]",
-  annotation: "text-[#3F7F5F]",
+/** 伪代码语法高亮：全部使用主题语义色，浅色 / 深色自动一致 */
+const BEAN_CODE_SYNTAX = {
+  keyword: "text-accent",
+  type: "text-warning",
+  field: "text-foreground",
+  number: "text-success",
+  annotation: "text-default-600",
+  comment: "text-muted",
 } as const;
-
-const INTELLIJ_COLORS = {
-  keyword: "text-[#CC7832]",
-  type: "text-[#FF8020]",
-  field: "text-[#A9B7C6]",
-  string: "text-[#A9B7C6]",
-  number: "text-[#6897BB]",
-  comment: "text-[#808080]",
-  annotation: "text-[#A9B7C6]",
-} as const;
-
-const useCodeColors = () => {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window === "undefined") return false;
-
-    return document.documentElement.classList.contains("dark");
-  });
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return isDark ? INTELLIJ_COLORS : ECLIPSE_COLORS;
-};
 
 const getImplDetail = (
   impl: string,
@@ -99,8 +65,8 @@ const getImplDetail = (
 };
 
 const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
-  const codeColors = useCodeColors();
-  const { keyword, type, field, number, annotation, comment } = codeColors;
+  const { keyword, type, field, number, annotation, comment } =
+    BEAN_CODE_SYNTAX;
   const p = property as Dic;
   const getterImpl = p.getter?.implementation as string;
   const setterImpl = p.setter?.implementation as string;
@@ -146,24 +112,29 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
   }, [p.condition]);
 
   return (
-    <div className="flex flex-col gap-2 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-md font-mono text-xs overflow-x-auto">
-      {p.desc && <div className={comment + " italic"}>// {p.desc}</div>}
+    <div className="flex flex-col gap-2 overflow-x-auto rounded-md border border-border bg-background-tertiary/90 p-3 font-mono text-xs">
+      {p.desc && (
+        <div className={comment + " italic"}>
+          {"// "}
+          {p.desc}
+        </div>
+      )}
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
           <span className={keyword}>name</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={field}>{p.name}</span>
         </span>
         <span>
           <span className={keyword}>type</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={type}>{getSimpleTypeName(p.type as string)}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
           <span className={keyword}>codec</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={type}>
             {getSimpleClassName(p.codec?.name)}
             {p.codec?.isBuiltIn !== true && " (custom)"}
@@ -171,18 +142,18 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         </span>
         <span>
           <span className={keyword}>length</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={annotation}>{lengthDesc}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
           <span className={keyword}>version</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span
             className={
               p.version?.isDefault === true
-                ? "text-zinc-400"
+                ? "text-muted"
                 : number + " font-semibold"
             }
           >
@@ -191,20 +162,20 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
         </span>
         <span>
           <span className={keyword}>order</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={field}>
             {p.order?.isDefault === true ? "default" : p.order?.value}
           </span>
         </span>
         <span>
           <span className={keyword}>dataType</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={annotation}>{p.dataType}</span>
         </span>
         {(p.recordClass || p.recordComponent) && (
           <span>
             <span className={keyword}>record</span>
-            <span className="text-zinc-500">=</span>
+            <span className="text-muted">=</span>
             <span className={number}>
               {p.recordComponent ? "component" : ""}
               {p.recordClass ? " class" : ""}
@@ -215,21 +186,21 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
           <span className={keyword}>condition</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={number}>{conditionDesc}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
           <span className={keyword}>getter</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={annotation}>
             {getterImpl}({getterDetail || "-"})
           </span>
         </span>
         <span>
           <span className={keyword}>setter</span>
-          <span className="text-zinc-500">=</span>
+          <span className="text-muted">=</span>
           <span className={annotation}>
             {setterImpl}({setterDetail || "-"})
           </span>
@@ -241,8 +212,7 @@ const PropertyDetail: FC<{ property: Dic }> = ({ property }) => {
 
 const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
   const [expanded, setExpanded] = useState(false);
-  const codeColors = useCodeColors();
-  const { keyword, type, field, comment: commentColor } = codeColors;
+  const { keyword, type, field, comment: commentColor } = BEAN_CODE_SYNTAX;
 
   const typeName = getSimpleTypeName(property.type as string);
   const propName = property.name as string;
@@ -250,7 +220,7 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
   const getterImpl = property.getter?.implementation as string;
 
   return (
-    <div className="border-b border-zinc-200 dark:border-zinc-700 last:border-b-0">
+    <div className="border-b border-border last:border-b-0">
       <Button
         className="h-auto min-h-8 w-full justify-between px-2 py-1"
         size="sm"
@@ -262,7 +232,10 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
           <span className={type}>{typeName}</span>{" "}
           <span className={field}>{propName}</span>
           {desc && (
-            <span className={`text-xs italic ${commentColor}`}> // {desc}</span>
+            <span className={`text-xs italic ${commentColor}`}>
+              {"// "}
+              {desc}
+            </span>
           )}
         </span>
         <div className="flex gap-1 flex-wrap">
@@ -328,8 +301,7 @@ const PropertyRow: FC<{ property: Dic }> = ({ property }) => {
 
 const BeanCard: FC<{ item: Dic }> = ({ item }) => {
   const [expanded, setExpanded] = useState(false);
-  const codeColors = useCodeColors();
-  const { keyword, field } = codeColors;
+  const { keyword, field } = BEAN_CODE_SYNTAX;
   const properties = (item.properties as Dic[]) || [];
   const typeName = getSimpleClassName(item.rawClass as string);
   const fullClassName = item.rawClass as string;
@@ -372,8 +344,8 @@ const BeanCard: FC<{ item: Dic }> = ({ item }) => {
           </Chip>
         </Button>
         {expanded && (
-          <div className="border-t border-zinc-200 bg-zinc-50 p-2 pl-4 dark:border-zinc-700 dark:bg-zinc-900/30">
-            <div className="text-xs font-mono text-zinc-500 mb-2 pl-2 truncate">
+          <div className="border-t border-border bg-background-tertiary/60 p-2 pl-4">
+            <div className="mb-2 truncate pl-2 font-mono text-xs text-muted">
               {String(item.constructor)}
             </div>
             <div className="flex flex-col gap-1">
@@ -486,7 +458,17 @@ export const BeanMetadataPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full box-border">
+    <div className="box-border flex h-full flex-col">
+      <div className="mb-4 shrink-0">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          Bean 元数据
+        </h2>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+          编解码 Bean 的属性、getter/setter
+          与长度策略等结构化信息；代码块背景与伪代码语法色均使用主题语义
+          token，随浅色 / 深色自动切换。
+        </p>
+      </div>
       {topContent}
       <div className="flex-1 overflow-y-auto flex flex-col gap-2">
         {tableData?.data?.map((item, idx) => (

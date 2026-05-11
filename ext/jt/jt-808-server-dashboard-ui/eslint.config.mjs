@@ -98,6 +98,8 @@ export default defineConfig([
       "react/jsx-uses-react": "off",
       "react/react-in-jsx-scope": "off",
       "react-hooks/exhaustive-deps": "off",
+      // v7 默认开启；本项目大量 SSE / 图表在 effect 内同步 setState，与规则冲突且重构成本高
+      "react-hooks/set-state-in-effect": "off",
       "jsx-a11y/click-events-have-key-events": "warn",
       "jsx-a11y/interactive-supports-focus": "warn",
       "prettier/prettier": "warn",

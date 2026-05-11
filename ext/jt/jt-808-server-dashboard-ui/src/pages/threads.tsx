@@ -48,16 +48,28 @@ export const ThreadsPage = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {threads.map((thread: Thread) => (
-        <Card key={thread.name}>
-          <Card.Header>{thread.name}</Card.Header>
-          <Card.Content>
-            <p className="mb-2">time: {thread.time.slice(0, -4)}</p>
-            <JsonPreview json={thread.value} page="threads" />
-          </Card.Content>
-        </Card>
-      ))}
+    <div className="flex flex-col gap-6">
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          调度器指标
+        </h2>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
+          各调度器线程池的实时配置快照，配色随当前主题切换。
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {threads.map((thread: Thread) => (
+          <Card key={thread.name} className="border border-border">
+            <Card.Header className="text-foreground">{thread.name}</Card.Header>
+            <Card.Content>
+              <p className="mb-2 text-sm text-muted">
+                time: {thread.time.slice(0, -4)}
+              </p>
+              <JsonPreview json={thread.value} page="threads" />
+            </Card.Content>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };

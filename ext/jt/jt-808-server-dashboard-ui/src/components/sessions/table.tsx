@@ -139,7 +139,9 @@ export const SessionTable: FC<SessionTableProps> = ({ type }) => {
   }, [page, pages, setPage]);
 
   const topContent = useMemo(() => {
-    return <p>总数： {tableData?.total}</p>;
+    return (
+      <p className="text-sm text-muted">总数：{tableData?.total ?? "—"}</p>
+    );
   }, [tableData?.total]);
 
   const items = tableData?.data ?? [];

@@ -1,128 +1,158 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
+import type { LucideProps } from "lucide-react";
+
 import {
-  faBug,
-  faChartSimple,
-  faChevronDown,
-  faChevronRight,
-  faCircleCheck,
-  faClone,
-  faCube,
-  faCubes,
-  faDesktop,
-  faEye,
-  faFileCirclePlus,
-  faGear,
-  faHashtag,
-  faHeart,
-  faMoon,
-  faQuoteRight,
-  faRobot,
-  faServer,
-  faShuffle,
-  faSun,
-  faTags,
-  faGauge,
-  faComments,
-  faTerminal,
-  faTrash,
-  IconDefinition,
-  faDatabase,
-} from "@fortawesome/free-solid-svg-icons";
+  Bot,
+  Box,
+  Boxes,
+  Bug,
+  ChartColumnIncreasing,
+  ChevronDown,
+  ChevronRight,
+  CircleCheck,
+  Copy,
+  Database,
+  Eye,
+  FilePlus,
+  Gauge,
+  GitBranch,
+  Hash,
+  Heart,
+  MessageSquare,
+  Monitor,
+  Moon,
+  Quote,
+  Server,
+  Settings,
+  Shuffle,
+  Sun,
+  Tags,
+  Terminal,
+  Trash2,
+} from "lucide-react";
 import * as React from "react";
+import clsx from "clsx";
 
 import { IconSvgProps } from "@/types";
-const FaIcon = ({ icon, ...props }: { icon: IconDefinition }) => {
+
+const baseClass = "text-default-500 shrink-0";
+
+function resolveIconSize(size: LucideProps["size"]): number | undefined {
+  if (size == null) {
+    return undefined;
+  }
+  if (typeof size === "number") {
+    return size;
+  }
+  if (size === "xl") {
+    return 24;
+  }
+
+  return 20;
+}
+
+function LucideIcon({
+  as: Icon,
+  className,
+  size,
+  strokeWidth = 2,
+  ...props
+}: LucideProps & { as: React.ComponentType<LucideProps> }) {
+  const resolved = resolveIconSize(size);
+
   return (
-    <FontAwesomeIcon
-      className="text-default-500 text-xl"
-      icon={icon}
+    <Icon
+      aria-hidden
+      className={clsx(baseClass, className)}
+      size={resolved ?? 18}
+      strokeWidth={strokeWidth}
       {...props}
     />
   );
-};
+}
 
-export const FaGithubIcon = ({ ...props }) => {
-  return <FaIcon icon={faGithub} {...props} />;
-};
-export const FaSunIcon = ({ ...props }) => {
-  return <FaIcon icon={faSun} {...props} />;
-};
-export const FaMoonIcon = ({ ...props }) => {
-  return <FaIcon icon={faMoon} {...props} />;
-};
-export const FaGaugeIcon = ({ ...props }) => {
-  return <FaIcon icon={faGauge} {...props} />;
-};
-export const FaBugIcon = ({ ...props }) => {
-  return <FaIcon icon={faBug} {...props} />;
-};
-export const FaCommentsIcon = ({ ...props }) => {
-  return <FaIcon icon={faComments} {...props} />;
-};
-export const FaTerminalIcon = ({ ...props }) => {
-  return <FaIcon icon={faTerminal} {...props} />;
-};
-export const FaHeatIcon = ({ ...props }) => {
-  return <FaIcon icon={faHeart} {...props} />;
-};
-export const FaTagsIcon = ({ ...props }) => {
-  return <FaIcon icon={faTags} {...props} />;
-};
-export const FaEyeIcon = ({ ...props }) => {
-  return <FaIcon icon={faEye} {...props} />;
-};
-export const FaTrashIcon = ({ ...props }) => {
-  return <FaIcon icon={faTrash} {...props} />;
-};
-export const FaChevronDownIcon = ({ ...props }) => {
-  return <FaIcon icon={faChevronDown} {...props} />;
-};
-export const FaFileCirclePlusIcon = ({ ...props }) => {
-  return <FaIcon icon={faFileCirclePlus} {...props} />;
-};
-export const FaGearIcon = ({ ...props }) => {
-  return <FaIcon icon={faGear} {...props} />;
-};
-export const FaShuffleIcon = ({ ...props }) => {
-  return <FaIcon icon={faShuffle} {...props} />;
-};
-export const FaCloneIcon = ({ ...props }) => {
-  return <FaIcon icon={faClone} {...props} />;
-};
-export const FaChartSimpleIcon = ({ ...props }) => {
-  return <FaIcon icon={faChartSimple} {...props} />;
-};
-export const FaServerIcon = ({ ...props }) => {
-  return <FaIcon icon={faServer} {...props} />;
-};
-export const FaDesktopIcon = ({ ...props }) => {
-  return <FaIcon icon={faDesktop} {...props} />;
-};
-export const FaRobotIcon = ({ ...props }) => {
-  return <FaIcon icon={faRobot} {...props} />;
-};
-export const FaHashtagIcon = ({ ...props }) => {
-  return <FaIcon icon={faHashtag} {...props} />;
-};
-export const FaQuoteRightIcon = ({ ...props }) => {
-  return <FaIcon icon={faQuoteRight} {...props} />;
-};
-export const FaCubeIcon = ({ ...props }) => {
-  return <FaIcon icon={faCube} {...props} />;
-};
-export const FaCircleCheckIcon = ({ ...props }) => {
-  return <FaIcon icon={faCircleCheck} {...props} />;
-};
-export const FaChevronRightIcon = ({ ...props }) => {
-  return <FaIcon icon={faChevronRight} {...props} />;
-};
-export const FaDataBaseIcon = ({ ...props }) => {
-  return <FaIcon icon={faDatabase} {...props} />;
-};
-export const FaCubesIcon = ({ ...props }) => {
-  return <FaIcon icon={faCubes} {...props} />;
-};
+/** Lucide v1 已移除品牌图标；用 Git 分支表示代码仓库入口。 */
+export const FaGithubIcon = (props: LucideProps) => (
+  <LucideIcon as={GitBranch} {...props} />
+);
+export const FaSunIcon = (props: LucideProps) => (
+  <LucideIcon as={Sun} {...props} />
+);
+export const FaMoonIcon = (props: LucideProps) => (
+  <LucideIcon as={Moon} {...props} />
+);
+export const FaGaugeIcon = (props: LucideProps) => (
+  <LucideIcon as={Gauge} {...props} />
+);
+export const FaBugIcon = (props: LucideProps) => (
+  <LucideIcon as={Bug} {...props} />
+);
+export const FaCommentsIcon = (props: LucideProps) => (
+  <LucideIcon as={MessageSquare} {...props} />
+);
+export const FaTerminalIcon = (props: LucideProps) => (
+  <LucideIcon as={Terminal} {...props} />
+);
+export const FaHeatIcon = (props: LucideProps) => (
+  <LucideIcon as={Heart} {...props} />
+);
+export const FaTagsIcon = (props: LucideProps) => (
+  <LucideIcon as={Tags} {...props} />
+);
+export const FaEyeIcon = (props: LucideProps) => (
+  <LucideIcon as={Eye} {...props} />
+);
+export const FaTrashIcon = (props: LucideProps) => (
+  <LucideIcon as={Trash2} {...props} />
+);
+export const FaChevronDownIcon = (props: LucideProps) => (
+  <LucideIcon as={ChevronDown} {...props} />
+);
+export const FaFileCirclePlusIcon = (props: LucideProps) => (
+  <LucideIcon as={FilePlus} {...props} />
+);
+export const FaGearIcon = (props: LucideProps) => (
+  <LucideIcon as={Settings} {...props} />
+);
+export const FaShuffleIcon = (props: LucideProps) => (
+  <LucideIcon as={Shuffle} {...props} />
+);
+export const FaCloneIcon = (props: LucideProps) => (
+  <LucideIcon as={Copy} {...props} />
+);
+export const FaChartSimpleIcon = (props: LucideProps) => (
+  <LucideIcon as={ChartColumnIncreasing} {...props} />
+);
+export const FaServerIcon = (props: LucideProps) => (
+  <LucideIcon as={Server} {...props} />
+);
+export const FaDesktopIcon = (props: LucideProps) => (
+  <LucideIcon as={Monitor} {...props} />
+);
+export const FaRobotIcon = (props: LucideProps) => (
+  <LucideIcon as={Bot} {...props} />
+);
+export const FaHashtagIcon = (props: LucideProps) => (
+  <LucideIcon as={Hash} {...props} />
+);
+export const FaQuoteRightIcon = (props: LucideProps) => (
+  <LucideIcon as={Quote} {...props} />
+);
+export const FaCubeIcon = (props: LucideProps) => (
+  <LucideIcon as={Box} {...props} />
+);
+export const FaCircleCheckIcon = (props: LucideProps) => (
+  <LucideIcon as={CircleCheck} {...props} />
+);
+export const FaChevronRightIcon = (props: LucideProps) => (
+  <LucideIcon as={ChevronRight} {...props} />
+);
+export const FaDataBaseIcon = (props: LucideProps) => (
+  <LucideIcon as={Database} {...props} />
+);
+export const FaCubesIcon = (props: LucideProps) => (
+  <LucideIcon as={Boxes} {...props} />
+);
+
 export const LogoIcon: React.FC<IconSvgProps> = ({
   size = 36,
   height,

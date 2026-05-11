@@ -130,7 +130,7 @@ export const JsonPreview: FC<JSONPreviewProps> = ({ json, page }) => {
           props.expanded ? (
             <FaChevronDownIcon />
           ) : (
-            <FaChevronDownIcon className="fa-rotate-270" />
+            <FaChevronDownIcon className="-rotate-90" />
           )
         }
         treeData={treeData}

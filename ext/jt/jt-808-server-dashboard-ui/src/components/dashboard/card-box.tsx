@@ -119,10 +119,18 @@ export const CardBox = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          概览
+        </h2>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
+          服务器、会话与请求指标的实时视图；配色随浅色 / 深色主题自动切换。
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6">
         <SpotlightCard>
-          <Card.Header>
-            <b>服务器信息</b>
+          <Card.Header className="text-sm font-semibold text-foreground">
+            服务器信息
           </Card.Header>
           <Card.Content className="min-h-48 overflow-visible p-4">
             <Tabs className="w-full">
@@ -204,12 +212,12 @@ export const CardBox = () => {
           </Card.Content>
         </SpotlightCard>
       </div>
-      <div className="h-4" />
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="h-2 sm:h-4" />
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5">
         {listCount.map((item, index) => (
           <SpotlightCard key={index} className="min-h-32">
-            <Card.Header className="text-small flex flex-wrap items-center gap-2">
-              <b>会话数</b>
+            <Card.Header className="text-small flex flex-wrap items-center gap-2 text-muted">
+              <span className="font-semibold text-foreground">会话数</span>
               <FaServerIcon />
               <Chip
                 color={item.serverRole === "附件服务器" ? "warning" : "success"}
@@ -236,17 +244,17 @@ export const CardBox = () => {
                   }
                 />
               </p>
-              <b>
+              <span className="font-semibold text-foreground">
                 峰值:{" "}
                 {asMetricSlice(getKeyValue(data.value, item.key)).max ?? "—"}
-              </b>
+              </span>
             </Card.Content>
           </SpotlightCard>
         ))}
         {listRequest.map((item, index) => (
           <SpotlightCard key={index} className="min-h-32">
-            <Card.Header className="text-small flex flex-wrap items-center gap-2">
-              <b>请求数</b>
+            <Card.Header className="text-small flex flex-wrap items-center gap-2 text-muted">
+              <span className="font-semibold text-foreground">请求数</span>
               <FaServerIcon />
               <Chip
                 color={item.serverRole === "附件服务器" ? "warning" : "success"}
@@ -293,10 +301,12 @@ export const CardBox = () => {
           </SpotlightCard>
         ))}
       </div>
-      <div className="h-4" />
-      <div className="grid grid-cols-1 gap-2">
+      <div className="h-2 sm:h-4" />
+      <div className="grid grid-cols-1 gap-4 sm:gap-5">
         <SpotlightCard>
-          <Card.Header>线程</Card.Header>
+          <Card.Header className="text-sm font-semibold text-foreground">
+            线程
+          </Card.Header>
           <Card.Content className="h-96">
             <ThreadsCharts
               data={{

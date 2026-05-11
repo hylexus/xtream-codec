@@ -39,56 +39,48 @@ const getSimpleClassName = (fullName: string) => {
 
 const CodecDetail: FC<{ item: Dic }> = ({ item }) => {
   return (
-    <div className="flex flex-col gap-2 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-md font-mono text-xs overflow-x-auto">
+    <div className="flex flex-col gap-2 overflow-x-auto rounded-md border border-border bg-background-tertiary/90 p-3 font-mono text-xs">
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
-          <span className="text-blue-600 dark:text-blue-400">key</span>
-          <span className="text-zinc-500">=</span>
-          <span className="text-amber-600 dark:text-amber-400">{item.key}</span>
+          <span className="text-accent">key</span>
+          <span className="text-muted">=</span>
+          <span className="text-foreground">{item.key}</span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">
-            implementation
-          </span>
-          <span className="text-zinc-500">=</span>
-          <span className="text-emerald-600 dark:text-emerald-400">
+          <span className="text-accent">implementation</span>
+          <span className="text-muted">=</span>
+          <span className="text-success">
             {getSimpleClassName(item.rawClassName)}
           </span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">signedness</span>
-          <span className="text-zinc-500">=</span>
-          <span className="text-purple-600 dark:text-purple-400">
-            {item.signedness}
-          </span>
+          <span className="text-accent">signedness</span>
+          <span className="text-muted">=</span>
+          <span className="text-warning">{item.signedness}</span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">endian</span>
-          <span className="text-zinc-500">=</span>
-          <span className="text-cyan-600 dark:text-cyan-400">
-            {item.endian}
-          </span>
+          <span className="text-accent">endian</span>
+          <span className="text-muted">=</span>
+          <span className="text-default-600">{item.endian}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
-          <span className="text-blue-600 dark:text-blue-400">charset</span>
-          <span className="text-zinc-500">=</span>
-          <span className="text-pink-600 dark:text-pink-400">
-            {item.charset}
-          </span>
+          <span className="text-accent">charset</span>
+          <span className="text-muted">=</span>
+          <span className="text-default-600">{item.charset}</span>
         </span>
         <span>
-          <span className="text-blue-600 dark:text-blue-400">isBuiltin</span>
-          <span className="text-zinc-500">=</span>
-          <span className={item.isBuiltin ? "text-green-600" : "text-zinc-400"}>
+          <span className="text-accent">isBuiltin</span>
+          <span className="text-muted">=</span>
+          <span className={item.isBuiltin ? "text-success" : "text-muted"}>
             {String(item.isBuiltin)}
           </span>
         </span>
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-zinc-500">Full Class Name:</span>
-        <span className="text-xs text-zinc-600 dark:text-zinc-300 break-all">
+        <span className="text-xs text-muted">Full Class Name:</span>
+        <span className="break-all text-xs text-foreground">
           {item.rawClassName}
         </span>
       </div>
@@ -150,7 +142,7 @@ const CodecCard: FC<{ item: Dic; idx: number }> = ({ item, idx }) => {
           </div>
         </Button>
         {expanded && (
-          <div className="border-t border-zinc-200 bg-zinc-50 p-2 dark:border-zinc-700 dark:bg-zinc-900/30">
+          <div className="border-t border-border bg-background-tertiary/60 p-2">
             <CodecDetail item={item} />
           </div>
         )}
@@ -294,7 +286,15 @@ export const CodecMetadataPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full p-4 box-border">
+    <div className="box-border flex h-full flex-col">
+      <div className="mb-4 shrink-0">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          Codec 元数据
+        </h2>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+          内置与自定义字段编解码器注册表，可按 key、符号性、字节序等筛选。
+        </p>
+      </div>
       {topContent}
       <div className="flex-1 overflow-y-auto flex flex-col gap-2">
         {tableData?.data?.map((item, idx) => (

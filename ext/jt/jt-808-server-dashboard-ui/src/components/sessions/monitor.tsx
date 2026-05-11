@@ -61,13 +61,13 @@ const Message: FC<MessageProps> = ({ item, className }) => {
     ].includes(Number(item.type))
       ? {
           name: "C",
-          avatar: <FaServerIcon className="text-green-500 fa-fade" />,
-          bg: " bg-content3",
+          avatar: <FaServerIcon className="animate-pulse text-success" />,
+          bg: "bg-background-tertiary",
         }
       : {
           name: "S",
-          avatar: <FaDesktopIcon className="text-blue-500 fa-beat" />,
-          bg: " bg-content2",
+          avatar: <FaDesktopIcon className="animate-pulse text-accent" />,
+          bg: "bg-surface",
         };
   }, [item]);
 
@@ -99,7 +99,12 @@ const Message: FC<MessageProps> = ({ item, className }) => {
           </Avatar>
         )}
       </div>
-      <Card className={clsx("w-full flex-grow-0", rowDisplay.bg)}>
+      <Card
+        className={clsx(
+          "w-full flex-grow-0 border border-border",
+          rowDisplay.bg,
+        )}
+      >
         <Card.Content>
           {Object.keys(item)
             .filter((k) => ["messageId", "hexString", "eventTime"].includes(k))
