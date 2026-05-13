@@ -5,11 +5,11 @@ import { FC } from "react";
 import clsx from "clsx";
 
 import {
-  FaChevronDownIcon,
-  FaCircleCheckIcon,
-  FaCubeIcon,
-  FaHashtagIcon,
-  FaQuoteRightIcon,
+  LuChevronDownIcon,
+  LuCircleCheckIcon,
+  LuCubeIcon,
+  LuHashtagIcon,
+  LuQuoteRightIcon,
 } from "@/components/icons.tsx";
 import { Dic } from "@/types";
 const annotation: Dic = {
@@ -27,40 +27,46 @@ const annotation: Dic = {
   eventPublisher: "[事件发布器] 用到的调度器",
   customSchedulers: "[用户自定义] 调度器",
 };
-const isObject = (val: any) => {
+const isObject = (val: unknown) => {
   return typeof val === "object" && val !== null;
 };
-const valueColor = (item: string | number | boolean) => {
-  switch (typeof item) {
-    case "number":
-      return "text-primary";
-    case "boolean":
-      return item ? "text-success" : "text-secondary";
-    case "string":
-      return "text-secondary";
+const valueColor = (item: unknown): string => {
+  if (typeof item === "number") {
+    return "text-primary";
   }
-};
-const valueIcon = (item: string | number | boolean) => {
-  switch (typeof item) {
-    case "number":
-      return <FaHashtagIcon className="text-small" />;
-    case "boolean":
-      return <FaCircleCheckIcon className="text-small" />;
-    case "string":
-      return <FaQuoteRightIcon className="text-small" />;
+  if (typeof item === "boolean") {
+    return item ? "text-success" : "text-secondary";
   }
+  if (typeof item === "string") {
+    return "text-secondary";
+  }
+
+  return "text-secondary";
 };
-const generateData = (json: Object, _preKey: string, page?: string) => {
+const valueIcon = (item: unknown) => {
+  if (typeof item === "number") {
+    return <LuHashtagIcon className="text-small" />;
+  }
+  if (typeof item === "boolean") {
+    return <LuCircleCheckIcon className="text-small" />;
+  }
+  if (typeof item === "string") {
+    return <LuQuoteRightIcon className="text-small" />;
+  }
+
+  return <LuQuoteRightIcon className="text-small" />;
+};
+const generateData = (json: object, _preKey: string, page?: string) => {
   const tree: TreeDataNode[] = [];
 
   Object.keys(json).forEach((key, index) => {
-    const item: any = json[key as keyof Object];
+    const item: unknown = (json as Record<string, unknown>)[key];
     const curKey = _preKey + "-" + index;
 
     if (isObject(item)) {
       tree.push({
         key: curKey,
-        icon: <FaCubeIcon className="text-small" />,
+        icon: <LuCubeIcon className="text-small" />,
         title: (
           <div
             className={clsx(
@@ -76,7 +82,7 @@ const generateData = (json: Object, _preKey: string, page?: string) => {
             )}
           </div>
         ),
-        children: generateData(item, curKey, page),
+        children: generateData(item as object, curKey, page),
       });
     } else {
       tree.push({
@@ -90,7 +96,13 @@ const generateData = (json: Object, _preKey: string, page?: string) => {
             )}
           >
             <span>{key}</span>
-            <span className={valueColor(item)}>{String(item)}</span>
+            <span className={valueColor(item)}>
+              {typeof item === "string" ||
+              typeof item === "number" ||
+              typeof item === "boolean"
+                ? String(item)
+                : JSON.stringify(item)}
+            </span>
             {annotation[key] && <span>{annotation[key]}</span>}
           </div>
         ),
@@ -102,7 +114,7 @@ const generateData = (json: Object, _preKey: string, page?: string) => {
 };
 
 export interface JSONPreviewProps {
-  json: Object;
+  json: object;
   page?: string;
 }
 export const JsonPreview: FC<JSONPreviewProps> = ({ json, page }) => {
@@ -112,10 +124,8 @@ export const JsonPreview: FC<JSONPreviewProps> = ({ json, page }) => {
     <ConfigProvider
       theme={{
         token: {
-          // @ts-ignore
-          fontSize: "0.875rem",
+          fontSize: 14,
           colorBgContainer: "var(--background)",
-          titleHeight: "1.5rem",
           colorText: "var(--foreground)",
         },
       }}
@@ -128,9 +138,9 @@ export const JsonPreview: FC<JSONPreviewProps> = ({ json, page }) => {
         showLine={page !== "threads"}
         switcherIcon={(props) =>
           props.expanded ? (
-            <FaChevronDownIcon />
+            <LuChevronDownIcon />
           ) : (
-            <FaChevronDownIcon className="-rotate-90" />
+            <LuChevronDownIcon className="-rotate-90" />
           )
         }
         treeData={treeData}

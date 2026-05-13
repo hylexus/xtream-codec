@@ -1,11 +1,11 @@
 import {
   Button,
+  ButtonGroup,
   Card,
   Chip,
   Input,
   Label,
   Spinner,
-  Tabs,
   TextField,
   Tooltip,
 } from "@heroui/react";
@@ -120,6 +120,14 @@ const getHandlerClassName = (handler: string): string => {
 
   return parts[0].replace(/^.*\./, "");
 };
+
+const GROUP_BY_OPTIONS = [
+  { id: "messageId", label: "消息ID" },
+  { id: "version", label: "协议版本" },
+  { id: "className", label: "处理器" },
+  { id: "status", label: "状态" },
+  { id: "scheduler", label: "调度器" },
+] as const;
 
 export const MappingsPage = () => {
   const [searchKey, setSearchKey] = useState("");
@@ -327,39 +335,18 @@ export const MappingsPage = () => {
         </p>
       </div>
       <div className="flex shrink-0 flex-wrap items-center gap-4">
-        <Tabs
-          selectedKey={groupBy}
-          onSelectionChange={(key) => setGroupBy(String(key))}
-        >
-          <Tabs.ListContainer>
-            <Tabs.List aria-label="分组方式">
-              <Tabs.Tab id="messageId">消息ID</Tabs.Tab>
-              <Tabs.Tab id="version">协议版本</Tabs.Tab>
-              <Tabs.Tab id="className">处理器</Tabs.Tab>
-              <Tabs.Tab id="status">状态</Tabs.Tab>
-              <Tabs.Tab id="scheduler">调度器</Tabs.Tab>
-            </Tabs.List>
-          </Tabs.ListContainer>
-          <Tabs.Panel className="sr-only" id="messageId">
-            .
-          </Tabs.Panel>
-          <Tabs.Panel className="sr-only" id="version">
-            .
-          </Tabs.Panel>
-          <Tabs.Panel className="sr-only" id="className">
-            .
-          </Tabs.Panel>
-          <Tabs.Panel className="sr-only" id="status">
-            .
-          </Tabs.Panel>
-          <Tabs.Panel className="sr-only" id="scheduler">
-            .
-          </Tabs.Panel>
-        </Tabs>
+        <ButtonGroup aria-label="分组方式" size="sm">
+          {GROUP_BY_OPTIONS.map((opt) => (
+            <Button
+              key={opt.id}
+              variant={groupBy === opt.id ? "primary" : "ghost"}
+              onPress={() => setGroupBy(opt.id)}
+            >
+              {opt.label}
+            </Button>
+          ))}
+        </ButtonGroup>
         <div className="flex w-96 max-w-full items-center gap-2">
-          <span aria-hidden className="shrink-0 text-xs text-default-400">
-            🔍
-          </span>
           <TextField
             className="min-w-0 flex-1"
             value={searchKey}

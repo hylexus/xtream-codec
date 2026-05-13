@@ -4,7 +4,7 @@ import { Bell, Menu, Search } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { GiteeIcon, FaGithubIcon, FaHeatIcon } from "@/components/icons";
+import { GiteeIcon, GithubIcon, LuHeatIcon } from "@/components/icons";
 
 const iconLinkClass =
   "inline-flex size-9 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-background-tertiary hover:text-foreground";
@@ -86,7 +86,7 @@ export const Navbar = ({ onOpenMobileNav }: NavbarProps) => {
             rel="noopener noreferrer"
             target="_blank"
           >
-            <FaGithubIcon size={20} />
+            <GithubIcon size={20} />
           </Link>
         </span>
         <span title="Gitee">
@@ -111,7 +111,7 @@ export const Navbar = ({ onOpenMobileNav }: NavbarProps) => {
           onPress={handleSponsor}
         >
           <span className="flex items-center gap-2">
-            <FaHeatIcon className="size-4 text-accent-foreground" />
+            <LuHeatIcon className="size-4 text-accent-foreground" />
             赞助
           </span>
         </Button>
@@ -123,7 +123,7 @@ export const Navbar = ({ onOpenMobileNav }: NavbarProps) => {
           variant="primary"
           onPress={handleSponsor}
         >
-          <FaHeatIcon className="size-4 text-accent-foreground" />
+          <LuHeatIcon className="size-4 text-accent-foreground" />
         </Button>
       </div>
     </header>

@@ -27,10 +27,10 @@ import {
 import clsx from "clsx";
 
 import {
-  FaChevronDownIcon,
-  FaDesktopIcon,
-  FaRobotIcon,
-  FaServerIcon,
+  LuChevronDownIcon,
+  LuDesktopIcon,
+  LuRobotIcon,
+  LuServerIcon,
 } from "@/components/icons.tsx";
 import { subtitle } from "@/components/primitives.ts";
 import { Event, EventType, Session } from "@/types";
@@ -61,12 +61,12 @@ const Message: FC<MessageProps> = ({ item, className }) => {
     ].includes(Number(item.type))
       ? {
           name: "C",
-          avatar: <FaServerIcon className="animate-pulse text-success" />,
+          avatar: <LuServerIcon className="animate-pulse text-success" />,
           bg: "bg-background-tertiary",
         }
       : {
           name: "S",
-          avatar: <FaDesktopIcon className="animate-pulse text-accent" />,
+          avatar: <LuDesktopIcon className="animate-pulse text-accent" />,
           bg: "bg-surface",
         };
   }, [item]);
@@ -79,13 +79,17 @@ const Message: FC<MessageProps> = ({ item, className }) => {
       <div className="w-12">
         <Avatar>
           <Avatar.Fallback>
-            <FaRobotIcon className="text-primary" />
+            <LuRobotIcon className="text-primary" />
           </Avatar.Fallback>
         </Avatar>
       </div>
       <Card className="w-full flex-grow-0">
         <Card.Content className="text-center">
-          <p className="text-primary line-clamp-2 text-sm">{`Session${EventType.BEFORE_SESSION_CLOSED ? " closed" : " opened"} at: ${item.eventTime} remoteAddress: ${item.remoteAddress} reason: ${item.reason}`}</p>
+          <p className="text-primary line-clamp-2 text-sm">{`Session${
+            Number(item.type) === EventType.BEFORE_SESSION_CLOSED
+              ? " closed"
+              : " opened"
+          } at: ${item.eventTime} remoteAddress: ${item.remoteAddress} reason: ${item.reason}`}</p>
         </Card.Content>
       </Card>
       <div className="w-12" />
@@ -251,7 +255,7 @@ export const SessionMonitor: FC<SessionMonitorProps> = ({
                   <Button variant="secondary">
                     <span className="flex items-center gap-2">
                       Event
-                      <FaChevronDownIcon className="text-small" />
+                      <LuChevronDownIcon className="text-small" />
                     </span>
                   </Button>
                 </Dropdown.Trigger>

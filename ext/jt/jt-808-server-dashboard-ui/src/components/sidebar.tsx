@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { NavLink, useLocation, useRouteLoaderData } from "react-router-dom";
 
-import { FaChevronRightIcon, LogoIcon } from "@/components/icons";
+import { LuChevronRightIcon, LogoIcon } from "@/components/icons";
 import { siteConfig } from "@/config/site.ts";
 import { ServerInfo } from "@/types";
 
@@ -142,10 +142,7 @@ export const Sidebar = ({
                   "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors",
                   compact ? "justify-center px-2" : "",
                   isOn
-                    ? clsx(
-                        "dashboard-nav-active",
-                        compact ? "compact-nav" : "",
-                      )
+                    ? clsx("dashboard-nav-active", compact ? "compact-nav" : "")
                     : "text-muted hover:bg-background-tertiary hover:text-foreground",
                 )}
                 to={link.href}
@@ -210,7 +207,7 @@ export const Sidebar = ({
         {compact ? (
           <PanelLeft className="size-4" strokeWidth={1.75} />
         ) : (
-          <FaChevronRightIcon className="rotate-180" size={14} />
+          <LuChevronRightIcon className="rotate-180" size={14} />
         )}
       </Button>
     </aside>

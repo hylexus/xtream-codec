@@ -7,11 +7,11 @@ import { PagePagination } from "@/components/page-pagination.tsx";
 import { usePageList } from "@/hooks/use-page-list.ts";
 import { Session, SessionType } from "@/types";
 import { request } from "@/utils/request.ts";
-import { FaEyeIcon, FaTrashIcon } from "@/components/icons.tsx";
+import { LuEyeIcon, LuTrashIcon } from "@/components/icons.tsx";
 
 interface CellProps {
-  handleMonitor: Function;
-  handleDel: Function;
+  handleMonitor: (session: Session) => void;
+  handleDel: (session: Session) => void;
   session: Session;
   columnKey: React.Key;
 }
@@ -56,7 +56,7 @@ const SessionCell: FC<CellProps> = ({
                   }
                 }}
               >
-                <FaEyeIcon />
+                <LuEyeIcon />
               </span>
             </Tooltip.Trigger>
             <Tooltip.Content>链路监控</Tooltip.Content>
@@ -75,7 +75,7 @@ const SessionCell: FC<CellProps> = ({
                   }
                 }}
               >
-                <FaTrashIcon />
+                <LuTrashIcon />
               </span>
             </Tooltip.Trigger>
             <Tooltip.Content>删除会话</Tooltip.Content>
@@ -116,7 +116,7 @@ export const SessionTable: FC<SessionTableProps> = ({ type }) => {
   };
   const handleDel = async (session: Session) => {
     try {
-      const res: any = await request({
+      const res = await request<{ closed?: boolean }>({
         path: `session/${type}-session/${session.id}`,
         method: "DELETE",
       });
@@ -124,8 +124,8 @@ export const SessionTable: FC<SessionTableProps> = ({ type }) => {
       if (res.closed) {
         await mutate();
       }
-    } catch (_e) {
-      console.error(_e);
+    } catch {
+      /* 删除失败由后端错误处理；表格保持原状 */
     }
   };
   const bottomContent = useMemo(() => {

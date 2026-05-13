@@ -1,6 +1,6 @@
 import { Switch, useTheme } from "@heroui/react";
 
-import { FaMoonIcon, FaSunIcon } from "@/components/icons.tsx";
+import { LuMoonIcon, LuSunIcon } from "@/components/icons.tsx";
 
 function resolveUiTheme(theme: string) {
   if (theme === "system") {
@@ -29,9 +29,9 @@ export const ThemeSwitch = () => {
         <Switch.Control>
           <Switch.Thumb>
             {resolved === "light" ? (
-              <FaSunIcon className="text-sm" />
+              <LuSunIcon className="text-sm" />
             ) : (
-              <FaMoonIcon className="text-sm" />
+              <LuMoonIcon className="text-sm" />
             )}
           </Switch.Thumb>
         </Switch.Control>

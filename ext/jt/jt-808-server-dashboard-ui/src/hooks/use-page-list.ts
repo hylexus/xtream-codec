@@ -12,11 +12,12 @@ export const usePageList = <T = Session>(
   const [page, setPage] = useState(1);
   const rowsPerPage = initPerPage || 10;
   const extraKey = extraParams ? JSON.stringify(extraParams) : "";
+  const swrKey = [path, page, rowsPerPage, extraKey] as const;
   const { data, isLoading, mutate } = useSWR<{
     total: number;
     data: T[];
   }>(
-    `${path}${page}${rowsPerPage}${extraKey}`,
+    swrKey,
     () =>
       request({
         path,

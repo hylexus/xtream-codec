@@ -19,7 +19,7 @@ import { CountTime } from "./count-time.tsx";
 import { SpotlightCard } from "./spolight-card.tsx";
 
 import { Metrics, ServerInfo } from "@/types";
-import { FaServerIcon } from "@/components/icons.tsx";
+import { LuServerIcon } from "@/components/icons.tsx";
 import { ThreadsCharts } from "@/components/dashboard/threads-charts.tsx";
 import { MsgMiniTable } from "@/components/dashboard/msg-mini-table.tsx";
 import { getKeyValue } from "@/utils/get-key-value.ts";
@@ -218,7 +218,7 @@ export const CardBox = () => {
           <SpotlightCard key={index} className="min-h-32">
             <Card.Header className="text-small flex flex-wrap items-center gap-2 text-muted">
               <span className="font-semibold text-foreground">会话数</span>
-              <FaServerIcon />
+              <LuServerIcon />
               <Chip
                 color={item.serverRole === "附件服务器" ? "warning" : "success"}
                 size="sm"
@@ -255,7 +255,7 @@ export const CardBox = () => {
           <SpotlightCard key={index} className="min-h-32">
             <Card.Header className="text-small flex flex-wrap items-center gap-2 text-muted">
               <span className="font-semibold text-foreground">请求数</span>
-              <FaServerIcon />
+              <LuServerIcon />
               <Chip
                 color={item.serverRole === "附件服务器" ? "warning" : "success"}
                 size="sm"

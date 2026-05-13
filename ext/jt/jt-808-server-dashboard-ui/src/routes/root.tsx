@@ -16,9 +16,8 @@ export async function loader() {
       path,
       method: "GET",
     });
-  } catch (error) {
-    // TODO
-    console.log(error);
+  } catch {
+    /* 首屏仍渲染占位配置，避免路由白屏 */
   }
 
   return { config: data };

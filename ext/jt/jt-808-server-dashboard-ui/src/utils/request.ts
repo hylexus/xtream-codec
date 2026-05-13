@@ -29,9 +29,11 @@ const instance: AxiosInstance = axios.create({
 });
 
 // global loading default processing
+const noop = () => {};
+
 const defaultLoadingHandler: LoadingHandler = {
-  start: () => console.log("Loading started..."),
-  end: () => console.log("Loading ended..."),
+  start: noop,
+  end: noop,
 };
 
 let loadingHandler: LoadingHandler = defaultLoadingHandler;
@@ -107,9 +109,9 @@ const request = async <T>(
   config: {
     path: string;
     method: string;
-    headers?: any;
-    data?: any;
-    params?: any;
+    headers?: Record<string, string>;
+    data?: unknown;
+    params?: Record<string, unknown>;
     cancelToken?: CancelTokenSource;
   } & AxiosRequestConfig,
 ): Promise<T> => {
