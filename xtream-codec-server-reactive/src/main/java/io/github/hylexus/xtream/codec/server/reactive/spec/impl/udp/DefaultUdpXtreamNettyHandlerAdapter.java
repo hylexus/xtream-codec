@@ -47,7 +47,7 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
         this.xtreamHandler = xtreamHandler;
         this.allocator = allocator;
         this.sessionManager = sessionManager;
-        log.info("DefaultUdpXtreamNettyHandlerAdapter initialized");
+        log.info("[{}] initialized", this.getClass().getSimpleName());
     }
 
     @Override

@@ -47,7 +47,7 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
         this.xtreamHandler = xtreamHandler;
         this.allocator = allocator;
         this.sessionManager = sessionManager;
-        log.info("DefaultTcpXtreamNettyHandlerAdapter initialized");
+        log.info("[{}] initialized", this.getClass().getSimpleName());
     }
 
     @Override

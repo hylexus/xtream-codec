@@ -12,13 +12,14 @@ import { NumberValue } from "@visx/vendor/d3-scale";
 
 import { Dump, Group } from "./types.ts";
 
+// spring-boot-admin
 const types = {
-  NEW: { color: "#7b9ce1" },
-  RUNNABLE: { color: "#bd6d6c" },
-  BLOCKED: { color: "#75d874" },
-  WAITING: { color: "#e0bc78" },
-  TIMED_WAITING: { color: "#dc77dc" },
-  TERMINATED: { color: "#72b362" },
+  NEW: { color: "#f5f5f5", textColor: "#000" },
+  RUNNABLE: { color: "#48c78e", textColor: "#000" },
+  BLOCKED: { color: "#f14668", textColor: "#fff" },
+  WAITING: { color: "#ffe08a", textColor: "#000" },
+  TIMED_WAITING: { color: "#ffe08a", textColor: "#000" },
+  TERMINATED: { color: "#f5f5f5", textColor: "#000" },
 };
 const format = timeFormat("%H:%m:%S");
 const maxPixelsPerSeconds = 15;
@@ -76,6 +77,7 @@ export const DumpGroup = () => {
                       threadState: data.value.dumpInfo.threadState,
                     });
                   }
+                  tempThread.latestDumpInfo = data.value.dumpInfo;
                   tempGroup.threads[threadIndex] = tempThread;
                 } else {
                   tempGroup.threads.push({
@@ -88,6 +90,7 @@ export const DumpGroup = () => {
                         threadState: data.value.dumpInfo.threadState,
                       },
                     ],
+                    latestDumpInfo: data.value.dumpInfo,
                   });
                 }
 
@@ -107,6 +110,7 @@ export const DumpGroup = () => {
                             threadState: data.value.dumpInfo.threadState,
                           },
                         ],
+                        latestDumpInfo: data.value.dumpInfo,
                       },
                     ],
                   },
@@ -223,18 +227,139 @@ export const DumpGroup = () => {
                       </Accordion.Trigger>
                     </Accordion.Heading>
                     <Accordion.Panel>
-                      <ul className="space-y-2 text-sm">
-                        <li className="text-foreground">
-                          <span className="text-muted">ID: </span>
-                          <span>{thread.threadId}</span>
-                        </li>
-                        <li className="text-foreground">
-                          <span className="text-muted">Stack trace: </span>
-                          <pre className="mt-1 overflow-x-auto rounded-md border border-border bg-background-tertiary/80 p-3 font-mono text-xs">
-                            {JSON.stringify(thread.stackTrace, null, 2)}
-                          </pre>
-                        </li>
-                      </ul>
+                      {(() => {
+                        const dump = thread.latestDumpInfo;
+
+                        if (!dump) return null;
+
+                        const renderStackTrace = (
+                          stack: typeof dump.stackTrace,
+                        ) =>
+                          stack.map((frame, i) => {
+                            const isNative = frame.nativeMethod;
+                            const location =
+                              frame.fileName != null
+                                ? `${frame.fileName}:${frame.lineNumber}`
+                                : isNative
+                                  ? "Native Method"
+                                  : "Unknown";
+
+                            return (
+                              <div
+                                key={i}
+                                className={isNative ? "text-warning" : ""}
+                              >
+                                {`    at ${frame.className}.${frame.methodName}(${location})`}
+                                {isNative && (
+                                  <span className="ml-2 font-semibold text-warning">
+                                    [native]
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          });
+
+                        return (
+                          <div className="space-y-4 pl-5">
+                            <div className="flex items-center gap-3">
+                              <Chip
+                                size="sm"
+                                style={{
+                                  backgroundColor:
+                                    types[dump.threadState].color,
+                                  color: types[dump.threadState].textColor,
+                                }}
+                              >
+                                {dump.threadState}
+                              </Chip>
+                              <span className="text-sm text-muted-foreground">
+                                {dump.threadName}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                              <div>
+                                <span className="text-muted">Thread ID: </span>
+                                <span className="text-foreground">
+                                  {dump.threadId}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-muted">Priority: </span>
+                                <span className="text-foreground">
+                                  {dump.priority}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-muted">Daemon: </span>
+                                <span className="text-foreground">
+                                  {dump.daemon ? "Yes" : "No"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-muted">
+                                  Blocked Count:{" "}
+                                </span>
+                                <span className="text-foreground">
+                                  {dump.blockedCount}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-muted">
+                                  Blocked Time:{" "}
+                                </span>
+                                <span className="text-foreground">
+                                  {dump.blockedTime}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-muted">
+                                  Waited Count:{" "}
+                                </span>
+                                <span className="text-foreground">
+                                  {dump.waitedCount}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-muted">
+                                  Waited Time:{" "}
+                                </span>
+                                <span className="text-foreground">
+                                  {dump.waitedTime}
+                                </span>
+                              </div>
+                              {dump.lockName && (
+                                <div className="col-span-2">
+                                  <span className="text-muted">Lock: </span>
+                                  <span className="text-foreground">
+                                    {dump.lockName}
+                                  </span>
+                                </div>
+                              )}
+                              {dump.lockOwnerName && (
+                                <div className="col-span-2">
+                                  <span className="text-muted">
+                                    Lock Owner:{" "}
+                                  </span>
+                                  <span className="text-foreground">
+                                    {dump.lockOwnerName} (ID: {dump.lockOwnerId}
+                                    )
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div>
+                              <div className="mb-1 text-sm font-medium text-foreground">
+                                Stack Trace
+                              </div>
+                              <div className="overflow-x-auto rounded-md border border-border bg-background-tertiary/80 p-3 font-mono text-xs text-foreground">
+                                {renderStackTrace(dump.stackTrace)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </Accordion.Panel>
                   </Accordion.Item>
                 </Accordion>
