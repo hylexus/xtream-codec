@@ -41,7 +41,7 @@ public class DemoLocationMsg01 {
 
     // byte[4]     协议版本号
     @Preset.RustStyle.u8
-    private byte protocolVersion;
+    private short protocolVersion;
 
     // byte[5-15)    终端手机号或设备ID bcd[10]
     @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_BCD_8421, length = 10)

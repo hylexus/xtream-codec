@@ -72,7 +72,7 @@ public class DemoUdpXtreamHandler2 {
         final DemoLocationMsg01 msg = new DemoLocationMsg01();
         msg.setMsgId(0x01);
         msg.setMsgBodyProps(222);
-        msg.setProtocolVersion((byte) 1);
+        msg.setProtocolVersion((short) 1);
         msg.setTerminalId("6666");
         // return Flux.error(new RuntimeException("..."));
         // return ByteBufAllocator.DEFAULT.buffer().writeBytes(new byte[]{1,1,2,2});
