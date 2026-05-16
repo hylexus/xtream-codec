@@ -22,28 +22,10 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class U8FieldCodecTest extends BaseFieldCodecTest {
-
-
-    @Data
-    @Accessors(chain = true)
-    public static class U8FiledTestEntity {
-        @Preset.RustStyle.u8
-        private short s1;
-        @Preset.RustStyle.u8
-        private Short s2;
-
-        @Preset.RustStyle.u8
-        private int i1;
-        @Preset.RustStyle.u8
-        private Integer i2;
-
-        @Preset.RustStyle.u8
-        private long l1;
-        @Preset.RustStyle.u8
-        private Long l2;
-    }
 
     @Test
     void test() {
@@ -66,5 +48,81 @@ class U8FieldCodecTest extends BaseFieldCodecTest {
                 }
         );
 
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0", "1", "127", "128", "254", "255"})
+    void testBoundaryValues(int boundary) {
+        codec(
+                XtreamField.ALL_VERSION,
+                new U8FiledTestEntity()
+                        .setS1((short) boundary)
+                        .setS2((short) boundary)
+                        .setI1(boundary)
+                        .setI2(boundary)
+                        .setL1(boundary)
+                        .setL2((long) boundary),
+                (s, t) -> {
+                    Assertions.assertNotSame(s, t);
+                    Assertions.assertEquals(s.s1, t.s1);
+                    Assertions.assertEquals(s.s2, t.s2);
+                    Assertions.assertEquals(s.i1, t.i1);
+                    Assertions.assertEquals(s.i2, t.i2);
+                    Assertions.assertEquals(s.l1, t.l1);
+                    Assertions.assertEquals(s.l2, t.l2);
+                }
+        );
+    }
+
+    @Test
+    void testOutOfRangePositive() {
+        final U8FiledTestEntity entity = new U8FiledTestEntity()
+                .setS1((short) 0)
+                .setS2((short) 0)
+                .setI1(0)
+                .setI2(0)
+                .setL1(0)
+                .setL2(0L)
+                .setOutOfRangeValue(257);
+        codec(XtreamField.ALL_VERSION, entity,
+                (s, t) -> Assertions.assertEquals(1, t.outOfRangeValue)
+        );
+    }
+
+    @Test
+    void testOutOfRangeNegative() {
+        final U8FiledTestEntity entity = new U8FiledTestEntity()
+                .setS1((short) 0)
+                .setS2((short) 0)
+                .setI1(0)
+                .setI2(0)
+                .setL1(0)
+                .setL2(0L)
+                .setOutOfRangeValue(-1);
+        codec(XtreamField.ALL_VERSION, entity,
+                (s, t) -> Assertions.assertEquals(255, t.outOfRangeValue)
+        );
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class U8FiledTestEntity {
+        @Preset.RustStyle.u8
+        private short s1;
+        @Preset.RustStyle.u8
+        private Short s2;
+
+        @Preset.RustStyle.u8
+        private int i1;
+        @Preset.RustStyle.u8
+        private Integer i2;
+
+        @Preset.RustStyle.u8
+        private long l1;
+        @Preset.RustStyle.u8
+        private Long l2;
+
+        @Preset.RustStyle.u8
+        private int outOfRangeValue;
     }
 }
