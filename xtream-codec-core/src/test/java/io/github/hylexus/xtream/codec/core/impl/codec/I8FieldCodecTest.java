@@ -20,15 +20,20 @@ import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 class I8FieldCodecTest extends BaseFieldCodecTest {
 
     @Test
     void test() {
         codec(
-                XtreamField.ALL_VERSION, new I8FiledTestEntity()
+                XtreamField.ALL_VERSION,
+                new I8FiledTestEntity()
                         .setB1((byte) -127)
                         .setB2((byte) -128)
                         .setS1((short) -127)
@@ -38,16 +43,71 @@ class I8FieldCodecTest extends BaseFieldCodecTest {
                         .setL1(-127)
                         .setL2(-128L),
                 (s, t) -> {
-                    Assertions.assertNotSame(s, t);
-                    Assertions.assertEquals(s.b1, t.b1);
-                    Assertions.assertEquals(s.b2, t.b2);
-                    Assertions.assertEquals(s.s1, t.s1);
-                    Assertions.assertEquals(s.s2, t.s2);
-                    Assertions.assertEquals(s.i1, t.i1);
-                    Assertions.assertEquals(s.i2, t.i2);
-                    Assertions.assertEquals(s.l1, t.l1);
-                    Assertions.assertEquals(s.l2, t.l2);
+                    assertNotSame(s, t);
+                    assertEquals(s.b1, t.b1);
+                    assertEquals(s.b2, t.b2);
+                    assertEquals(s.s1, t.s1);
+                    assertEquals(s.s2, t.s2);
+                    assertEquals(s.i1, t.i1);
+                    assertEquals(s.i2, t.i2);
+                    assertEquals(s.l1, t.l1);
+                    assertEquals(s.l2, t.l2);
                 }
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0", "1", "-1", "-2", "100", "-100", "127", "-128"})
+    void testBoundaryValues(int boundary) {
+        codec(
+                XtreamField.ALL_VERSION,
+                new I8FiledTestEntity()
+                        .setB1((byte) boundary)
+                        .setB2((byte) boundary)
+                        .setS1((short) boundary)
+                        .setS2((short) boundary)
+                        .setI1(boundary)
+                        .setI2(boundary)
+                        .setL1(boundary)
+                        .setL2((long) boundary),
+                (s, t) -> {
+                    assertNotSame(s, t);
+                    assertEquals(s.b1, t.b1);
+                    assertEquals(s.b2, t.b2);
+                    assertEquals(s.s1, t.s1);
+                    assertEquals(s.s2, t.s2);
+                    assertEquals(s.i1, t.i1);
+                    assertEquals(s.i2, t.i2);
+                    assertEquals(s.l1, t.l1);
+                    assertEquals(s.l2, t.l2);
+                }
+        );
+    }
+
+    @Test
+    void testOutOfRangePositive() {
+        final I8FiledTestEntity entity = new I8FiledTestEntity()
+                .setOutOfRangeValue(128) // i8: [-128, 127] 128 溢出为 -128
+                .setB2((byte) 0)
+                .setS2((short) 0)
+                .setI2(0)
+                .setL2(0L);
+
+        codec(XtreamField.ALL_VERSION, entity,
+                (s, t) -> assertEquals(-128, t.outOfRangeValue)
+        );
+    }
+
+    @Test
+    void testOutOfRangeNegative() {
+        final I8FiledTestEntity entity = new I8FiledTestEntity()
+                .setOutOfRangeValue(-129)
+                .setB2((byte) 0)
+                .setS2((short) 0)
+                .setI2(0)
+                .setL2(0L);
+        codec(XtreamField.ALL_VERSION, entity,
+                (s, t) -> assertEquals(127, t.outOfRangeValue)
         );
     }
 
@@ -77,5 +137,8 @@ class I8FieldCodecTest extends BaseFieldCodecTest {
 
         @Preset.RustStyle.i8
         private Long l2;
+
+        @Preset.RustStyle.i8
+        private int outOfRangeValue;
     }
 }
