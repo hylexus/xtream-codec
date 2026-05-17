@@ -16,8 +16,8 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
-import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.type.Preset;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.junit.jupiter.api.Assertions;
@@ -73,18 +73,18 @@ class I64FieldCodecTest extends BaseFieldCodecTest {
     @Data
     @Accessors(chain = true)
     public static class I64BeFiledTestEntity {
-        @XtreamField(signedness = NumberSignedness.SIGNED)
+        @Preset.RustStyle.i64
         private long l1;
-        @XtreamField(signedness = NumberSignedness.SIGNED)
+        @Preset.RustStyle.i64
         private Long l2;
     }
 
     @Data
     @Accessors(chain = true)
     public static class I64LeFiledTestEntity {
-        @XtreamField(signedness = NumberSignedness.SIGNED, littleEndian = true)
+        @Preset.RustStyle.i64_le
         private long l1;
-        @XtreamField(signedness = NumberSignedness.SIGNED, littleEndian = true)
+        @Preset.RustStyle.i64_le
         private Long l2;
     }
 }

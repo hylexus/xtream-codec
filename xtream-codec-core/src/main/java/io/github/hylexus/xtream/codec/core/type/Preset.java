@@ -298,6 +298,162 @@ public @interface Preset {
         @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
         @Retention(RetentionPolicy.RUNTIME)
         @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerI64.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 8, signedness = NumberSignedness.SIGNED)
+        @interface i64 {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerI64Le.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 8, littleEndian = true, signedness = NumberSignedness.SIGNED)
+        @interface i64_le {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerF32.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, signedness = NumberSignedness.SIGNED)
+        @interface f32 {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerF32Le.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 4, littleEndian = true, signedness = NumberSignedness.SIGNED)
+        @interface f32_le {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerF64.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 8, signedness = NumberSignedness.SIGNED)
+        @interface f64 {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
+        @Repeatable(PresetAliasContainers.RustStyleContainerF64Le.class)
+        @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, length = 8, littleEndian = true, signedness = NumberSignedness.SIGNED)
+        @interface f64_le {
+            @AliasFor(annotation = XtreamField.class, attribute = "order")
+            int order() default -1;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "propertyAccessStrategy")
+            PropertyAccessStrategy propertyAccessStrategy() default PropertyAccessStrategy.AUTO;
+
+            @AliasFor(annotation = XtreamField.class, attribute = "version")
+            int[] version() default {XtreamField.ALL_VERSION};
+
+            @AliasFor(annotation = XtreamField.class, attribute = "condition")
+            String condition() default "";
+
+            @AliasFor(annotation = XtreamField.class, attribute = "conditions")
+            Expression conditions() default @Expression();
+
+            @AliasFor(annotation = XtreamField.class, attribute = "desc")
+            String desc() default "";
+        }
+
+        @SuppressWarnings("checkstyle:TypeName")
+        @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Documented
         @Repeatable(PresetAliasContainers.RustStyleContainerStr.class)
         @XtreamField(dataType = BeanPropertyMetadata.FiledDataType.basic, charset = "utf-8")
         @interface str {

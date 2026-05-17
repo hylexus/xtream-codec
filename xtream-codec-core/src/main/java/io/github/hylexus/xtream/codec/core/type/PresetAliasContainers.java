@@ -98,6 +98,48 @@ final class PresetAliasContainers {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
     @Documented
+    public @interface RustStyleContainerI64 {
+        Preset.RustStyle.i64[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+    @Documented
+    public @interface RustStyleContainerI64Le {
+        Preset.RustStyle.i64_le[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+    @Documented
+    public @interface RustStyleContainerF32 {
+        Preset.RustStyle.f32[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+    @Documented
+    public @interface RustStyleContainerF32Le {
+        Preset.RustStyle.f32_le[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+    @Documented
+    public @interface RustStyleContainerF64 {
+        Preset.RustStyle.f64[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+    @Documented
+    public @interface RustStyleContainerF64Le {
+        Preset.RustStyle.f64_le[] value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD, ElementType.RECORD_COMPONENT})
+    @Documented
     public @interface RustStyleContainerStr {
         Preset.RustStyle.str[] value();
     }
