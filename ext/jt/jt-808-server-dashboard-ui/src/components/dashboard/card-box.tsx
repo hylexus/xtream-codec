@@ -297,7 +297,7 @@ export const CardBox = () => {
           <Card.Header className="text-sm font-semibold text-foreground">
             线程
           </Card.Header>
-          <Card.Content className="h-96">
+          <Card.Content className="min-h-96">
             <ThreadsCharts
               data={{
                 date: data.time ? data.time.slice(11, 19) : "",
