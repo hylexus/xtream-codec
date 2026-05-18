@@ -1,3 +1,141 @@
 @import "tailwindcss";
+@import "@heroui/styles";
 
-@config "../../tailwind.config.js"
+@config "../../tailwind.config.js";
+
+/*
+ * 深色模式：对齐参考图（纯黑侧栏 / zinc-950 主画布 / zinc-900 卡片块、弱线框 / #006FEE 主色）
+ * 浅色模式：保留 HeroUI 默认变量，仅调整仪表盘布局类。
+ */
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  html.dark {
+    color-scheme: dark;
+
+    --background: #000000;
+    --foreground: #ffffff;
+
+    --surface: #18181b;
+    --surface-foreground: #ffffff;
+    --surface-secondary: #161618;
+    --surface-tertiary: #27272a;
+
+    --overlay: #18181b;
+    --overlay-foreground: #ffffff;
+
+    --muted: #a1a1aa;
+
+    --scrollbar: #52525b;
+
+    --default: #27272a;
+    --default-foreground: #fafafa;
+
+    --field-background: #18181b;
+    --field-foreground: #fafafa;
+    --field-placeholder: var(--muted);
+    --field-border: rgb(255 255 255 / 0.07);
+
+    --segment: #27272a;
+    --segment-foreground: #fafafa;
+
+    --border: rgb(255 255 255 / 0.06);
+    --separator: rgb(255 255 255 / 0.05);
+
+    --accent: #006fee;
+    --accent-foreground: #ffffff;
+
+    --success: #10b981;
+    --success-foreground: #ffffff;
+
+    --warning: #f5a524;
+    --warning-foreground: #18181b;
+
+    --danger: #ef4444;
+    --danger-foreground: #ffffff;
+
+    --backdrop: rgba(0, 0, 0, 0.65);
+
+    --surface-shadow: none;
+    --field-shadow: none;
+    --overlay-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+  }
+
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  body {
+    @apply m-0 min-h-dvh bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .dashboard-main-surface {
+    @apply rounded-3xl border border-border bg-surface shadow-none;
+  }
+
+  html:not(.dark) .dashboard-main-surface {
+    @apply bg-surface/85 shadow-field backdrop-blur-xl;
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--foreground) 5%, transparent),
+      inset 0 1px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
+  }
+
+  html.dark .dashboard-main-surface {
+    border-color: transparent;
+    background-color: #09090b;
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+  }
+
+  .dashboard-main-column {
+    @apply relative z-10 min-h-0 flex-1 md:border-l md:border-border;
+  }
+
+  html:not(.dark) .dashboard-main-column {
+    @apply md:bg-background/45 md:backdrop-blur-md;
+  }
+
+  html.dark .dashboard-main-column {
+    @apply md:border-transparent;
+    background-color: #09090b;
+  }
+
+  .dashboard-sidebar {
+    @apply border-r border-border bg-background;
+  }
+
+  html.dark .dashboard-sidebar {
+    border-color: transparent;
+    background-color: #000000;
+  }
+
+  html.dark .dashboard-stat-card {
+    border-width: 0;
+    border-color: transparent;
+    background-color: #18181b;
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+  }
+
+  html.dark .dashboard-stat-card:hover {
+    background-color: #1f1f23;
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.07);
+  }
+
+  html:not(.dark) .dashboard-stat-card {
+    @apply border-0;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.05),
+      inset 0 1px 0 0 rgb(255 255 255 / 0.7);
+  }
+
+  .dashboard-nav-active {
+    @apply rounded-2xl bg-default text-default-foreground shadow-none ring-0;
+  }
+
+  .dashboard-nav-active.compact-nav {
+    @apply rounded-2xl bg-default text-default-foreground shadow-none ring-0;
+  }
+}

@@ -1,24 +1,17 @@
-import {
-  Accordion,
-  Button,
-  Card,
-  Chip,
-  Link,
-  Popover,
-  Tabs,
-} from "@heroui/react";
+import { Accordion, Button, Card, Chip, Popover, Tabs } from "@heroui/react";
 import { useEffect, useState } from "react";
 import {
   EventSourceMessage,
   fetchEventSource,
 } from "@microsoft/fetch-event-source";
-import { useRouteLoaderData } from "react-router-dom";
+import { NavLink, useRouteLoaderData } from "react-router-dom";
 
 import { CountNumber } from "./count-number.tsx";
 import { CountTime } from "./count-time.tsx";
 import { SpotlightCard } from "./spolight-card.tsx";
 
 import { Metrics, ServerInfo } from "@/types";
+import { PageHeader } from "@/components/page-header.tsx";
 import { LuServerIcon } from "@/components/icons.tsx";
 import { ThreadsCharts } from "@/components/dashboard/threads-charts.tsx";
 import { MsgMiniTable } from "@/components/dashboard/msg-mini-table.tsx";
@@ -119,14 +112,11 @@ export const CardBox = () => {
 
   return (
     <>
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          概览
-        </h2>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-          服务器、会话与请求指标的实时视图；配色随浅色 / 深色主题自动切换。
-        </p>
-      </div>
+      <PageHeader
+        className="mb-8"
+        description="服务器、会话与请求指标的实时视图；配色随浅色 / 深色主题自动切换。"
+        title="概览"
+      />
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6">
         <SpotlightCard>
           <Card.Header className="text-sm font-semibold text-foreground">
@@ -202,12 +192,12 @@ export const CardBox = () => {
                   }
                 />
               </p>
-              <Link
+              <NavLink
                 className="text-sm font-medium text-accent underline-offset-4 hover:underline"
-                href="/subscriber"
+                to="/subscriber"
               >
                 详情
-              </Link>
+              </NavLink>
             </div>
           </Card.Content>
         </SpotlightCard>
@@ -216,7 +206,7 @@ export const CardBox = () => {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5">
         {listCount.map((item, index) => (
           <SpotlightCard key={index} className="min-h-32">
-            <Card.Header className="text-small flex flex-wrap items-center gap-2 text-muted">
+            <Card.Header className="text-small flex-row items-center gap-2 text-muted">
               <span className="font-semibold text-foreground">会话数</span>
               <LuServerIcon />
               <Chip
@@ -253,7 +243,7 @@ export const CardBox = () => {
         ))}
         {listRequest.map((item, index) => (
           <SpotlightCard key={index} className="min-h-32">
-            <Card.Header className="text-small flex flex-wrap items-center gap-2 text-muted">
+            <Card.Header className="text-small flex-row items-center gap-2 text-muted">
               <span className="font-semibold text-foreground">请求数</span>
               <LuServerIcon />
               <Chip

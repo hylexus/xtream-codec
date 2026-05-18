@@ -9,9 +9,10 @@ import {
   TextField,
   Tooltip,
 } from "@heroui/react";
-import React, { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
+import { PageHeader } from "@/components/page-header.tsx";
 import { request } from "@/utils/request.ts";
 
 interface HandlerInfo {
@@ -236,7 +237,7 @@ export const MappingsPage = () => {
   );
   const [expanded, setExpanded] = useState<Set<GroupKey>>(new Set());
 
-  React.useEffect(() => {
+  useEffect(() => {
     setExpanded(expandedKeys);
   }, [expandedKeys]);
 
@@ -325,15 +326,10 @@ export const MappingsPage = () => {
 
   return (
     <div className="box-border flex h-full flex-col gap-4">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          消息映射
-        </h2>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          按消息 ID、协议版本、处理器等维度查看 JT808
-          处理器注册情况；表格区域使用与主题一致的表面色与分割线。
-        </p>
-      </div>
+      <PageHeader
+        description="按消息 ID、协议版本、处理器等维度查看 JT808 处理器注册情况；表格区域使用与主题一致的表面色与分割线。"
+        title="消息映射"
+      />
       <div className="flex shrink-0 flex-wrap items-center gap-4">
         <ButtonGroup aria-label="分组方式" size="sm">
           {GROUP_BY_OPTIONS.map((opt) => (

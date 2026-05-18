@@ -1,17 +1,15 @@
-import { Avatar, Button } from "@heroui/react";
+import { Avatar, Button, Link } from "@heroui/react";
 import clsx from "clsx";
 import {
-  ExternalLink as ExternalLinkIcon,
+  ExternalLink,
   LifeBuoy,
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
-import { NavLink, useLocation, useRouteLoaderData } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
-import { ExternalLink } from "@/components/external-link.tsx";
 import { LuChevronRightIcon, LogoIcon } from "@/components/icons";
 import { siteConfig } from "@/config/site.ts";
-import { ServerInfo } from "@/types";
 
 function pathMatches(pathname: string, href: string): boolean {
   if (href === "/dashboard") {
@@ -35,25 +33,6 @@ export const Sidebar = ({
   onCloseMobile,
 }: SidebarProps) => {
   const { pathname } = useLocation();
-  const { config } = useRouteLoaderData("root") as { config: ServerInfo };
-
-  const sideNavList = siteConfig.sidenav.filter((item) => {
-    if (item.href === "/attachment") {
-      return (
-        config.jt808ServerConfig?.attachmentServer?.tcpServer?.enabled ||
-        config.jt808ServerConfig?.attachmentServer?.udpServer?.enabled
-      );
-    }
-    if (item.href === "/instruction") {
-      return (
-        config.jt808ServerConfig?.instructionServer?.tcpServer?.enabled ||
-        config.jt808ServerConfig?.instructionServer?.udpServer?.enabled
-      );
-    }
-
-    return true;
-  });
-
   const asideWidth = compact ? "w-[76px]" : "w-[260px]";
 
   return (
@@ -87,13 +66,14 @@ export const Sidebar = ({
           compact ? "items-center px-2" : "",
         )}
       >
-        <ExternalLink
-          unstyled
+        <Link
           className={clsx(
             "mb-6 flex w-full items-center gap-3 rounded-2xl px-2 py-2 ring-1 ring-black/5 transition-colors hover:bg-background-tertiary dark:ring-0 dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06)]",
             compact ? "justify-center" : "",
           )}
           href={siteConfig.links.github}
+          rel="noopener noreferrer"
+          target="_blank"
         >
           <Avatar className="h-11 w-11 shrink-0 border-0 bg-surface shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06)]">
             <Avatar.Fallback className="bg-transparent">
@@ -105,34 +85,14 @@ export const Sidebar = ({
               <p className="truncate text-sm font-semibold text-foreground">
                 {siteConfig.name}
               </p>
-              <p className="truncate text-xs text-muted">监控控制台</p>
+              <p className="truncate text-xs text-muted">1078 监控控制台</p>
             </div>
           ) : null}
-        </ExternalLink>
+        </Link>
 
         <nav aria-label="主导航" className="flex flex-1 flex-col gap-1">
-          {sideNavList.map((link) => {
+          {siteConfig.sidenav.map((link) => {
             const Icon = link.icon;
-            const disabled = link.href === "/debug";
-
-            if (disabled) {
-              return (
-                <div
-                  key={link.href}
-                  className={clsx(
-                    "flex cursor-not-allowed items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-muted opacity-60",
-                    compact ? "justify-center px-2" : "",
-                  )}
-                  title="暂未开放"
-                >
-                  <Icon className="!text-current size-[1.15rem] shrink-0 [&>svg]:block" />
-                  {!compact ? (
-                    <span className="truncate font-medium">{link.name}</span>
-                  ) : null}
-                </div>
-              );
-            }
-
             const isOn = pathMatches(pathname, link.href);
 
             return (
@@ -169,28 +129,30 @@ export const Sidebar = ({
               : "flex flex-col gap-1",
           )}
         >
-          <ExternalLink
-            unstyled
+          <Link
             className={clsx(
               "flex items-center gap-2 rounded-2xl px-3 py-2 text-sm text-muted transition-colors hover:bg-background-tertiary hover:text-foreground",
               compact ? "justify-center px-0" : "",
             )}
             href={siteConfig.links.github}
+            rel="noopener noreferrer"
+            target="_blank"
           >
             <LifeBuoy className="size-4 shrink-0" strokeWidth={1.75} />
             {!compact ? <span>帮助与文档</span> : null}
-          </ExternalLink>
-          <ExternalLink
-            unstyled
+          </Link>
+          <Link
             className={clsx(
               "flex items-center gap-2 rounded-2xl px-3 py-2 text-sm text-muted transition-colors hover:bg-background-tertiary hover:text-foreground",
               compact ? "justify-center px-0" : "",
             )}
             href={siteConfig.links.sponsor}
+            rel="noopener noreferrer"
+            target="_blank"
           >
-            <ExternalLinkIcon className="size-4 shrink-0" strokeWidth={1.75} />
+            <ExternalLink className="size-4 shrink-0" strokeWidth={1.75} />
             {!compact ? <span>赞助 / 仓库</span> : null}
-          </ExternalLink>
+          </Link>
         </div>
       </div>
 

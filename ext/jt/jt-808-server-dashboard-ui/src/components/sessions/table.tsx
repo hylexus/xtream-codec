@@ -29,6 +29,17 @@ const SessionCell: FC<CellProps> = ({
   const cellValue = session[columnKey as keyof Session];
 
   switch (columnKey) {
+    case "id":
+      return (
+        <Tooltip>
+          <Tooltip.Trigger>
+            <div className="max-w-[10rem] overflow-hidden whitespace-nowrap text-ellipsis text">
+              {cellValue}
+            </div>
+          </Tooltip.Trigger>
+          <Tooltip.Content>{cellValue}</Tooltip.Content>
+        </Tooltip>
+      );
     case "serverType":
       return ServerMap[cellValue as keyof typeof ServerMap];
     case "protocolVersion":

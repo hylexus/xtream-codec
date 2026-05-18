@@ -1,69 +1,16 @@
-export type SiteConfig = typeof siteConfig;
+import { LuGaugeIcon, LuDesktopIcon, LuTagsIcon } from "@/components/icons.tsx";
 
 export const siteConfig = {
-  name: "Vite + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
-  navItems: [
-    {
-      label: "Home",
-      href: "/",
-    },
-    {
-      label: "Docs",
-      href: "/docs",
-    },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
-    {
-      label: "Blog",
-      href: "/blog",
-    },
-    {
-      label: "About",
-      href: "/about",
-    },
-  ],
-  navMenuItems: [
-    {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
-    },
+  name: "Xtream",
+  description: "JT/T 1078 流媒体服务监控",
+  sidenav: [
+    { name: "仪表盘", href: "/dashboard", icon: LuGaugeIcon },
+    { name: "媒体会话", href: "/sessions", icon: LuDesktopIcon },
+    { name: "数据订阅", href: "/subscribers", icon: LuTagsIcon },
   ],
   links: {
-    github: "https://github.com/heroui-inc/heroui",
-    twitter: "https://twitter.com/hero_ui",
-    docs: "https://heroui.com",
-    discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev",
+    gitee: "https://gitee.com/hylexus/xtream-codec",
+    github: "https://github.com/hylexus/xtream-codec",
+    sponsor: "https://github.com/hylexus/jt-framework",
   },
 };

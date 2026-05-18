@@ -32,7 +32,7 @@ const isObject = (val: unknown) => {
 };
 const valueColor = (item: unknown): string => {
   if (typeof item === "number") {
-    return "text-primary";
+    return "text-accent";
   }
   if (typeof item === "boolean") {
     return item ? "text-success" : "text-secondary";
@@ -76,9 +76,7 @@ const generateData = (json: object, _preKey: string, page?: string) => {
           >
             <span>{key}</span>
             {annotation[key] && (
-              <span className="text-small text-default-300">
-                {annotation[key]}
-              </span>
+              <span className="text-small text-muted">{annotation[key]}</span>
             )}
           </div>
         ),

@@ -1,7 +1,8 @@
-import { Button, Link } from "@heroui/react";
+import { Button } from "@heroui/react";
 import confetti from "canvas-confetti";
 import { Bell, Menu, Search } from "lucide-react";
 
+import { ExternalLink } from "@/components/external-link.tsx";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { GiteeIcon, GithubIcon, LuHeatIcon } from "@/components/icons";
@@ -80,24 +81,22 @@ export const Navbar = ({ onOpenMobileNav }: NavbarProps) => {
         </Button>
 
         <span title="GitHub">
-          <Link
+          <ExternalLink
+            unstyled
             className={iconLinkClass}
             href={siteConfig.links.github}
-            rel="noopener noreferrer"
-            target="_blank"
           >
             <GithubIcon size={20} />
-          </Link>
+          </ExternalLink>
         </span>
         <span title="Gitee">
-          <Link
+          <ExternalLink
+            unstyled
             className={iconLinkClass}
             href={siteConfig.links.gitee}
-            rel="noopener noreferrer"
-            target="_blank"
           >
             <GiteeIcon className="size-5" />
-          </Link>
+          </ExternalLink>
         </span>
 
         <div className="ml-1 rounded-full border border-border bg-background-tertiary p-0.5 dark:border-white/[0.08]">
