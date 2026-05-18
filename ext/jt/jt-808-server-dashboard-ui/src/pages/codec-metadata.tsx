@@ -9,7 +9,9 @@ import {
 } from "@heroui/react";
 import { FC, useCallback, useMemo, useState } from "react";
 
-import { PagePagination } from "@/components/page-pagination.tsx";
+import { FilterOptionGroup } from "@/components/filter-option-group.tsx";
+import { ListPageFooter } from "@/components/list-page-footer.tsx";
+import { PageSection } from "@/components/page-header.tsx";
 import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
 
@@ -61,14 +63,14 @@ const CodecDetail: FC<{ item: Dic }> = ({ item }) => {
         <span>
           <span className="text-accent">endian</span>
           <span className="text-muted">=</span>
-          <span className="text-default-600">{item.endian}</span>
+          <span className="text-muted">{item.endian}</span>
         </span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>
           <span className="text-accent">charset</span>
           <span className="text-muted">=</span>
-          <span className="text-default-600">{item.charset}</span>
+          <span className="text-muted">{item.charset}</span>
         </span>
         <span>
           <span className="text-accent">isBuiltin</span>
@@ -220,51 +222,24 @@ export const CodecMetadataPage = () => {
           <Label className="sr-only">字符集</Label>
           <Input placeholder="输入字符集" />
         </TextField>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-default-500">符号:</span>
-          <div className="flex">
-            {signednessOptions.map((o) => (
-              <Button
-                key={o.key}
-                size="sm"
-                variant={filterSignedness === o.key ? "primary" : "ghost"}
-                onPress={() => onFilterChange(setFilterSignedness)(o.key)}
-              >
-                {o.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-default-500">字节序:</span>
-          <div className="flex">
-            {endianOptions.map((o) => (
-              <Button
-                key={o.key}
-                size="sm"
-                variant={filterEndian === o.key ? "primary" : "ghost"}
-                onPress={() => onFilterChange(setFilterEndian)(o.key)}
-              >
-                {o.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-default-500">内置:</span>
-          <div className="flex">
-            {builtinOptions.map((o) => (
-              <Button
-                key={o.key}
-                size="sm"
-                variant={filterBuiltin === o.key ? "primary" : "ghost"}
-                onPress={() => onFilterChange(setFilterBuiltin)(o.key)}
-              >
-                {o.label}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <FilterOptionGroup
+          label="符号"
+          options={signednessOptions}
+          value={filterSignedness}
+          onChange={onFilterChange(setFilterSignedness)}
+        />
+        <FilterOptionGroup
+          label="字节序"
+          options={endianOptions}
+          value={filterEndian}
+          onChange={onFilterChange(setFilterEndian)}
+        />
+        <FilterOptionGroup
+          label="内置"
+          options={builtinOptions}
+          value={filterBuiltin}
+          onChange={onFilterChange(setFilterBuiltin)}
+        />
       </div>
     );
   }, [
@@ -286,32 +261,26 @@ export const CodecMetadataPage = () => {
   }
 
   return (
-    <div className="box-border flex h-full flex-col">
-      <div className="mb-4 shrink-0">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          Codec 元数据
-        </h2>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          内置与自定义字段编解码器注册表，可按 key、符号性、字节序等筛选。
-        </p>
-      </div>
+    <PageSection
+      className="box-border h-full"
+      description="内置与自定义字段编解码器注册表，可按 key、符号性、字节序等筛选。"
+      title="Codec 元数据"
+    >
       {topContent}
-      <div className="flex-1 overflow-y-auto flex flex-col gap-2">
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
         {tableData?.data?.map((item, idx) => (
           <CodecCard key={`${item.key}-${idx}`} idx={idx} item={item} />
         ))}
         {(!tableData?.data || tableData.data.length === 0) && (
-          <div className="text-center text-default-400 py-8">暂无数据</div>
+          <p className="py-8 text-center text-muted">暂无数据</p>
         )}
       </div>
-      <div className="flex w-full items-center justify-center gap-3 mt-4 shrink-0">
-        <p className="text-small text-default-400">
-          总数：{tableData?.total ?? 0}
-        </p>
-        {pages > 0 && (
-          <PagePagination page={page} total={pages} onChange={setPage} />
-        )}
-      </div>
-    </div>
+      <ListPageFooter
+        page={page}
+        pages={pages}
+        total={tableData?.total ?? 0}
+        onPageChange={setPage}
+      />
+    </PageSection>
   );
 };

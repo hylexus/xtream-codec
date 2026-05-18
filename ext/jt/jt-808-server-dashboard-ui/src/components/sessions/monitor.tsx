@@ -79,13 +79,13 @@ const Message: FC<MessageProps> = ({ item, className }) => {
       <div className="w-12">
         <Avatar>
           <Avatar.Fallback>
-            <LuRobotIcon className="text-primary" />
+            <LuRobotIcon className="text-accent" />
           </Avatar.Fallback>
         </Avatar>
       </div>
       <Card className="w-full flex-grow-0">
         <Card.Content className="text-center">
-          <p className="text-primary line-clamp-2 text-sm">{`Session${
+          <p className="line-clamp-2 text-sm text-accent">{`Session${
             Number(item.type) === EventType.BEFORE_SESSION_CLOSED
               ? " closed"
               : " opened"
@@ -234,65 +234,66 @@ export const SessionMonitor: FC<SessionMonitorProps> = ({
 
   return (
     <Drawer state={drawerState}>
-      <Drawer.Backdrop isDismissable variant="blur" />
-      <Drawer.Content className="max-w-[min(100vw,56rem)]" placement="right">
-        <Drawer.Dialog>
-          <Drawer.Header className="flex justify-between gap-1">
-            <div className={subtitle()}>terminalId: {row?.terminalId}</div>
-          </Drawer.Header>
-          <Drawer.Body>
-            <div className="flex items-center gap-4">
-              <TextField
-                className="w-1/6 min-w-32"
-                value={max}
-                onChange={setMax}
+      <Drawer.Backdrop variant="blur">
+        <Drawer.Content placement="right">
+          <Drawer.Dialog className="w-1/2">
+            <Drawer.Header className="flex justify-between gap-1">
+              <div className={subtitle()}>terminalId: {row?.terminalId}</div>
+            </Drawer.Header>
+            <Drawer.Body>
+              <div className="flex items-center gap-4">
+                <TextField
+                  className="w-1/6 min-w-32"
+                  value={max}
+                  onChange={setMax}
+                >
+                  <Label>Max</Label>
+                  <Input type="number" />
+                </TextField>
+                <Dropdown>
+                  <Dropdown.Trigger className="hidden sm:flex">
+                    <Button variant="secondary">
+                      <span className="flex items-center gap-2">
+                        Event
+                        <LuChevronDownIcon className="text-small" />
+                      </span>
+                    </Button>
+                  </Dropdown.Trigger>
+                  <Dropdown.Popover>
+                    <Dropdown.Menu
+                      disallowEmptySelection
+                      aria-label="Event"
+                      selectedKeys={selected}
+                      selectionMode="multiple"
+                      onSelectionChange={setSelected}
+                    >
+                      {eventList.map((event) => (
+                        <Dropdown.Item
+                          key={event.key}
+                          className="capitalize"
+                          id={event.key}
+                          textValue={event.name}
+                        >
+                          {event.name}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown.Popover>
+                </Dropdown>
+              </div>
+              <ScrollShadow
+                hideScrollBar
+                className="mt-4 flex flex-col gap-4 px-1"
               >
-                <Label>Max</Label>
-                <Input type="number" />
-              </TextField>
-              <Dropdown>
-                <Dropdown.Trigger className="hidden sm:flex">
-                  <Button variant="secondary">
-                    <span className="flex items-center gap-2">
-                      Event
-                      <LuChevronDownIcon className="text-small" />
-                    </span>
-                  </Button>
-                </Dropdown.Trigger>
-                <Dropdown.Popover>
-                  <Dropdown.Menu
-                    disallowEmptySelection
-                    aria-label="Event"
-                    selectedKeys={selected}
-                    selectionMode="multiple"
-                    onSelectionChange={setSelected}
-                  >
-                    {eventList.map((event) => (
-                      <Dropdown.Item
-                        key={event.key}
-                        className="capitalize"
-                        id={event.key}
-                        textValue={event.name}
-                      >
-                        {event.name}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown.Popover>
-              </Dropdown>
-            </div>
-            <ScrollShadow
-              hideScrollBar
-              className="mt-4 flex flex-col gap-4 px-1"
-            >
-              {filteredLinkData?.map((item: any, index: number) => (
-                <Message key={index} className="message-card" item={item} />
-              ))}
-              <div ref={listBottomRef} />
-            </ScrollShadow>
-          </Drawer.Body>
-        </Drawer.Dialog>
-      </Drawer.Content>
+                {filteredLinkData?.map((item: any, index: number) => (
+                  <Message key={index} className="message-card" item={item} />
+                ))}
+                <div ref={listBottomRef} />
+              </ScrollShadow>
+            </Drawer.Body>
+          </Drawer.Dialog>
+        </Drawer.Content>
+      </Drawer.Backdrop>
     </Drawer>
   );
 };

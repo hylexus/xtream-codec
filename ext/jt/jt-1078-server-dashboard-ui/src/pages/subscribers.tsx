@@ -1,21 +1,19 @@
 import { Spinner, Table, Tooltip } from "@heroui/react";
-import { FC, Key, useMemo } from "react";
+import React, { FC, useMemo } from "react";
 
-import { PageSection } from "@/components/page-header.tsx";
 import { PagePagination } from "@/components/page-pagination.tsx";
-import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
+import { Dic, Jt1078Subscriber } from "@/types";
 
 interface CellProps {
   item: Dic;
-  columnKey: Key;
+  columnKey: React.Key;
 }
 
 const RenderCell: FC<CellProps> = ({ item, columnKey }) => {
   const cellValue = item[columnKey as keyof Dic];
 
   switch (columnKey) {
-    case "interestedEvents":
     case "metadata":
       return (
         <Tooltip>
@@ -29,25 +27,42 @@ const RenderCell: FC<CellProps> = ({ item, columnKey }) => {
           </Tooltip.Content>
         </Tooltip>
       );
-    case "createdAt":
-      return String(cellValue).slice(0, -4);
     default:
-      return cellValue;
+      if (cellValue == null) {
+        return "—";
+      }
+
+      return String(cellValue);
   }
 };
 
-export const SubscribePage = () => {
-  const path = "event-publisher/subscribers";
-  const { setPage, page, pages, tableData, isLoading } = usePageList(path, 10);
+const pageIntro = (
+  <div>
+    <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+      数据订阅
+    </h2>
+    <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+      流媒体通道上的订阅方列表及元数据。
+    </p>
+  </div>
+);
+
+export const SubscribersPage = () => {
+  const path = "subscribers";
+  const { setPage, page, pages, tableData, isLoading } =
+    usePageList<Jt1078Subscriber>(path, 10);
 
   const loadingState =
-    isLoading && tableData?.data?.length === 0 ? "loading" : "idle";
+    isLoading && (tableData?.data?.length ?? 0) === 0 ? "loading" : "idle";
 
   const columns = [
-    { key: "id", label: "ID", width: "20%" },
-    { key: "interestedEvents", label: "订阅事件", width: "30%" },
-    { key: "metadata", label: "元数据", width: "30%" },
-    { key: "createdAt", label: "创建时间", width: "20%" },
+    { key: "id", label: "ID", width: "18%" },
+    { key: "convertedSim", label: "SIM", width: "12%" },
+    { key: "channel", label: "通道", width: "8%" },
+    { key: "convertedAudioType", label: "音频", width: "12%" },
+    { key: "rawVideoType", label: "视频", width: "12%" },
+    { key: "createdAt", label: "创建时间", width: "18%" },
+    { key: "metadata", label: "元数据", width: "20%" },
   ];
 
   const bottomContent = useMemo(() => {
@@ -68,32 +83,28 @@ export const SubscribePage = () => {
 
   const items = tableData?.data ?? [];
 
-  if (loadingState === "loading" && items.length === 0) {
+  if (loadingState === "loading") {
     return (
-      <PageSection
-        description="事件发布器上的订阅方列表及元数据。"
-        title="事件订阅者"
-      >
+      <div className="flex flex-col gap-6">
+        {pageIntro}
         <div className="flex flex-col gap-4">
           {topContent}
           <div className="flex justify-center p-12">
             <Spinner />
           </div>
         </div>
-      </PageSection>
+      </div>
     );
   }
 
   return (
-    <PageSection
-      description="事件发布器上的订阅方列表及元数据。"
-      title="事件订阅者"
-    >
+    <div className="flex flex-col gap-6">
+      {pageIntro}
       <div className="flex flex-col gap-2">
         {topContent}
         <Table.Root className="w-full">
           <Table.ScrollContainer className="max-h-[80vh]">
-            <Table.Content aria-label="Subscribe">
+            <Table.Content aria-label="Subscribers">
               <Table.Header>
                 {columns.map((column) => (
                   <Table.Column
@@ -109,7 +120,10 @@ export const SubscribePage = () => {
                   <Table.Row id={String(item?.id)}>
                     {columns.map((column) => (
                       <Table.Cell key={String(column.key)}>
-                        <RenderCell columnKey={column.key} item={item} />
+                        <RenderCell
+                          columnKey={column.key}
+                          item={item as unknown as Dic}
+                        />
                       </Table.Cell>
                     ))}
                   </Table.Row>
@@ -120,6 +134,6 @@ export const SubscribePage = () => {
         </Table.Root>
         {bottomContent}
       </div>
-    </PageSection>
+    </div>
   );
 };

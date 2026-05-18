@@ -5,8 +5,9 @@ import {
 } from "@microsoft/fetch-event-source";
 import { Card } from "@heroui/react";
 
-import { Thread } from "@/types";
+import { PageSection } from "@/components/page-header.tsx";
 import { JsonPreview } from "@/components/json-preview.tsx";
+import { Thread } from "@/types";
 
 export const ThreadsPage = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -48,15 +49,10 @@ export const ThreadsPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          调度器指标
-        </h2>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-          各调度器线程池的实时配置快照，配色随当前主题切换。
-        </p>
-      </div>
+    <PageSection
+      description="各调度器线程池的实时配置快照，配色随当前主题切换。"
+      title="调度器指标"
+    >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {threads.map((thread: Thread) => (
           <Card key={thread.name} className="border border-border">
@@ -70,6 +66,6 @@ export const ThreadsPage = () => {
           </Card>
         ))}
       </div>
-    </div>
+    </PageSection>
   );
 };

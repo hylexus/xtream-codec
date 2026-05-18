@@ -9,7 +9,9 @@ import {
 } from "@heroui/react";
 import { FC, useCallback, useMemo, useState } from "react";
 
-import { PagePagination } from "@/components/page-pagination.tsx";
+import { FilterOptionGroup } from "@/components/filter-option-group.tsx";
+import { ListPageFooter } from "@/components/list-page-footer.tsx";
+import { PageSection } from "@/components/page-header.tsx";
 import { Dic } from "@/types";
 import { usePageList } from "@/hooks/use-page-list.ts";
 
@@ -39,7 +41,7 @@ const BEAN_CODE_SYNTAX = {
   type: "text-warning",
   field: "text-foreground",
   number: "text-success",
-  annotation: "text-default-600",
+  annotation: "text-muted",
   comment: "text-muted",
 } as const;
 
@@ -415,36 +417,18 @@ export const BeanMetadataPage = () => {
           <Label className="sr-only">类名</Label>
           <Input placeholder="输入类名" />
         </TextField>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-default-500">版本:</span>
-          <div className="flex">
-            {versionOptions.map((o) => (
-              <Button
-                key={o.key}
-                size="sm"
-                variant={filterVersion === o.key ? "primary" : "ghost"}
-                onPress={() => onFilterChange(setFilterVersion)(o.key)}
-              >
-                {o.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-default-500">类型:</span>
-          <div className="flex">
-            {dataTypeOptions.map((o) => (
-              <Button
-                key={o.key}
-                size="sm"
-                variant={filterDataType === o.key ? "primary" : "ghost"}
-                onPress={() => onFilterChange(setFilterDataType)(o.key)}
-              >
-                {o.label}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <FilterOptionGroup
+          label="版本"
+          options={versionOptions}
+          value={filterVersion}
+          onChange={onFilterChange(setFilterVersion)}
+        />
+        <FilterOptionGroup
+          label="类型"
+          options={dataTypeOptions}
+          value={filterDataType}
+          onChange={onFilterChange(setFilterDataType)}
+        />
       </div>
     );
   }, [filterClassName, filterVersion, filterDataType, onFilterChange]);
@@ -458,34 +442,26 @@ export const BeanMetadataPage = () => {
   }
 
   return (
-    <div className="box-border flex h-full flex-col">
-      <div className="mb-4 shrink-0">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          Bean 元数据
-        </h2>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          编解码 Bean 的属性、getter/setter
-          与长度策略等结构化信息；代码块背景与伪代码语法色均使用主题语义
-          token，随浅色 / 深色自动切换。
-        </p>
-      </div>
+    <PageSection
+      className="box-border h-full"
+      description="编解码 Bean 的属性、getter/setter 与长度策略等结构化信息；代码块背景与伪代码语法色均使用主题语义 token，随浅色 / 深色自动切换。"
+      title="Bean 元数据"
+    >
       {topContent}
-      <div className="flex-1 overflow-y-auto flex flex-col gap-2">
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
         {tableData?.data?.map((item, idx) => (
           <BeanCard key={`${item.rawClass}-${idx}`} item={item} />
         ))}
         {(!tableData?.data || tableData.data.length === 0) && (
-          <div className="text-center text-default-400 py-8">暂无数据</div>
+          <p className="py-8 text-center text-muted">暂无数据</p>
         )}
       </div>
-      <div className="flex w-full items-center justify-center gap-3 mt-4 shrink-0">
-        <p className="text-small text-default-400">
-          总数：{tableData?.total ?? 0}
-        </p>
-        {pages > 0 && (
-          <PagePagination page={page} total={pages} onChange={setPage} />
-        )}
-      </div>
-    </div>
+      <ListPageFooter
+        page={page}
+        pages={pages}
+        total={tableData?.total ?? 0}
+        onPageChange={setPage}
+      />
+    </PageSection>
   );
 };
