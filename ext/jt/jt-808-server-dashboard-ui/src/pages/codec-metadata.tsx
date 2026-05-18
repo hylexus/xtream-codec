@@ -97,7 +97,7 @@ const CodecCard: FC<{ item: Dic; idx: number }> = ({ item, idx }) => {
     <Card key={`${item.key}-${idx}`} className="mb-2 flex-shrink-0">
       <Card.Content className="p-0">
         <Button
-          className="h-auto min-h-10 w-full justify-between rounded-none px-3 py-2"
+          className="h-auto min-h-10 w-full justify-between bg-transparent px-3 py-2"
           variant="secondary"
           onPress={() => setExpanded(!expanded)}
         >

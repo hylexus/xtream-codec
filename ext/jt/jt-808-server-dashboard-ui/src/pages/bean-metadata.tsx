@@ -313,7 +313,7 @@ const BeanCard: FC<{ item: Dic }> = ({ item }) => {
     <Card className="mb-2 w-full flex-shrink-0">
       <Card.Content className="w-full p-0">
         <Button
-          className="h-auto min-h-12 w-full justify-between rounded-none px-3 py-2"
+          className="h-auto min-h-12 w-full justify-between bg-transparent px-3 py-2"
           variant="secondary"
           onPress={() => setExpanded(!expanded)}
         >
