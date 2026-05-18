@@ -15,11 +15,12 @@ pluginManagement {
     }
 
     repositories {
+        mavenLocal()
         listOf(
             "https://maven.aliyun.com/repository/public",
+            "https://maven.aliyun.com/repository/gradle-plugin",
             "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
             "https://repo.huaweicloud.com/repository/maven",
-            // "https://maven.aliyun.com/repository/gradle-plugin",
         ).forEach {
             maven {
                 url = uri(it)
@@ -28,16 +29,11 @@ pluginManagement {
                     // 上面几个镜像都没这个依赖
                     excludeGroup("net.minecraftforge.licenser")
                     excludeGroup("com.github.jk1")
-                    // 排除腾讯云 404 的依赖
-                    // if (it.contains("tencent")) {
-                    //     excludeGroup("com.github.jk1")
-                    // }
                 }
             }
         }
         gradlePluginPortal()
         mavenCentral()
-        mavenLocal()
     }
 }
 
@@ -104,18 +100,19 @@ fun setBuildFileName(project: ProjectDescriptor) {
 }
 
 fun extraMavenRepositoryUrls() = listOf(
+    // 国内镜像优先
     "https://maven.aliyun.com/repository/central",
     "https://maven.aliyun.com/repository/public",
     "https://maven.aliyun.com/repository/google",
     "https://maven.aliyun.com/repository/spring",
-    "https://repo.huaweicloud.com/repository/maven",
-    "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
-    // Central
-    "https://repo1.maven.org/maven2",
     "https://maven.aliyun.com/repository/spring-plugin",
     "https://maven.aliyun.com/repository/gradle-plugin",
     "https://maven.aliyun.com/repository/grails-core",
     "https://maven.aliyun.com/repository/apache-snapshots",
+    "https://repo.huaweicloud.com/repository/maven",
+    "https://mirrors.cloud.tencent.com/nexus/repository/maven-public",
+    // 官方源兜底
+    "https://repo1.maven.org/maven2",
     "https://plugins.gradle.org/m2/",
     "https://repo.spring.io/release",
     "https://repo.spring.io/snapshot"
