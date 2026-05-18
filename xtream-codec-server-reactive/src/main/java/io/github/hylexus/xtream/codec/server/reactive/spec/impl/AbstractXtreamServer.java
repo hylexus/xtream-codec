@@ -62,10 +62,12 @@ public abstract class AbstractXtreamServer<
     }
 
     private void doStart() {
+        final DisposableChannel disposable = requireNonNull(this.disposableServer);
+        final String threadName = this.getClass().getSimpleName() + ":" + disposable.address();
         final Thread thread = new Thread(() -> {
             // ...
-            requireNonNull(this.disposableServer).onDispose().block();
-        }, "XtreamServer");
+            disposable.onDispose().block();
+        }, threadName);
         thread.setDaemon(false);
         thread.setContextClassLoader(this.getClass().getClassLoader());
         thread.start();
