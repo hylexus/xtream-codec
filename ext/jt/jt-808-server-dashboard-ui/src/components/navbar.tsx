@@ -55,7 +55,7 @@ export const Navbar = ({ onOpenMobileNav }: NavbarProps) => {
             {greetingLabel()}，欢迎使用
           </p>
           <h1 className="truncate text-lg font-semibold tracking-tight text-foreground md:text-xl">
-            JT808 服务面板
+            JT/T 808 服务面板
           </h1>
         </div>
       </div>

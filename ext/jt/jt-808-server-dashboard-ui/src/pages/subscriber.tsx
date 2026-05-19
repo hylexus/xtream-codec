@@ -86,7 +86,7 @@ export const SubscribePage = () => {
 
   return (
     <PageSection
-      description="事件发布器上的订阅方列表及元数据。"
+      description="事件发布器上的订阅方列表及元数据"
       title="事件订阅者"
     >
       <div className="flex flex-col gap-2">

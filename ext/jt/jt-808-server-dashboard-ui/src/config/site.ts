@@ -37,6 +37,7 @@ export const siteConfig = {
   links: {
     gitee: "https://gitee.com/hylexus/xtream-codec",
     github: "https://github.com/hylexus/xtream-codec",
-    sponsor: "https://github.com/hylexus/jt-framework",
+    docs: "https://hylexus.github.io/xtream-codec",
+    sponsor: "https://github.com/hylexus/xtream-codec",
   },
 };

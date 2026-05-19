@@ -263,7 +263,7 @@ export const CodecMetadataPage = () => {
   return (
     <PageSection
       className="box-border h-full"
-      description="内置与自定义字段编解码器注册表，可按 key、符号性、字节序等筛选。"
+      description="字段编解码器注册表，可按 key、符号性、字节序等筛选"
       title="Codec 元数据"
     >
       {topContent}

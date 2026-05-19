@@ -444,7 +444,7 @@ export const BeanMetadataPage = () => {
   return (
     <PageSection
       className="box-border h-full"
-      description="编解码 Bean 的属性、getter/setter 与长度策略等结构化信息；代码块背景与伪代码语法色均使用主题语义 token，随浅色 / 深色自动切换。"
+      description="编解码 Bean 的属性、getter/setter 与长度策略等结构化信息"
       title="Bean 元数据"
     >
       {topContent}

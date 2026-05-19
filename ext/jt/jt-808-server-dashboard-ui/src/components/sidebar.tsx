@@ -175,7 +175,7 @@ export const Sidebar = ({
               "flex items-center gap-2 rounded-2xl px-3 py-2 text-sm text-muted transition-colors hover:bg-background-tertiary hover:text-foreground",
               compact ? "justify-center px-0" : "",
             )}
-            href={siteConfig.links.github}
+            href={siteConfig.links.docs}
           >
             <LifeBuoy className="size-4 shrink-0" strokeWidth={1.75} />
             {!compact ? <span>帮助与文档</span> : null}

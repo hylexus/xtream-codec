@@ -327,8 +327,8 @@ export const MappingsPage = () => {
   return (
     <div className="box-border flex h-full flex-col gap-4">
       <PageHeader
-        description="按消息 ID、协议版本、处理器等维度查看 JT808 处理器注册情况；表格区域使用与主题一致的表面色与分割线。"
-        title="消息映射"
+        description="按消息 ID、协议版本、处理器等维度查看 JT808 处理器注册情况"
+        title="请求映射"
       />
       <div className="flex shrink-0 flex-wrap items-center gap-4">
         <ButtonGroup aria-label="分组方式" size="sm">

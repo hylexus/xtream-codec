@@ -114,7 +114,7 @@ export const CardBox = () => {
     <>
       <PageHeader
         className="mb-8"
-        description="服务器、会话与请求指标的实时视图；配色随浅色 / 深色主题自动切换。"
+        description="服务器、会话与请求指标的实时视图"
         title="概览"
       />
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6">
