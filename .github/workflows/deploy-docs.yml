@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - feature/debug_ui
     paths:
       - 'docs/**'
       - '.github/workflows/deploy-docs.yml'
@@ -22,19 +23,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js & pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Install pnpm
-        run: npm install -g pnpm
+          cache: 'pnpm'
+          cache-dependency-path: 'docs/pnpm-lock.yaml' # 指定 docs 目录下的 lockfile 以启用缓存
 
       - name: Install & Build Docs
         run: |
           cd docs
-          pnpm config set ignore-scripts false
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm run docs:build
 
       - name: Upload artifact
