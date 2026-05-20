@@ -17,11 +17,13 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.common;
 
 import io.github.hylexus.xtream.codec.common.bean.XtreamMethodParameter;
+import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistry;
 import io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamHandlerResult;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 /**
  * 当前类是从 `org.springframework.web.method.HandlerMethod` 复制过来修改的。
@@ -30,25 +32,38 @@ import java.lang.reflect.Method;
  *
  * @author hylexus
  */
-// todo: NullAway 重构
-@SuppressWarnings("NullAway")
+@SuppressWarnings("LombokGetterMayBeUsed")
 public abstract class XtreamHandlerMethod {
 
     protected final Class<?> containerClass;
-    protected Object containerInstance;
+    protected final Object containerInstance;
     protected final Method method;
     protected final XtreamMethodParameter[] parameters;
-    protected Scheduler scheduler;
-    protected String schedulerName;
-    protected String desc;
-    protected boolean nonBlocking;
-    protected boolean rejectBlockingTask;
-    protected boolean virtualThread;
+    protected final String desc;
 
-    public XtreamHandlerMethod(Class<?> containerClass, Method method) {
+    /**
+     * @see io.github.hylexus.xtream.codec.server.reactive.spec.handler.XtreamBlockingHandlerMethodPredicate#isBlockingHandlerMethod(XtreamHandlerMethod)
+     */
+    protected final boolean nonBlocking;
+
+    protected final Scheduler scheduler;
+    protected final String schedulerName;
+    protected final boolean rejectBlockingTask;
+    protected final boolean virtualThread;
+
+    public XtreamHandlerMethod(Class<?> containerClass, Object containerInstance, Method method, String desc, Function<XtreamHandlerMethod, HandlerMethodSchedulerInfo> schedulerInfoFunc) {
         this.containerClass = containerClass;
+        this.containerInstance = containerInstance;
+        this.desc = desc;
         this.method = method;
         this.parameters = this.initMethodParameters(method);
+
+        final HandlerMethodSchedulerInfo schedulerInfo = schedulerInfoFunc.apply(this);
+        this.nonBlocking = !schedulerInfo.isBlockingHandler();
+        this.scheduler = schedulerInfo.scheduler();
+        this.schedulerName = schedulerInfo.config().name();
+        this.rejectBlockingTask = schedulerInfo.config().rejectBlocking();
+        this.virtualThread = schedulerInfo.config().virtualThread();
     }
 
     public Mono<XtreamHandlerResult> invoke(Object containerInstance, Object[] args) {
@@ -75,7 +90,6 @@ public abstract class XtreamHandlerMethod {
         return parameters;
     }
 
-
     public Method getMethod() {
         return method;
     }
@@ -88,17 +102,8 @@ public abstract class XtreamHandlerMethod {
         return containerInstance;
     }
 
-    public void setContainerInstance(Object containerInstance) {
-        this.containerInstance = containerInstance;
-    }
-
     public Scheduler getScheduler() {
         return scheduler;
-    }
-
-    public XtreamHandlerMethod setSchedulerName(String schedulerName) {
-        this.schedulerName = schedulerName;
-        return this;
     }
 
     public String getSchedulerName() {
@@ -109,21 +114,6 @@ public abstract class XtreamHandlerMethod {
         return desc;
     }
 
-    public XtreamHandlerMethod setDesc(String desc) {
-        this.desc = desc;
-        return this;
-    }
-
-    public XtreamHandlerMethod setScheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
-        return this;
-    }
-
-    public XtreamHandlerMethod setNonBlocking(boolean nonBlocking) {
-        this.nonBlocking = nonBlocking;
-        return this;
-    }
-
     public boolean isNonBlocking() {
         return nonBlocking;
     }
@@ -132,17 +122,11 @@ public abstract class XtreamHandlerMethod {
         return virtualThread;
     }
 
-    public XtreamHandlerMethod setVirtualThread(boolean virtualThread) {
-        this.virtualThread = virtualThread;
-        return this;
-    }
-
     public boolean isRejectBlockingTask() {
         return rejectBlockingTask;
     }
 
-    public XtreamHandlerMethod setRejectBlockingTask(boolean rejectBlockingTask) {
-        this.rejectBlockingTask = rejectBlockingTask;
-        return this;
+    public record HandlerMethodSchedulerInfo(boolean isBlockingHandler, Scheduler scheduler, XtreamSchedulerRegistry.SchedulerConfig config) {
     }
+
 }

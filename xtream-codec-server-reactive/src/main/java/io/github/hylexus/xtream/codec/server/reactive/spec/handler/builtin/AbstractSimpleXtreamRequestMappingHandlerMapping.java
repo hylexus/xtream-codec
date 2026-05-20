@@ -79,19 +79,21 @@ public abstract class AbstractSimpleXtreamRequestMappingHandlerMapping extends A
                     method -> {
                         log.info(method.getName());
                         final XtreamRequestHandlerMapping mappingAnnotation = requireNonNull(AnnotatedElementUtils.getMergedAnnotation(method, XtreamRequestHandlerMapping.class));
-                        final XtreamHandlerMethod handlerMethod = new ReactiveXtreamHandlerMethod(cls, method);
-                        final SchedulerInfo schedulerInfo = this.determineScheduler(
-                                handlerMethod,
-                                mappingAnnotation.scheduler(),
-                                classLevelAnnotation.blockingScheduler(),
-                                classLevelAnnotation.nonBlockingScheduler()
-                        );
-                        handlerMethod.setScheduler(schedulerInfo.scheduler());
-                        handlerMethod.setVirtualThread(schedulerInfo.config().virtualThread());
-                        handlerMethod.setRejectBlockingTask(schedulerInfo.config().rejectBlocking());
-
                         final Object containerInstance = instanceFactory.apply(cls);
-                        handlerMethod.setContainerInstance(containerInstance);
+
+                        final XtreamHandlerMethod handlerMethod = new ReactiveXtreamHandlerMethod(
+                                cls,
+                                containerInstance,
+                                method,
+                                "desc",
+                                (XtreamHandlerMethod ha) -> this.determineSchedulerInfo(
+                                        ha,
+                                        mappingAnnotation.scheduler(),
+                                        classLevelAnnotation.blockingScheduler(),
+                                        classLevelAnnotation.nonBlockingScheduler()
+                                )
+                        );
+
                         handlerMethods.add(handlerMethod);
                     },
                     // 被 @XtreamRequestHandlerMapping 注解的方法才会被注册为处理器

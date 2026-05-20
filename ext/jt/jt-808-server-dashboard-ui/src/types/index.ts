@@ -58,6 +58,10 @@ export interface Metrics {
 export interface Thread {
   time: string;
   name?: string;
+  remark?: string;
+  metadata?: {
+    [key: string]: any;
+  };
   value: {
     [key: string]: number;
   };

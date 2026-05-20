@@ -32,49 +32,30 @@ public abstract class AbstractXtreamRequestMappingHandlerMapping implements Xtre
         this.blockingHandlerMethodPredicate = blockingHandlerMethodPredicate;
     }
 
-    protected String determineSchedulerName(XtreamHandlerMethod handlerMethod, String methodLevelScheduler, String blockingScheduler, String nonBlockingScheduler) {
+    protected XtreamHandlerMethod.HandlerMethodSchedulerInfo determineSchedulerInfo(XtreamHandlerMethod handlerMethod, String methodLevelScheduler, String blockingScheduler, String nonBlockingScheduler) {
+        final boolean isBlockingHandler = this.blockingHandlerMethodPredicate.isBlockingHandlerMethod(handlerMethod);
         if (StringUtils.hasText(methodLevelScheduler)) {
-            return methodLevelScheduler;
+            return this.getSchedulerOrThrow(methodLevelScheduler, isBlockingHandler);
         }
-        if (this.blockingHandlerMethodPredicate.isBlockingHandlerMethod(handlerMethod)) {
+        if (isBlockingHandler) {
             if (StringUtils.hasText(blockingScheduler)) {
-                return blockingScheduler;
+                return this.getSchedulerOrThrow(blockingScheduler, true);
             }
             throw new IllegalArgumentException("Cannot determine `blockingScheduler`. Because `schedulerName` is EMPTY");
         }
-        handlerMethod.setNonBlocking(true);
         if (StringUtils.hasText(nonBlockingScheduler)) {
-            return nonBlockingScheduler;
+            return this.getSchedulerOrThrow(nonBlockingScheduler, false);
         }
 
         throw new IllegalArgumentException("Cannot determine `nonBlockingScheduler`. Because `schedulerName` is EMPTY");
     }
 
-    protected SchedulerInfo determineScheduler(XtreamHandlerMethod handlerMethod, String methodLevelScheduler, String blockingScheduler, String nonBlockingScheduler) {
-        if (StringUtils.hasText(methodLevelScheduler)) {
-            return this.getSchedulerOrThrow(methodLevelScheduler);
-        }
-        if (this.blockingHandlerMethodPredicate.isBlockingHandlerMethod(handlerMethod)) {
-            if (StringUtils.hasText(blockingScheduler)) {
-                return this.getSchedulerOrThrow(blockingScheduler);
-            }
-            throw new IllegalArgumentException("Cannot determine `blockingScheduler`. Because `schedulerName` is EMPTY");
-        }
-        if (StringUtils.hasText(nonBlockingScheduler)) {
-            return this.getSchedulerOrThrow(nonBlockingScheduler);
-        }
-
-        throw new IllegalArgumentException("Cannot determine `nonBlockingScheduler`. Because `schedulerName` is EMPTY");
-    }
-
-    protected SchedulerInfo getSchedulerOrThrow(String schedulerName) {
+    protected XtreamHandlerMethod.HandlerMethodSchedulerInfo getSchedulerOrThrow(String schedulerName, boolean isBlocking) {
         final Scheduler scheduler = this.schedulerRegistry.getScheduler(schedulerName)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot determine `Scheduler` with name `" + schedulerName + "`"));
         final XtreamSchedulerRegistry.SchedulerConfig config = this.schedulerRegistry.getSchedulerConfig(schedulerName)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot determine `SchedulerConfig` with name `" + schedulerName + "`"));
-        return new SchedulerInfo(scheduler, config);
+        return new XtreamHandlerMethod.HandlerMethodSchedulerInfo(isBlocking, scheduler, config);
     }
 
-    public record SchedulerInfo(Scheduler scheduler, XtreamSchedulerRegistry.SchedulerConfig config) {
-    }
 }

@@ -78,21 +78,19 @@ public class Jt808RequestMappingHandlerMapping extends AbstractXtreamRequestMapp
             ReflectionUtils.doWithMethods(
                     cls,
                     method -> {
-                        final XtreamHandlerMethod handlerMethod = new ReactiveXtreamHandlerMethod(cls, method);
-                        handlerMethod.setContainerInstance(instance);
                         final Jt808RequestHandlerMapping annotation = Objects.requireNonNull(AnnotatedElementUtils.getMergedAnnotation(method, Jt808RequestHandlerMapping.class));
-                        final String schedulerName = this.determineSchedulerName(
-                                handlerMethod,
-                                annotation.scheduler(),
-                                classLevelAnnotation.blockingScheduler(),
-                                classLevelAnnotation.nonBlockingScheduler()
+
+                        final XtreamHandlerMethod handlerMethod = new ReactiveXtreamHandlerMethod(
+                                cls,
+                                instance,
+                                method,
+                                annotation.desc(),
+                                (XtreamHandlerMethod ha) -> determineSchedulerInfo(ha, annotation.scheduler(),
+                                        classLevelAnnotation.blockingScheduler(),
+                                        classLevelAnnotation.nonBlockingScheduler()
+                                )
                         );
-                        final SchedulerInfo schedulerInfo = this.getSchedulerOrThrow(schedulerName);
-                        handlerMethod.setScheduler(schedulerInfo.scheduler());
-                        handlerMethod.setSchedulerName(schedulerName);
-                        handlerMethod.setDesc(annotation.desc());
-                        handlerMethod.setRejectBlockingTask(schedulerInfo.config().rejectBlocking());
-                        handlerMethod.setVirtualThread(schedulerInfo.config().virtualThread());
+
                         final int[] messageIds = annotation.messageIds();
                         for (final int messageId : messageIds) {
                             final Map<Jt808ProtocolVersion, XtreamHandlerMethod> map = this.mappings.computeIfAbsent(messageId, k -> new HashMap<>());

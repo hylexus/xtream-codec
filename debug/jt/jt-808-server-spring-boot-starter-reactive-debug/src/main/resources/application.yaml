@@ -194,7 +194,7 @@ jt808-server:
     request-dispatcher:
       ## xrd: Xtream-request-dispatcher
       metrics:
-        enabled: false
+        enabled: true
         prefix: "xrd"
       metadata:
         desc: "Xtream request dispatcher"
@@ -230,7 +230,7 @@ jt808-server:
     non-blocking-handler:
       ## xnbh: Xtream-non-blocking-handler
       metrics:
-        enabled: false
+        enabled: true
         prefix: xnbh
       metadata:
         desc: "Xtream non-blocking handler"
@@ -266,7 +266,7 @@ jt808-server:
     blocking-handler:
       ## xbh: Xtream-blocking-handler
       metrics:
-        enabled: false
+        enabled: true
         prefix: "xbh"
       metadata:
         desc: "Xtream blocking handler"
@@ -302,7 +302,7 @@ jt808-server:
     event-publisher:
       ## xep: xtream-event-publisher
       metrics:
-        enabled: false
+        enabled: true
         prefix: xep
       metadata:
         desc: "Xtream event publisher"

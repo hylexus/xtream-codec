@@ -17,14 +17,15 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.common;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 /**
  * @author hylexus
  */
 public class ReactiveXtreamHandlerMethod extends XtreamHandlerMethod {
 
-    public ReactiveXtreamHandlerMethod(Class<?> containerClass, Method handler) {
-        super(containerClass, handler);
+    public ReactiveXtreamHandlerMethod(Class<?> containerClass, Object containerInstance, Method method, String desc, Function<XtreamHandlerMethod, HandlerMethodSchedulerInfo> schedulerInfoFunc) {
+        super(containerClass, containerInstance, method, desc, schedulerInfoFunc);
     }
 
 }
