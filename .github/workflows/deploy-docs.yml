@@ -33,6 +33,7 @@ jobs:
       - name: Install & Build Docs
         run: |
           cd docs
+          pnpm config set ignore-scripts false
           pnpm install
           pnpm run docs:build
 
