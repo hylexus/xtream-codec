@@ -48,7 +48,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.SERVER_HOST }}
           REMOTE_USER: ${{ secrets.SERVER_USER }}
           SOURCE: "docs/src/.vuepress/dist/"
-          TARGET: ${{ SERVER_TARGET_PATH }}
+          TARGET: ${{ secrets.SERVER_TARGET_PATH }}
           ARGS: "-avzr --delete"
 
       - name: Upload artifact
