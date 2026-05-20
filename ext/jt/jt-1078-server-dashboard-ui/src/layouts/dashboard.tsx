@@ -39,8 +39,8 @@ export const DashboardLayout = () => {
       />
       <div className="dashboard-main-column flex min-w-0 flex-col">
         <Navbar onOpenMobileNav={() => setMobileNavOpen(true)} />
-        <main className="min-h-0 flex-1 px-3 pb-4 pt-1 md:px-7 md:pb-7 md:pt-3">
-          <div className="dashboard-main-surface mx-auto h-full max-w-[1600px] min-h-0 overflow-y-auto p-5 md:p-8">
+        <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-4 md:px-8 md:pt-6">
+          <div className="mx-auto w-full max-w-[1600px]">
             <Outlet />
           </div>
         </main>

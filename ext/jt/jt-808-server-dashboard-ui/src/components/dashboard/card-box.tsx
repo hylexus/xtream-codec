@@ -126,9 +126,18 @@ export const CardBox = () => {
             <Tabs className="w-full">
               <Tabs.ListContainer>
                 <Tabs.List aria-label="服务器信息">
-                  <Tabs.Tab id="version">版本</Tabs.Tab>
-                  <Tabs.Tab id="java">java</Tabs.Tab>
-                  <Tabs.Tab id="os">os</Tabs.Tab>
+                  <Tabs.Tab id="version">
+                    版本
+                    <Tabs.Indicator className="bg-accent" />
+                  </Tabs.Tab>
+                  <Tabs.Tab id="java">
+                    java
+                    <Tabs.Indicator className="bg-accent" />
+                  </Tabs.Tab>
+                  <Tabs.Tab id="os">
+                    os
+                    <Tabs.Indicator className="bg-accent" />
+                  </Tabs.Tab>
                 </Tabs.List>
               </Tabs.ListContainer>
               <Tabs.Panel className="pt-2" id="version">

@@ -1,9 +1,12 @@
-import { Card } from "@heroui/react";
+import { Button } from "@heroui/react";
 import useSWR from "swr";
-import { Link } from "react-router-dom";
 
-import { SpotlightCard } from "@/components/dashboard/spotlight-card.tsx";
-import { LuDesktopIcon, LuTagsIcon } from "@/components/icons.tsx";
+import { ChartCard } from "@/components/dashboard/chart-card.tsx";
+import { DashboardToolbar } from "@/components/dashboard/dashboard-toolbar.tsx";
+import { MetricCard } from "@/components/dashboard/metric-card.tsx";
+import { SalesBarChart } from "@/components/dashboard/sales-bar-chart.tsx";
+import { TrafficLineChart } from "@/components/dashboard/traffic-line-chart.tsx";
+import { PageShell } from "@/components/ui/page-shell.tsx";
 import { request } from "@/utils/request.ts";
 
 export const DashboardPage = () => {
@@ -22,57 +25,83 @@ export const DashboardPage = () => {
     }),
   );
 
+  const sessionTotal = sessions?.total ?? 0;
+  const subscriberTotal = subscribers?.total ?? 0;
+
   const stats = [
     {
       key: "sessions",
       label: "媒体会话",
       value: sessions?.total ?? "—",
-      href: "/sessions",
-      icon: LuDesktopIcon,
+      trend: { value: "3.3%", direction: "up" as const },
     },
     {
       key: "subscribers",
       label: "数据订阅",
       value: subscribers?.total ?? "—",
-      href: "/subscribers",
-      icon: LuTagsIcon,
+      trend: { value: "3.3%", direction: "up" as const },
+    },
+    {
+      key: "active",
+      label: "活跃连接",
+      value: sessionTotal,
+      trend: { value: "1.2%", direction: "up" as const },
+    },
+    {
+      key: "channels",
+      label: "订阅通道",
+      value: subscriberTotal,
+      trend: { value: "0.8%", direction: "down" as const },
     },
   ];
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          概览
-        </h2>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          JT/T 1078 流媒体服务运行状态一览。
-        </p>
+    <PageShell showGreeting toolbar={<DashboardToolbar />}>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+        {stats.map((stat) => (
+          <MetricCard
+            key={stat.key}
+            label={stat.label}
+            trend={stat.trend}
+            value={stat.value}
+          />
+        ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-5">
+        <ChartCard
+          actions={
+            <Button className="text-muted" size="sm" variant="secondary">
+              近 2 周
+            </Button>
+          }
+          bodyClassName="h-52 p-4 sm:h-56"
+          className="lg:col-span-2"
+          subtitle="近两周流媒体连接趋势（示意）"
+          title="会话趋势"
+        >
+          <SalesBarChart />
+        </ChartCard>
 
-          return (
-            <Link key={stat.key} className="block" to={stat.href}>
-              <SpotlightCard className="p-6 transition-opacity hover:opacity-95">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-sm text-muted">{stat.label}</p>
-                    <p className="mt-2 text-3xl font-semibold tabular-nums text-foreground">
-                      {stat.value}
-                    </p>
-                  </div>
-                  <Card className="flex size-11 items-center justify-center rounded-xl border-0 bg-default shadow-none">
-                    <Icon className="size-5 text-muted" />
-                  </Card>
-                </div>
-              </SpotlightCard>
-            </Link>
-          );
-        })}
+        <ChartCard
+          bodyClassName="h-52 p-4 sm:h-56"
+          legend={
+            <div className="flex items-center gap-4 text-xs text-muted">
+              <span className="flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-[var(--chart-primary)]" />
+                TCP
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-[var(--chart-secondary)]" />
+                UDP
+              </span>
+            </div>
+          }
+          title="协议分布"
+        >
+          <TrafficLineChart />
+        </ChartCard>
       </div>
-    </div>
+    </PageShell>
   );
 };

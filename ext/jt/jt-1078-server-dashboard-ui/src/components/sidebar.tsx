@@ -1,14 +1,10 @@
-import { Avatar, Button, Link } from "@heroui/react";
+import { Avatar, Button, Chip } from "@heroui/react";
 import clsx from "clsx";
-import {
-  ExternalLink,
-  LifeBuoy,
-  PanelLeftClose,
-  PanelLeft,
-} from "lucide-react";
+import { LifeBuoy, LogOut, PanelLeftClose, PanelLeft } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
-import { LuChevronRightIcon, LogoIcon } from "@/components/icons";
+import { ExternalLink } from "@/components/external-link.tsx";
+import { LuChevronRightIcon } from "@/components/icons";
 import { siteConfig } from "@/config/site.ts";
 
 function pathMatches(pathname: string, href: string): boolean {
@@ -62,35 +58,32 @@ export const Sidebar = ({
 
       <div
         className={clsx(
-          "flex flex-col px-3 pb-4 pt-2 md:px-4 md:pb-6 md:pt-5",
+          "flex flex-1 flex-col px-3 pb-4 pt-3 md:px-4 md:pb-6 md:pt-5",
           compact ? "items-center px-2" : "",
         )}
       >
-        <Link
+        <div
           className={clsx(
-            "mb-6 flex w-full items-center gap-3 rounded-2xl px-2 py-2 ring-1 ring-black/5 transition-colors hover:bg-background-tertiary dark:ring-0 dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06)]",
+            "mb-6 flex w-full items-center gap-3",
             compact ? "justify-center" : "",
           )}
-          href={siteConfig.links.github}
-          rel="noopener noreferrer"
-          target="_blank"
         >
-          <Avatar className="h-11 w-11 shrink-0 border-0 bg-surface shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06)]">
-            <Avatar.Fallback className="bg-transparent">
-              <LogoIcon className="mx-auto size-8" />
+          <Avatar className="h-10 w-10 shrink-0 border-0">
+            <Avatar.Fallback className="dashboard-profile-gradient text-sm font-semibold text-white">
+              {siteConfig.user.name.slice(0, 1)}
             </Avatar.Fallback>
           </Avatar>
           {!compact ? (
             <div className="min-w-0 flex-1 text-left">
               <p className="truncate text-sm font-semibold text-foreground">
-                {siteConfig.name}
+                {siteConfig.user.name}
               </p>
-              <p className="truncate text-xs text-muted">1078 监控控制台</p>
+              <p className="truncate text-xs text-muted">{siteConfig.user.role}</p>
             </div>
           ) : null}
-        </Link>
+        </div>
 
-        <nav aria-label="主导航" className="flex flex-1 flex-col gap-1">
+        <nav aria-label="主导航" className="flex flex-col gap-0.5">
           {siteConfig.sidenav.map((link) => {
             const Icon = link.icon;
             const isOn = pathMatches(pathname, link.href);
@@ -99,10 +92,10 @@ export const Sidebar = ({
               <NavLink
                 key={link.href}
                 className={clsx(
-                  "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                   compact ? "justify-center px-2" : "",
                   isOn
-                    ? clsx("dashboard-nav-active", compact ? "compact-nav" : "")
+                    ? "dashboard-nav-active"
                     : "text-muted hover:bg-background-tertiary hover:text-foreground",
                 )}
                 to={link.href}
@@ -112,9 +105,21 @@ export const Sidebar = ({
                   }
                 }}
               >
-                <Icon className="!text-current size-[1.15rem] shrink-0 opacity-90 [&>svg]:block" />
+                <Icon className="!text-current size-[1.15rem] shrink-0 [&>svg]:block" />
                 {!compact ? (
-                  <span className="truncate">{link.name}</span>
+                  <span className="flex flex-1 items-center justify-between gap-2">
+                    <span className="truncate">{link.name}</span>
+                    {link.href === "/subscribers" ? (
+                      <Chip
+                        className="h-5 min-h-5 px-1.5 text-[10px]"
+                        color="success"
+                        size="sm"
+                        variant="soft"
+                      >
+                        Live
+                      </Chip>
+                    ) : null}
+                  </span>
                 ) : null}
               </NavLink>
             );
@@ -123,43 +128,38 @@ export const Sidebar = ({
 
         <div
           className={clsx(
-            "mt-6 border-t border-separator pt-4",
-            compact
-              ? "flex w-full flex-col items-center gap-2"
-              : "flex flex-col gap-1",
+            "mt-auto flex flex-col gap-0.5 border-t border-separator pt-4",
+            compact ? "items-center" : "",
           )}
         >
-          <Link
+          <ExternalLink
+            unstyled
             className={clsx(
-              "flex items-center gap-2 rounded-2xl px-3 py-2 text-sm text-muted transition-colors hover:bg-background-tertiary hover:text-foreground",
+              "flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition-colors hover:bg-background-tertiary hover:text-foreground",
               compact ? "justify-center px-0" : "",
             )}
-            href={siteConfig.links.github}
-            rel="noopener noreferrer"
-            target="_blank"
+            href={siteConfig.links.docs}
           >
             <LifeBuoy className="size-4 shrink-0" strokeWidth={1.75} />
             {!compact ? <span>帮助与文档</span> : null}
-          </Link>
-          <Link
+          </ExternalLink>
+          <button
             className={clsx(
-              "flex items-center gap-2 rounded-2xl px-3 py-2 text-sm text-muted transition-colors hover:bg-background-tertiary hover:text-foreground",
+              "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition-colors hover:bg-background-tertiary hover:text-foreground",
               compact ? "justify-center px-0" : "",
             )}
-            href={siteConfig.links.sponsor}
-            rel="noopener noreferrer"
-            target="_blank"
+            type="button"
           >
-            <ExternalLink className="size-4 shrink-0" strokeWidth={1.75} />
-            {!compact ? <span>赞助 / 仓库</span> : null}
-          </Link>
+            <LogOut className="size-4 shrink-0" strokeWidth={1.75} />
+            {!compact ? <span>退出登录</span> : null}
+          </button>
         </div>
       </div>
 
       <Button
         isIconOnly
         aria-label={compact ? "展开侧栏" : "收起侧栏"}
-        className="absolute right-[-11px] top-24 z-20 hidden h-8 w-8 min-w-8 rounded-full border border-border bg-surface text-default-foreground shadow-none ring-1 ring-black/5 hover:bg-default dark:border-white/[0.08] dark:ring-0 dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.07)] md:flex"
+        className="absolute right-[-11px] top-28 z-20 hidden h-8 w-8 min-w-8 rounded-full border border-border bg-surface text-default-foreground shadow-sm hover:bg-default dark:border-white/[0.08] dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.07)] md:flex"
         size="sm"
         variant="secondary"
         onPress={onToggleCompact}

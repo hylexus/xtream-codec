@@ -1,135 +1,76 @@
-import { Spinner, Table, Tooltip } from "@heroui/react";
-import React, { FC, useMemo } from "react";
+import { Tooltip } from "@heroui/react";
+import { Key } from "react";
 
-import { PagePagination } from "@/components/page-pagination.tsx";
+import { PageSection } from "@/components/page-header.tsx";
+import { DataTable } from "@/components/ui/data-table.tsx";
+import { LoadingPanel } from "@/components/ui/loading-panel.tsx";
 import { usePageList } from "@/hooks/use-page-list.ts";
-import { Dic, Jt1078Session } from "@/types";
+import { Jt1078Session } from "@/types";
 
-interface CellProps {
-  item: Dic;
-  columnKey: React.Key;
-}
+const PAGE_TITLE = "媒体会话";
+const PAGE_DESCRIPTION = "当前 JT1078 流媒体连接会话列表";
 
-const RenderCell: FC<CellProps> = ({ item, columnKey }) => {
-  const cellValue = item[columnKey as keyof Dic];
+const columns = [
+  { key: "id", label: "会话 ID", isRowHeader: true },
+  { key: "convertedSim", label: "SIM" },
+  { key: "protocolType", label: "协议" },
+  { key: "audioType", label: "音频" },
+  { key: "videoType", label: "视频" },
+  { key: "creationTime", label: "创建时间" },
+  { key: "lastCommunicateTime", label: "最后通信" },
+] as const;
+
+function renderSessionCell(item: Jt1078Session, columnKey: Key) {
+  const cellValue = item[columnKey as keyof Jt1078Session];
 
   if (cellValue == null) {
-    return "—";
+    return <span className="dashboard-table-cell-text">—</span>;
   }
 
-  return String(cellValue);
-};
+  const text = String(cellValue);
 
-const pageIntro = (
-  <div>
-    <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-      媒体会话
-    </h2>
-    <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-      当前 JT1078 流媒体连接会话列表。
-    </p>
-  </div>
-);
+  return (
+    <Tooltip>
+      <Tooltip.Trigger>
+        <p className="dashboard-table-cell-text">{text}</p>
+      </Tooltip.Trigger>
+      <Tooltip.Content>{text}</Tooltip.Content>
+    </Tooltip>
+  );
+}
 
 export const SessionsPage = () => {
   const path = "sessions";
   const { setPage, page, pages, tableData, isLoading } =
     usePageList<Jt1078Session>(path, 10);
 
-  const loadingState =
-    isLoading && (tableData?.data?.length ?? 0) === 0 ? "loading" : "idle";
-
-  const columns = [
-    { key: "id", label: "会话 ID", width: "18%" },
-    { key: "convertedSim", label: "SIM", width: "12%" },
-    { key: "protocolType", label: "协议", width: "10%" },
-    { key: "audioType", label: "音频", width: "10%" },
-    { key: "videoType", label: "视频", width: "10%" },
-    { key: "creationTime", label: "创建时间", width: "20%" },
-    { key: "lastCommunicateTime", label: "最后通信", width: "20%" },
-  ];
-
-  const bottomContent = useMemo(() => {
-    return (
-      pages > 0 && (
-        <div className="flex w-full justify-center py-4">
-          <PagePagination page={page} total={pages} onChange={setPage} />
-        </div>
-      )
-    );
-  }, [page, pages, setPage]);
-
-  const topContent = useMemo(() => {
-    return (
-      <p className="text-sm text-muted">总数：{tableData?.total ?? "—"}</p>
-    );
-  }, [tableData?.total]);
-
+  const loading =
+    isLoading && (tableData?.data?.length ?? 0) === 0;
   const items = tableData?.data ?? [];
+  const total = tableData?.total ?? 0;
 
-  if (loadingState === "loading") {
+  if (loading) {
     return (
-      <div className="flex flex-col gap-6">
-        {pageIntro}
-        <div className="flex flex-col gap-4">
-          {topContent}
-          <div className="flex justify-center p-12">
-            <Spinner />
-          </div>
-        </div>
-      </div>
+      <PageSection description={PAGE_DESCRIPTION} title={PAGE_TITLE}>
+        <LoadingPanel />
+      </PageSection>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {pageIntro}
-      <div className="flex flex-col gap-2">
-        {topContent}
-        <Table.Root className="w-full">
-          <Table.ScrollContainer className="max-h-[80vh]">
-            <Table.Content aria-label="Sessions">
-              <Table.Header>
-                {columns.map((column) => (
-                  <Table.Column
-                    key={String(column.key)}
-                    isRowHeader={column.key === "id"}
-                  >
-                    {column.label}
-                  </Table.Column>
-                ))}
-              </Table.Header>
-              <Table.Body items={items}>
-                {(item) => (
-                  <Table.Row id={String(item?.id)}>
-                    {columns.map((column) => (
-                      <Table.Cell key={String(column.key)}>
-                        <Tooltip>
-                          <Tooltip.Trigger>
-                            <p className="line-clamp-1">
-                              <RenderCell
-                                columnKey={column.key}
-                                item={item as unknown as Dic}
-                              />
-                            </p>
-                          </Tooltip.Trigger>
-                          <Tooltip.Content>
-                            <RenderCell
-                              columnKey={column.key}
-                              item={item as unknown as Dic}
-                            />
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </Table.Cell>
-                    ))}
-                  </Table.Row>
-                )}
-              </Table.Body>
-            </Table.Content>
-          </Table.ScrollContainer>
-        </Table.Root>
-        {bottomContent}
-      </div>
-    </div>
+    <PageSection description={PAGE_DESCRIPTION} title={PAGE_TITLE}>
+      <DataTable
+        ariaLabel="Sessions"
+        columns={columns.map((c) => ({ ...c }))}
+        items={items}
+        label="全部会话"
+        page={page}
+        pages={pages}
+        renderCell={renderSessionCell}
+        searchPlaceholder="搜索会话..."
+        total={total}
+        onPageChange={setPage}
+      />
+    </PageSection>
   );
 };

@@ -1,50 +1,42 @@
-# Vite & HeroUI Template
+# JT1078 Server Dashboard UI
 
-This is a template for creating applications using Vite and HeroUI (v2).
+JT/T 1078 流媒体服务监控控制台（Vite + React 19 + HeroUI v3）。
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/vite-template)
+## 文档
 
-## Technologies Used
+- **[设计指南](./docs/DESIGN_GUIDE.md)** — 色彩、布局、组件使用规范（开发前必读）
 
-- [Vite](https://vitejs.dev/guide/)
-- [HeroUI](https://heroui.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Framer Motion](https://www.framer.com/motion)
-
-## How to Use
-
-To clone the project, run the following command:
+## 开发
 
 ```bash
-git clone https://github.com/heroui-inc/vite-template.git
+pnpm install
+pnpm dev
 ```
 
-### Install dependencies
-
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+生产构建：
 
 ```bash
-npm install
+pnpm build
 ```
 
-### Run the development server
+API 代理见 `vite.config.ts`（默认 `/dashboard-api/jt1078` → 后端 `v1`）。
 
-```bash
-npm run dev
+## 技术栈
+
+- [Vite](https://vite.dev/)
+- [HeroUI](https://heroui.com) v3
+- [Tailwind CSS](https://tailwindcss.com) v4
+- [React Router](https://reactrouter.com/)
+
+## 目录约定
+
 ```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@heroui/*
+src/
+  components/
+    ui/           # 设计系统基元（DashboardCard、PageShell、DataTable）
+    dashboard/    # 仪表盘业务组件（MetricCard、ChartCard）
+  styles/
+    globals.css   # 主题令牌与 utility 类
+docs/
+  DESIGN_GUIDE.md
 ```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
-
-## License
-
-Licensed under the [MIT license](https://github.com/heroui-inc/vite-template/blob/main/LICENSE).
