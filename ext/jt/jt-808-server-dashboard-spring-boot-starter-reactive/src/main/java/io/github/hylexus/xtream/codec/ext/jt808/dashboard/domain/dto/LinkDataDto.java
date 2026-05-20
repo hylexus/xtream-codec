@@ -18,18 +18,39 @@ package io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.util.Set;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
-@ToString
 public class LinkDataDto {
     private Set<Integer> eventCodes;
     @NotNull(message = "terminalId is missing")
     @NotEmpty(message = "terminalId is empty")
     private String terminalId;
+
+    public Set<Integer> getEventCodes() {
+        return eventCodes;
+    }
+
+    public LinkDataDto setEventCodes(Set<Integer> eventCodes) {
+        this.eventCodes = eventCodes;
+        return this;
+    }
+
+    public String getTerminalId() {
+        return terminalId;
+    }
+
+    public LinkDataDto setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LinkDataDto.class.getSimpleName() + "[", "]")
+                .add("eventCodes=" + eventCodes)
+                .add("terminalId='" + terminalId + "'")
+                .toString();
+    }
 }

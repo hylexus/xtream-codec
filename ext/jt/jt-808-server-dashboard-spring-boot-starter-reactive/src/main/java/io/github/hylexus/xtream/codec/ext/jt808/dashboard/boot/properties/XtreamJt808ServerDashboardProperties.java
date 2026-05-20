@@ -17,18 +17,13 @@
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.boot.properties;
 
 import io.github.hylexus.xtream.codec.ext.jt808.dashboard.utils.DashboardWebUtils;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
-@ToString
 @ConfigurationProperties(prefix = "jt808-server.features.dashboard")
 public class XtreamJt808ServerDashboardProperties {
 
@@ -53,8 +48,57 @@ public class XtreamJt808ServerDashboardProperties {
         return DashboardWebUtils.formatBasePath(this.getBasePath());
     }
 
-    @Getter
-    @Setter
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public XtreamJt808ServerDashboardProperties setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return this;
+    }
+
+    public String getBasePath() {
+        return basePath;
+    }
+
+    public boolean isRedirectRootToBasePath() {
+        return redirectRootToBasePath;
+    }
+
+    public XtreamJt808ServerDashboardProperties setRedirectRootToBasePath(boolean redirectRootToBasePath) {
+        this.redirectRootToBasePath = redirectRootToBasePath;
+        return this;
+    }
+
+    public boolean isForwardNotFoundToIndex() {
+        return forwardNotFoundToIndex;
+    }
+
+    public XtreamJt808ServerDashboardProperties setForwardNotFoundToIndex(boolean forwardNotFoundToIndex) {
+        this.forwardNotFoundToIndex = forwardNotFoundToIndex;
+        return this;
+    }
+
+    public CodecConfig getCodecDebugOptions() {
+        return codecDebugOptions;
+    }
+
+    public XtreamJt808ServerDashboardProperties setCodecDebugOptions(CodecConfig codecDebugOptions) {
+        this.codecDebugOptions = codecDebugOptions;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", XtreamJt808ServerDashboardProperties.class.getSimpleName() + "[", "]")
+                .add("enabled=" + enabled)
+                .add("basePath='" + basePath + "'")
+                .add("redirectRootToBasePath=" + redirectRootToBasePath)
+                .add("forwardNotFoundToIndex=" + forwardNotFoundToIndex)
+                .add("codecDebugOptions=" + codecDebugOptions)
+                .toString();
+    }
+
     public static class CodecConfig {
         private static final String DEFAULT_PACKAGE = "io.github.hylexus.xtream.codec.ext.jt808.builtin.messages";
 
@@ -72,5 +116,25 @@ public class XtreamJt808ServerDashboardProperties {
             }
         }
 
+        public List<String> getBasePackages() {
+            return basePackages;
+        }
+
+        public String getDefaultTerminalId() {
+            return defaultTerminalId;
+        }
+
+        public CodecConfig setDefaultTerminalId(String defaultTerminalId) {
+            this.defaultTerminalId = defaultTerminalId;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", CodecConfig.class.getSimpleName() + "[", "]")
+                    .add("basePackages=" + basePackages)
+                    .add("defaultTerminalId='" + defaultTerminalId + "'")
+                    .toString();
+        }
     }
 }

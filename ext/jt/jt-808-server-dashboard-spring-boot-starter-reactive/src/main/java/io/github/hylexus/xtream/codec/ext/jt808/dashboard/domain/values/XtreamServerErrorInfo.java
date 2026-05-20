@@ -17,18 +17,13 @@
 package io.github.hylexus.xtream.codec.ext.jt808.dashboard.domain.values;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.StringJoiner;
 import java.util.concurrent.atomic.LongAdder;
 
-@ToString
-@Getter
-@Setter
 @SuppressWarnings("NullAway")
 public final class XtreamServerErrorInfo {
 
@@ -37,11 +32,59 @@ public final class XtreamServerErrorInfo {
 
     private LongAdder count = new LongAdder();
     private Serializable details;
+
     private @Nullable String lastErrorMessage;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "GMT+8")
     private Instant lastErrorTime;
 
     public void incrementCount() {
         this.count.increment();
+    }
+
+    public LongAdder getCount() {
+        return count;
+    }
+
+    public XtreamServerErrorInfo setCount(LongAdder count) {
+        this.count = count;
+        return this;
+    }
+
+    public Serializable getDetails() {
+        return details;
+    }
+
+    public XtreamServerErrorInfo setDetails(Serializable details) {
+        this.details = details;
+        return this;
+    }
+
+    public @Nullable String getLastErrorMessage() {
+        return lastErrorMessage;
+    }
+
+    public XtreamServerErrorInfo setLastErrorMessage(@Nullable String lastErrorMessage) {
+        this.lastErrorMessage = lastErrorMessage;
+        return this;
+    }
+
+    public Instant getLastErrorTime() {
+        return lastErrorTime;
+    }
+
+    public XtreamServerErrorInfo setLastErrorTime(Instant lastErrorTime) {
+        this.lastErrorTime = lastErrorTime;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", XtreamServerErrorInfo.class.getSimpleName() + "[", "]")
+                .add("count=" + count)
+                .add("details=" + details)
+                .add("lastErrorMessage='" + lastErrorMessage + "'")
+                .add("lastErrorTime=" + lastErrorTime)
+                .toString();
     }
 }
