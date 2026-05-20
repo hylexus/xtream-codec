@@ -18,18 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 查询终端参数应答 0x0108
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0108, desc = "查询终端参数应答")
 public class BuiltinMessage0108 {
 
@@ -44,4 +40,29 @@ public class BuiltinMessage0108 {
     @Preset.JtStyle.Byte(desc = "升级结果 0：成功，1：失败，2：取消")
     private short result;
 
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage0108 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public short getResult() {
+        return result;
+    }
+
+    public BuiltinMessage0108 setResult(short result) {
+        this.result = result;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0108.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("result=" + result)
+                .toString();
+    }
 }

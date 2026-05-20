@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 电话回拨
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8400, desc = "电话回拨")
 public class BuiltinMessage8400 {
 
@@ -46,4 +40,29 @@ public class BuiltinMessage8400 {
     @Preset.JtStyle.Str(desc = "电话号码 最长为20字节")
     private String phoneNumber;
 
+    public short getFlag() {
+        return flag;
+    }
+
+    public BuiltinMessage8400 setFlag(short flag) {
+        this.flag = flag;
+        return this;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public BuiltinMessage8400 setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8400.class.getSimpleName() + "[", "]")
+                .add("flag=" + flag)
+                .add("phoneNumber='" + phoneNumber + "'")
+                .toString();
+    }
 }

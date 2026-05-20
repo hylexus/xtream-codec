@@ -19,20 +19,17 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
+import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodecs;
+import io.github.hylexus.xtream.codec.core.impl.codec.U32FieldCodecs;
+import io.github.hylexus.xtream.codec.core.impl.codec.U8FieldCodecs;
 import org.jspecify.annotations.Nullable;
+
+import java.util.StringJoiner;
 
 /**
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class ParameterItem {
 
     // 自定义 FieldCodec 时就不用加 @Preset.JtStyle.Dword 注解了
@@ -54,6 +51,52 @@ public class ParameterItem {
         this.parameterId = parameterId;
         this.parameterLength = parameterLength;
         this.parameterValue = parameterValue;
+    }
+
+    public long getParameterId() {
+        return parameterId;
+    }
+
+    public ParameterItem setParameterId(long parameterId) {
+        this.parameterId = parameterId;
+        return this;
+    }
+
+    public short getParameterLength() {
+        return parameterLength;
+    }
+
+    public ParameterItem setParameterLength(short parameterLength) {
+        this.parameterLength = parameterLength;
+        return this;
+    }
+
+    public @Nullable Object getParameterValue() {
+        return parameterValue;
+    }
+
+    public ParameterItem setParameterValue(@Nullable Object parameterValue) {
+        this.parameterValue = parameterValue;
+        return this;
+    }
+
+    public ParameterType getParameterType() {
+        return parameterType;
+    }
+
+    public ParameterItem setParameterType(ParameterType parameterType) {
+        this.parameterType = parameterType;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ParameterItem.class.getSimpleName() + "[", "]")
+                .add("parameterId=" + parameterId)
+                .add("parameterLength=" + parameterLength)
+                .add("parameterValue=" + parameterValue)
+                .add("parameterType=" + parameterType)
+                .toString();
     }
 
     // 下面代码都是为了调试方便添加的  可以忽略

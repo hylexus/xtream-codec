@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 驾驶员身份信息采集上报
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class BuiltinMessage0702V2011 {
 
     /**
@@ -57,4 +51,49 @@ public class BuiltinMessage0702V2011 {
     @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8)
     private String certificateAuthorityName;
 
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public BuiltinMessage0702V2011 setDriverName(String driverName) {
+        this.driverName = driverName;
+        return this;
+    }
+
+    public String getDriverIdCardNo() {
+        return driverIdCardNo;
+    }
+
+    public BuiltinMessage0702V2011 setDriverIdCardNo(String driverIdCardNo) {
+        this.driverIdCardNo = driverIdCardNo;
+        return this;
+    }
+
+    public String getProfessionalLicenseNo() {
+        return professionalLicenseNo;
+    }
+
+    public BuiltinMessage0702V2011 setProfessionalLicenseNo(String professionalLicenseNo) {
+        this.professionalLicenseNo = professionalLicenseNo;
+        return this;
+    }
+
+    public String getCertificateAuthorityName() {
+        return certificateAuthorityName;
+    }
+
+    public BuiltinMessage0702V2011 setCertificateAuthorityName(String certificateAuthorityName) {
+        this.certificateAuthorityName = certificateAuthorityName;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0702V2011.class.getSimpleName() + "[", "]")
+                .add("driverName='" + driverName + "'")
+                .add("driverIdCardNo='" + driverIdCardNo + "'")
+                .add("professionalLicenseNo='" + professionalLicenseNo + "'")
+                .add("certificateAuthorityName='" + certificateAuthorityName + "'")
+                .toString();
+    }
 }

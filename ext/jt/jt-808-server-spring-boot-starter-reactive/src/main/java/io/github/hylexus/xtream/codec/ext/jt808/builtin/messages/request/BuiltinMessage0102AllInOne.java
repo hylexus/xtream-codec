@@ -20,15 +20,9 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
+import java.util.StringJoiner;
+
 @Jt808ResponseBody(messageId = 0x0102, desc = "终端鉴权(多版本合一)")
 public class BuiltinMessage0102AllInOne {
 
@@ -62,4 +56,39 @@ public class BuiltinMessage0102AllInOne {
         return XtreamBytes.trimTailing(this.getSoftwareVersion(), (byte) 0x00);
     }
 
+    public String getAuthenticationCode() {
+        return authenticationCode;
+    }
+
+    public BuiltinMessage0102AllInOne setAuthenticationCode(String authenticationCode) {
+        this.authenticationCode = authenticationCode;
+        return this;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+    public BuiltinMessage0102AllInOne setImei(String imei) {
+        this.imei = imei;
+        return this;
+    }
+
+    public String getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public BuiltinMessage0102AllInOne setSoftwareVersion(String softwareVersion) {
+        this.softwareVersion = softwareVersion;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0102AllInOne.class.getSimpleName() + "[", "]")
+                .add("authenticationCode='" + authenticationCode + "'")
+                .add("imei='" + imei + "'")
+                .add("softwareVersion='" + softwareVersion + "'")
+                .toString();
+    }
 }

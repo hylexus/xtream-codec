@@ -21,22 +21,15 @@ import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec.CustomParameterListFieldCodec;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec.ParameterItem;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 查询终端参数应答 0x0104
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-@ToString
 @Jt808ResponseBody(messageId = 0x0104, desc = "查询终端参数应答")
 public class BuiltinMessage0104Sample2 {
     /**
@@ -57,4 +50,39 @@ public class BuiltinMessage0104Sample2 {
     @XtreamField(fieldCodec = CustomParameterListFieldCodec.class)
     private List<ParameterItem> parameterItems;
 
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0104Sample2 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public short getParameterCount() {
+        return parameterCount;
+    }
+
+    public BuiltinMessage0104Sample2 setParameterCount(short parameterCount) {
+        this.parameterCount = parameterCount;
+        return this;
+    }
+
+    public List<ParameterItem> getParameterItems() {
+        return parameterItems;
+    }
+
+    public BuiltinMessage0104Sample2 setParameterItems(List<ParameterItem> parameterItems) {
+        this.parameterItems = parameterItems;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0104Sample2.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("parameterCount=" + parameterCount)
+                .add("parameterItems=" + parameterItems)
+                .toString();
+    }
 }

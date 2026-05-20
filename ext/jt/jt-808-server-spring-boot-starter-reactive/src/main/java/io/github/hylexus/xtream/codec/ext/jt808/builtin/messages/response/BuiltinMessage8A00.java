@@ -20,20 +20,15 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.Arrays;
+import java.util.StringJoiner;
 
 /**
  * 平台 RSA 公钥
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8A00, desc = "平台 RSA 公钥")
 public class BuiltinMessage8A00 {
 
@@ -45,4 +40,30 @@ public class BuiltinMessage8A00 {
     @Preset.JtStyle.Bytes(length = 128, desc = "平台RSA公钥{e,n}中的n")
     @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
     private byte[] n;
+
+    public long getE() {
+        return e;
+    }
+
+    public BuiltinMessage8A00 setE(long e) {
+        this.e = e;
+        return this;
+    }
+
+    public byte[] getN() {
+        return n;
+    }
+
+    public BuiltinMessage8A00 setN(byte[] n) {
+        this.n = n;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8A00.class.getSimpleName() + "[", "]")
+                .add("e=" + e)
+                .add("n=" + Arrays.toString(n))
+                .toString();
+    }
 }

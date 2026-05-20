@@ -17,18 +17,12 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 0x13 路线行驶时间不足/过长报警附加信息消息体数据格式
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class LocationItem0x13 {
     @Preset.JtStyle.Dword(desc = "路段ID")
     private long lineId;
@@ -38,4 +32,40 @@ public class LocationItem0x13 {
 
     @Preset.JtStyle.Byte(desc = "结果; 0：不足；1：过长")
     private short result;
+
+    public long getLineId() {
+        return lineId;
+    }
+
+    public LocationItem0x13 setLineId(long lineId) {
+        this.lineId = lineId;
+        return this;
+    }
+
+    public int getLineDrivenTime() {
+        return lineDrivenTime;
+    }
+
+    public LocationItem0x13 setLineDrivenTime(int lineDrivenTime) {
+        this.lineDrivenTime = lineDrivenTime;
+        return this;
+    }
+
+    public short getResult() {
+        return result;
+    }
+
+    public LocationItem0x13 setResult(short result) {
+        this.result = result;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LocationItem0x13.class.getSimpleName() + "[", "]")
+                .add("lineId=" + lineId)
+                .add("lineDrivenTime=" + lineDrivenTime)
+                .add("result=" + result)
+                .toString();
+    }
 }

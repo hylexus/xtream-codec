@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 车辆控制
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8500, desc = "车辆控制")
 public class BuiltinMessage8500 {
 
@@ -43,4 +37,19 @@ public class BuiltinMessage8500 {
     @Preset.JtStyle.Byte(desc = "控制标志")
     private short type;
 
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8500 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8500.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .toString();
+    }
 }

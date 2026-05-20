@@ -19,23 +19,16 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 /**
  * 存储多媒体数据检索
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8802, desc = "存储多媒体数据检索")
 public class BuiltinMessage8802 {
 
@@ -61,4 +54,59 @@ public class BuiltinMessage8802 {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
 
+    public short getMultimediaType() {
+        return multimediaType;
+    }
+
+    public BuiltinMessage8802 setMultimediaType(short multimediaType) {
+        this.multimediaType = multimediaType;
+        return this;
+    }
+
+    public short getChannelId() {
+        return channelId;
+    }
+
+    public BuiltinMessage8802 setChannelId(short channelId) {
+        this.channelId = channelId;
+        return this;
+    }
+
+    public short getEventItemCode() {
+        return eventItemCode;
+    }
+
+    public BuiltinMessage8802 setEventItemCode(short eventItemCode) {
+        this.eventItemCode = eventItemCode;
+        return this;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public BuiltinMessage8802 setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public BuiltinMessage8802 setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8802.class.getSimpleName() + "[", "]")
+                .add("multimediaType=" + multimediaType)
+                .add("channelId=" + channelId)
+                .add("eventItemCode=" + eventItemCode)
+                .add("startTime=" + startTime)
+                .add("endTime=" + endTime)
+                .toString();
+    }
 }

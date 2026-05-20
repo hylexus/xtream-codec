@@ -19,20 +19,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 查询终端属性应答 0x0107(多版本合一)
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-@ToString
 @Jt808ResponseBody(messageId = 0x0107, desc = "查询终端属性应答(多版本合一)")
 public class BuiltinMessage0107AllInOne {
 
@@ -72,10 +66,105 @@ public class BuiltinMessage0107AllInOne {
     @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "终端固件版本号(2019 || 2013)")
     private String firmwareVersion;
 
-    @Preset.JtStyle.Byte(version = 2019,desc = "GNSS 模块属性(2019)")
+    @Preset.JtStyle.Byte(version = 2019, desc = "GNSS 模块属性(2019)")
     private Short gnssModelProperty;
 
     @Preset.JtStyle.Byte(version = 2019, desc = "通信模块属性(2019)")
     private Short communicationModelProperty;
 
+    public int getType() {
+        return type;
+    }
+
+    public BuiltinMessage0107AllInOne setType(int type) {
+        this.type = type;
+        return this;
+    }
+
+    public String getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public BuiltinMessage0107AllInOne setManufacturerId(String manufacturerId) {
+        this.manufacturerId = manufacturerId;
+        return this;
+    }
+
+    public String getTerminalType() {
+        return terminalType;
+    }
+
+    public BuiltinMessage0107AllInOne setTerminalType(String terminalType) {
+        this.terminalType = terminalType;
+        return this;
+    }
+
+    public String getTerminalId() {
+        return terminalId;
+    }
+
+    public BuiltinMessage0107AllInOne setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
+        return this;
+    }
+
+    public String getIccid() {
+        return iccid;
+    }
+
+    public BuiltinMessage0107AllInOne setIccid(String iccid) {
+        this.iccid = iccid;
+        return this;
+    }
+
+    public String getHardwareVersion() {
+        return hardwareVersion;
+    }
+
+    public BuiltinMessage0107AllInOne setHardwareVersion(String hardwareVersion) {
+        this.hardwareVersion = hardwareVersion;
+        return this;
+    }
+
+    public String getFirmwareVersion() {
+        return firmwareVersion;
+    }
+
+    public BuiltinMessage0107AllInOne setFirmwareVersion(String firmwareVersion) {
+        this.firmwareVersion = firmwareVersion;
+        return this;
+    }
+
+    public Short getGnssModelProperty() {
+        return gnssModelProperty;
+    }
+
+    public BuiltinMessage0107AllInOne setGnssModelProperty(Short gnssModelProperty) {
+        this.gnssModelProperty = gnssModelProperty;
+        return this;
+    }
+
+    public Short getCommunicationModelProperty() {
+        return communicationModelProperty;
+    }
+
+    public BuiltinMessage0107AllInOne setCommunicationModelProperty(Short communicationModelProperty) {
+        this.communicationModelProperty = communicationModelProperty;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0107AllInOne.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("manufacturerId='" + manufacturerId + "'")
+                .add("terminalType='" + terminalType + "'")
+                .add("terminalId='" + terminalId + "'")
+                .add("iccid='" + iccid + "'")
+                .add("hardwareVersion='" + hardwareVersion + "'")
+                .add("firmwareVersion='" + firmwareVersion + "'")
+                .add("gnssModelProperty=" + gnssModelProperty)
+                .add("communicationModelProperty=" + communicationModelProperty)
+                .toString();
+    }
 }

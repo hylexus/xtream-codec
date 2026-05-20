@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DwordWrapper;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 删除圆形区域
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8601, desc = "删除圆形区域")
 public class BuiltinMessage8601 {
 
@@ -43,4 +36,30 @@ public class BuiltinMessage8601 {
 
     @Preset.JtStyle.List(desc = "区域 ID 列表")
     private List<DwordWrapper> areaIdList;
+
+    public short getAreaCount() {
+        return areaCount;
+    }
+
+    public BuiltinMessage8601 setAreaCount(short areaCount) {
+        this.areaCount = areaCount;
+        return this;
+    }
+
+    public List<DwordWrapper> getAreaIdList() {
+        return areaIdList;
+    }
+
+    public BuiltinMessage8601 setAreaIdList(List<DwordWrapper> areaIdList) {
+        this.areaIdList = areaIdList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8601.class.getSimpleName() + "[", "]")
+                .add("areaCount=" + areaCount)
+                .add("areaIdList=" + areaIdList)
+                .toString();
+    }
 }

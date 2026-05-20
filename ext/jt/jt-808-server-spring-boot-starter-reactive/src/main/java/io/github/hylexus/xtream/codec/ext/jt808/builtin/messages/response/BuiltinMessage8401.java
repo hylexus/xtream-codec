@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 设置电话本
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8401, desc = "设置电话本")
 public class BuiltinMessage8401 {
 
@@ -54,10 +47,42 @@ public class BuiltinMessage8401 {
     @Preset.JtStyle.List(desc = "联系人项")
     private List<Item> itemList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8401 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public short getCount() {
+        return count;
+    }
+
+    public BuiltinMessage8401 setCount(short count) {
+        this.count = count;
+        return this;
+    }
+
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
+    public BuiltinMessage8401 setItemList(List<Item> itemList) {
+        this.itemList = itemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8401.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("count=" + count)
+                .add("itemList=" + itemList)
+                .toString();
+    }
+
     public static class Item {
         /**
          * 标志
@@ -75,5 +100,40 @@ public class BuiltinMessage8401 {
         @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "联系人")
         private String contacts;
 
+        public short getFlag() {
+            return flag;
+        }
+
+        public Item setFlag(short flag) {
+            this.flag = flag;
+            return this;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+
+        public Item setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        public String getContacts() {
+            return contacts;
+        }
+
+        public Item setContacts(String contacts) {
+            this.contacts = contacts;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Item.class.getSimpleName() + "[", "]")
+                    .add("flag=" + flag)
+                    .add("phoneNumber='" + phoneNumber + "'")
+                    .add("contacts='" + contacts + "'")
+                    .toString();
+        }
     }
 }

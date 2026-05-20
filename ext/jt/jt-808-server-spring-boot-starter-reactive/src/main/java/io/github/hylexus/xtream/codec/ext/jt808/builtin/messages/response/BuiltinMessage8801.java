@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 摄像头立即拍摄命令
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8801, desc = "摄像头立即拍摄命令")
 public class BuiltinMessage8801 {
     /**
@@ -92,4 +86,110 @@ public class BuiltinMessage8801 {
 
     @Preset.JtStyle.Byte(desc = "色度")
     private short chroma;
+
+    public short getChanelId() {
+        return chanelId;
+    }
+
+    public BuiltinMessage8801 setChanelId(short chanelId) {
+        this.chanelId = chanelId;
+        return this;
+    }
+
+    public int getCommand() {
+        return command;
+    }
+
+    public BuiltinMessage8801 setCommand(int command) {
+        this.command = command;
+        return this;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public BuiltinMessage8801 setDuration(int duration) {
+        this.duration = duration;
+        return this;
+    }
+
+    public short getSaveFlag() {
+        return saveFlag;
+    }
+
+    public BuiltinMessage8801 setSaveFlag(short saveFlag) {
+        this.saveFlag = saveFlag;
+        return this;
+    }
+
+    public short getResolution() {
+        return resolution;
+    }
+
+    public BuiltinMessage8801 setResolution(short resolution) {
+        this.resolution = resolution;
+        return this;
+    }
+
+    public short getQuality() {
+        return quality;
+    }
+
+    public BuiltinMessage8801 setQuality(short quality) {
+        this.quality = quality;
+        return this;
+    }
+
+    public short getBrightness() {
+        return brightness;
+    }
+
+    public BuiltinMessage8801 setBrightness(short brightness) {
+        this.brightness = brightness;
+        return this;
+    }
+
+    public short getContrastRate() {
+        return contrastRate;
+    }
+
+    public BuiltinMessage8801 setContrastRate(short contrastRate) {
+        this.contrastRate = contrastRate;
+        return this;
+    }
+
+    public short getSaturation() {
+        return saturation;
+    }
+
+    public BuiltinMessage8801 setSaturation(short saturation) {
+        this.saturation = saturation;
+        return this;
+    }
+
+    public short getChroma() {
+        return chroma;
+    }
+
+    public BuiltinMessage8801 setChroma(short chroma) {
+        this.chroma = chroma;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8801.class.getSimpleName() + "[", "]")
+                .add("chanelId=" + chanelId)
+                .add("command=" + command)
+                .add("duration=" + duration)
+                .add("saveFlag=" + saveFlag)
+                .add("resolution=" + resolution)
+                .add("quality=" + quality)
+                .add("brightness=" + brightness)
+                .add("contrastRate=" + contrastRate)
+                .add("saturation=" + saturation)
+                .add("chroma=" + chroma)
+                .toString();
+    }
 }

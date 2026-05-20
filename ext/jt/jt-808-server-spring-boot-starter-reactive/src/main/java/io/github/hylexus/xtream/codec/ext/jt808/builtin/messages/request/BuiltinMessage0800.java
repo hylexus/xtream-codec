@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 多媒体事件信息上传
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0800, desc = "多媒体事件信息上传")
 public class BuiltinMessage0800 {
 
@@ -83,4 +77,60 @@ public class BuiltinMessage0800 {
      */
     @Preset.JtStyle.Byte(desc = "通道ID")
     private short channelId;
+
+    public long getMultimediaDataID() {
+        return multimediaDataID;
+    }
+
+    public BuiltinMessage0800 setMultimediaDataID(long multimediaDataID) {
+        this.multimediaDataID = multimediaDataID;
+        return this;
+    }
+
+    public short getMultimediaType() {
+        return multimediaType;
+    }
+
+    public BuiltinMessage0800 setMultimediaType(short multimediaType) {
+        this.multimediaType = multimediaType;
+        return this;
+    }
+
+    public short getMultimediaFormatCode() {
+        return multimediaFormatCode;
+    }
+
+    public BuiltinMessage0800 setMultimediaFormatCode(short multimediaFormatCode) {
+        this.multimediaFormatCode = multimediaFormatCode;
+        return this;
+    }
+
+    public short getEventItemCode() {
+        return eventItemCode;
+    }
+
+    public BuiltinMessage0800 setEventItemCode(short eventItemCode) {
+        this.eventItemCode = eventItemCode;
+        return this;
+    }
+
+    public short getChannelId() {
+        return channelId;
+    }
+
+    public BuiltinMessage0800 setChannelId(short channelId) {
+        this.channelId = channelId;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0800.class.getSimpleName() + "[", "]")
+                .add("multimediaDataID=" + multimediaDataID)
+                .add("multimediaType=" + multimediaType)
+                .add("multimediaFormatCode=" + multimediaFormatCode)
+                .add("eventItemCode=" + eventItemCode)
+                .add("channelId=" + channelId)
+                .toString();
+    }
 }

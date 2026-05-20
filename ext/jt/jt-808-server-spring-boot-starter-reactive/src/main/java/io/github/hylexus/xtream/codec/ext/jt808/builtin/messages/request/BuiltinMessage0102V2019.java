@@ -20,20 +20,14 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 终端鉴权 0x0102
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0102, desc = "终端鉴权(2019)")
 public class BuiltinMessage0102V2019 {
 
@@ -66,4 +60,39 @@ public class BuiltinMessage0102V2019 {
         return XtreamBytes.trimTailing(this.getSoftwareVersion(), (byte) 0x00);
     }
 
+    public String getAuthenticationCode() {
+        return authenticationCode;
+    }
+
+    public BuiltinMessage0102V2019 setAuthenticationCode(String authenticationCode) {
+        this.authenticationCode = authenticationCode;
+        return this;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+    public BuiltinMessage0102V2019 setImei(String imei) {
+        this.imei = imei;
+        return this;
+    }
+
+    public String getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public BuiltinMessage0102V2019 setSoftwareVersion(String softwareVersion) {
+        this.softwareVersion = softwareVersion;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0102V2019.class.getSimpleName() + "[", "]")
+                .add("authenticationCode='" + authenticationCode + "'")
+                .add("imei='" + imei + "'")
+                .add("softwareVersion='" + softwareVersion + "'")
+                .toString();
+    }
 }

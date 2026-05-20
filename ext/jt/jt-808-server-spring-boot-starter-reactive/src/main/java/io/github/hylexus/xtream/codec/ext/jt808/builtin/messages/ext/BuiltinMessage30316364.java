@@ -17,8 +17,6 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * TJSATL12—2017道路运输车辆主动安全智能防控系统 $4.6.4--文件数据上传
@@ -27,8 +25,6 @@ import lombok.experimental.Accessors;
  *
  * @author hylexus
  */
-@Data
-@Accessors(chain = true)
 public class BuiltinMessage30316364 {
 
     // BYTE[50]  文件名称
@@ -47,12 +43,48 @@ public class BuiltinMessage30316364 {
     @Preset.JtStyle.Bytes(lengthExpression = "getDataLength()")
     private byte[] data;
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public BuiltinMessage30316364 setFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
+    public long getDataOffset() {
+        return dataOffset;
+    }
+
+    public BuiltinMessage30316364 setDataOffset(long dataOffset) {
+        this.dataOffset = dataOffset;
+        return this;
+    }
+
+    public long getDataLength() {
+        return dataLength;
+    }
+
+    public BuiltinMessage30316364 setDataLength(long dataLength) {
+        this.dataLength = dataLength;
+        return this;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public BuiltinMessage30316364 setData(byte[] data) {
+        this.data = data;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "BuiltinMsg30316364Alias{"
-                + "fileName='" + fileName + '\''
-                + ", dataOffset=" + dataOffset
-                + ", dataLength=" + dataLength
-                + '}';
+               + "fileName='" + fileName + '\''
+               + ", dataOffset=" + dataOffset
+               + ", dataLength=" + dataLength
+               + '}';
     }
 }

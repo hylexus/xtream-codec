@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 提问下发
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8302, desc = "提问下发")
 public class BuiltinMessage8302 {
     /**
@@ -56,10 +49,42 @@ public class BuiltinMessage8302 {
     @Preset.JtStyle.List(desc = "候选答案列表")
     private List<CandidateAnswer> candidateAnswerList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public short getIdentifier() {
+        return identifier;
+    }
+
+    public BuiltinMessage8302 setIdentifier(short identifier) {
+        this.identifier = identifier;
+        return this;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public BuiltinMessage8302 setQuestion(String question) {
+        this.question = question;
+        return this;
+    }
+
+    public List<CandidateAnswer> getCandidateAnswerList() {
+        return candidateAnswerList;
+    }
+
+    public BuiltinMessage8302 setCandidateAnswerList(List<CandidateAnswer> candidateAnswerList) {
+        this.candidateAnswerList = candidateAnswerList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8302.class.getSimpleName() + "[", "]")
+                .add("identifier=" + identifier)
+                .add("question='" + question + "'")
+                .add("candidateAnswerList=" + candidateAnswerList)
+                .toString();
+    }
+
     public static class CandidateAnswer {
 
         @Preset.JtStyle.Byte(desc = "答案 ID")
@@ -69,5 +94,30 @@ public class BuiltinMessage8302 {
         @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u16, desc = "答案内容")
         private String answer;
 
+        public short getAnswerId() {
+            return answerId;
+        }
+
+        public CandidateAnswer setAnswerId(short answerId) {
+            this.answerId = answerId;
+            return this;
+        }
+
+        public String getAnswer() {
+            return answer;
+        }
+
+        public CandidateAnswer setAnswer(String answer) {
+            this.answer = answer;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", CandidateAnswer.class.getSimpleName() + "[", "]")
+                    .add("answerId=" + answerId)
+                    .add("answer='" + answer + "'")
+                    .toString();
+        }
     }
 }

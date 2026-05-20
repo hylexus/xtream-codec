@@ -20,23 +20,16 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 设置多边形区域
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8604)
 public class BuiltinMessage8604V2019 {
 
@@ -151,9 +144,122 @@ public class BuiltinMessage8604V2019 {
     @Preset.JtStyle.Str
     private String areaName;
 
-    @Getter
-    @Setter
-    @ToString
+    public long getAreaId() {
+        return areaId;
+    }
+
+    public BuiltinMessage8604V2019 setAreaId(long areaId) {
+        this.areaId = areaId;
+        return this;
+    }
+
+    public int getAreaProps() {
+        return areaProps;
+    }
+
+    public BuiltinMessage8604V2019 setAreaProps(int areaProps) {
+        this.areaProps = areaProps;
+        return this;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public BuiltinMessage8604V2019 setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public BuiltinMessage8604V2019 setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+        return this;
+    }
+
+    public int getTopSpeed() {
+        return topSpeed;
+    }
+
+    public BuiltinMessage8604V2019 setTopSpeed(int topSpeed) {
+        this.topSpeed = topSpeed;
+        return this;
+    }
+
+    public short getDurationOfOverSpeed() {
+        return durationOfOverSpeed;
+    }
+
+    public BuiltinMessage8604V2019 setDurationOfOverSpeed(short durationOfOverSpeed) {
+        this.durationOfOverSpeed = durationOfOverSpeed;
+        return this;
+    }
+
+    public int getPointCount() {
+        return pointCount;
+    }
+
+    public BuiltinMessage8604V2019 setPointCount(int pointCount) {
+        this.pointCount = pointCount;
+        return this;
+    }
+
+    public List<Point> getPointList() {
+        return pointList;
+    }
+
+    public BuiltinMessage8604V2019 setPointList(List<Point> pointList) {
+        this.pointList = pointList;
+        return this;
+    }
+
+    public int getTopSpeedAtNight() {
+        return topSpeedAtNight;
+    }
+
+    public BuiltinMessage8604V2019 setTopSpeedAtNight(int topSpeedAtNight) {
+        this.topSpeedAtNight = topSpeedAtNight;
+        return this;
+    }
+
+    public int getAreaNameLength() {
+        return areaNameLength;
+    }
+
+    public BuiltinMessage8604V2019 setAreaNameLength(int areaNameLength) {
+        this.areaNameLength = areaNameLength;
+        return this;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public BuiltinMessage8604V2019 setAreaName(String areaName) {
+        this.areaName = areaName;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8604V2019.class.getSimpleName() + "[", "]")
+                .add("areaId=" + areaId)
+                .add("areaProps=" + areaProps)
+                .add("startTime=" + startTime)
+                .add("endTime=" + endTime)
+                .add("topSpeed=" + topSpeed)
+                .add("durationOfOverSpeed=" + durationOfOverSpeed)
+                .add("pointCount=" + pointCount)
+                .add("pointList=" + pointList)
+                .add("topSpeedAtNight=" + topSpeedAtNight)
+                .add("areaNameLength=" + areaNameLength)
+                .add("areaName='" + areaName + "'")
+                .toString();
+    }
+
     public static class Point {
 
         @Preset.JtStyle.Dword
@@ -168,6 +274,32 @@ public class BuiltinMessage8604V2019 {
         public Point(long latitude, long longitude) {
             this.latitude = latitude;
             this.longitude = longitude;
+        }
+
+        public long getLatitude() {
+            return latitude;
+        }
+
+        public Point setLatitude(long latitude) {
+            this.latitude = latitude;
+            return this;
+        }
+
+        public long getLongitude() {
+            return longitude;
+        }
+
+        public Point setLongitude(long longitude) {
+            this.longitude = longitude;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Point.class.getSimpleName() + "[", "]")
+                    .add("latitude=" + latitude)
+                    .add("longitude=" + longitude)
+                    .toString();
         }
     }
 }

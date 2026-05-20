@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 信息点播菜单设置
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8303, desc = "信息点播菜单设置")
 public class BuiltinMessage8303 {
     /**
@@ -53,10 +46,42 @@ public class BuiltinMessage8303 {
     @Preset.JtStyle.List(desc = "信息项列表")
     private List<Item> itemList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8303 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public short getItemCount() {
+        return itemCount;
+    }
+
+    public BuiltinMessage8303 setItemCount(short itemCount) {
+        this.itemCount = itemCount;
+        return this;
+    }
+
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
+    public BuiltinMessage8303 setItemList(List<Item> itemList) {
+        this.itemList = itemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8303.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("itemCount=" + itemCount)
+                .add("itemList=" + itemList)
+                .toString();
+    }
+
     public static class Item {
 
         @Preset.JtStyle.Byte(desc = "信息类型")
@@ -74,5 +99,30 @@ public class BuiltinMessage8303 {
             this.content = content;
         }
 
+        public short getType() {
+            return type;
+        }
+
+        public Item setType(short type) {
+            this.type = type;
+            return this;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public Item setContent(String content) {
+            this.content = content;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Item.class.getSimpleName() + "[", "]")
+                    .add("type=" + type)
+                    .add("content='" + content + "'")
+                    .toString();
+        }
     }
 }

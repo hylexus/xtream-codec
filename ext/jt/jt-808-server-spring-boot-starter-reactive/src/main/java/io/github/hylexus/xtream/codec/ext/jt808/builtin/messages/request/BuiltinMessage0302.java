@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 提问应答 0x0302
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0302, desc = "提问应答")
 public class BuiltinMessage0302 {
 
@@ -40,4 +34,30 @@ public class BuiltinMessage0302 {
 
     @Preset.JtStyle.Byte(desc = "答案ID")
     private short answerId;
+
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0302 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public short getAnswerId() {
+        return answerId;
+    }
+
+    public BuiltinMessage0302 setAnswerId(short answerId) {
+        this.answerId = answerId;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0302.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("answerId=" + answerId)
+                .toString();
+    }
 }

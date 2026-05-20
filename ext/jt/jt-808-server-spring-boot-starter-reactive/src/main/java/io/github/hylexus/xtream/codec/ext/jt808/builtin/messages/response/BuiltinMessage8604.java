@@ -21,24 +21,17 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 设置多边形区域
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8604, desc = "设置多边形区域")
 public class BuiltinMessage8604 {
 
@@ -155,9 +148,92 @@ public class BuiltinMessage8604 {
     @Preset.JtStyle.List(desc = "顶点项")
     private List<Point> pointList;
 
-    @Getter
-    @Setter
-    @ToString
+    public long getAreaId() {
+        return areaId;
+    }
+
+    public BuiltinMessage8604 setAreaId(long areaId) {
+        this.areaId = areaId;
+        return this;
+    }
+
+    public int getAreaProps() {
+        return areaProps;
+    }
+
+    public BuiltinMessage8604 setAreaProps(int areaProps) {
+        this.areaProps = areaProps;
+        return this;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public BuiltinMessage8604 setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public BuiltinMessage8604 setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+        return this;
+    }
+
+    public int getTopSpeed() {
+        return topSpeed;
+    }
+
+    public BuiltinMessage8604 setTopSpeed(int topSpeed) {
+        this.topSpeed = topSpeed;
+        return this;
+    }
+
+    public short getDurationOfOverSpeed() {
+        return durationOfOverSpeed;
+    }
+
+    public BuiltinMessage8604 setDurationOfOverSpeed(short durationOfOverSpeed) {
+        this.durationOfOverSpeed = durationOfOverSpeed;
+        return this;
+    }
+
+    public int getPointCount() {
+        return pointCount;
+    }
+
+    public BuiltinMessage8604 setPointCount(int pointCount) {
+        this.pointCount = pointCount;
+        return this;
+    }
+
+    public List<Point> getPointList() {
+        return pointList;
+    }
+
+    public BuiltinMessage8604 setPointList(List<Point> pointList) {
+        this.pointList = pointList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8604.class.getSimpleName() + "[", "]")
+                .add("areaId=" + areaId)
+                .add("areaProps=" + areaProps)
+                .add("startTime=" + startTime)
+                .add("endTime=" + endTime)
+                .add("topSpeed=" + topSpeed)
+                .add("durationOfOverSpeed=" + durationOfOverSpeed)
+                .add("pointCount=" + pointCount)
+                .add("pointList=" + pointList)
+                .toString();
+    }
+
     public static class Point {
 
         @Preset.JtStyle.Dword(desc = "顶点纬度")
@@ -172,6 +248,32 @@ public class BuiltinMessage8604 {
         public Point(long latitude, long longitude) {
             this.latitude = latitude;
             this.longitude = longitude;
+        }
+
+        public long getLatitude() {
+            return latitude;
+        }
+
+        public Point setLatitude(long latitude) {
+            this.latitude = latitude;
+            return this;
+        }
+
+        public long getLongitude() {
+            return longitude;
+        }
+
+        public Point setLongitude(long longitude) {
+            this.longitude = longitude;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Point.class.getSimpleName() + "[", "]")
+                    .add("latitude=" + latitude)
+                    .add("longitude=" + longitude)
+                    .toString();
         }
     }
 }

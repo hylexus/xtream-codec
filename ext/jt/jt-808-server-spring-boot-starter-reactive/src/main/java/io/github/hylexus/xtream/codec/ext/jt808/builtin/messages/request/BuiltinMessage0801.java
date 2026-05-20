@@ -20,20 +20,15 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.Arrays;
+import java.util.StringJoiner;
 
 /**
  * 多媒体数据上传
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0801, desc = "多媒体数据上传")
 public class BuiltinMessage0801 {
 
@@ -98,4 +93,80 @@ public class BuiltinMessage0801 {
     @Preset.JtStyle.Bytes(desc = "多媒体数据包")
     @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
     private byte[] mediaData;
+
+    public long getMultimediaDataID() {
+        return multimediaDataID;
+    }
+
+    public BuiltinMessage0801 setMultimediaDataID(long multimediaDataID) {
+        this.multimediaDataID = multimediaDataID;
+        return this;
+    }
+
+    public short getMultimediaType() {
+        return multimediaType;
+    }
+
+    public BuiltinMessage0801 setMultimediaType(short multimediaType) {
+        this.multimediaType = multimediaType;
+        return this;
+    }
+
+    public short getMultimediaFormatCode() {
+        return multimediaFormatCode;
+    }
+
+    public BuiltinMessage0801 setMultimediaFormatCode(short multimediaFormatCode) {
+        this.multimediaFormatCode = multimediaFormatCode;
+        return this;
+    }
+
+    public short getEventItemCode() {
+        return eventItemCode;
+    }
+
+    public BuiltinMessage0801 setEventItemCode(short eventItemCode) {
+        this.eventItemCode = eventItemCode;
+        return this;
+    }
+
+    public short getChannelId() {
+        return channelId;
+    }
+
+    public BuiltinMessage0801 setChannelId(short channelId) {
+        this.channelId = channelId;
+        return this;
+    }
+
+    public BuiltinMessage0200 getLocation() {
+        return location;
+    }
+
+    public BuiltinMessage0801 setLocation(BuiltinMessage0200 location) {
+        this.location = location;
+        return this;
+    }
+
+    public byte[] getMediaData() {
+        return mediaData;
+    }
+
+    public BuiltinMessage0801 setMediaData(byte[] mediaData) {
+        this.mediaData = mediaData;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0801.class.getSimpleName() + "[", "]")
+                .add("multimediaDataID=" + multimediaDataID)
+                .add("multimediaType=" + multimediaType)
+                .add("multimediaFormatCode=" + multimediaFormatCode)
+                .add("eventItemCode=" + eventItemCode)
+                .add("channelId=" + channelId)
+                .add("location=" + location)
+                .add("mediaData=" + Arrays.toString(mediaData))
+                .toString();
+    }
 }

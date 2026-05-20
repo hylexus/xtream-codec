@@ -21,20 +21,15 @@ import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.Arrays;
+import java.util.StringJoiner;
 
 /**
  * 多媒体数据上传应答
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8800, desc = "多媒体数据上传应答")
 public class BuiltinMessage8800 {
     /**
@@ -61,5 +56,37 @@ public class BuiltinMessage8800 {
     @SuppressWarnings("lombok")
     public short getRetransmittedPackageCount() {
         return retransmittedPackageCount;
+    }
+
+    public long getMultimediaId() {
+        return multimediaId;
+    }
+
+    public BuiltinMessage8800 setMultimediaId(long multimediaId) {
+        this.multimediaId = multimediaId;
+        return this;
+    }
+
+    public BuiltinMessage8800 setRetransmittedPackageCount(short retransmittedPackageCount) {
+        this.retransmittedPackageCount = retransmittedPackageCount;
+        return this;
+    }
+
+    public byte[] getRetransmittedPackageIdList() {
+        return retransmittedPackageIdList;
+    }
+
+    public BuiltinMessage8800 setRetransmittedPackageIdList(byte[] retransmittedPackageIdList) {
+        this.retransmittedPackageIdList = retransmittedPackageIdList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8800.class.getSimpleName() + "[", "]")
+                .add("multimediaId=" + multimediaId)
+                .add("retransmittedPackageCount=" + retransmittedPackageCount)
+                .add("retransmittedPackageIdList=" + Arrays.toString(retransmittedPackageIdList))
+                .toString();
     }
 }

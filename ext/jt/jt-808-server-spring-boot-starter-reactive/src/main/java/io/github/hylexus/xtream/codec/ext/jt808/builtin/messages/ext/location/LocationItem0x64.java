@@ -17,22 +17,15 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 /**
  * 苏标-表-4-15 高级驾驶辅助报警信息数据格式
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class LocationItem0x64 {
 
     // offset[0,4) DWORD 报警 ID: 按照报警先后，从0开始循环累加，不区分报警类型。
@@ -104,4 +97,169 @@ public class LocationItem0x64 {
     @Preset.JtStyle.Object(length = 16, desc = "报警标识号")
     private AlarmIdentifier alarmIdentifier;
 
+    public long getAlarmId() {
+        return alarmId;
+    }
+
+    public LocationItem0x64 setAlarmId(long alarmId) {
+        this.alarmId = alarmId;
+        return this;
+    }
+
+    public short getStatus() {
+        return status;
+    }
+
+    public LocationItem0x64 setStatus(short status) {
+        this.status = status;
+        return this;
+    }
+
+    public short getAlarmType() {
+        return alarmType;
+    }
+
+    public LocationItem0x64 setAlarmType(short alarmType) {
+        this.alarmType = alarmType;
+        return this;
+    }
+
+    public short getAlarmLevel() {
+        return alarmLevel;
+    }
+
+    public LocationItem0x64 setAlarmLevel(short alarmLevel) {
+        this.alarmLevel = alarmLevel;
+        return this;
+    }
+
+    public short getSpeedOfFrontObject() {
+        return speedOfFrontObject;
+    }
+
+    public LocationItem0x64 setSpeedOfFrontObject(short speedOfFrontObject) {
+        this.speedOfFrontObject = speedOfFrontObject;
+        return this;
+    }
+
+    public short getDistanceToFrontObject() {
+        return distanceToFrontObject;
+    }
+
+    public LocationItem0x64 setDistanceToFrontObject(short distanceToFrontObject) {
+        this.distanceToFrontObject = distanceToFrontObject;
+        return this;
+    }
+
+    public short getDeviationType() {
+        return deviationType;
+    }
+
+    public LocationItem0x64 setDeviationType(short deviationType) {
+        this.deviationType = deviationType;
+        return this;
+    }
+
+    public short getRoadSignType() {
+        return roadSignType;
+    }
+
+    public LocationItem0x64 setRoadSignType(short roadSignType) {
+        this.roadSignType = roadSignType;
+        return this;
+    }
+
+    public short getRoadSignData() {
+        return roadSignData;
+    }
+
+    public LocationItem0x64 setRoadSignData(short roadSignData) {
+        this.roadSignData = roadSignData;
+        return this;
+    }
+
+    public short getSpeed() {
+        return speed;
+    }
+
+    public LocationItem0x64 setSpeed(short speed) {
+        this.speed = speed;
+        return this;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public LocationItem0x64 setHeight(int height) {
+        this.height = height;
+        return this;
+    }
+
+    public long getLatitude() {
+        return latitude;
+    }
+
+    public LocationItem0x64 setLatitude(long latitude) {
+        this.latitude = latitude;
+        return this;
+    }
+
+    public long getLongitude() {
+        return longitude;
+    }
+
+    public LocationItem0x64 setLongitude(long longitude) {
+        this.longitude = longitude;
+        return this;
+    }
+
+    public LocalDateTime getDatetime() {
+        return datetime;
+    }
+
+    public LocationItem0x64 setDatetime(LocalDateTime datetime) {
+        this.datetime = datetime;
+        return this;
+    }
+
+    public int getVehicleStatus() {
+        return vehicleStatus;
+    }
+
+    public LocationItem0x64 setVehicleStatus(int vehicleStatus) {
+        this.vehicleStatus = vehicleStatus;
+        return this;
+    }
+
+    public AlarmIdentifier getAlarmIdentifier() {
+        return alarmIdentifier;
+    }
+
+    public LocationItem0x64 setAlarmIdentifier(AlarmIdentifier alarmIdentifier) {
+        this.alarmIdentifier = alarmIdentifier;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LocationItem0x64.class.getSimpleName() + "[", "]")
+                .add("alarmId=" + alarmId)
+                .add("status=" + status)
+                .add("alarmType=" + alarmType)
+                .add("alarmLevel=" + alarmLevel)
+                .add("speedOfFrontObject=" + speedOfFrontObject)
+                .add("distanceToFrontObject=" + distanceToFrontObject)
+                .add("deviationType=" + deviationType)
+                .add("roadSignType=" + roadSignType)
+                .add("roadSignData=" + roadSignData)
+                .add("speed=" + speed)
+                .add("height=" + height)
+                .add("latitude=" + latitude)
+                .add("longitude=" + longitude)
+                .add("datetime=" + datetime)
+                .add("vehicleStatus=" + vehicleStatus)
+                .add("alarmIdentifier=" + alarmIdentifier)
+                .toString();
+    }
 }

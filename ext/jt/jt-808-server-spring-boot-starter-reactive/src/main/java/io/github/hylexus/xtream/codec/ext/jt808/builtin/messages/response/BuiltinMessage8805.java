@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 单条存储多媒体数据检索上传命令
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8805, desc = "单条存储多媒体数据检索上传命令")
 public class BuiltinMessage8805 {
 
@@ -40,4 +34,30 @@ public class BuiltinMessage8805 {
 
     @Preset.JtStyle.Byte(desc = "删除标志 0：保留；1：删除；")
     private short deleteFlag;
+
+    public long getMultimediaId() {
+        return multimediaId;
+    }
+
+    public BuiltinMessage8805 setMultimediaId(long multimediaId) {
+        this.multimediaId = multimediaId;
+        return this;
+    }
+
+    public short getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public BuiltinMessage8805 setDeleteFlag(short deleteFlag) {
+        this.deleteFlag = deleteFlag;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8805.class.getSimpleName() + "[", "]")
+                .add("multimediaId=" + multimediaId)
+                .add("deleteFlag=" + deleteFlag)
+                .toString();
+    }
 }

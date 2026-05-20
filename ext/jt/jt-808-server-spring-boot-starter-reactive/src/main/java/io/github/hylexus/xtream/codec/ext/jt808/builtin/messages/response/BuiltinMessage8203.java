@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 人工确认报警消息 0x8203
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8203, desc = "人工确认报警消息")
 public class BuiltinMessage8203 {
 
@@ -60,4 +54,29 @@ public class BuiltinMessage8203 {
     @Preset.JtStyle.Dword(desc = "人工确认报警类型")
     private long alarmType;
 
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage8203 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public long getAlarmType() {
+        return alarmType;
+    }
+
+    public BuiltinMessage8203 setAlarmType(long alarmType) {
+        this.alarmType = alarmType;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8203.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("alarmType=" + alarmType)
+                .toString();
+    }
 }

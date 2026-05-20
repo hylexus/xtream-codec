@@ -19,20 +19,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 查询终端属性应答 0x0107
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-@ToString
 @Jt808ResponseBody(messageId = 0x0107, desc = "查询终端属性应答(2013)")
 public class BuiltinMessage0107V2013 {
 
@@ -68,4 +62,79 @@ public class BuiltinMessage0107V2013 {
     @Preset.JtStyle.Str(prependLengthFieldType = PrependLengthFieldType.u8, desc = "终端固件版本号")
     private String firmwareVersion;
 
+    public int getType() {
+        return type;
+    }
+
+    public BuiltinMessage0107V2013 setType(int type) {
+        this.type = type;
+        return this;
+    }
+
+    public String getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public BuiltinMessage0107V2013 setManufacturerId(String manufacturerId) {
+        this.manufacturerId = manufacturerId;
+        return this;
+    }
+
+    public String getTerminalType() {
+        return terminalType;
+    }
+
+    public BuiltinMessage0107V2013 setTerminalType(String terminalType) {
+        this.terminalType = terminalType;
+        return this;
+    }
+
+    public String getTerminalId() {
+        return terminalId;
+    }
+
+    public BuiltinMessage0107V2013 setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
+        return this;
+    }
+
+    public String getIccid() {
+        return iccid;
+    }
+
+    public BuiltinMessage0107V2013 setIccid(String iccid) {
+        this.iccid = iccid;
+        return this;
+    }
+
+    public String getHardwareVersion() {
+        return hardwareVersion;
+    }
+
+    public BuiltinMessage0107V2013 setHardwareVersion(String hardwareVersion) {
+        this.hardwareVersion = hardwareVersion;
+        return this;
+    }
+
+    public String getFirmwareVersion() {
+        return firmwareVersion;
+    }
+
+    public BuiltinMessage0107V2013 setFirmwareVersion(String firmwareVersion) {
+        this.firmwareVersion = firmwareVersion;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0107V2013.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("manufacturerId='" + manufacturerId + "'")
+                .add("terminalType='" + terminalType + "'")
+                .add("terminalId='" + terminalId + "'")
+                .add("iccid='" + iccid + "'")
+                .add("hardwareVersion='" + hardwareVersion + "'")
+                .add("firmwareVersion='" + firmwareVersion + "'")
+                .toString();
+    }
 }

@@ -17,20 +17,15 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 /**
  * 苏标-表-4-20 盲区监测系统报警定义数据格式
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
 public class LocationItem0x67 {
 
     // offset[0,4) DWORD 报警ID 按照报警先后，从0开始循环累加，不区分报警类型。
@@ -81,4 +76,109 @@ public class LocationItem0x67 {
     @Preset.JtStyle.Object
     private AlarmIdentifier alarmIdentifier;
 
+    public long getAlarmId() {
+        return alarmId;
+    }
+
+    public LocationItem0x67 setAlarmId(long alarmId) {
+        this.alarmId = alarmId;
+        return this;
+    }
+
+    public short getStatus() {
+        return status;
+    }
+
+    public LocationItem0x67 setStatus(short status) {
+        this.status = status;
+        return this;
+    }
+
+    public short getAlarmType() {
+        return alarmType;
+    }
+
+    public LocationItem0x67 setAlarmType(short alarmType) {
+        this.alarmType = alarmType;
+        return this;
+    }
+
+    public short getSpeed() {
+        return speed;
+    }
+
+    public LocationItem0x67 setSpeed(short speed) {
+        this.speed = speed;
+        return this;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public LocationItem0x67 setHeight(int height) {
+        this.height = height;
+        return this;
+    }
+
+    public long getLatitude() {
+        return latitude;
+    }
+
+    public LocationItem0x67 setLatitude(long latitude) {
+        this.latitude = latitude;
+        return this;
+    }
+
+    public long getLongitude() {
+        return longitude;
+    }
+
+    public LocationItem0x67 setLongitude(long longitude) {
+        this.longitude = longitude;
+        return this;
+    }
+
+    public LocalDateTime getDatetime() {
+        return datetime;
+    }
+
+    public LocationItem0x67 setDatetime(LocalDateTime datetime) {
+        this.datetime = datetime;
+        return this;
+    }
+
+    public int getVehicleStatus() {
+        return vehicleStatus;
+    }
+
+    public LocationItem0x67 setVehicleStatus(int vehicleStatus) {
+        this.vehicleStatus = vehicleStatus;
+        return this;
+    }
+
+    public AlarmIdentifier getAlarmIdentifier() {
+        return alarmIdentifier;
+    }
+
+    public LocationItem0x67 setAlarmIdentifier(AlarmIdentifier alarmIdentifier) {
+        this.alarmIdentifier = alarmIdentifier;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LocationItem0x67.class.getSimpleName() + "[", "]")
+                .add("alarmId=" + alarmId)
+                .add("status=" + status)
+                .add("alarmType=" + alarmType)
+                .add("speed=" + speed)
+                .add("height=" + height)
+                .add("latitude=" + latitude)
+                .add("longitude=" + longitude)
+                .add("datetime=" + datetime)
+                .add("vehicleStatus=" + vehicleStatus)
+                .add("alarmIdentifier=" + alarmIdentifier)
+                .toString();
+    }
 }

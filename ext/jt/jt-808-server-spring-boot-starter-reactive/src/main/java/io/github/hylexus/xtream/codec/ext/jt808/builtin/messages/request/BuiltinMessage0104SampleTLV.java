@@ -22,13 +22,10 @@ import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.TLV;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 查询终端参数应答 0x0104
@@ -37,10 +34,6 @@ import java.util.List;
  * @since 0.4.0
  *
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-@ToString
 @ApiStatus.AvailableSince("0.4.0")
 @Jt808ResponseBody(messageId = 0x0104, desc = "查询终端参数应答(TLV示例)")
 public class BuiltinMessage0104SampleTLV {
@@ -111,4 +104,40 @@ public class BuiltinMessage0104SampleTLV {
             )
     )
     private List<TLV> parameterItems;
+
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0104SampleTLV setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public short getParameterCount() {
+        return parameterCount;
+    }
+
+    public BuiltinMessage0104SampleTLV setParameterCount(short parameterCount) {
+        this.parameterCount = parameterCount;
+        return this;
+    }
+
+    public List<TLV> getParameterItems() {
+        return parameterItems;
+    }
+
+    public BuiltinMessage0104SampleTLV setParameterItems(List<TLV> parameterItems) {
+        this.parameterItems = parameterItems;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0104SampleTLV.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("parameterCount=" + parameterCount)
+                .add("parameterItems=" + parameterItems)
+                .toString();
+    }
 }

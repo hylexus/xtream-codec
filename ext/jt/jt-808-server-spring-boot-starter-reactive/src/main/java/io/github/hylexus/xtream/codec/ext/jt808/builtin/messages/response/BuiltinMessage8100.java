@@ -18,10 +18,8 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 终端注册应答
@@ -31,10 +29,6 @@ import lombok.experimental.Accessors;
  * @see io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request.BuiltinMessage0100V2013
  * @see io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request.BuiltinMessage0100V2019
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8100, desc = "终端注册应答")
 public class BuiltinMessage8100 {
 
@@ -50,4 +44,39 @@ public class BuiltinMessage8100 {
     @Preset.JtStyle.Str(condition = "result == 0", desc = "鉴权码")
     private String authCode;
 
+    public int getClientFlowId() {
+        return clientFlowId;
+    }
+
+    public BuiltinMessage8100 setClientFlowId(int clientFlowId) {
+        this.clientFlowId = clientFlowId;
+        return this;
+    }
+
+    public short getResult() {
+        return result;
+    }
+
+    public BuiltinMessage8100 setResult(short result) {
+        this.result = result;
+        return this;
+    }
+
+    public String getAuthCode() {
+        return authCode;
+    }
+
+    public BuiltinMessage8100 setAuthCode(String authCode) {
+        this.authCode = authCode;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8100.class.getSimpleName() + "[", "]")
+                .add("clientFlowId=" + clientFlowId)
+                .add("result=" + result)
+                .add("authCode='" + authCode + "'")
+                .toString();
+    }
 }

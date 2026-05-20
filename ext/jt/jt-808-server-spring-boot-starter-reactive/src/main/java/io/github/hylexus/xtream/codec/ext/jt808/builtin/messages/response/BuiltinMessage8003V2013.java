@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.WordWrapper;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 服务器补传分包请求 0x8003
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8003, desc = "服务器补传分包请求(2013)")
 public class BuiltinMessage8003V2013 {
 
@@ -47,4 +40,39 @@ public class BuiltinMessage8003V2013 {
     @Preset.JtStyle.List(desc = "重传包 ID 列表")
     private List<WordWrapper> packageIdList;
 
+    public int getOriginalMessageFlowId() {
+        return originalMessageFlowId;
+    }
+
+    public BuiltinMessage8003V2013 setOriginalMessageFlowId(int originalMessageFlowId) {
+        this.originalMessageFlowId = originalMessageFlowId;
+        return this;
+    }
+
+    public short getPackageCount() {
+        return packageCount;
+    }
+
+    public BuiltinMessage8003V2013 setPackageCount(short packageCount) {
+        this.packageCount = packageCount;
+        return this;
+    }
+
+    public List<WordWrapper> getPackageIdList() {
+        return packageIdList;
+    }
+
+    public BuiltinMessage8003V2013 setPackageIdList(List<WordWrapper> packageIdList) {
+        this.packageIdList = packageIdList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8003V2013.class.getSimpleName() + "[", "]")
+                .add("originalMessageFlowId=" + originalMessageFlowId)
+                .add("packageCount=" + packageCount)
+                .add("packageIdList=" + packageIdList)
+                .toString();
+    }
 }

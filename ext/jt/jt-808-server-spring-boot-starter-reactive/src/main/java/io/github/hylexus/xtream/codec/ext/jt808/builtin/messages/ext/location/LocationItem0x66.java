@@ -17,22 +17,16 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 苏标-表-4-18 胎压监测系统报警信息数据格式
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
 public class LocationItem0x66 {
 
     // offset[0,4) DWORD 报警 ID: 按照报警先后，从0开始循环累加，不区分报警类型。
@@ -84,7 +78,122 @@ public class LocationItem0x66 {
     @Preset.JtStyle.List(condition = "getEventItemCount() > 0")
     private List<EventItem> eventItemList;
 
-    @Data
+    public long getAlarmId() {
+        return alarmId;
+    }
+
+    public LocationItem0x66 setAlarmId(long alarmId) {
+        this.alarmId = alarmId;
+        return this;
+    }
+
+    public short getStatus() {
+        return status;
+    }
+
+    public LocationItem0x66 setStatus(short status) {
+        this.status = status;
+        return this;
+    }
+
+    public short getSpeed() {
+        return speed;
+    }
+
+    public LocationItem0x66 setSpeed(short speed) {
+        this.speed = speed;
+        return this;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public LocationItem0x66 setHeight(int height) {
+        this.height = height;
+        return this;
+    }
+
+    public long getLatitude() {
+        return latitude;
+    }
+
+    public LocationItem0x66 setLatitude(long latitude) {
+        this.latitude = latitude;
+        return this;
+    }
+
+    public long getLongitude() {
+        return longitude;
+    }
+
+    public LocationItem0x66 setLongitude(long longitude) {
+        this.longitude = longitude;
+        return this;
+    }
+
+    public LocalDateTime getDatetime() {
+        return datetime;
+    }
+
+    public LocationItem0x66 setDatetime(LocalDateTime datetime) {
+        this.datetime = datetime;
+        return this;
+    }
+
+    public int getVehicleStatus() {
+        return vehicleStatus;
+    }
+
+    public LocationItem0x66 setVehicleStatus(int vehicleStatus) {
+        this.vehicleStatus = vehicleStatus;
+        return this;
+    }
+
+    public AlarmIdentifier getAlarmIdentifier() {
+        return alarmIdentifier;
+    }
+
+    public LocationItem0x66 setAlarmIdentifier(AlarmIdentifier alarmIdentifier) {
+        this.alarmIdentifier = alarmIdentifier;
+        return this;
+    }
+
+    public short getEventItemCount() {
+        return eventItemCount;
+    }
+
+    public LocationItem0x66 setEventItemCount(short eventItemCount) {
+        this.eventItemCount = eventItemCount;
+        return this;
+    }
+
+    public List<EventItem> getEventItemList() {
+        return eventItemList;
+    }
+
+    public LocationItem0x66 setEventItemList(List<EventItem> eventItemList) {
+        this.eventItemList = eventItemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LocationItem0x66.class.getSimpleName() + "[", "]")
+                .add("alarmId=" + alarmId)
+                .add("status=" + status)
+                .add("speed=" + speed)
+                .add("height=" + height)
+                .add("latitude=" + latitude)
+                .add("longitude=" + longitude)
+                .add("datetime=" + datetime)
+                .add("vehicleStatus=" + vehicleStatus)
+                .add("alarmIdentifier=" + alarmIdentifier)
+                .add("eventItemCount=" + eventItemCount)
+                .add("eventItemList=" + eventItemList)
+                .toString();
+    }
+
     public static class EventItem {
         // 胎压报警位置 BYTE 报警轮胎位置编号（从左前轮开始以Z字形从00依次编号，编号与是否安装TPMS无关）
         @Preset.JtStyle.Byte
@@ -114,5 +223,61 @@ public class LocationItem0x66 {
         // 电池电量 WORD 单位 %
         @Preset.JtStyle.Word
         private int offset8;
+
+        public short getOffset0() {
+            return offset0;
+        }
+
+        public EventItem setOffset0(short offset0) {
+            this.offset0 = offset0;
+            return this;
+        }
+
+        public int getOffset2() {
+            return offset2;
+        }
+
+        public EventItem setOffset2(int offset2) {
+            this.offset2 = offset2;
+            return this;
+        }
+
+        public int getOffset4() {
+            return offset4;
+        }
+
+        public EventItem setOffset4(int offset4) {
+            this.offset4 = offset4;
+            return this;
+        }
+
+        public int getOffset6() {
+            return offset6;
+        }
+
+        public EventItem setOffset6(int offset6) {
+            this.offset6 = offset6;
+            return this;
+        }
+
+        public int getOffset8() {
+            return offset8;
+        }
+
+        public EventItem setOffset8(int offset8) {
+            this.offset8 = offset8;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", EventItem.class.getSimpleName() + "[", "]")
+                    .add("offset0=" + offset0)
+                    .add("offset2=" + offset2)
+                    .add("offset4=" + offset4)
+                    .add("offset6=" + offset6)
+                    .add("offset8=" + offset8)
+                    .toString();
+        }
     }
 }

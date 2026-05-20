@@ -19,23 +19,16 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 /**
  * 查询服务器时间应答 0x8004
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8004, desc = "查询服务器时间应答")
 public class BuiltinMessage8004 {
 
@@ -44,4 +37,19 @@ public class BuiltinMessage8004 {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime serverSideDateTime;
 
+    public LocalDateTime getServerSideDateTime() {
+        return serverSideDateTime;
+    }
+
+    public BuiltinMessage8004 setServerSideDateTime(LocalDateTime serverSideDateTime) {
+        this.serverSideDateTime = serverSideDateTime;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8004.class.getSimpleName() + "[", "]")
+                .add("serverSideDateTime=" + serverSideDateTime)
+                .toString();
+    }
 }

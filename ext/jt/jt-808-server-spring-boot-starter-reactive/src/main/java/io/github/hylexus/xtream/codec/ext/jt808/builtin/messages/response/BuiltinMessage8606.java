@@ -21,24 +21,17 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 设置路线
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8606, desc = "设置路线")
 public class BuiltinMessage8606 {
 
@@ -97,10 +90,72 @@ public class BuiltinMessage8606 {
     @Preset.JtStyle.List(desc = "拐点项")
     private List<Item> itemList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public long getRouteId() {
+        return routeId;
+    }
+
+    public BuiltinMessage8606 setRouteId(long routeId) {
+        this.routeId = routeId;
+        return this;
+    }
+
+    public int getRouteProps() {
+        return routeProps;
+    }
+
+    public BuiltinMessage8606 setRouteProps(int routeProps) {
+        this.routeProps = routeProps;
+        return this;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public BuiltinMessage8606 setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public BuiltinMessage8606 setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+        return this;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public BuiltinMessage8606 setCount(int count) {
+        this.count = count;
+        return this;
+    }
+
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
+    public BuiltinMessage8606 setItemList(List<Item> itemList) {
+        this.itemList = itemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8606.class.getSimpleName() + "[", "]")
+                .add("routeId=" + routeId)
+                .add("routeProps=" + routeProps)
+                .add("startTime=" + startTime)
+                .add("endTime=" + endTime)
+                .add("count=" + count)
+                .add("itemList=" + itemList)
+                .toString();
+    }
+
     public static class Item {
 
         @Preset.JtStyle.Dword(desc = "拐点 ID")
@@ -193,6 +248,112 @@ public class BuiltinMessage8606 {
         @SuppressWarnings("unused")
         public boolean isHasSpeedLimitProperty() {
             return Numbers.getBitAt(this.routeProps, 1) == 1;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public Item setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public long getRouteId() {
+            return routeId;
+        }
+
+        public Item setRouteId(long routeId) {
+            this.routeId = routeId;
+            return this;
+        }
+
+        public long getLatitude() {
+            return latitude;
+        }
+
+        public Item setLatitude(long latitude) {
+            this.latitude = latitude;
+            return this;
+        }
+
+        public long getLongitude() {
+            return longitude;
+        }
+
+        public Item setLongitude(long longitude) {
+            this.longitude = longitude;
+            return this;
+        }
+
+        public short getRouteWidth() {
+            return routeWidth;
+        }
+
+        public Item setRouteWidth(short routeWidth) {
+            this.routeWidth = routeWidth;
+            return this;
+        }
+
+        public short getRouteProps() {
+            return routeProps;
+        }
+
+        public Item setRouteProps(short routeProps) {
+            this.routeProps = routeProps;
+            return this;
+        }
+
+        public Integer getLongDriveThreshold() {
+            return longDriveThreshold;
+        }
+
+        public Item setLongDriveThreshold(Integer longDriveThreshold) {
+            this.longDriveThreshold = longDriveThreshold;
+            return this;
+        }
+
+        public Integer getShortDriveThreshold() {
+            return shortDriveThreshold;
+        }
+
+        public Item setShortDriveThreshold(Integer shortDriveThreshold) {
+            this.shortDriveThreshold = shortDriveThreshold;
+            return this;
+        }
+
+        public Integer getMaxSpeedLimit() {
+            return maxSpeedLimit;
+        }
+
+        public Item setMaxSpeedLimit(Integer maxSpeedLimit) {
+            this.maxSpeedLimit = maxSpeedLimit;
+            return this;
+        }
+
+        public Short getSpeedingDuration() {
+            return speedingDuration;
+        }
+
+        public Item setSpeedingDuration(Short speedingDuration) {
+            this.speedingDuration = speedingDuration;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Item.class.getSimpleName() + "[", "]")
+                    .add("id=" + id)
+                    .add("routeId=" + routeId)
+                    .add("latitude=" + latitude)
+                    .add("longitude=" + longitude)
+                    .add("routeWidth=" + routeWidth)
+                    .add("routeProps=" + routeProps)
+                    .add("longDriveThreshold=" + longDriveThreshold)
+                    .add("shortDriveThreshold=" + shortDriveThreshold)
+                    .add("maxSpeedLimit=" + maxSpeedLimit)
+                    .add("speedingDuration=" + speedingDuration)
+                    .toString();
         }
     }
 }

@@ -19,23 +19,16 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 /**
  * 存储多媒体数据上传命令
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8803, desc = "存储多媒体数据上传命令")
 public class BuiltinMessage8803 {
 
@@ -60,4 +53,70 @@ public class BuiltinMessage8803 {
 
     @Preset.JtStyle.Byte(desc = "删除标志 0：保留；1：删除；")
     private short deleteFlag;
+
+    public short getMultimediaType() {
+        return multimediaType;
+    }
+
+    public BuiltinMessage8803 setMultimediaType(short multimediaType) {
+        this.multimediaType = multimediaType;
+        return this;
+    }
+
+    public short getChannelId() {
+        return channelId;
+    }
+
+    public BuiltinMessage8803 setChannelId(short channelId) {
+        this.channelId = channelId;
+        return this;
+    }
+
+    public short getEventItemCode() {
+        return eventItemCode;
+    }
+
+    public BuiltinMessage8803 setEventItemCode(short eventItemCode) {
+        this.eventItemCode = eventItemCode;
+        return this;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public BuiltinMessage8803 setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public BuiltinMessage8803 setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+        return this;
+    }
+
+    public short getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public BuiltinMessage8803 setDeleteFlag(short deleteFlag) {
+        this.deleteFlag = deleteFlag;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8803.class.getSimpleName() + "[", "]")
+                .add("multimediaType=" + multimediaType)
+                .add("channelId=" + channelId)
+                .add("eventItemCode=" + eventItemCode)
+                .add("startTime=" + startTime)
+                .add("endTime=" + endTime)
+                .add("deleteFlag=" + deleteFlag)
+                .toString();
+    }
 }

@@ -21,14 +21,11 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 设置圆形区域
@@ -37,10 +34,6 @@ import java.util.List;
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8600, desc = "设置圆形区域")
 public class BuiltinMessage8600 {
 
@@ -59,10 +52,42 @@ public class BuiltinMessage8600 {
     @Preset.JtStyle.List(desc = "区域项")
     private List<CircularArea> areaList;
 
-    @Getter
-    @Setter
-    @Accessors(chain = true)
-    @ToString
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8600 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public short getAreaCount() {
+        return areaCount;
+    }
+
+    public BuiltinMessage8600 setAreaCount(short areaCount) {
+        this.areaCount = areaCount;
+        return this;
+    }
+
+    public List<CircularArea> getAreaList() {
+        return areaList;
+    }
+
+    public BuiltinMessage8600 setAreaList(List<CircularArea> areaList) {
+        this.areaList = areaList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8600.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("areaCount=" + areaCount)
+                .add("areaList=" + areaList)
+                .toString();
+    }
+
     public static class CircularArea {
 
         @Preset.JtStyle.Dword(desc = "区域 ID")
@@ -171,5 +196,101 @@ public class BuiltinMessage8600 {
         // @Preset.JtStyle.Byte(condition = "hasSpeedProperty()", desc = "超速持续时间")
         @Preset.JtStyle.Byte(conditions = @Expression(spel = "hasSpeedProperty()", mvel = "self.hasSpeedProperty()", aviator = "self.hasSpeedProperty"), desc = "超速持续时间")
         private short durationOfOverSpeed;
+
+        public long getAreaId() {
+            return areaId;
+        }
+
+        public CircularArea setAreaId(long areaId) {
+            this.areaId = areaId;
+            return this;
+        }
+
+        public int getAreaProps() {
+            return areaProps;
+        }
+
+        public CircularArea setAreaProps(int areaProps) {
+            this.areaProps = areaProps;
+            return this;
+        }
+
+        public long getLatitude() {
+            return latitude;
+        }
+
+        public CircularArea setLatitude(long latitude) {
+            this.latitude = latitude;
+            return this;
+        }
+
+        public long getLongitude() {
+            return longitude;
+        }
+
+        public CircularArea setLongitude(long longitude) {
+            this.longitude = longitude;
+            return this;
+        }
+
+        public long getRadius() {
+            return radius;
+        }
+
+        public CircularArea setRadius(long radius) {
+            this.radius = radius;
+            return this;
+        }
+
+        public LocalDateTime getStartTime() {
+            return startTime;
+        }
+
+        public CircularArea setStartTime(LocalDateTime startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public LocalDateTime getEndTime() {
+            return endTime;
+        }
+
+        public CircularArea setEndTime(LocalDateTime endTime) {
+            this.endTime = endTime;
+            return this;
+        }
+
+        public int getTopSpeed() {
+            return topSpeed;
+        }
+
+        public CircularArea setTopSpeed(int topSpeed) {
+            this.topSpeed = topSpeed;
+            return this;
+        }
+
+        public short getDurationOfOverSpeed() {
+            return durationOfOverSpeed;
+        }
+
+        public CircularArea setDurationOfOverSpeed(short durationOfOverSpeed) {
+            this.durationOfOverSpeed = durationOfOverSpeed;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", CircularArea.class.getSimpleName() + "[", "]")
+                    .add("areaId=" + areaId)
+                    .add("areaProps=" + areaProps)
+                    .add("latitude=" + latitude)
+                    .add("longitude=" + longitude)
+                    .add("radius=" + radius)
+                    .add("startTime=" + startTime)
+                    .add("endTime=" + endTime)
+                    .add("topSpeed=" + topSpeed)
+                    .add("durationOfOverSpeed=" + durationOfOverSpeed)
+                    .toString();
+        }
     }
 }

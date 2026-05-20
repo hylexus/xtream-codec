@@ -18,15 +18,9 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.jt1078;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
+import java.util.StringJoiner;
+
 @Jt808ResponseBody(messageId = 0x9102, desc = "音视频实时传输控制")
 public class BuiltinMessage9102 {
 
@@ -56,4 +50,50 @@ public class BuiltinMessage9102 {
     // 1: 子码流
     @Preset.JtStyle.Byte(desc = "切换码流类型")
     private short streamType;
+
+    public short getChannelNumber() {
+        return channelNumber;
+    }
+
+    public BuiltinMessage9102 setChannelNumber(short channelNumber) {
+        this.channelNumber = channelNumber;
+        return this;
+    }
+
+    public short getCommand() {
+        return command;
+    }
+
+    public BuiltinMessage9102 setCommand(short command) {
+        this.command = command;
+        return this;
+    }
+
+    public short getMediaTypeToClose() {
+        return mediaTypeToClose;
+    }
+
+    public BuiltinMessage9102 setMediaTypeToClose(short mediaTypeToClose) {
+        this.mediaTypeToClose = mediaTypeToClose;
+        return this;
+    }
+
+    public short getStreamType() {
+        return streamType;
+    }
+
+    public BuiltinMessage9102 setStreamType(short streamType) {
+        this.streamType = streamType;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage9102.class.getSimpleName() + "[", "]")
+                .add("channelNumber=" + channelNumber)
+                .add("command=" + command)
+                .add("mediaTypeToClose=" + mediaTypeToClose)
+                .add("streamType=" + streamType)
+                .toString();
+    }
 }

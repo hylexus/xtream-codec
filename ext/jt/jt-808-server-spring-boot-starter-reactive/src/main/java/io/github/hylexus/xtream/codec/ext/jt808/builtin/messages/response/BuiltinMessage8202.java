@@ -19,20 +19,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 临时位置跟踪控制 0x8202
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8202, desc = "临时位置跟踪控制")
 public class BuiltinMessage8202 {
 
@@ -59,5 +53,27 @@ public class BuiltinMessage8202 {
     @SuppressWarnings("lombok")
     public int getTimeDurationInSeconds() {
         return timeDurationInSeconds;
+    }
+
+    public BuiltinMessage8202 setTimeDurationInSeconds(int timeDurationInSeconds) {
+        this.timeDurationInSeconds = timeDurationInSeconds;
+        return this;
+    }
+
+    public long getTraceValidityDurationInSeconds() {
+        return traceValidityDurationInSeconds;
+    }
+
+    public BuiltinMessage8202 setTraceValidityDurationInSeconds(long traceValidityDurationInSeconds) {
+        this.traceValidityDurationInSeconds = traceValidityDurationInSeconds;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8202.class.getSimpleName() + "[", "]")
+                .add("timeDurationInSeconds=" + timeDurationInSeconds)
+                .add("traceValidityDurationInSeconds=" + traceValidityDurationInSeconds)
+                .toString();
     }
 }

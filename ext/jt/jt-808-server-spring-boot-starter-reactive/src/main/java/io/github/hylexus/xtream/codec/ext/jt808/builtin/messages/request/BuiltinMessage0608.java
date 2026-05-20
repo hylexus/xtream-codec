@@ -24,24 +24,17 @@ import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.Builti
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.BuiltinMessage8604V2019;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.BuiltinMessage8606V2019;
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 查询区域或线路数据应答
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class BuiltinMessage0608 {
 
     /**
@@ -62,6 +55,42 @@ public class BuiltinMessage0608 {
 
     @Preset.JtStyle.List(fieldCodec = BuiltinMessage0608.Message0608FieldCodec.class)
     private List<Object> dataList;
+
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage0608 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public BuiltinMessage0608 setCount(long count) {
+        this.count = count;
+        return this;
+    }
+
+    public List<Object> getDataList() {
+        return dataList;
+    }
+
+    public BuiltinMessage0608 setDataList(List<Object> dataList) {
+        this.dataList = dataList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0608.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("count=" + count)
+                .add("dataList=" + dataList)
+                .toString();
+    }
 
     public static class Message0608FieldCodec implements FieldCodec<List<Object>> {
 

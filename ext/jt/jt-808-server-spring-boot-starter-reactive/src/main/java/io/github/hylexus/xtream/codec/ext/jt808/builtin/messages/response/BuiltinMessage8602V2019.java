@@ -20,23 +20,16 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 设置矩形区域
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8602)
 public class BuiltinMessage8602V2019 {
 
@@ -61,10 +54,42 @@ public class BuiltinMessage8602V2019 {
     @Preset.JtStyle.List
     private List<RectangularArea> areaList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8602V2019 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public short getAreaCount() {
+        return areaCount;
+    }
+
+    public BuiltinMessage8602V2019 setAreaCount(short areaCount) {
+        this.areaCount = areaCount;
+        return this;
+    }
+
+    public List<RectangularArea> getAreaList() {
+        return areaList;
+    }
+
+    public BuiltinMessage8602V2019 setAreaList(List<RectangularArea> areaList) {
+        this.areaList = areaList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8602V2019.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("areaCount=" + areaCount)
+                .add("areaList=" + areaList)
+                .toString();
+    }
+
     public static class RectangularArea {
         /**
          * 区域 ID
@@ -188,5 +213,141 @@ public class BuiltinMessage8602V2019 {
          */
         @Preset.JtStyle.Str
         private String areaName;
+
+        public long getAreaId() {
+            return areaId;
+        }
+
+        public RectangularArea setAreaId(long areaId) {
+            this.areaId = areaId;
+            return this;
+        }
+
+        public int getAreaProps() {
+            return areaProps;
+        }
+
+        public RectangularArea setAreaProps(int areaProps) {
+            this.areaProps = areaProps;
+            return this;
+        }
+
+        public long getLeftTopLatitude() {
+            return leftTopLatitude;
+        }
+
+        public RectangularArea setLeftTopLatitude(long leftTopLatitude) {
+            this.leftTopLatitude = leftTopLatitude;
+            return this;
+        }
+
+        public long getLeftTopLongitude() {
+            return leftTopLongitude;
+        }
+
+        public RectangularArea setLeftTopLongitude(long leftTopLongitude) {
+            this.leftTopLongitude = leftTopLongitude;
+            return this;
+        }
+
+        public long getRightBottomLatitude() {
+            return rightBottomLatitude;
+        }
+
+        public RectangularArea setRightBottomLatitude(long rightBottomLatitude) {
+            this.rightBottomLatitude = rightBottomLatitude;
+            return this;
+        }
+
+        public long getRightBottomLongitude() {
+            return rightBottomLongitude;
+        }
+
+        public RectangularArea setRightBottomLongitude(long rightBottomLongitude) {
+            this.rightBottomLongitude = rightBottomLongitude;
+            return this;
+        }
+
+        public LocalDateTime getStartTime() {
+            return startTime;
+        }
+
+        public RectangularArea setStartTime(LocalDateTime startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public LocalDateTime getEndTime() {
+            return endTime;
+        }
+
+        public RectangularArea setEndTime(LocalDateTime endTime) {
+            this.endTime = endTime;
+            return this;
+        }
+
+        public int getTopSpeed() {
+            return topSpeed;
+        }
+
+        public RectangularArea setTopSpeed(int topSpeed) {
+            this.topSpeed = topSpeed;
+            return this;
+        }
+
+        public short getDurationOfOverSpeed() {
+            return durationOfOverSpeed;
+        }
+
+        public RectangularArea setDurationOfOverSpeed(short durationOfOverSpeed) {
+            this.durationOfOverSpeed = durationOfOverSpeed;
+            return this;
+        }
+
+        public int getTopSpeedAtNight() {
+            return topSpeedAtNight;
+        }
+
+        public RectangularArea setTopSpeedAtNight(int topSpeedAtNight) {
+            this.topSpeedAtNight = topSpeedAtNight;
+            return this;
+        }
+
+        public int getAreaNameLength() {
+            return areaNameLength;
+        }
+
+        public RectangularArea setAreaNameLength(int areaNameLength) {
+            this.areaNameLength = areaNameLength;
+            return this;
+        }
+
+        public String getAreaName() {
+            return areaName;
+        }
+
+        public RectangularArea setAreaName(String areaName) {
+            this.areaName = areaName;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", RectangularArea.class.getSimpleName() + "[", "]")
+                    .add("areaId=" + areaId)
+                    .add("areaProps=" + areaProps)
+                    .add("leftTopLatitude=" + leftTopLatitude)
+                    .add("leftTopLongitude=" + leftTopLongitude)
+                    .add("rightBottomLatitude=" + rightBottomLatitude)
+                    .add("rightBottomLongitude=" + rightBottomLongitude)
+                    .add("startTime=" + startTime)
+                    .add("endTime=" + endTime)
+                    .add("topSpeed=" + topSpeed)
+                    .add("durationOfOverSpeed=" + durationOfOverSpeed)
+                    .add("topSpeedAtNight=" + topSpeedAtNight)
+                    .add("areaNameLength=" + areaNameLength)
+                    .add("areaName='" + areaName + "'")
+                    .toString();
+        }
     }
 }

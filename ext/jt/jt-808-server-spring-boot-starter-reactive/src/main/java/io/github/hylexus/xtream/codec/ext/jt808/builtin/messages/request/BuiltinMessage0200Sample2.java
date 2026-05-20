@@ -20,24 +20,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec.BuiltinLocationMessageExtraItemFieldCodec;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * 位置信息汇报 0x0200
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0200, desc = "位置信息汇报(示例2)")
 public class BuiltinMessage0200Sample2 {
     // 报警标志  DWORD(4)
@@ -78,4 +71,99 @@ public class BuiltinMessage0200Sample2 {
     @Preset.JtStyle.Object(desc = "附加项", fieldCodec = BuiltinLocationMessageExtraItemFieldCodec.class)
     private Map<Short, Object> extraItems;
 
+    public long getAlarmFlag() {
+        return alarmFlag;
+    }
+
+    public BuiltinMessage0200Sample2 setAlarmFlag(long alarmFlag) {
+        this.alarmFlag = alarmFlag;
+        return this;
+    }
+
+    public long getStatus() {
+        return status;
+    }
+
+    public BuiltinMessage0200Sample2 setStatus(long status) {
+        this.status = status;
+        return this;
+    }
+
+    public long getLatitude() {
+        return latitude;
+    }
+
+    public BuiltinMessage0200Sample2 setLatitude(long latitude) {
+        this.latitude = latitude;
+        return this;
+    }
+
+    public long getLongitude() {
+        return longitude;
+    }
+
+    public BuiltinMessage0200Sample2 setLongitude(long longitude) {
+        this.longitude = longitude;
+        return this;
+    }
+
+    public int getAltitude() {
+        return altitude;
+    }
+
+    public BuiltinMessage0200Sample2 setAltitude(int altitude) {
+        this.altitude = altitude;
+        return this;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public BuiltinMessage0200Sample2 setSpeed(int speed) {
+        this.speed = speed;
+        return this;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public BuiltinMessage0200Sample2 setDirection(int direction) {
+        this.direction = direction;
+        return this;
+    }
+
+    public LocalDateTime getTime() {
+        return time;
+    }
+
+    public BuiltinMessage0200Sample2 setTime(LocalDateTime time) {
+        this.time = time;
+        return this;
+    }
+
+    public Map<Short, Object> getExtraItems() {
+        return extraItems;
+    }
+
+    public BuiltinMessage0200Sample2 setExtraItems(Map<Short, Object> extraItems) {
+        this.extraItems = extraItems;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0200Sample2.class.getSimpleName() + "[", "]")
+                .add("alarmFlag=" + alarmFlag)
+                .add("status=" + status)
+                .add("latitude=" + latitude)
+                .add("longitude=" + longitude)
+                .add("altitude=" + altitude)
+                .add("speed=" + speed)
+                .add("direction=" + direction)
+                .add("time=" + time)
+                .add("extraItems=" + extraItems)
+                .toString();
+    }
 }

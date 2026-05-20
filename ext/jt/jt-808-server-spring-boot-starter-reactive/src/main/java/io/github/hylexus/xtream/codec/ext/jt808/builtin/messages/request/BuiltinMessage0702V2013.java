@@ -20,24 +20,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 /**
  * 驾驶员身份信息采集上报
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0702, desc = "驾驶员身份信息采集上报(2013)")
 public class BuiltinMessage0702V2013 {
 
@@ -86,4 +79,79 @@ public class BuiltinMessage0702V2013 {
     @Preset.JtStyle.BcdDateTime(length = 4, pattern = "yyyyMMdd", desc = "到期时间")
     private LocalDate certificateExpiresDate;
 
+    public short getStatus() {
+        return status;
+    }
+
+    public BuiltinMessage0702V2013 setStatus(short status) {
+        this.status = status;
+        return this;
+    }
+
+    public LocalDateTime getTime() {
+        return time;
+    }
+
+    public BuiltinMessage0702V2013 setTime(LocalDateTime time) {
+        this.time = time;
+        return this;
+    }
+
+    public short getIcCardReadResult() {
+        return icCardReadResult;
+    }
+
+    public BuiltinMessage0702V2013 setIcCardReadResult(short icCardReadResult) {
+        this.icCardReadResult = icCardReadResult;
+        return this;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public BuiltinMessage0702V2013 setDriverName(String driverName) {
+        this.driverName = driverName;
+        return this;
+    }
+
+    public String getProfessionalLicenseNo() {
+        return professionalLicenseNo;
+    }
+
+    public BuiltinMessage0702V2013 setProfessionalLicenseNo(String professionalLicenseNo) {
+        this.professionalLicenseNo = professionalLicenseNo;
+        return this;
+    }
+
+    public String getCertificateAuthorityName() {
+        return certificateAuthorityName;
+    }
+
+    public BuiltinMessage0702V2013 setCertificateAuthorityName(String certificateAuthorityName) {
+        this.certificateAuthorityName = certificateAuthorityName;
+        return this;
+    }
+
+    public LocalDate getCertificateExpiresDate() {
+        return certificateExpiresDate;
+    }
+
+    public BuiltinMessage0702V2013 setCertificateExpiresDate(LocalDate certificateExpiresDate) {
+        this.certificateExpiresDate = certificateExpiresDate;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0702V2013.class.getSimpleName() + "[", "]")
+                .add("status=" + status)
+                .add("time=" + time)
+                .add("icCardReadResult=" + icCardReadResult)
+                .add("driverName='" + driverName + "'")
+                .add("professionalLicenseNo='" + professionalLicenseNo + "'")
+                .add("certificateAuthorityName='" + certificateAuthorityName + "'")
+                .add("certificateExpiresDate=" + certificateExpiresDate)
+                .toString();
+    }
 }

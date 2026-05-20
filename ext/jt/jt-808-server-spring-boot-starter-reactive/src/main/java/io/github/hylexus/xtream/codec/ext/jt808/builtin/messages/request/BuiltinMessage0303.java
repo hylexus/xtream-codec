@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 信息点播/取消
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0303, desc = "信息点播/取消")
 public class BuiltinMessage0303 {
 
@@ -41,4 +35,29 @@ public class BuiltinMessage0303 {
     @Preset.JtStyle.Byte(desc = "点播/取消标志 0：取消；1：点播")
     private short flag;
 
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage0303 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public short getFlag() {
+        return flag;
+    }
+
+    public BuiltinMessage0303 setFlag(short flag) {
+        this.flag = flag;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0303.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("flag=" + flag)
+                .toString();
+    }
 }

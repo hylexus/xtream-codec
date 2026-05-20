@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.WordWrapper;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 终端补传分包请求 0x0005
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0005, desc = "终端补传分包请求")
 public class BuiltinMessage0005 {
 
@@ -50,4 +43,39 @@ public class BuiltinMessage0005 {
     @Preset.JtStyle.List
     private List<WordWrapper> packageIdList;
 
+    public int getOriginalMessageFlowId() {
+        return originalMessageFlowId;
+    }
+
+    public BuiltinMessage0005 setOriginalMessageFlowId(int originalMessageFlowId) {
+        this.originalMessageFlowId = originalMessageFlowId;
+        return this;
+    }
+
+    public int getPackageCount() {
+        return packageCount;
+    }
+
+    public BuiltinMessage0005 setPackageCount(int packageCount) {
+        this.packageCount = packageCount;
+        return this;
+    }
+
+    public List<WordWrapper> getPackageIdList() {
+        return packageIdList;
+    }
+
+    public BuiltinMessage0005 setPackageIdList(List<WordWrapper> packageIdList) {
+        this.packageIdList = packageIdList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0005.class.getSimpleName() + "[", "]")
+                .add("originalMessageFlowId=" + originalMessageFlowId)
+                .add("packageCount=" + packageCount)
+                .add("packageIdList=" + packageIdList)
+                .toString();
+    }
 }

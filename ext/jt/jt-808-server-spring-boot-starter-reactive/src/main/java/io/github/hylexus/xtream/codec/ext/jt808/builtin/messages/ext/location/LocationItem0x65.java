@@ -17,18 +17,15 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+
+import java.util.Arrays;
+import java.util.StringJoiner;
 
 /**
  * 苏标-表-4-17 驾驶状态监测系统报警信息数据格式
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
 public class LocationItem0x65 {
 
     // offset[0,4) 报警 ID: 按照报警先后，从0开始循环累加，不区分报警类型。
@@ -85,4 +82,140 @@ public class LocationItem0x65 {
     // 报警识别号定义见表4-16
     @Preset.JtStyle.Object
     private AlarmIdentifier alarmIdentifier;
+
+    public long getAlarmId() {
+        return alarmId;
+    }
+
+    public LocationItem0x65 setAlarmId(long alarmId) {
+        this.alarmId = alarmId;
+        return this;
+    }
+
+    public short getStatus() {
+        return status;
+    }
+
+    public LocationItem0x65 setStatus(short status) {
+        this.status = status;
+        return this;
+    }
+
+    public short getAlarmType() {
+        return alarmType;
+    }
+
+    public LocationItem0x65 setAlarmType(short alarmType) {
+        this.alarmType = alarmType;
+        return this;
+    }
+
+    public short getAlarmLevel() {
+        return alarmLevel;
+    }
+
+    public LocationItem0x65 setAlarmLevel(short alarmLevel) {
+        this.alarmLevel = alarmLevel;
+        return this;
+    }
+
+    public short getFatigueLevel() {
+        return fatigueLevel;
+    }
+
+    public LocationItem0x65 setFatigueLevel(short fatigueLevel) {
+        this.fatigueLevel = fatigueLevel;
+        return this;
+    }
+
+    public byte[] getReservedOffset8() {
+        return reservedOffset8;
+    }
+
+    public LocationItem0x65 setReservedOffset8(byte[] reservedOffset8) {
+        this.reservedOffset8 = reservedOffset8;
+        return this;
+    }
+
+    public short getSpeed() {
+        return speed;
+    }
+
+    public LocationItem0x65 setSpeed(short speed) {
+        this.speed = speed;
+        return this;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public LocationItem0x65 setHeight(int height) {
+        this.height = height;
+        return this;
+    }
+
+    public long getLatitude() {
+        return latitude;
+    }
+
+    public LocationItem0x65 setLatitude(long latitude) {
+        this.latitude = latitude;
+        return this;
+    }
+
+    public long getLongitude() {
+        return longitude;
+    }
+
+    public LocationItem0x65 setLongitude(long longitude) {
+        this.longitude = longitude;
+        return this;
+    }
+
+    public String getDatetime() {
+        return datetime;
+    }
+
+    public LocationItem0x65 setDatetime(String datetime) {
+        this.datetime = datetime;
+        return this;
+    }
+
+    public int getVehicleStatus() {
+        return vehicleStatus;
+    }
+
+    public LocationItem0x65 setVehicleStatus(int vehicleStatus) {
+        this.vehicleStatus = vehicleStatus;
+        return this;
+    }
+
+    public AlarmIdentifier getAlarmIdentifier() {
+        return alarmIdentifier;
+    }
+
+    public LocationItem0x65 setAlarmIdentifier(AlarmIdentifier alarmIdentifier) {
+        this.alarmIdentifier = alarmIdentifier;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LocationItem0x65.class.getSimpleName() + "[", "]")
+                .add("alarmId=" + alarmId)
+                .add("status=" + status)
+                .add("alarmType=" + alarmType)
+                .add("alarmLevel=" + alarmLevel)
+                .add("fatigueLevel=" + fatigueLevel)
+                .add("reservedOffset8=" + Arrays.toString(reservedOffset8))
+                .add("speed=" + speed)
+                .add("height=" + height)
+                .add("latitude=" + latitude)
+                .add("longitude=" + longitude)
+                .add("datetime='" + datetime + "'")
+                .add("vehicleStatus=" + vehicleStatus)
+                .add("alarmIdentifier=" + alarmIdentifier)
+                .toString();
+    }
 }

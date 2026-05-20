@@ -21,22 +21,15 @@ import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.sample8105.codec.Message8105CodecSample;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.sample8105.types.CommandValue;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 查询终端参数
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8105)
 public class BuiltinMessage8105 {
 
@@ -61,5 +54,27 @@ public class BuiltinMessage8105 {
     @SuppressWarnings("lombok")
     public short getCommandWord() {
         return this.commandWord;
+    }
+
+    public BuiltinMessage8105 setCommandWord(short commandWord) {
+        this.commandWord = commandWord;
+        return this;
+    }
+
+    public List<CommandValue<?>> getCommandValue() {
+        return commandValue;
+    }
+
+    public BuiltinMessage8105 setCommandValue(List<CommandValue<?>> commandValue) {
+        this.commandValue = commandValue;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8105.class.getSimpleName() + "[", "]")
+                .add("commandWord=" + commandWord)
+                .add("commandValue=" + commandValue)
+                .toString();
     }
 }

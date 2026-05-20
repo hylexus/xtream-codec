@@ -16,16 +16,12 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext;
 
-import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.AlarmIdentifier;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 import static io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType.u8;
 
@@ -34,10 +30,6 @@ import static io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldT
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x1210, desc = "苏标-报警附件信息消息(表-23)")
 public class BuiltinMessage1210 {
 
@@ -85,9 +77,72 @@ public class BuiltinMessage1210 {
     @Preset.JtStyle.List(desc = "附件信息列表")
     private List<AttachmentItem> attachmentItemList;
 
-    @Getter
-    @Setter
-    @Accessors(chain = true)
+    public String getTerminalId() {
+        return terminalId;
+    }
+
+    public BuiltinMessage1210 setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
+        return this;
+    }
+
+    public AlarmIdentifier getAlarmIdentifier() {
+        return alarmIdentifier;
+    }
+
+    public BuiltinMessage1210 setAlarmIdentifier(AlarmIdentifier alarmIdentifier) {
+        this.alarmIdentifier = alarmIdentifier;
+        return this;
+    }
+
+    public String getAlarmNo() {
+        return alarmNo;
+    }
+
+    public BuiltinMessage1210 setAlarmNo(String alarmNo) {
+        this.alarmNo = alarmNo;
+        return this;
+    }
+
+    public short getMessageType() {
+        return messageType;
+    }
+
+    public BuiltinMessage1210 setMessageType(short messageType) {
+        this.messageType = messageType;
+        return this;
+    }
+
+    public short getAttachmentCount() {
+        return attachmentCount;
+    }
+
+    public BuiltinMessage1210 setAttachmentCount(short attachmentCount) {
+        this.attachmentCount = attachmentCount;
+        return this;
+    }
+
+    public List<AttachmentItem> getAttachmentItemList() {
+        return attachmentItemList;
+    }
+
+    public BuiltinMessage1210 setAttachmentItemList(List<AttachmentItem> attachmentItemList) {
+        this.attachmentItemList = attachmentItemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage1210.class.getSimpleName() + "[", "]")
+                .add("terminalId='" + terminalId + "'")
+                .add("alarmIdentifier=" + alarmIdentifier)
+                .add("alarmNo='" + alarmNo + "'")
+                .add("messageType=" + messageType)
+                .add("attachmentCount=" + attachmentCount)
+                .add("attachmentItemList=" + attachmentItemList)
+                .toString();
+    }
+
     public static class AttachmentItem {
 
         // prependLengthFieldType: 前置一个 u8 类型的字段 表示当前字段长度
@@ -101,6 +156,42 @@ public class BuiltinMessage1210 {
         private short fileType;
         // 这个属性不在报文里  由外部赋值
         private BuiltinMessage1210 group;
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public AttachmentItem setFileName(String fileName) {
+            this.fileName = fileName;
+            return this;
+        }
+
+        public long getFileSize() {
+            return fileSize;
+        }
+
+        public AttachmentItem setFileSize(long fileSize) {
+            this.fileSize = fileSize;
+            return this;
+        }
+
+        public short getFileType() {
+            return fileType;
+        }
+
+        public AttachmentItem setFileType(short fileType) {
+            this.fileType = fileType;
+            return this;
+        }
+
+        public BuiltinMessage1210 getGroup() {
+            return group;
+        }
+
+        public AttachmentItem setGroup(BuiltinMessage1210 group) {
+            this.group = group;
+            return this;
+        }
 
         @Override
         public String toString() {

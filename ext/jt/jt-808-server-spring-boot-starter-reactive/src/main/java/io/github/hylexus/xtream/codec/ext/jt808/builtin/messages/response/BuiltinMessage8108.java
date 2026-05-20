@@ -21,20 +21,15 @@ import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.Arrays;
+import java.util.StringJoiner;
 
 /**
  * 下发终端升级包
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8108, desc = "下发终端升级包")
 public class BuiltinMessage8108 {
     /**
@@ -56,5 +51,51 @@ public class BuiltinMessage8108 {
     @Preset.JtStyle.Bytes(prependLengthFieldType = PrependLengthFieldType.u32, desc = "升级数据包")
     @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
     private byte[] data;
+
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8108 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public String getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public BuiltinMessage8108 setManufacturerId(String manufacturerId) {
+        this.manufacturerId = manufacturerId;
+        return this;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public BuiltinMessage8108 setVersion(String version) {
+        this.version = version;
+        return this;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public BuiltinMessage8108 setData(byte[] data) {
+        this.data = data;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8108.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("manufacturerId='" + manufacturerId + "'")
+                .add("version='" + version + "'")
+                .add("data=" + Arrays.toString(data))
+                .toString();
+    }
 
 }

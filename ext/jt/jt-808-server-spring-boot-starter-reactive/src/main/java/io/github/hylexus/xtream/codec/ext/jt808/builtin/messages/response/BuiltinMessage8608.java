@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DwordWrapper;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 查询区域或线路数据
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8608, desc = "查询区域或线路数据")
 public class BuiltinMessage8608 {
 
@@ -56,4 +49,40 @@ public class BuiltinMessage8608 {
 
     @Preset.JtStyle.List(desc = "ID 列表")
     private List<DwordWrapper> idList;
+
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8608 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public BuiltinMessage8608 setCount(long count) {
+        this.count = count;
+        return this;
+    }
+
+    public List<DwordWrapper> getIdList() {
+        return idList;
+    }
+
+    public BuiltinMessage8608 setIdList(List<DwordWrapper> idList) {
+        this.idList = idList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8608.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("count=" + count)
+                .add("idList=" + idList)
+                .toString();
+    }
 }

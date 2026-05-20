@@ -19,18 +19,12 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 /**
  * 终端通用应答 0x0001
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0001, desc = "终端通用应答")
 public class BuiltinMessage0001 {
 
@@ -42,6 +36,33 @@ public class BuiltinMessage0001 {
 
     @Preset.JtStyle.Byte(desc = "结果 0:成功/确认; 1:失败; 2:消息有误; 3:不支持")
     private short result;
+
+    public int getServerFlowId() {
+        return serverFlowId;
+    }
+
+    public BuiltinMessage0001 setServerFlowId(int serverFlowId) {
+        this.serverFlowId = serverFlowId;
+        return this;
+    }
+
+    public int getServerMessageId() {
+        return serverMessageId;
+    }
+
+    public BuiltinMessage0001 setServerMessageId(int serverMessageId) {
+        this.serverMessageId = serverMessageId;
+        return this;
+    }
+
+    public short getResult() {
+        return result;
+    }
+
+    public BuiltinMessage0001 setResult(short result) {
+        this.result = result;
+        return this;
+    }
 
     @Override
     public String toString() {

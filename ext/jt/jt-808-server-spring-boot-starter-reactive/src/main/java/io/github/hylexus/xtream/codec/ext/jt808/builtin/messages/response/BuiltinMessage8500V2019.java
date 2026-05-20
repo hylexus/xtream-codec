@@ -23,10 +23,6 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +30,13 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * 车辆控制
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8500)
 public class BuiltinMessage8500V2019 {
 
@@ -64,6 +57,32 @@ public class BuiltinMessage8500V2019 {
      */
     @Preset.JtStyle.Bytes(fieldCodec = Message8500FieldCodec.class)
     private Map<Integer, Object> params;
+
+    public int getParamCount() {
+        return paramCount;
+    }
+
+    public BuiltinMessage8500V2019 setParamCount(int paramCount) {
+        this.paramCount = paramCount;
+        return this;
+    }
+
+    public Map<Integer, Object> getParams() {
+        return params;
+    }
+
+    public BuiltinMessage8500V2019 setParams(Map<Integer, Object> params) {
+        this.params = params;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8500V2019.class.getSimpleName() + "[", "]")
+                .add("paramCount=" + paramCount)
+                .add("params=" + params)
+                .toString();
+    }
 
     public static class Message8500FieldCodec implements FieldCodec<Map<Integer, Object>> {
 

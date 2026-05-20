@@ -20,20 +20,14 @@ import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.AlarmIdentifier;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 报警附件上传指令(苏标)
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x9208, desc = "苏标-报警附件上传指令(表-4-21)")
 public class BuiltinMessage9208 {
 
@@ -61,4 +55,70 @@ public class BuiltinMessage9208 {
     // BYTE[16]
     @Preset.JtStyle.Bytes(desc = "预留")
     private String reservedByte16 = "0000000000000000";
+
+    public String getAttachmentServerIp() {
+        return attachmentServerIp;
+    }
+
+    public BuiltinMessage9208 setAttachmentServerIp(String attachmentServerIp) {
+        this.attachmentServerIp = attachmentServerIp;
+        return this;
+    }
+
+    public int getAttachmentServerPortTcp() {
+        return attachmentServerPortTcp;
+    }
+
+    public BuiltinMessage9208 setAttachmentServerPortTcp(int attachmentServerPortTcp) {
+        this.attachmentServerPortTcp = attachmentServerPortTcp;
+        return this;
+    }
+
+    public int getAttachmentServerPortUdp() {
+        return attachmentServerPortUdp;
+    }
+
+    public BuiltinMessage9208 setAttachmentServerPortUdp(int attachmentServerPortUdp) {
+        this.attachmentServerPortUdp = attachmentServerPortUdp;
+        return this;
+    }
+
+    public AlarmIdentifier getAlarmIdentifier() {
+        return alarmIdentifier;
+    }
+
+    public BuiltinMessage9208 setAlarmIdentifier(AlarmIdentifier alarmIdentifier) {
+        this.alarmIdentifier = alarmIdentifier;
+        return this;
+    }
+
+    public String getAlarmNo() {
+        return alarmNo;
+    }
+
+    public BuiltinMessage9208 setAlarmNo(String alarmNo) {
+        this.alarmNo = alarmNo;
+        return this;
+    }
+
+    public String getReservedByte16() {
+        return reservedByte16;
+    }
+
+    public BuiltinMessage9208 setReservedByte16(String reservedByte16) {
+        this.reservedByte16 = reservedByte16;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage9208.class.getSimpleName() + "[", "]")
+                .add("attachmentServerIp='" + attachmentServerIp + "'")
+                .add("attachmentServerPortTcp=" + attachmentServerPortTcp)
+                .add("attachmentServerPortUdp=" + attachmentServerPortUdp)
+                .add("alarmIdentifier=" + alarmIdentifier)
+                .add("alarmNo='" + alarmNo + "'")
+                .add("reservedByte16='" + reservedByte16 + "'")
+                .toString();
+    }
 }

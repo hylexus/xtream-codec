@@ -17,20 +17,14 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 0x12
  * <p>
  * 进出区域/路线报警附加信息见表29
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class LocationItem0x12 {
     /**
      * <li>1：圆形区域</li>
@@ -47,4 +41,39 @@ public class LocationItem0x12 {
     @Preset.JtStyle.Byte(desc = "方向；0:进; 1:出")
     private short direction;
 
+    public short getLocationType() {
+        return locationType;
+    }
+
+    public LocationItem0x12 setLocationType(short locationType) {
+        this.locationType = locationType;
+        return this;
+    }
+
+    public long getAreaId() {
+        return areaId;
+    }
+
+    public LocationItem0x12 setAreaId(long areaId) {
+        this.areaId = areaId;
+        return this;
+    }
+
+    public short getDirection() {
+        return direction;
+    }
+
+    public LocationItem0x12 setDirection(short direction) {
+        this.direction = direction;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LocationItem0x12.class.getSimpleName() + "[", "]")
+                .add("locationType=" + locationType)
+                .add("areaId=" + areaId)
+                .add("direction=" + direction)
+                .toString();
+    }
 }

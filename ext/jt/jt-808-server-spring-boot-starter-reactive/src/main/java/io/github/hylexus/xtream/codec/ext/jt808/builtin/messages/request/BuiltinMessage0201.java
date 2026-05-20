@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 位置信息查询应答 0x0201
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0201, desc = "位置信息查询应答")
 public class BuiltinMessage0201 {
 
@@ -47,4 +41,29 @@ public class BuiltinMessage0201 {
     @Preset.JtStyle.Object(desc = "位置汇报信息")
     private BuiltinMessage0200 locationMessage;
 
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0201 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public BuiltinMessage0200 getLocationMessage() {
+        return locationMessage;
+    }
+
+    public BuiltinMessage0201 setLocationMessage(BuiltinMessage0200 locationMessage) {
+        this.locationMessage = locationMessage;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0201.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("locationMessage=" + locationMessage)
+                .toString();
+    }
 }

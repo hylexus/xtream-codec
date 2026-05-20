@@ -21,17 +21,10 @@ import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec.CustomParameterListFieldCodec;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec.ParameterItem;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8103)
 public class BuiltinMessage8103Sample4 {
 
@@ -41,4 +34,29 @@ public class BuiltinMessage8103Sample4 {
     @XtreamField(fieldCodec = CustomParameterListFieldCodec.class)
     private List<ParameterItem> parameterItemList;
 
+    public short getParameterCount() {
+        return parameterCount;
+    }
+
+    public BuiltinMessage8103Sample4 setParameterCount(short parameterCount) {
+        this.parameterCount = parameterCount;
+        return this;
+    }
+
+    public List<ParameterItem> getParameterItemList() {
+        return parameterItemList;
+    }
+
+    public BuiltinMessage8103Sample4 setParameterItemList(List<ParameterItem> parameterItemList) {
+        this.parameterItemList = parameterItemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8103Sample4.class.getSimpleName() + "[", "]")
+                .add("parameterCount=" + parameterCount)
+                .add("parameterItemList=" + parameterItemList)
+                .toString();
+    }
 }

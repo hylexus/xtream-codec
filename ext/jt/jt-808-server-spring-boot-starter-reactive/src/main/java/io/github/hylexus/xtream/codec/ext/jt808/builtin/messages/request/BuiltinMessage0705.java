@@ -20,23 +20,18 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * CAN 总线数据上传
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
+@SuppressWarnings("NotNullFieldNotInitialized")
 @Jt808ResponseBody(messageId = 0x0705, desc = "CAN 总线数据上传")
 public class BuiltinMessage0705 {
 
@@ -61,10 +56,42 @@ public class BuiltinMessage0705 {
     @Preset.JtStyle.List
     private List<Item> itemList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public int getCount() {
+        return count;
+    }
+
+    public BuiltinMessage0705 setCount(int count) {
+        this.count = count;
+        return this;
+    }
+
+    public LocalTime getReceiveTime() {
+        return receiveTime;
+    }
+
+    public BuiltinMessage0705 setReceiveTime(LocalTime receiveTime) {
+        this.receiveTime = receiveTime;
+        return this;
+    }
+
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
+    public BuiltinMessage0705 setItemList(List<Item> itemList) {
+        this.itemList = itemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0705.class.getSimpleName() + "[", "]")
+                .add("count=" + count)
+                .add("receiveTime=" + receiveTime)
+                .add("itemList=" + itemList)
+                .toString();
+    }
+
     public static class Item {
         /**
          * CAN ID
@@ -84,6 +111,32 @@ public class BuiltinMessage0705 {
         @Preset.JtStyle.Bytes(length = 8)
         @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
         private byte[] canData;
+
+        public long getCanId() {
+            return canId;
+        }
+
+        public Item setCanId(long canId) {
+            this.canId = canId;
+            return this;
+        }
+
+        public byte[] getCanData() {
+            return canData;
+        }
+
+        public Item setCanData(byte[] canData) {
+            this.canData = canData;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Item.class.getSimpleName() + "[", "]")
+                    .add("canId=" + canId)
+                    .add("canData=" + Arrays.toString(canData))
+                    .toString();
+        }
     }
 
 }

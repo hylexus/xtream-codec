@@ -19,16 +19,10 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.jt1078;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x9101, desc = "音视频实时传输请求")
 public class BuiltinMessage9101 {
 
@@ -51,4 +45,69 @@ public class BuiltinMessage9101 {
     @Preset.JtStyle.Byte(desc = "码流类型")
     private short streamType;
 
+    public String getServerIp() {
+        return serverIp;
+    }
+
+    public BuiltinMessage9101 setServerIp(String serverIp) {
+        this.serverIp = serverIp;
+        return this;
+    }
+
+    public int getServerPortTcp() {
+        return serverPortTcp;
+    }
+
+    public BuiltinMessage9101 setServerPortTcp(int serverPortTcp) {
+        this.serverPortTcp = serverPortTcp;
+        return this;
+    }
+
+    public int getServerPortUdp() {
+        return serverPortUdp;
+    }
+
+    public BuiltinMessage9101 setServerPortUdp(int serverPortUdp) {
+        this.serverPortUdp = serverPortUdp;
+        return this;
+    }
+
+    public short getChannelNumber() {
+        return channelNumber;
+    }
+
+    public BuiltinMessage9101 setChannelNumber(short channelNumber) {
+        this.channelNumber = channelNumber;
+        return this;
+    }
+
+    public short getDataType() {
+        return dataType;
+    }
+
+    public BuiltinMessage9101 setDataType(short dataType) {
+        this.dataType = dataType;
+        return this;
+    }
+
+    public short getStreamType() {
+        return streamType;
+    }
+
+    public BuiltinMessage9101 setStreamType(short streamType) {
+        this.streamType = streamType;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage9101.class.getSimpleName() + "[", "]")
+                .add("serverIp='" + serverIp + "'")
+                .add("serverPortTcp=" + serverPortTcp)
+                .add("serverPortUdp=" + serverPortUdp)
+                .add("channelNumber=" + channelNumber)
+                .add("dataType=" + dataType)
+                .add("streamType=" + streamType)
+                .toString();
+    }
 }

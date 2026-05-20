@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 信息服务
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8304, desc = "信息服务")
 public class BuiltinMessage8304 {
 
@@ -44,4 +38,39 @@ public class BuiltinMessage8304 {
     @Preset.JtStyle.Str(desc = "信息内容")
     private String content;
 
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8304 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public BuiltinMessage8304 setLength(int length) {
+        this.length = length;
+        return this;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public BuiltinMessage8304 setContent(String content) {
+        this.content = content;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8304.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("length=" + length)
+                .add("content='" + content + "'")
+                .toString();
+    }
 }

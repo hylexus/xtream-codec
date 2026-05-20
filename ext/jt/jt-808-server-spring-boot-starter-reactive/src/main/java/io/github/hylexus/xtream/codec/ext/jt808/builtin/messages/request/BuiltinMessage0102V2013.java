@@ -18,10 +18,8 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 终端鉴权 0x0102
@@ -30,10 +28,6 @@ import lombok.experimental.Accessors;
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0102, desc = "终端鉴权(2013)")
 public class BuiltinMessage0102V2013 {
 
@@ -43,4 +37,19 @@ public class BuiltinMessage0102V2013 {
     @Preset.JtStyle.Str(desc = "鉴权码")
     private String authenticationCode;
 
+    public String getAuthenticationCode() {
+        return authenticationCode;
+    }
+
+    public BuiltinMessage0102V2013 setAuthenticationCode(String authenticationCode) {
+        this.authenticationCode = authenticationCode;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0102V2013.class.getSimpleName() + "[", "]")
+                .add("authenticationCode='" + authenticationCode + "'")
+                .toString();
+    }
 }

@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 录音开始命令
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8804, desc = "录音开始命令")
 public class BuiltinMessage8804 {
 
@@ -65,4 +59,50 @@ public class BuiltinMessage8804 {
      */
     @Preset.JtStyle.Byte(desc = "音频采样率")
     private short audioSampleRate;
+
+    public short getRecordingCommand() {
+        return recordingCommand;
+    }
+
+    public BuiltinMessage8804 setRecordingCommand(short recordingCommand) {
+        this.recordingCommand = recordingCommand;
+        return this;
+    }
+
+    public int getRecordingDuration() {
+        return recordingDuration;
+    }
+
+    public BuiltinMessage8804 setRecordingDuration(int recordingDuration) {
+        this.recordingDuration = recordingDuration;
+        return this;
+    }
+
+    public short getSaveFlag() {
+        return saveFlag;
+    }
+
+    public BuiltinMessage8804 setSaveFlag(short saveFlag) {
+        this.saveFlag = saveFlag;
+        return this;
+    }
+
+    public short getAudioSampleRate() {
+        return audioSampleRate;
+    }
+
+    public BuiltinMessage8804 setAudioSampleRate(short audioSampleRate) {
+        this.audioSampleRate = audioSampleRate;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8804.class.getSimpleName() + "[", "]")
+                .add("recordingCommand=" + recordingCommand)
+                .add("recordingDuration=" + recordingDuration)
+                .add("saveFlag=" + saveFlag)
+                .add("audioSampleRate=" + audioSampleRate)
+                .toString();
+    }
 }

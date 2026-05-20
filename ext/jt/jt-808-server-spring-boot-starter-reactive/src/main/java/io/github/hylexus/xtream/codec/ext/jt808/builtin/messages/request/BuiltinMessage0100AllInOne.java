@@ -18,10 +18,8 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 终端注册(多版本合一)
@@ -29,10 +27,6 @@ import lombok.experimental.Accessors;
  * @author hylexus
  * @see io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.BuiltinMessage8100
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0100, desc = "终端注册(多版本合一)")
 public class BuiltinMessage0100AllInOne {
 
@@ -62,4 +56,79 @@ public class BuiltinMessage0100AllInOne {
     @Preset.JtStyle.Str(desc = "车辆标识")
     private String carIdentifier;
 
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public BuiltinMessage0100AllInOne setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+        return this;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public BuiltinMessage0100AllInOne setCityId(int cityId) {
+        this.cityId = cityId;
+        return this;
+    }
+
+    public String getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public BuiltinMessage0100AllInOne setManufacturerId(String manufacturerId) {
+        this.manufacturerId = manufacturerId;
+        return this;
+    }
+
+    public String getTerminalType() {
+        return terminalType;
+    }
+
+    public BuiltinMessage0100AllInOne setTerminalType(String terminalType) {
+        this.terminalType = terminalType;
+        return this;
+    }
+
+    public String getTerminalId() {
+        return terminalId;
+    }
+
+    public BuiltinMessage0100AllInOne setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
+        return this;
+    }
+
+    public short getColor() {
+        return color;
+    }
+
+    public BuiltinMessage0100AllInOne setColor(short color) {
+        this.color = color;
+        return this;
+    }
+
+    public String getCarIdentifier() {
+        return carIdentifier;
+    }
+
+    public BuiltinMessage0100AllInOne setCarIdentifier(String carIdentifier) {
+        this.carIdentifier = carIdentifier;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0100AllInOne.class.getSimpleName() + "[", "]")
+                .add("provinceId=" + provinceId)
+                .add("cityId=" + cityId)
+                .add("manufacturerId='" + manufacturerId + "'")
+                .add("terminalType='" + terminalType + "'")
+                .add("terminalId='" + terminalId + "'")
+                .add("color=" + color)
+                .add("carIdentifier='" + carIdentifier + "'")
+                .toString();
+    }
 }

@@ -20,22 +20,15 @@ import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DwordWrapper;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 摄像头立即拍摄命令应答
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0805, desc = "摄像头立即拍摄命令应答")
 public class BuiltinMessage0805 {
 
@@ -72,4 +65,49 @@ public class BuiltinMessage0805 {
         return success();
     }
 
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0805 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public short getResult() {
+        return result;
+    }
+
+    public BuiltinMessage0805 setResult(short result) {
+        this.result = result;
+        return this;
+    }
+
+    public int getMultimediaIdCount() {
+        return multimediaIdCount;
+    }
+
+    public BuiltinMessage0805 setMultimediaIdCount(int multimediaIdCount) {
+        this.multimediaIdCount = multimediaIdCount;
+        return this;
+    }
+
+    public List<DwordWrapper> getMultimediaIdList() {
+        return multimediaIdList;
+    }
+
+    public BuiltinMessage0805 setMultimediaIdList(List<DwordWrapper> multimediaIdList) {
+        this.multimediaIdList = multimediaIdList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0805.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("result=" + result)
+                .add("multimediaIdCount=" + multimediaIdCount)
+                .add("multimediaIdList=" + multimediaIdList)
+                .toString();
+    }
 }

@@ -19,20 +19,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 苏标-表-4-25 文件信息上传
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x1211, desc = "苏标-文件信息上传(表-4-25)")
 public class BuiltinMessage1211 {
 
@@ -53,4 +47,40 @@ public class BuiltinMessage1211 {
 
     @Preset.JtStyle.Dword(desc = "文件大小")
     private long fileSize;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public BuiltinMessage1211 setFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
+    public short getFileType() {
+        return fileType;
+    }
+
+    public BuiltinMessage1211 setFileType(short fileType) {
+        this.fileType = fileType;
+        return this;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public BuiltinMessage1211 setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage1211.class.getSimpleName() + "[", "]")
+                .add("fileName='" + fileName + "'")
+                .add("fileType=" + fileType)
+                .add("fileSize=" + fileSize)
+                .toString();
+    }
 }

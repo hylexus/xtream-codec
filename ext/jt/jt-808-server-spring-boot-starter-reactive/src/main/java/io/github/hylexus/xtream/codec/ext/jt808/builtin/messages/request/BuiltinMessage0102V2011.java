@@ -17,20 +17,14 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 终端鉴权 0x0102
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class BuiltinMessage0102V2011 {
 
     /**
@@ -39,4 +33,19 @@ public class BuiltinMessage0102V2011 {
     @Preset.JtStyle.Str
     private String authenticationCode;
 
+    public String getAuthenticationCode() {
+        return authenticationCode;
+    }
+
+    public BuiltinMessage0102V2011 setAuthenticationCode(String authenticationCode) {
+        this.authenticationCode = authenticationCode;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0102V2011.class.getSimpleName() + "[", "]")
+                .add("authenticationCode='" + authenticationCode + "'")
+                .toString();
+    }
 }

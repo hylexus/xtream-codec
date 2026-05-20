@@ -17,20 +17,14 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 车辆控制应答
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class BuiltinMessage0500 {
 
     /**
@@ -48,4 +42,30 @@ public class BuiltinMessage0500 {
      */
     @Preset.JtStyle.Object(desc = "位置信息汇报消息体")
     private BuiltinMessage0200 location;
+
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0500 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public BuiltinMessage0200 getLocation() {
+        return location;
+    }
+
+    public BuiltinMessage0500 setLocation(BuiltinMessage0200 location) {
+        this.location = location;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0500.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("location=" + location)
+                .toString();
+    }
 }

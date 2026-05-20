@@ -18,20 +18,14 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+
+import java.util.StringJoiner;
 
 /**
  * 文本信息下发
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8300, desc = "文本信息下发(2019)")
 public class BuiltinMessage8300V2019 {
     /**
@@ -61,4 +55,40 @@ public class BuiltinMessage8300V2019 {
      */
     @Preset.JtStyle.Str(desc = "文本信息")
     private String text;
+
+    public short getIdentifier() {
+        return identifier;
+    }
+
+    public BuiltinMessage8300V2019 setIdentifier(short identifier) {
+        this.identifier = identifier;
+        return this;
+    }
+
+    public short getTextType() {
+        return textType;
+    }
+
+    public BuiltinMessage8300V2019 setTextType(short textType) {
+        this.textType = textType;
+        return this;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public BuiltinMessage8300V2019 setText(String text) {
+        this.text = text;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8300V2019.class.getSimpleName() + "[", "]")
+                .add("identifier=" + identifier)
+                .add("textType=" + textType)
+                .add("text='" + text + "'")
+                .toString();
+    }
 }

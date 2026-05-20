@@ -19,22 +19,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 事件设置
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8301, desc = "事件设置")
 public class BuiltinMessage8301 {
     /**
@@ -54,10 +47,42 @@ public class BuiltinMessage8301 {
     @Preset.JtStyle.List(desc = "事件项列表")
     private List<EventItem> eventItemList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public short getEventType() {
+        return eventType;
+    }
+
+    public BuiltinMessage8301 setEventType(short eventType) {
+        this.eventType = eventType;
+        return this;
+    }
+
+    public short getEventCount() {
+        return eventCount;
+    }
+
+    public BuiltinMessage8301 setEventCount(short eventCount) {
+        this.eventCount = eventCount;
+        return this;
+    }
+
+    public List<EventItem> getEventItemList() {
+        return eventItemList;
+    }
+
+    public BuiltinMessage8301 setEventItemList(List<EventItem> eventItemList) {
+        this.eventItemList = eventItemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8301.class.getSimpleName() + "[", "]")
+                .add("eventType=" + eventType)
+                .add("eventCount=" + eventCount)
+                .add("eventItemList=" + eventItemList)
+                .toString();
+    }
+
     public static class EventItem {
 
         @Preset.JtStyle.Byte(desc = "事件 ID")
@@ -73,6 +98,32 @@ public class BuiltinMessage8301 {
         public EventItem(short eventId, String eventContent) {
             this.eventId = eventId;
             this.eventContent = eventContent;
+        }
+
+        public short getEventId() {
+            return eventId;
+        }
+
+        public EventItem setEventId(short eventId) {
+            this.eventId = eventId;
+            return this;
+        }
+
+        public String getEventContent() {
+            return eventContent;
+        }
+
+        public EventItem setEventContent(String eventContent) {
+            this.eventContent = eventContent;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", EventItem.class.getSimpleName() + "[", "]")
+                    .add("eventId=" + eventId)
+                    .add("eventContent='" + eventContent + "'")
+                    .toString();
         }
     }
 

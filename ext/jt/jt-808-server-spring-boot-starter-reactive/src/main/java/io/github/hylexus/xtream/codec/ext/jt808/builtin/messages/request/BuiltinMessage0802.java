@@ -18,22 +18,15 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 存储多媒体数据检索应答
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0802, desc = "存储多媒体数据检索应答")
 public class BuiltinMessage0802 {
 
@@ -46,10 +39,42 @@ public class BuiltinMessage0802 {
     @Preset.JtStyle.List(desc = "数据项列表")
     private List<Item> itemList;
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0802 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public int getMultimediaDataItemCount() {
+        return multimediaDataItemCount;
+    }
+
+    public BuiltinMessage0802 setMultimediaDataItemCount(int multimediaDataItemCount) {
+        this.multimediaDataItemCount = multimediaDataItemCount;
+        return this;
+    }
+
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
+    public BuiltinMessage0802 setItemList(List<Item> itemList) {
+        this.itemList = itemList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0802.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("multimediaDataItemCount=" + multimediaDataItemCount)
+                .add("itemList=" + itemList)
+                .toString();
+    }
+
     public static class Item {
 
         @Preset.JtStyle.Dword(desc = "多媒体ID")
@@ -74,5 +99,61 @@ public class BuiltinMessage0802 {
          */
         @Preset.JtStyle.Object(length = 28, desc = "位置信息汇报")
         private BuiltinMessage0200 location;
+
+        public long getMultimediaId() {
+            return multimediaId;
+        }
+
+        public Item setMultimediaId(long multimediaId) {
+            this.multimediaId = multimediaId;
+            return this;
+        }
+
+        public short getMultimediaType() {
+            return multimediaType;
+        }
+
+        public Item setMultimediaType(short multimediaType) {
+            this.multimediaType = multimediaType;
+            return this;
+        }
+
+        public short getChannelId() {
+            return channelId;
+        }
+
+        public Item setChannelId(short channelId) {
+            this.channelId = channelId;
+            return this;
+        }
+
+        public short getEventItemCode() {
+            return eventItemCode;
+        }
+
+        public Item setEventItemCode(short eventItemCode) {
+            this.eventItemCode = eventItemCode;
+            return this;
+        }
+
+        public BuiltinMessage0200 getLocation() {
+            return location;
+        }
+
+        public Item setLocation(BuiltinMessage0200 location) {
+            this.location = location;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Item.class.getSimpleName() + "[", "]")
+                    .add("multimediaId=" + multimediaId)
+                    .add("multimediaType=" + multimediaType)
+                    .add("channelId=" + channelId)
+                    .add("eventItemCode=" + eventItemCode)
+                    .add("location=" + location)
+                    .toString();
+        }
     }
 }

@@ -18,23 +18,16 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
 
 /**
  * 苏标-表-4-16 报警标识号格式
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @SuppressWarnings("NullAway.Init")
 public class AlarmIdentifier {
     // 终端ID BYTE[7] 7个字节，由大写字母和数字组成
@@ -60,4 +53,60 @@ public class AlarmIdentifier {
     // 预留 BYTE
     @Preset.JtStyle.Byte(desc = "预留")
     private short reserved = 0;
+
+    public String getTerminalId() {
+        return terminalId;
+    }
+
+    public AlarmIdentifier setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
+        return this;
+    }
+
+    public LocalDateTime getTime() {
+        return time;
+    }
+
+    public AlarmIdentifier setTime(LocalDateTime time) {
+        this.time = time;
+        return this;
+    }
+
+    public short getSequence() {
+        return sequence;
+    }
+
+    public AlarmIdentifier setSequence(short sequence) {
+        this.sequence = sequence;
+        return this;
+    }
+
+    public short getAttachmentCount() {
+        return attachmentCount;
+    }
+
+    public AlarmIdentifier setAttachmentCount(short attachmentCount) {
+        this.attachmentCount = attachmentCount;
+        return this;
+    }
+
+    public short getReserved() {
+        return reserved;
+    }
+
+    public AlarmIdentifier setReserved(short reserved) {
+        this.reserved = reserved;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", AlarmIdentifier.class.getSimpleName() + "[", "]")
+                .add("terminalId='" + terminalId + "'")
+                .add("time=" + time)
+                .add("sequence=" + sequence)
+                .add("attachmentCount=" + attachmentCount)
+                .add("reserved=" + reserved)
+                .toString();
+    }
 }

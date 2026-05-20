@@ -19,14 +19,10 @@ package io.github.hylexus.xtream.codec.ext.jt808.spec.impl;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808RequestHeader;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 /**
  * @author hylexus
  */
-@Accessors(fluent = true, chain = true)
-@Setter
 public class DefaultJt808RequestHeader implements Jt808RequestHeader {
 
     private Jt808ProtocolVersion version;
@@ -59,9 +55,19 @@ public class DefaultJt808RequestHeader implements Jt808RequestHeader {
         this.subPackageProps = subPackageProps;
     }
 
+    public DefaultJt808RequestHeader version(Jt808ProtocolVersion version) {
+        this.version = version;
+        return this;
+    }
+
     @Override
     public Jt808ProtocolVersion version() {
         return version;
+    }
+
+    public DefaultJt808RequestHeader messageId(int messageId) {
+        this.messageId = messageId;
+        return this;
     }
 
     @Override
@@ -69,14 +75,34 @@ public class DefaultJt808RequestHeader implements Jt808RequestHeader {
         return messageId;
     }
 
+    public DefaultJt808RequestHeader subPackageProps(Jt808SubPackageProps subPackageProps) {
+        this.subPackageProps = subPackageProps;
+        return this;
+    }
+
+    public DefaultJt808RequestHeader messageBodyProps(Jt808MessageBodyProps messageBodyProps) {
+        this.messageBodyProps = messageBodyProps;
+        return this;
+    }
+
     @Override
     public Jt808MessageBodyProps messageBodyProps() {
         return messageBodyProps;
     }
 
+    public DefaultJt808RequestHeader terminalId(String terminalId) {
+        this.terminalId = terminalId;
+        return this;
+    }
+
     @Override
     public String terminalId() {
         return terminalId;
+    }
+
+    public DefaultJt808RequestHeader flowId(int flowId) {
+        this.flowId = flowId;
+        return this;
     }
 
     @Override

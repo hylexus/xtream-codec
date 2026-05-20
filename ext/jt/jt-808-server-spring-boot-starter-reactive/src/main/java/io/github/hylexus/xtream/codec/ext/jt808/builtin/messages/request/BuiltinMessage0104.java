@@ -24,21 +24,15 @@ import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.Builti
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.BuiltinMessage8103Sample3;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.BuiltinMessage8103Sample4;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 查询终端参数应答 0x0104
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x0104, desc = "查询终端参数应答")
 public class BuiltinMessage0104 {
     /**
@@ -59,6 +53,42 @@ public class BuiltinMessage0104 {
     @Preset.JtStyle.List
     private List<ParameterItem> parameterItems;
 
+    public int getFlowId() {
+        return flowId;
+    }
+
+    public BuiltinMessage0104 setFlowId(int flowId) {
+        this.flowId = flowId;
+        return this;
+    }
+
+    public short getParameterCount() {
+        return parameterCount;
+    }
+
+    public BuiltinMessage0104 setParameterCount(short parameterCount) {
+        this.parameterCount = parameterCount;
+        return this;
+    }
+
+    public List<ParameterItem> getParameterItems() {
+        return parameterItems;
+    }
+
+    public BuiltinMessage0104 setParameterItems(List<ParameterItem> parameterItems) {
+        this.parameterItems = parameterItems;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage0104.class.getSimpleName() + "[", "]")
+                .add("flowId=" + flowId)
+                .add("parameterCount=" + parameterCount)
+                .add("parameterItems=" + parameterItems)
+                .toString();
+    }
+
     /**
      * 其他写法参考：
      * <ol>
@@ -68,10 +98,6 @@ public class BuiltinMessage0104 {
      * <li>{@link BuiltinMessage8103Sample4}</li>
      * </ol>
      */
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
     public static class ParameterItem {
 
         @Preset.JtStyle.Dword
@@ -89,5 +115,30 @@ public class BuiltinMessage0104 {
             this.parameterValue = container;
         }
 
+        public long getParameterId() {
+            return parameterId;
+        }
+
+        public ParameterItem setParameterId(long parameterId) {
+            this.parameterId = parameterId;
+            return this;
+        }
+
+        public ByteArrayContainer getParameterValue() {
+            return parameterValue;
+        }
+
+        public ParameterItem setParameterValue(ByteArrayContainer parameterValue) {
+            this.parameterValue = parameterValue;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", ParameterItem.class.getSimpleName() + "[", "]")
+                    .add("parameterId=" + parameterId)
+                    .add("parameterValue=" + parameterValue)
+                    .toString();
+        }
     }
 }

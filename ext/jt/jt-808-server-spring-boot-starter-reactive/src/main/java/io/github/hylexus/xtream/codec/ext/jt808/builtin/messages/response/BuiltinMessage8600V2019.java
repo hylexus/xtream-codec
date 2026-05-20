@@ -20,13 +20,10 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * 设置圆形区域
@@ -35,10 +32,6 @@ import java.util.List;
  *
  * @author hylexus
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 @Jt808ResponseBody(messageId = 0x8600)
 public class BuiltinMessage8600V2019 {
 
@@ -61,10 +54,42 @@ public class BuiltinMessage8600V2019 {
     @Preset.JtStyle.List(iterationTimesExpressions = @Expression(spel = "getAreaCount()", mvel = "self.getAreaCount()", aviator = "self.areaCount"))
     private List<CircularArea> areaList;
 
-    @Getter
-    @Setter
-    @Accessors(chain = true)
-    @ToString
+    public short getType() {
+        return type;
+    }
+
+    public BuiltinMessage8600V2019 setType(short type) {
+        this.type = type;
+        return this;
+    }
+
+    public short getAreaCount() {
+        return areaCount;
+    }
+
+    public BuiltinMessage8600V2019 setAreaCount(short areaCount) {
+        this.areaCount = areaCount;
+        return this;
+    }
+
+    public List<CircularArea> getAreaList() {
+        return areaList;
+    }
+
+    public BuiltinMessage8600V2019 setAreaList(List<CircularArea> areaList) {
+        this.areaList = areaList;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BuiltinMessage8600V2019.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("areaCount=" + areaCount)
+                .add("areaList=" + areaList)
+                .toString();
+    }
+
     public static class CircularArea {
         /**
          * 区域 ID
@@ -195,6 +220,128 @@ public class BuiltinMessage8600V2019 {
         @SuppressWarnings("unused")
         public int getAreaNameLength() {
             return areaNameLength;
+        }
+
+        public long getAreaId() {
+            return areaId;
+        }
+
+        public CircularArea setAreaId(long areaId) {
+            this.areaId = areaId;
+            return this;
+        }
+
+        public int getAreaProps() {
+            return areaProps;
+        }
+
+        public CircularArea setAreaProps(int areaProps) {
+            this.areaProps = areaProps;
+            return this;
+        }
+
+        public long getLatitude() {
+            return latitude;
+        }
+
+        public CircularArea setLatitude(long latitude) {
+            this.latitude = latitude;
+            return this;
+        }
+
+        public long getLongitude() {
+            return longitude;
+        }
+
+        public CircularArea setLongitude(long longitude) {
+            this.longitude = longitude;
+            return this;
+        }
+
+        public long getRadius() {
+            return radius;
+        }
+
+        public CircularArea setRadius(long radius) {
+            this.radius = radius;
+            return this;
+        }
+
+        public LocalDateTime getStartTime() {
+            return startTime;
+        }
+
+        public CircularArea setStartTime(LocalDateTime startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public LocalDateTime getEndTime() {
+            return endTime;
+        }
+
+        public CircularArea setEndTime(LocalDateTime endTime) {
+            this.endTime = endTime;
+            return this;
+        }
+
+        public int getTopSpeed() {
+            return topSpeed;
+        }
+
+        public CircularArea setTopSpeed(int topSpeed) {
+            this.topSpeed = topSpeed;
+            return this;
+        }
+
+        public short getDurationOfOverSpeed() {
+            return durationOfOverSpeed;
+        }
+
+        public CircularArea setDurationOfOverSpeed(short durationOfOverSpeed) {
+            this.durationOfOverSpeed = durationOfOverSpeed;
+            return this;
+        }
+
+        public int getTopSpeedAtNight() {
+            return topSpeedAtNight;
+        }
+
+        public CircularArea setTopSpeedAtNight(int topSpeedAtNight) {
+            this.topSpeedAtNight = topSpeedAtNight;
+            return this;
+        }
+
+        public CircularArea setAreaNameLength(int areaNameLength) {
+            this.areaNameLength = areaNameLength;
+            return this;
+        }
+
+        public String getAreaName() {
+            return areaName;
+        }
+
+        public CircularArea setAreaName(String areaName) {
+            this.areaName = areaName;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", CircularArea.class.getSimpleName() + "[", "]")
+                    .add("areaId=" + areaId)
+                    .add("areaProps=" + areaProps)
+                    .add("latitude=" + latitude)
+                    .add("longitude=" + longitude)
+                    .add("radius=" + radius)
+                    .add("startTime=" + startTime)
+                    .add("endTime=" + endTime)
+                    .add("topSpeed=" + topSpeed)
+                    .add("durationOfOverSpeed=" + durationOfOverSpeed)
+                    .add("topSpeedAtNight=" + topSpeedAtNight)
+                    .add("areaNameLength=" + areaNameLength)
+                    .add("areaName='" + areaName + "'")
+                    .toString();
         }
     }
 }
