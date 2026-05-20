@@ -49,7 +49,7 @@ jobs:
           REMOTE_USER: ${{ secrets.SERVER_USER }}
           SOURCE: "docs/src/.vuepress/dist/"
           TARGET: "/var/www/xtream-codec-docs/"
-          ARGS: "-rlgoDIVz --delete"
+          ARGS: "-avzr --delete"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
