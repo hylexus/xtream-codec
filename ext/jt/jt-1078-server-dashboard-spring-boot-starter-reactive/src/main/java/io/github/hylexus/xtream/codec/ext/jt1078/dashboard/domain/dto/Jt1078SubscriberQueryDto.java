@@ -17,13 +17,25 @@
 package io.github.hylexus.xtream.codec.ext.jt1078.dashboard.domain.dto;
 
 import io.github.hylexus.xtream.codec.base.web.domain.dto.PageableDto;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
+import java.util.StringJoiner;
+
 public class Jt1078SubscriberQueryDto extends PageableDto {
     private String sim;
+
+    public String getSim() {
+        return sim;
+    }
+
+    public Jt1078SubscriberQueryDto setSim(String sim) {
+        this.sim = sim;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Jt1078SubscriberQueryDto.class.getSimpleName() + "[", "]")
+                .add("sim='" + sim + "'")
+                .toString();
+    }
 }

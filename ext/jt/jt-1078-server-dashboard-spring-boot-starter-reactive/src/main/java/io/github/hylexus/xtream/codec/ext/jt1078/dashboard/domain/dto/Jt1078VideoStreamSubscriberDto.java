@@ -19,17 +19,9 @@ package io.github.hylexus.xtream.codec.ext.jt1078.dashboard.domain.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
-@NoArgsConstructor
+import java.util.StringJoiner;
+
 public class Jt1078VideoStreamSubscriberDto {
 
     @NotNull(message = "终端手机号不能为空")
@@ -54,4 +46,79 @@ public class Jt1078VideoStreamSubscriberDto {
     @JsonProperty("hasVideo")
     private boolean hasVideo = true;
 
+    public String getSim() {
+        return sim;
+    }
+
+    public Jt1078VideoStreamSubscriberDto setSim(String sim) {
+        this.sim = sim;
+        return this;
+    }
+
+    public short getChannel() {
+        return channel;
+    }
+
+    public Jt1078VideoStreamSubscriberDto setChannel(short channel) {
+        this.channel = channel;
+        return this;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public Jt1078VideoStreamSubscriberDto setTimeout(int timeout) {
+        this.timeout = timeout;
+        return this;
+    }
+
+    public boolean isByteArrayAsBase64() {
+        return byteArrayAsBase64;
+    }
+
+    public Jt1078VideoStreamSubscriberDto setByteArrayAsBase64(boolean byteArrayAsBase64) {
+        this.byteArrayAsBase64 = byteArrayAsBase64;
+        return this;
+    }
+
+    public int getNaluDecoderRingBufferSize() {
+        return naluDecoderRingBufferSize;
+    }
+
+    public Jt1078VideoStreamSubscriberDto setNaluDecoderRingBufferSize(int naluDecoderRingBufferSize) {
+        this.naluDecoderRingBufferSize = naluDecoderRingBufferSize;
+        return this;
+    }
+
+    public boolean isHasAudio() {
+        return hasAudio;
+    }
+
+    public Jt1078VideoStreamSubscriberDto setHasAudio(boolean hasAudio) {
+        this.hasAudio = hasAudio;
+        return this;
+    }
+
+    public boolean isHasVideo() {
+        return hasVideo;
+    }
+
+    public Jt1078VideoStreamSubscriberDto setHasVideo(boolean hasVideo) {
+        this.hasVideo = hasVideo;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Jt1078VideoStreamSubscriberDto.class.getSimpleName() + "[", "]")
+                .add("sim='" + sim + "'")
+                .add("channel=" + channel)
+                .add("timeout=" + timeout)
+                .add("byteArrayAsBase64=" + byteArrayAsBase64)
+                .add("naluDecoderRingBufferSize=" + naluDecoderRingBufferSize)
+                .add("hasAudio=" + hasAudio)
+                .add("hasVideo=" + hasVideo)
+                .toString();
+    }
 }

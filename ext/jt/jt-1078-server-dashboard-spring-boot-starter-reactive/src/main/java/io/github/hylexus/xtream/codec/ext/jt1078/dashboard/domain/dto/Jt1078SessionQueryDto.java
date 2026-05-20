@@ -19,16 +19,59 @@ package io.github.hylexus.xtream.codec.ext.jt1078.dashboard.domain.dto;
 import io.github.hylexus.xtream.codec.base.web.domain.dto.PageableDto;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078PayloadType;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamInbound;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
+import java.util.StringJoiner;
+
+
 public class Jt1078SessionQueryDto extends PageableDto {
     private String sim;
     private XtreamInbound.Type protocolType;
     private Jt1078PayloadType audioType;
     private Jt1078PayloadType videoType;
+
+    public String getSim() {
+        return sim;
+    }
+
+    public Jt1078SessionQueryDto setSim(String sim) {
+        this.sim = sim;
+        return this;
+    }
+
+    public XtreamInbound.Type getProtocolType() {
+        return protocolType;
+    }
+
+    public Jt1078SessionQueryDto setProtocolType(XtreamInbound.Type protocolType) {
+        this.protocolType = protocolType;
+        return this;
+    }
+
+    public Jt1078PayloadType getAudioType() {
+        return audioType;
+    }
+
+    public Jt1078SessionQueryDto setAudioType(Jt1078PayloadType audioType) {
+        this.audioType = audioType;
+        return this;
+    }
+
+    public Jt1078PayloadType getVideoType() {
+        return videoType;
+    }
+
+    public Jt1078SessionQueryDto setVideoType(Jt1078PayloadType videoType) {
+        this.videoType = videoType;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Jt1078SessionQueryDto.class.getSimpleName() + "[", "]")
+                .add("sim='" + sim + "'")
+                .add("protocolType=" + protocolType)
+                .add("audioType=" + audioType)
+                .add("videoType=" + videoType)
+                .toString();
+    }
 }
