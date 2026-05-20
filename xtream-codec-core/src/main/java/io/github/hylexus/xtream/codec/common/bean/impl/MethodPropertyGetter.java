@@ -18,16 +18,15 @@ package io.github.hylexus.xtream.codec.common.bean.impl;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.PropertyGetters;
-import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.StringJoiner;
 
 /**
  * @deprecated Use {@link PropertyGetters.ReflectionMethodPropertyGetter} instead.
  */
-@ToString
 @Deprecated(since = "0.2.0", forRemoval = true)
 public class MethodPropertyGetter implements BeanPropertyMetadata.PropertyGetter {
 
@@ -40,6 +39,13 @@ public class MethodPropertyGetter implements BeanPropertyMetadata.PropertyGetter
     @Override
     public @Nullable Object getProperty(BeanPropertyMetadata metadata, Object instance) {
         return ReflectionUtils.invokeMethod(method, instance);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", MethodPropertyGetter.class.getSimpleName() + "[", "]")
+                .add("method=" + method)
+                .toString();
     }
 
 }

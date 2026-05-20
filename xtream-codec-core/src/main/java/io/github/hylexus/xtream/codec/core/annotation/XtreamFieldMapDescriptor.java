@@ -17,7 +17,6 @@
 package io.github.hylexus.xtream.codec.core.annotation;
 
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import lombok.Getter;
 
 import java.lang.annotation.*;
 
@@ -100,7 +99,6 @@ public @interface XtreamFieldMapDescriptor {
         String desc() default "";
     }
 
-    @Getter
     enum KeyType {
         i8(Byte.class, 1, NumberSignedness.SIGNED),
         u8(Short.class, 1, NumberSignedness.UNSIGNED),
@@ -119,6 +117,18 @@ public @interface XtreamFieldMapDescriptor {
             this.javaType = javaType;
             this.sizeInBytes = sizeInBytes;
             this.signedness = signedness;
+        }
+
+        public Class<?> getJavaType() {
+            return javaType;
+        }
+
+        public int getSizeInBytes() {
+            return sizeInBytes;
+        }
+
+        public NumberSignedness getSignedness() {
+            return signedness;
         }
     }
 

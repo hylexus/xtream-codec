@@ -19,16 +19,15 @@ package io.github.hylexus.xtream.codec.common.bean.impl;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.PropertyGetters;
-import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.StringJoiner;
 
 /**
  * @deprecated Use {@link PropertyGetters.ReflectionFieldPropertyGetter} instead.
  */
-@ToString
 @Deprecated(since = "0.2.0", forRemoval = true)
 public class FieldPropertySetter implements BeanPropertyMetadata.PropertySetter {
 
@@ -41,6 +40,13 @@ public class FieldPropertySetter implements BeanPropertyMetadata.PropertySetter 
     @Override
     public void setProperty(BeanPropertyMetadata metadata, Object instance, @Nullable Object value) {
         ReflectionUtils.setField(field, instance, value);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", FieldPropertySetter.class.getSimpleName() + "[", "]")
+                .add("field=" + field)
+                .toString();
     }
 
 }

@@ -22,10 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
@@ -47,10 +43,7 @@ public record BeanDescriptor(String rawClass, BeanType type, String constructor,
         return rawType.isRecord() ? BeanType.RECORD : BeanType.CLASS;
     }
 
-    @Getter
-    @Setter
-    @ToString
-    @Accessors(chain = true)
+    @SuppressWarnings("NotNullFieldNotInitialized")
     public static class BeanPropertyDescriptor {
         private String name;
         private String type;
@@ -77,6 +70,132 @@ public record BeanDescriptor(String rawClass, BeanType type, String constructor,
 
         public String getDataTypeName() {
             return this.dataType.name();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public BeanPropertyDescriptor setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public BeanPropertyDescriptor setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public String getField() {
+            return field;
+        }
+
+        public BeanPropertyDescriptor setField(String field) {
+            this.field = field;
+            return this;
+        }
+
+        public boolean isRecordComponent() {
+            return isRecordComponent;
+        }
+
+        public BeanPropertyDescriptor setRecordComponent(boolean recordComponent) {
+            isRecordComponent = recordComponent;
+            return this;
+        }
+
+        public boolean isRecordClass() {
+            return isRecordClass;
+        }
+
+        public BeanPropertyDescriptor setRecordClass(boolean recordClass) {
+            isRecordClass = recordClass;
+            return this;
+        }
+
+        public BeanPropertyMetadata.FiledDataType getDataType() {
+            return dataType;
+        }
+
+        public BeanPropertyDescriptor setDataType(BeanPropertyMetadata.FiledDataType dataType) {
+            this.dataType = dataType;
+            return this;
+        }
+
+        public GetterDescriptor getGetter() {
+            return getter;
+        }
+
+        public BeanPropertyDescriptor setGetter(GetterDescriptor getter) {
+            this.getter = getter;
+            return this;
+        }
+
+        public SetterDescriptor getSetter() {
+            return setter;
+        }
+
+        public BeanPropertyDescriptor setSetter(SetterDescriptor setter) {
+            this.setter = setter;
+            return this;
+        }
+
+        public VersionDescriptor getVersion() {
+            return version;
+        }
+
+        public BeanPropertyDescriptor setVersion(VersionDescriptor version) {
+            this.version = version;
+            return this;
+        }
+
+        public OrderDescriptor getOrder() {
+            return order;
+        }
+
+        public BeanPropertyDescriptor setOrder(OrderDescriptor order) {
+            this.order = order;
+            return this;
+        }
+
+        public FieldCodecDescriptor getCodec() {
+            return codec;
+        }
+
+        public BeanPropertyDescriptor setCodec(FieldCodecDescriptor codec) {
+            this.codec = codec;
+            return this;
+        }
+
+        public FieldLengthDescriptor getLength() {
+            return length;
+        }
+
+        public BeanPropertyDescriptor setLength(FieldLengthDescriptor length) {
+            this.length = length;
+            return this;
+        }
+
+        public FieldConditionDescriptor getCondition() {
+            return condition;
+        }
+
+        public BeanPropertyDescriptor setCondition(FieldConditionDescriptor condition) {
+            this.condition = condition;
+            return this;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public BeanPropertyDescriptor setDesc(String desc) {
+            this.desc = desc;
+            return this;
         }
     }
 
@@ -105,7 +224,7 @@ public record BeanDescriptor(String rawClass, BeanType type, String constructor,
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private record SetterDescriptor(
+    public record SetterDescriptor(
             String rawClass,
             String type,
             String implementation,
@@ -146,7 +265,7 @@ public record BeanDescriptor(String rawClass, BeanType type, String constructor,
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private record GetterDescriptor(
+    public record GetterDescriptor(
             String rawClass,
             String type,
             String implementation,
@@ -186,14 +305,14 @@ public record BeanDescriptor(String rawClass, BeanType type, String constructor,
         }
     }
 
-    private record OrderDescriptor(int value, @JsonProperty("isDefault") boolean isDefault) {
+    public record OrderDescriptor(int value, @JsonProperty("isDefault") boolean isDefault) {
     }
 
-    private record VersionDescriptor(int value, @JsonProperty("isDefault") boolean isDefault) {
+    public record VersionDescriptor(int value, @JsonProperty("isDefault") boolean isDefault) {
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private record FieldConditionDescriptor(
+    public record FieldConditionDescriptor(
             String rawClass,
             ConditionType type,
             @Nullable SingleValueDescriptor<String> expression,
@@ -220,7 +339,7 @@ public record BeanDescriptor(String rawClass, BeanType type, String constructor,
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private record FieldLengthDescriptor(
+    public record FieldLengthDescriptor(
             FieldLengthType type,
             @Nullable SingleValueDescriptor<String> placeholder,
             @Nullable SingleValueDescriptor<Integer> constant,
@@ -249,10 +368,10 @@ public record BeanDescriptor(String rawClass, BeanType type, String constructor,
         }
     }
 
-    private record SingleValueDescriptor<T>(T value) {
+    public record SingleValueDescriptor<T>(T value) {
     }
 
-    private record FieldCodecDescriptor(String name, @Nullable String encoding, @JsonProperty("isBuiltIn") boolean isBuiltIn) {
+    public record FieldCodecDescriptor(String name, @Nullable String encoding, @JsonProperty("isBuiltIn") boolean isBuiltIn) {
         static FieldCodecDescriptor of(FieldCodec<?> fieldCodec) {
             final boolean isBuiltin = fieldCodec.getClass().getName().startsWith("io.github.hylexus.xtream.codec.core.impl.codec");
             final String name = isBuiltin ? fieldCodec.getClass().getSimpleName() : fieldCodec.getClass().getName();

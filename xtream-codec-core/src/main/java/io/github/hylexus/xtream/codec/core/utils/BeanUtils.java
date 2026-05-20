@@ -27,7 +27,6 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.XtreamCacheableClassPredicate;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamEntityCreator;
-import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -346,7 +345,6 @@ public final class BeanUtils {
 
     public static class BasicPropertyDescriptor extends PropertyDescriptor {
 
-        @Getter
         private final Field field;
 
         @Nullable
@@ -382,6 +380,10 @@ public final class BeanUtils {
             } catch (IntrospectionException e) {
                 throw new BeanIntrospectionException(e);
             }
+        }
+
+        public Field getField() {
+            return field;
         }
 
         @Override

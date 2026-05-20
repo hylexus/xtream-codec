@@ -18,16 +18,12 @@ package io.github.hylexus.xtream.codec.core.type;
 
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.*;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 
 import java.util.Set;
 
 import static java.util.Set.of;
 
 @SuppressWarnings("BadImport")
-@Getter
-@Accessors(fluent = true)
 public enum XtreamDataType {
 
     placeholder(0, FieldCodec.Placeholder.createForInternalUse("placeholder"), false, of()),
@@ -134,6 +130,22 @@ public enum XtreamDataType {
 
     public CodecCharset codecCharset() {
         return CodecCharset.UNSUPPORTED;
+    }
+
+    public int sizeInBytes() {
+        return sizeInBytes;
+    }
+
+    public FieldCodec<Object> codec() {
+        return codec;
+    }
+
+    public boolean isNumberType() {
+        return isNumberType;
+    }
+
+    public Set<Class<?>> recommendedJavaTypes() {
+        return recommendedJavaTypes;
     }
 
 }

@@ -18,16 +18,15 @@ package io.github.hylexus.xtream.codec.common.bean.impl;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.bean.PropertySetters;
-import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.StringJoiner;
 
 /**
  * @deprecated Use {@link PropertySetters.ReflectionMethodPropertySetter} instead.
  */
-@ToString
 @Deprecated(since = "0.2.0", forRemoval = true)
 public class MethodPropertySetter implements BeanPropertyMetadata.PropertySetter {
     private final Method method;
@@ -40,4 +39,12 @@ public class MethodPropertySetter implements BeanPropertyMetadata.PropertySetter
     public void setProperty(BeanPropertyMetadata metadata, Object instance, @Nullable Object value) {
         ReflectionUtils.invokeMethod(method, instance, value);
     }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", MethodPropertySetter.class.getSimpleName() + "[", "]")
+                .add("method=" + method)
+                .toString();
+    }
+
 }

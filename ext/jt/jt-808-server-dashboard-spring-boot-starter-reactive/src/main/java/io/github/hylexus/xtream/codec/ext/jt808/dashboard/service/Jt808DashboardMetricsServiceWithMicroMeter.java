@@ -23,6 +23,9 @@ import java.time.Duration;
 
 public interface Jt808DashboardMetricsServiceWithMicroMeter {
 
+    /**
+     * @see "reactor.core.observability.micrometer.TimedSchedulerMeterDocumentation"
+     */
     Flux<ServerSentEvent<Object>> getSchedulerMetrics(Duration duration);
 
 }

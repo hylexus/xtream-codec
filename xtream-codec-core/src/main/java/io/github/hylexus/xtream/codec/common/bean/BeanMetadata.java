@@ -19,9 +19,6 @@ package io.github.hylexus.xtream.codec.common.bean;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.github.hylexus.xtream.codec.core.utils.XtreamRecordUtils;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +29,6 @@ import java.lang.reflect.Constructor;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-@Getter
-@Setter
-@Accessors(chain = true)
 public class BeanMetadata {
     private static final Logger log = LoggerFactory.getLogger(BeanMetadata.class);
     private final Class<?> rawType;
@@ -133,4 +127,17 @@ public class BeanMetadata {
             }
         }
     }
+
+    public Class<?> getRawType() {
+        return rawType;
+    }
+
+    public Constructor<?> getConstructor() {
+        return constructor;
+    }
+
+    public List<BeanPropertyMetadata> getPropertyMetadataList() {
+        return propertyMetadataList;
+    }
+
 }

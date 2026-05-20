@@ -150,8 +150,13 @@ configure(subprojects) {
     }
     dependencies {
         // common start
-        compileOnly("org.projectlombok:lombok")
-        annotationProcessor("org.projectlombok:lombok")
+        // 参考 https://github.com/hylexus/xtream-codec/issues/12
+        // 发布到中央仓库的代码 禁止 使用 Lombok
+        if (project.name !in setOf("xtream-codec-base", "xtream-codec-core")) {
+            compileOnly("org.projectlombok:lombok")
+            annotationProcessor("org.projectlombok:lombok")
+        }
+        // 测试代码允许使用 Lombok
         testCompileOnly("org.projectlombok:lombok")
         testAnnotationProcessor("org.projectlombok:lombok")
 
