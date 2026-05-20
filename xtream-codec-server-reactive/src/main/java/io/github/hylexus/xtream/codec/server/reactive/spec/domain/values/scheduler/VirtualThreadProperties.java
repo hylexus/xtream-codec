@@ -16,13 +16,8 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.scheduler;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
-@ToString
 public class VirtualThreadProperties {
     /**
      * @see Thread.Builder.OfVirtual#name(String, long)
@@ -38,5 +33,41 @@ public class VirtualThreadProperties {
      * @see java.lang.Thread.Builder.OfVirtual#inheritInheritableThreadLocals(boolean)
      */
     private boolean inheritInheritableThreadLocals = true;
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public VirtualThreadProperties setPrefix(String prefix) {
+        this.prefix = prefix;
+        return this;
+    }
+
+    public long getStart() {
+        return start;
+    }
+
+    public VirtualThreadProperties setStart(long start) {
+        this.start = start;
+        return this;
+    }
+
+    public boolean isInheritInheritableThreadLocals() {
+        return inheritInheritableThreadLocals;
+    }
+
+    public VirtualThreadProperties setInheritInheritableThreadLocals(boolean inheritInheritableThreadLocals) {
+        this.inheritInheritableThreadLocals = inheritInheritableThreadLocals;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", VirtualThreadProperties.class.getSimpleName() + "[", "]")
+                .add("prefix='" + prefix + "'")
+                .add("start=" + start)
+                .add("inheritInheritableThreadLocals=" + inheritInheritableThreadLocals)
+                .toString();
+    }
 
 }

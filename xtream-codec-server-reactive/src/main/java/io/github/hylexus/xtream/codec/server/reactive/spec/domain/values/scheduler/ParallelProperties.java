@@ -16,18 +16,61 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.scheduler;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import reactor.core.scheduler.Schedulers;
 
-@Getter
-@Setter
-@ToString
+import java.util.StringJoiner;
+
 public class ParallelProperties {
     private String threadNamePrefix = "x-parallel";
     private boolean daemon = true;
     private boolean rejectBlockingTask = true;
 
     private int parallelism = Schedulers.DEFAULT_POOL_SIZE + 2;
+
+    public String getThreadNamePrefix() {
+        return threadNamePrefix;
+    }
+
+    public ParallelProperties setThreadNamePrefix(String threadNamePrefix) {
+        this.threadNamePrefix = threadNamePrefix;
+        return this;
+    }
+
+    public boolean isDaemon() {
+        return daemon;
+    }
+
+    public ParallelProperties setDaemon(boolean daemon) {
+        this.daemon = daemon;
+        return this;
+    }
+
+    public boolean isRejectBlockingTask() {
+        return rejectBlockingTask;
+    }
+
+    public ParallelProperties setRejectBlockingTask(boolean rejectBlockingTask) {
+        this.rejectBlockingTask = rejectBlockingTask;
+        return this;
+    }
+
+    public int getParallelism() {
+        return parallelism;
+    }
+
+    public ParallelProperties setParallelism(int parallelism) {
+        this.parallelism = parallelism;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ParallelProperties.class.getSimpleName() + "[", "]")
+                .add("threadNamePrefix='" + threadNamePrefix + "'")
+                .add("daemon=" + daemon)
+                .add("rejectBlockingTask=" + rejectBlockingTask)
+                .add("parallelism=" + parallelism)
+                .toString();
+    }
+
 }

@@ -152,7 +152,7 @@ configure(subprojects) {
         // common start
         // 参考 https://github.com/hylexus/xtream-codec/issues/12
         // 发布到中央仓库的代码 禁止 使用 Lombok
-        if (project.name !in setOf("xtream-codec-base", "xtream-codec-core")) {
+        if (project.name !in setOf("xtream-codec-base", "xtream-codec-core", "xtream-codec-server-reactive")) {
             compileOnly("org.projectlombok:lombok")
             annotationProcessor("org.projectlombok:lombok")
         }

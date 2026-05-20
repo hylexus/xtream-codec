@@ -16,15 +16,47 @@
 
 package io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.scheduler;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
-@ToString
 public class SingleProperties {
     private String threadNamePrefix = "x-single";
     private boolean daemon = true;
     private boolean rejectBlockingTask = true;
+
+    public String getThreadNamePrefix() {
+        return threadNamePrefix;
+    }
+
+    public SingleProperties setThreadNamePrefix(String threadNamePrefix) {
+        this.threadNamePrefix = threadNamePrefix;
+        return this;
+    }
+
+    public boolean isDaemon() {
+        return daemon;
+    }
+
+    public SingleProperties setDaemon(boolean daemon) {
+        this.daemon = daemon;
+        return this;
+    }
+
+    public boolean isRejectBlockingTask() {
+        return rejectBlockingTask;
+    }
+
+    public SingleProperties setRejectBlockingTask(boolean rejectBlockingTask) {
+        this.rejectBlockingTask = rejectBlockingTask;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", SingleProperties.class.getSimpleName() + "[", "]")
+                .add("threadNamePrefix='" + threadNamePrefix + "'")
+                .add("daemon=" + daemon)
+                .add("rejectBlockingTask=" + rejectBlockingTask)
+                .toString();
+    }
+
 }

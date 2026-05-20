@@ -17,18 +17,13 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.domain.values;
 
 import io.netty.handler.timeout.IdleStateHandler;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.time.Duration;
+import java.util.StringJoiner;
 
 /**
  * @see IdleStateHandler
  */
-@Getter
-@Setter
-@ToString
 public class TcpSessionIdleStateCheckerProps {
     /**
      * @see IdleStateHandler#getReaderIdleTimeInMillis()
@@ -44,4 +39,41 @@ public class TcpSessionIdleStateCheckerProps {
      * @see IdleStateHandler#getAllIdleTimeInMillis()
      */
     Duration allIdleTime = Duration.ofMinutes(20);
+
+    public Duration getReaderIdleTime() {
+        return readerIdleTime;
+    }
+
+    public TcpSessionIdleStateCheckerProps setReaderIdleTime(Duration readerIdleTime) {
+        this.readerIdleTime = readerIdleTime;
+        return this;
+    }
+
+    public Duration getWriterIdleTime() {
+        return writerIdleTime;
+    }
+
+    public TcpSessionIdleStateCheckerProps setWriterIdleTime(Duration writerIdleTime) {
+        this.writerIdleTime = writerIdleTime;
+        return this;
+    }
+
+    public Duration getAllIdleTime() {
+        return allIdleTime;
+    }
+
+    public TcpSessionIdleStateCheckerProps setAllIdleTime(Duration allIdleTime) {
+        this.allIdleTime = allIdleTime;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", TcpSessionIdleStateCheckerProps.class.getSimpleName() + "[", "]")
+                .add("readerIdleTime=" + readerIdleTime)
+                .add("writerIdleTime=" + writerIdleTime)
+                .add("allIdleTime=" + allIdleTime)
+                .toString();
+    }
+
 }
