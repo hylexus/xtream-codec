@@ -19,7 +19,6 @@ package io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.tag;
 import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.impl.DefaultVideoFlvFlvTagHeader;
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
 
 import java.util.Optional;
 
@@ -109,7 +108,6 @@ public interface VideoFlvTag {
         }
     }
 
-    @Getter
     enum VideoCodecId {
         JPEG((byte) 1),
         SORENSON_H263((byte) 2),
@@ -123,9 +121,12 @@ public interface VideoFlvTag {
         VideoCodecId(byte value) {
             this.value = value;
         }
+
+        public byte getValue() {
+            return value;
+        }
     }
 
-    @Getter
     enum VideoFrameType {
         KEY_FRAME((byte) 1),
         INTER_FRAME((byte) 2),
@@ -138,9 +139,12 @@ public interface VideoFlvTag {
         VideoFrameType(byte value) {
             this.value = value;
         }
+
+        public byte getValue() {
+            return value;
+        }
     }
 
-    @Getter
     enum VideoAvcPacketType {
         AVC_SEQ_HEADER((byte) 0),
         AVC_NALU((byte) 1),
@@ -150,6 +154,10 @@ public interface VideoFlvTag {
 
         VideoAvcPacketType(byte value) {
             this.value = value;
+        }
+
+        public byte getValue() {
+            return value;
         }
     }
 

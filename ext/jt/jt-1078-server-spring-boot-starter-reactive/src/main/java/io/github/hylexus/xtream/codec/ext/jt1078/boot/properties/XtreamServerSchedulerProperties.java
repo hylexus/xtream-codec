@@ -18,18 +18,13 @@ package io.github.hylexus.xtream.codec.ext.jt1078.boot.properties;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistry;
 import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.scheduler.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
-@ToString
 @SuppressWarnings("NullAway")
 public class XtreamServerSchedulerProperties {
 
@@ -54,6 +49,92 @@ public class XtreamServerSchedulerProperties {
     @NestedConfigurationProperty
     protected VirtualThreadProperties virtual = new VirtualThreadProperties();
 
+    public SchedulerType getType() {
+        return type;
+    }
+
+    public XtreamServerSchedulerProperties setType(SchedulerType type) {
+        this.type = type;
+        return this;
+    }
+
+    public Map<String, Serializable> getMetadata() {
+        return metadata;
+    }
+
+    public XtreamServerSchedulerProperties setMetadata(Map<String, Serializable> metadata) {
+        this.metadata = metadata;
+        return this;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public XtreamServerSchedulerProperties setRemark(String remark) {
+        this.remark = remark;
+        return this;
+    }
+
+    public MetricsProps getMetrics() {
+        return metrics;
+    }
+
+    public XtreamServerSchedulerProperties setMetrics(MetricsProps metrics) {
+        this.metrics = metrics;
+        return this;
+    }
+
+    public BoundedElasticProperties getBoundedElastic() {
+        return boundedElastic;
+    }
+
+    public XtreamServerSchedulerProperties setBoundedElastic(BoundedElasticProperties boundedElastic) {
+        this.boundedElastic = boundedElastic;
+        return this;
+    }
+
+    public ParallelProperties getParallel() {
+        return parallel;
+    }
+
+    public XtreamServerSchedulerProperties setParallel(ParallelProperties parallel) {
+        this.parallel = parallel;
+        return this;
+    }
+
+    public SingleProperties getSingle() {
+        return single;
+    }
+
+    public XtreamServerSchedulerProperties setSingle(SingleProperties single) {
+        this.single = single;
+        return this;
+    }
+
+    public VirtualThreadProperties getVirtual() {
+        return virtual;
+    }
+
+    public XtreamServerSchedulerProperties setVirtual(VirtualThreadProperties virtual) {
+        this.virtual = virtual;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", XtreamServerSchedulerProperties.class.getSimpleName() + "[", "]")
+                .add("type=" + type)
+                .add("metadata=" + metadata)
+                .add("remark='" + remark + "'")
+                .add("metrics=" + metrics)
+                .add("boundedElastic=" + boundedElastic)
+                .add("parallel=" + parallel)
+                .add("single=" + single)
+                .add("virtual=" + virtual)
+                .toString();
+    }
+
     @SuppressWarnings("deprecation")
     public XtreamSchedulerRegistry.SchedulerConfig toSchedulerConfig(String name) {
         final XtreamSchedulerRegistry.SchedulerConfigBuilder builder = XtreamSchedulerRegistry.SchedulerConfig.newBuilder()
@@ -72,13 +153,36 @@ public class XtreamServerSchedulerProperties {
         return builder.build();
     }
 
-    @Getter
-    @Setter
-    @ToString
     public static class MetricsProps {
         private boolean enabled = false;
         // todo prefix 格式验证
         private String prefix;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public MetricsProps setEnabled(boolean enabled) {
+            this.enabled = enabled;
+            return this;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public MetricsProps setPrefix(String prefix) {
+            this.prefix = prefix;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", MetricsProps.class.getSimpleName() + "[", "]")
+                    .add("enabled=" + enabled)
+                    .add("prefix='" + prefix + "'")
+                    .toString();
+        }
     }
 
 }

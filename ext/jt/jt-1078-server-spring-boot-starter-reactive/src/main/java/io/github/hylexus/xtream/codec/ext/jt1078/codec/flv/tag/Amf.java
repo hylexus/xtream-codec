@@ -18,7 +18,6 @@ package io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.tag;
 
 import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -162,7 +161,6 @@ public interface Amf {
         }
     }
 
-    @Getter
     enum DataType {
         /**
          * 类型: Double
@@ -221,6 +219,10 @@ public interface Amf {
 
         DataType(byte value) {
             this.value = value;
+        }
+
+        public byte getValue() {
+            return value;
         }
     }
 }

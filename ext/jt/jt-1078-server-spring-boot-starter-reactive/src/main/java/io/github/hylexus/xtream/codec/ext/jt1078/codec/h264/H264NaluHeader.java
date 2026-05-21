@@ -16,8 +16,6 @@
 
 package io.github.hylexus.xtream.codec.ext.jt1078.codec.h264;
 
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -102,7 +100,6 @@ public class H264NaluHeader {
         return new H264NaluHeader(value);
     }
 
-    @Getter
     public enum NaluType {
         /**
          * 未指定
@@ -199,6 +196,10 @@ public class H264NaluHeader {
 
         public static Optional<NaluType> findByCode(byte code) {
             return Optional.ofNullable(mapping.get(code));
+        }
+
+        public byte getValue() {
+            return value;
         }
     }
 }

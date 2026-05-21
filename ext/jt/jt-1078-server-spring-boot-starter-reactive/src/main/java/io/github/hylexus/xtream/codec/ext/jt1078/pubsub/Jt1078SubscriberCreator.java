@@ -16,37 +16,110 @@
 
 package io.github.hylexus.xtream.codec.ext.jt1078.pubsub;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
-
 import java.time.Duration;
 import java.util.Map;
 import java.util.StringJoiner;
 
-@Getter
-@Setter
-@Accessors(chain = true, fluent = true)
-@SuperBuilder
-@NoArgsConstructor
-@SuppressWarnings("NullAway")
+@SuppressWarnings({"NullAway", "NotNullFieldNotInitialized"})
 public class Jt1078SubscriberCreator {
     protected String convertedSim;
     protected String rawSim;
     protected short channelNumber;
-
-    @Builder.Default
     protected boolean hasAudio = true;
-
-    @Builder.Default
     protected boolean hasVideo = true;
-
     protected Duration timeout;
     protected String desc;
     protected Map<String, Object> metadata;
+
+    public Jt1078SubscriberCreator() {
+    }
+
+    protected Jt1078SubscriberCreator(Jt1078SubscriberCreatorBuilder<?, ?> b) {
+        this.convertedSim = b.convertedSim;
+        this.rawSim = b.rawSim;
+        this.channelNumber = b.channelNumber;
+        this.hasAudio = b.hasAudio;
+        this.hasVideo = b.hasVideo;
+        this.timeout = b.timeout;
+        this.desc = b.desc;
+        this.metadata = b.metadata;
+    }
+
+    public String convertedSim() {
+        return convertedSim;
+    }
+
+    public Jt1078SubscriberCreator convertedSim(String convertedSim) {
+        this.convertedSim = convertedSim;
+        return this;
+    }
+
+    public String rawSim() {
+        return rawSim;
+    }
+
+    public Jt1078SubscriberCreator rawSim(String rawSim) {
+        this.rawSim = rawSim;
+        return this;
+    }
+
+    public short channelNumber() {
+        return channelNumber;
+    }
+
+    public Jt1078SubscriberCreator channelNumber(short channelNumber) {
+        this.channelNumber = channelNumber;
+        return this;
+    }
+
+    public boolean hasAudio() {
+        return hasAudio;
+    }
+
+    public Jt1078SubscriberCreator hasAudio(boolean hasAudio) {
+        this.hasAudio = hasAudio;
+        return this;
+    }
+
+    public boolean hasVideo() {
+        return hasVideo;
+    }
+
+    public Jt1078SubscriberCreator hasVideo(boolean hasVideo) {
+        this.hasVideo = hasVideo;
+        return this;
+    }
+
+    public Duration timeout() {
+        return timeout;
+    }
+
+    public Jt1078SubscriberCreator timeout(Duration timeout) {
+        this.timeout = timeout;
+        return this;
+    }
+
+    public String desc() {
+        return desc;
+    }
+
+    public Jt1078SubscriberCreator desc(String desc) {
+        this.desc = desc;
+        return this;
+    }
+
+    public Map<String, Object> metadata() {
+        return metadata;
+    }
+
+    public Jt1078SubscriberCreator metadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
+        return this;
+    }
+
+    public static Jt1078SubscriberCreatorBuilder<?, ?> builder() {
+        return new Jt1078SubscriberCreatorBuilder<>();
+    }
 
     @Override
     public String toString() {
@@ -60,5 +133,74 @@ public class Jt1078SubscriberCreator {
                 .add("desc='" + desc + "'")
                 .add("metadata=" + metadata)
                 .toString();
+    }
+
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    public static class Jt1078SubscriberCreatorBuilder<C extends Jt1078SubscriberCreator, B extends Jt1078SubscriberCreatorBuilder<C, B>> {
+        protected String convertedSim;
+        protected String rawSim;
+        protected short channelNumber;
+        protected boolean hasAudio = true;
+        protected boolean hasVideo = true;
+        protected Duration timeout;
+        protected String desc;
+        protected Map<String, Object> metadata;
+
+        public Jt1078SubscriberCreatorBuilder() {
+        }
+
+        @SuppressWarnings("unchecked")
+        protected B self() {
+            return (B) this;
+        }
+
+        public B convertedSim(String convertedSim) {
+            this.convertedSim = convertedSim;
+            return self();
+        }
+
+        public B rawSim(String rawSim) {
+            this.rawSim = rawSim;
+            return self();
+        }
+
+        public B channelNumber(short channelNumber) {
+            this.channelNumber = channelNumber;
+            return self();
+        }
+
+        public B hasAudio(boolean hasAudio) {
+            this.hasAudio = hasAudio;
+            return self();
+        }
+
+        public B hasVideo(boolean hasVideo) {
+            this.hasVideo = hasVideo;
+            return self();
+        }
+
+        public B timeout(Duration timeout) {
+            this.timeout = timeout;
+            return self();
+        }
+
+        public B desc(String desc) {
+            this.desc = desc;
+            return self();
+        }
+
+        public B metadata(Map<String, Object> metadata) {
+            this.metadata = metadata;
+            return self();
+        }
+
+        public C build() {
+            return createInstance();
+        }
+
+        @SuppressWarnings("unchecked")
+        protected C createInstance() {
+            return (C) new Jt1078SubscriberCreator(this);
+        }
     }
 }

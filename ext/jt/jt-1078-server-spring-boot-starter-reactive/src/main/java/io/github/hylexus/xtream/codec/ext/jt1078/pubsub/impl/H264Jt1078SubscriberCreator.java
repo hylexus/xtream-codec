@@ -18,54 +18,74 @@ package io.github.hylexus.xtream.codec.ext.jt1078.pubsub.impl;
 
 import io.github.hylexus.xtream.codec.core.utils.ByteRingBuffer;
 import io.github.hylexus.xtream.codec.ext.jt1078.pubsub.Jt1078SubscriberCreator;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 
 import java.util.StringJoiner;
 
-@Getter
-@Setter
-@SuperBuilder
-@Accessors(chain = true, fluent = true)
-@NoArgsConstructor
 public class H264Jt1078SubscriberCreator extends Jt1078SubscriberCreator {
 
-    @Builder.Default
     private H264Meta h264Meta = new H264Meta(1 << 18);
 
-    /**
-     * @param naluDecoderRingBufferSize 必须是 2 的 N 次幂。详情见 {@link io.github.hylexus.xtream.codec.core.utils.ByteRingBuffer}
-     * @see io.github.hylexus.xtream.codec.core.utils.ByteRingBuffer
-     */
-    public record H264Meta(int naluDecoderRingBufferSize) {
+    public H264Jt1078SubscriberCreator() {
+    }
 
-        @SuppressWarnings("redundent")
-        public H264Meta(int naluDecoderRingBufferSize) {
-            if (ByteRingBuffer.isInvalidCapacity(naluDecoderRingBufferSize)) {
-                throw new IllegalArgumentException("naluDecoderRingBufferSize must be a power of 2");
-            }
-            this.naluDecoderRingBufferSize = naluDecoderRingBufferSize;
-        }
+    protected H264Jt1078SubscriberCreator(H264Jt1078SubscriberCreatorBuilder<?, ?> b) {
+        super(b);
+        this.h264Meta = b.h264Meta;
+    }
 
+    public H264Meta h264Meta() {
+        return h264Meta;
+    }
+
+    public H264Jt1078SubscriberCreator h264Meta(H264Meta h264Meta) {
+        this.h264Meta = h264Meta;
+        return this;
+    }
+
+    public static H264Jt1078SubscriberCreatorBuilder<?, ?> builder() {
+        return new H264Jt1078SubscriberCreatorBuilder<>();
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", H264Jt1078SubscriberCreator.class.getSimpleName() + "[", "]")
-                .add("convertedSim='" + convertedSim + "'")
-                .add("rawSim='" + rawSim + "'")
-                .add("channelNumber=" + channelNumber)
-                .add("hasAudio=" + hasAudio)
-                .add("hasVideo=" + hasVideo)
+                .add("convertedSim='" + convertedSim() + "'")
+                .add("rawSim='" + rawSim() + "'")
+                .add("channelNumber=" + channelNumber())
+                .add("hasAudio=" + hasAudio())
+                .add("hasVideo=" + hasVideo())
                 .add("h264Meta=" + h264Meta)
-                .add("timeout=" + timeout)
-                .add("desc='" + desc + "'")
-                .add("metadata=" + metadata)
+                .add("timeout=" + timeout())
+                .add("desc='" + desc() + "'")
+                .add("metadata=" + metadata())
                 .toString();
     }
 
+    public record H264Meta(int naluDecoderRingBufferSize) {
+
+        public H264Meta {
+            if (ByteRingBuffer.isInvalidCapacity(naluDecoderRingBufferSize)) {
+                throw new IllegalArgumentException("naluDecoderRingBufferSize must be a power of 2");
+            }
+        }
+    }
+
+    public static class H264Jt1078SubscriberCreatorBuilder<C extends H264Jt1078SubscriberCreator, B extends H264Jt1078SubscriberCreatorBuilder<C, B>>
+            extends Jt1078SubscriberCreatorBuilder<C, B> {
+        private H264Meta h264Meta = new H264Meta(1 << 18);
+
+        public H264Jt1078SubscriberCreatorBuilder() {
+        }
+
+        public B h264Meta(H264Meta h264Meta) {
+            this.h264Meta = h264Meta;
+            return self();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected C createInstance() {
+            return (C) new H264Jt1078SubscriberCreator(this);
+        }
+    }
 }

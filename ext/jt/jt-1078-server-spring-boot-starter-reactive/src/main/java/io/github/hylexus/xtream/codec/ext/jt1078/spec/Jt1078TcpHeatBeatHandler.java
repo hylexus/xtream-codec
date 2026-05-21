@@ -23,7 +23,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 import jakarta.annotation.Nonnull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
@@ -36,10 +37,10 @@ import java.util.function.Consumer;
  * @author hylexus
  * @see XtreamSessionManager#closeSessionById(String, XtreamSessionEventListener.SessionCloseReason)
  */
-@Slf4j
 @ChannelHandler.Sharable
 public class Jt1078TcpHeatBeatHandler extends ChannelInboundHandlerAdapter {
 
+    private static final Logger log = LoggerFactory.getLogger(Jt1078TcpHeatBeatHandler.class);
     private final Jt1078SessionManager sessionManager;
 
     public Jt1078TcpHeatBeatHandler(Jt1078SessionManager sessionManager) {

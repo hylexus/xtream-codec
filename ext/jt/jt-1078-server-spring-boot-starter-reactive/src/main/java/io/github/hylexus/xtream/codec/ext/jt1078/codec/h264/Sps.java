@@ -16,16 +16,8 @@
 
 package io.github.hylexus.xtream.codec.ext.jt1078.codec.h264;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import java.util.StringJoiner;
 
-@Getter
-@Setter
-@Accessors(chain = true)
-@ToString
 public class Sps {
     public Sps() {
     }
@@ -35,4 +27,60 @@ public class Sps {
     private byte profileCompat;
     private int width;
     private int height;
+
+    public byte getProfileIdc() {
+        return profileIdc;
+    }
+
+    public Sps setProfileIdc(byte profileIdc) {
+        this.profileIdc = profileIdc;
+        return this;
+    }
+
+    public byte getLevelIdc() {
+        return levelIdc;
+    }
+
+    public Sps setLevelIdc(byte levelIdc) {
+        this.levelIdc = levelIdc;
+        return this;
+    }
+
+    public byte getProfileCompat() {
+        return profileCompat;
+    }
+
+    public Sps setProfileCompat(byte profileCompat) {
+        this.profileCompat = profileCompat;
+        return this;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public Sps setWidth(int width) {
+        this.width = width;
+        return this;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public Sps setHeight(int height) {
+        this.height = height;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Sps.class.getSimpleName() + "[", "]")
+                .add("profileIdc=" + profileIdc)
+                .add("levelIdc=" + levelIdc)
+                .add("profileCompat=" + profileCompat)
+                .add("width=" + width)
+                .add("height=" + height)
+                .toString();
+    }
 }

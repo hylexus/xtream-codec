@@ -23,8 +23,9 @@ import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.AbstractJt1078
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.BuiltinAudioFormatOptions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import lombok.ToString;
 import org.jspecify.annotations.Nullable;
+
+import java.util.StringJoiner;
 
 
 /**
@@ -245,7 +246,6 @@ public class AdpcmImaJt1078AudioCodec extends AbstractJt1078AudioCodec {
         return (short) predictor;
     }
 
-    @ToString
     static class AdpcmImaBlockStatus {
         short predictor;
         byte stepIndex;
@@ -253,6 +253,14 @@ public class AdpcmImaJt1078AudioCodec extends AbstractJt1078AudioCodec {
         public AdpcmImaBlockStatus(short predictor, byte stepIndex) {
             this.predictor = predictor;
             this.stepIndex = stepIndex;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", AdpcmImaBlockStatus.class.getSimpleName() + "[", "]")
+                    .add("predictor=" + predictor)
+                    .add("stepIndex=" + stepIndex)
+                    .toString();
         }
     }
 

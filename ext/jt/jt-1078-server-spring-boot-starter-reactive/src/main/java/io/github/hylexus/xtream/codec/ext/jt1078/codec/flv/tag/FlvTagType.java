@@ -16,9 +16,6 @@
 
 package io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.tag;
 
-import lombok.Getter;
-
-@Getter
 public enum FlvTagType {
     AUDIO((byte) 0x08),
     VIDEO((byte) 0x09),
@@ -30,4 +27,7 @@ public enum FlvTagType {
         this.value = value;
     }
 
+    public byte getValue() {
+        return value;
+    }
 }

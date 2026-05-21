@@ -18,7 +18,6 @@ package io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.tag;
 
 import io.github.hylexus.xtream.codec.ext.jt1078.codec.flv.impl.DefaultAudioFlvFlvTagHeader;
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
@@ -107,7 +106,6 @@ public interface AudioFlvTag {
         }
     }
 
-    @Getter
     enum AudioSoundType {
         MONO((byte) 0),
         STEREO((byte) 1);
@@ -116,9 +114,12 @@ public interface AudioFlvTag {
         AudioSoundType(byte value) {
             this.value = value;
         }
+
+        public byte getValue() {
+            return value;
+        }
     }
 
-    @Getter
     enum AudioSoundSize {
         SND_BIT_8((byte) 0),
         SND_BIT_16((byte) 1);
@@ -127,9 +128,12 @@ public interface AudioFlvTag {
         AudioSoundSize(byte value) {
             this.value = value;
         }
+
+        public byte getValue() {
+            return value;
+        }
     }
 
-    @Getter
     enum AudioSoundRate {
         // 5.5-kHz
         RATE_5_5_KHZ((byte) 0),
@@ -145,9 +149,12 @@ public interface AudioFlvTag {
         AudioSoundRate(byte value) {
             this.value = value;
         }
+
+        public byte getValue() {
+            return value;
+        }
     }
 
-    @Getter
     enum AudioSoundFormat {
         LINEAR_PCM_PLATFORM_ENDIAN((byte) 0),
         ADPCM((byte) 1),
@@ -169,9 +176,12 @@ public interface AudioFlvTag {
         AudioSoundFormat(byte value) {
             this.value = value;
         }
+
+        public byte getValue() {
+            return value;
+        }
     }
 
-    @Getter
     enum AudioAacPacketType {
         // AAC sequence header
         AAC_SEQ_HEADER((byte) 0),
@@ -182,6 +192,10 @@ public interface AudioFlvTag {
 
         AudioAacPacketType(byte value) {
             this.value = value;
+        }
+
+        public byte getValue() {
+            return value;
         }
     }
 

@@ -152,7 +152,7 @@ configure(subprojects) {
         // common start
         // 参考 https://github.com/hylexus/xtream-codec/issues/12
         // 发布到中央仓库的代码 禁止 使用 Lombok
-        if (project.name !in mavenPublications && project.name !in setOf("jt-1078-server-dashboard-spring-boot-starter-reactive")) {
+        if (project.name !in mavenPublications && project.name !in setOf("jt-1078-server-dashboard-spring-boot-starter-reactive", "jt-1078-server-spring-boot-starter-reactive")) {
             compileOnly("org.projectlombok:lombok")
             annotationProcessor("org.projectlombok:lombok")
         }

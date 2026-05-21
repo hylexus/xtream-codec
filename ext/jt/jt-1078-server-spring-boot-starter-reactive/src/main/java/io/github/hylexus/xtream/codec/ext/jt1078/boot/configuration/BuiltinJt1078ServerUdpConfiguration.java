@@ -34,7 +34,6 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.resources.DefaultUdpX
 import io.github.hylexus.xtream.codec.server.reactive.spec.resources.UdpXtreamNettyResourceFactory;
 import io.github.hylexus.xtream.codec.server.reactive.spec.resources.XtreamNettyResourceFactory;
 import io.github.hylexus.xtream.codec.server.reactive.utils.BuiltinConfigurationUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -43,7 +42,6 @@ import reactor.core.scheduler.Scheduler;
 
 import static io.github.hylexus.xtream.codec.ext.jt1078.utils.Jt1078Constants.*;
 
-@Slf4j
 @ConditionalOnJt1078Server(protocolType = ConditionalOnJt1078Server.ProtocolType.UDP)
 public class BuiltinJt1078ServerUdpConfiguration {
 
