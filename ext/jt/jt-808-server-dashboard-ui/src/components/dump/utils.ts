@@ -1,4 +1,3 @@
-import { DUMP_SEGMENT_WIDTH } from "./constants.ts";
 import {
   Group,
   SelectedDumpContext,
@@ -36,17 +35,6 @@ export const getOrderedDumpTimes = (groups: Group[]): string[] => {
   return Array.from(times).sort(
     (a, b) => parseDumpTime(a) - parseDumpTime(b),
   );
-};
-
-/** Plot width: fill container; scroll only when samples need more space. */
-export const getTimelinePlotWidth = (
-  timeCount: number,
-  containerWidth: number,
-) => {
-  const minContentWidth =
-    timeCount * DUMP_SEGMENT_WIDTH + Math.max(0, timeCount - 1) * 4;
-
-  return Math.max(containerWidth, minContentWidth);
 };
 
 export const collectThreadsAtDump = (

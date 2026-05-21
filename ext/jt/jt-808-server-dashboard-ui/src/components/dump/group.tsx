@@ -2,7 +2,7 @@ import {
   EventSourceMessage,
   fetchEventSource,
 } from "@microsoft/fetch-event-source";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Segment } from "@/components/ui/segment.tsx";
 
@@ -18,6 +18,7 @@ import {
 import { DumpBarSegment, collectThreadsAtDump } from "./utils.ts";
 
 export const DumpGroup = () => {
+  const windowStartMs = useRef(Date.now()).current;
   const [groups, setGroups] = useState<Group[]>([]);
   const [viewMode, setViewMode] = useState<DumpViewMode>("grouped");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -197,6 +198,7 @@ export const DumpGroup = () => {
         hoveredSegment={hoveredSegment}
         selectedDump={selectedDump}
         viewMode={viewMode}
+        windowStartMs={windowStartMs}
         onBarClick={handleBarClick}
         onBarHover={setHoveredSegment}
       />

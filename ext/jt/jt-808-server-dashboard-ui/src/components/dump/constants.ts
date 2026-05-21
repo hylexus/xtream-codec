@@ -22,7 +22,10 @@ export const THREAD_STATE_STYLES: Record<
 };
 
 export const MAX_DUMPS_PER_THREAD = 20;
-export const DUMP_SEGMENT_WIDTH = 15;
+/** Initial live window: 15 one-second slots on the axis. */
+export const TIMELINE_WINDOW_MS = 15_000;
+export const LIVE_SLOT_COUNT = TIMELINE_WINDOW_MS / 1000;
+export const HISTORICAL_BAR_WIDTH = 14;
 export const TIME_AXIS_HEIGHT = 32;
 export const AXIS_BODY_GAP = 12;
 export const THREAD_ROW_HEIGHT = 30;
@@ -31,3 +34,4 @@ export const GROUP_HEADER_HEIGHT = 36;
 export const GROUP_SECTION_GAP = 12;
 
 export type DumpViewMode = "grouped" | "flat";
+export type TimelineDisplayMode = "live" | "historical";

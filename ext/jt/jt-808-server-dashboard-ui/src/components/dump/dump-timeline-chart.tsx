@@ -2,7 +2,7 @@ import { AxisBottom } from "@visx/axis";
 import { Group } from "@visx/group";
 import { LegendOrdinal } from "@visx/legend";
 import { ParentSize } from "@visx/responsive";
-import { scaleBand, scaleOrdinal } from "@visx/scale";
+import { scaleOrdinal } from "@visx/scale";
 import clsx from "clsx";
 import { FC, KeyboardEvent, useMemo } from "react";
 
@@ -17,13 +17,8 @@ import {
   THREAD_STATE_STYLES,
   TIME_AXIS_HEIGHT,
 } from "./constants.ts";
-import {
-  DumpBarSegment,
-  formatDumpTimeLabel,
-  getOrderedDumpTimes,
-  getTimelinePlotWidth,
-  segmentsMatch,
-} from "./utils.ts";
+import { buildTimelineScale, type BarGeometry } from "./timeline-scale.ts";
+import { DumpBarSegment, segmentsMatch } from "./utils.ts";
 import {
   Group as DumpGroupModel,
   SelectedDumpContext,
@@ -114,6 +109,7 @@ const buildLayout = (
 export interface DumpTimelineChartProps {
   groups: DumpGroupModel[];
   viewMode: DumpViewMode;
+  windowStartMs: number;
   selectedDump: SelectedDumpContext | null;
   hoveredSegment: DumpBarSegment | null;
   onBarClick: (segment: DumpBarSegment) => void;
@@ -122,8 +118,8 @@ export interface DumpTimelineChartProps {
 
 interface TimelineBarsProps {
   layout: LayoutRow[];
-  timeScale: ReturnType<typeof scaleBand<string>>;
   bodyTop: number;
+  getBarGeometry: (time: string) => BarGeometry | null;
   selectedDump: SelectedDumpContext | null;
   hoveredSegment: DumpBarSegment | null;
   onBarClick: (segment: DumpBarSegment) => void;
@@ -132,8 +128,8 @@ interface TimelineBarsProps {
 
 const TimelineBars: FC<TimelineBarsProps> = ({
   layout,
-  timeScale,
   bodyTop,
+  getBarGeometry,
   selectedDump,
   hoveredSegment,
   onBarClick,
@@ -164,9 +160,9 @@ const TimelineBars: FC<TimelineBarsProps> = ({
         return (
           <g key={`${groupName}-${thread.threadName}`}>
             {thread.dumps.map((entry, index) => {
-              const x = timeScale(entry.time);
+              const geom = getBarGeometry(entry.time);
 
-              if (x == null) {
+              if (!geom) {
                 return null;
               }
 
@@ -205,8 +201,8 @@ const TimelineBars: FC<TimelineBarsProps> = ({
                   strokeWidth={highlighted || selected ? 2 : 0}
                   style={{ cursor: "pointer" }}
                   tabIndex={0}
-                  width={timeScale.bandwidth()}
-                  x={x}
+                  width={geom.width}
+                  x={geom.x}
                   y={barY}
                   onBlur={() => onBarHover(null)}
                   onClick={() => onBarClick(segment)}
@@ -262,12 +258,12 @@ const LabelCell: FC<{ row: LayoutRow }> = ({ row }) => {
 export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
   groups,
   viewMode,
+  windowStartMs,
   selectedDump,
   hoveredSegment,
   onBarClick,
   onBarHover,
 }) => {
-  const orderedTimes = useMemo(() => getOrderedDumpTimes(groups), [groups]);
   const layout = useMemo(
     () => buildLayout(groups, viewMode),
     [groups, viewMode],
@@ -275,22 +271,17 @@ export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
 
   const bodyHeight = useMemo(() => {
     if (layout.length === 0) {
-      return 0;
+      return THREAD_ROW_HEIGHT;
     }
     const last = layout[layout.length - 1];
 
-    return last.top + (last.type === "group" ? GROUP_HEADER_HEIGHT : THREAD_ROW_HEIGHT);
+    return (
+      last.top +
+      (last.type === "group" ? GROUP_HEADER_HEIGHT : THREAD_ROW_HEIGHT)
+    );
   }, [layout]);
 
   const chartHeight = TIME_AXIS_HEIGHT + AXIS_BODY_GAP + bodyHeight;
-
-  if (layout.length === 0 || orderedTimes.length === 0) {
-    return (
-      <p className="py-12 text-center text-sm text-muted-foreground">
-        Waiting for thread dump samples…
-      </p>
-    );
-  }
 
   return (
     <div className="w-full min-w-0">
@@ -301,65 +292,75 @@ export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
         <div className="flex h-full w-full min-w-0">
           <div className="shrink-0" style={{ width: THREAD_LABEL_WIDTH }}>
             <div style={{ height: TIME_AXIS_HEIGHT + AXIS_BODY_GAP }} />
-            {layout.map((row, index) => {
-              if (
-                viewMode === "grouped" &&
-                row.type === "group" &&
-                index > 0
-              ) {
-                return (
-                  <div key={`gap-${row.groupName}`}>
-                    <div style={{ height: GROUP_SECTION_GAP }} />
-                    <LabelCell row={row} />
-                  </div>
-                );
-              }
+            {layout.length === 0 ? (
+              <div
+                className="flex items-center px-2 text-xs text-muted-foreground"
+                style={{ height: THREAD_ROW_HEIGHT }}
+              >
+                等待线程数据…
+              </div>
+            ) : (
+              layout.map((row, index) => {
+                if (
+                  viewMode === "grouped" &&
+                  row.type === "group" &&
+                  index > 0
+                ) {
+                  return (
+                    <div key={`gap-${row.groupName}`}>
+                      <div style={{ height: GROUP_SECTION_GAP }} />
+                      <LabelCell row={row} />
+                    </div>
+                  );
+                }
 
-              return (
-                <LabelCell key={`${row.type}-${row.groupName}-${index}`} row={row} />
-              );
-            })}
+                return (
+                  <LabelCell
+                    key={`${row.type}-${row.groupName}-${index}`}
+                    row={row}
+                  />
+                );
+              })
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <ParentSize debounceTime={10}>
               {({ width: plotContainerWidth }) => {
-                const plotWidth = getTimelinePlotWidth(
-                  orderedTimes.length,
+                const timeline = buildTimelineScale(
+                  windowStartMs,
+                  groups,
                   plotContainerWidth,
                 );
-                const scrollable = plotWidth > plotContainerWidth;
-
-                const timeScale = scaleBand<string>({
-                  domain: orderedTimes,
-                  range: [0, plotWidth],
-                  padding: orderedTimes.length <= 1 ? 0 : 0.05,
-                });
-
                 const bodyTop = TIME_AXIS_HEIGHT + AXIS_BODY_GAP;
-
+                const svgWidth = Math.max(
+                  plotContainerWidth,
+                  timeline.plotWidth,
+                );
                 return (
                   <div
                     className={clsx(
                       "h-full w-full",
-                      scrollable && "overflow-x-auto",
+                      timeline.scrollable && "overflow-x-auto",
                     )}
                   >
                     <svg
                       className="text-foreground"
                       height={chartHeight}
-                      width={Math.max(plotContainerWidth, plotWidth)}
+                      width={svgWidth}
                     >
                       <rect
                         fill="var(--color-background-secondary)"
                         height={TIME_AXIS_HEIGHT + AXIS_BODY_GAP}
-                        width={Math.max(plotContainerWidth, plotWidth)}
+                        width={svgWidth}
                         x={0}
                         y={0}
                       />
                       <AxisBottom
-                        scale={timeScale}
+                        scale={timeline.axisScale}
                         stroke="var(--color-border)"
-                        tickFormat={formatDumpTimeLabel}
+                        tickFormat={(slotId) =>
+                          timeline.axisTickFormat(String(slotId))
+                        }
                         tickLabelProps={() => ({
                           fill: "currentColor",
                           fontSize: 11,
@@ -370,10 +371,10 @@ export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
                       />
                       <TimelineBars
                         bodyTop={bodyTop}
+                        getBarGeometry={timeline.getBarGeometry}
                         hoveredSegment={hoveredSegment}
                         layout={layout}
                         selectedDump={selectedDump}
-                        timeScale={timeScale}
                         onBarClick={onBarClick}
                         onBarHover={onBarHover}
                       />
