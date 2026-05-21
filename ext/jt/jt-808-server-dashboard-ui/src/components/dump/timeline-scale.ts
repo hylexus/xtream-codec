@@ -100,7 +100,7 @@ const buildContinuousBandScale = (
   return {
     scale,
     slotWidth: domain.length > 0 ? scale.bandwidth() : plotWidth,
-    gridXs: domain.map((d) => (scale(d) ?? 0) + scale.bandwidth()),
+    gridXs: [],
   };
 };
 
@@ -124,11 +124,6 @@ export const buildTimelineScale = (
       range: [0, plotWidth],
       padding: 0,
     });
-    const gridXs = Array.from(
-      { length: LIVE_SLOT_COUNT },
-      (_, i) => (i + 1) * slotWidth,
-    ).slice(0, -1);
-
     return {
       mode: "live",
       plotWidth,
@@ -136,7 +131,7 @@ export const buildTimelineScale = (
       windowStartMs,
       windowEndMs,
       axisScale,
-      gridXs,
+      gridXs: [],
       axisTickFormat: (slotId) =>
         formatMsTick(windowStartMs + Number(slotId) * 1000),
       getBarGeometry: (time: string) => {

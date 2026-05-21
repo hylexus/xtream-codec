@@ -23,6 +23,12 @@ export const formatDumpTimeLabel = (time: string) => {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
 };
 
+export const dumpSegmentKey = (
+  groupName: string,
+  threadName: string,
+  time: string,
+) => `${groupName}|${threadName}|${time}`;
+
 export const getOrderedDumpTimes = (groups: Group[]): string[] => {
   const times = new Set<string>();
 

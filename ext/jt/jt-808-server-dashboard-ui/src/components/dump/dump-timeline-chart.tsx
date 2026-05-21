@@ -4,7 +4,7 @@ import { LegendOrdinal } from "@visx/legend";
 import { ParentSize } from "@visx/responsive";
 import { scaleOrdinal } from "@visx/scale";
 import clsx from "clsx";
-import { FC, KeyboardEvent, useMemo } from "react";
+import { FC, KeyboardEvent, useLayoutEffect, useMemo, useRef } from "react";
 
 import {
   AXIS_BODY_GAP,
@@ -12,13 +12,15 @@ import {
   GROUP_HEADER_HEIGHT,
   GROUP_SECTION_GAP,
   STACK_KEYS,
+  THREAD_BAR_VERTICAL_INSET,
   THREAD_LABEL_WIDTH,
   THREAD_ROW_HEIGHT,
   THREAD_STATE_STYLES,
   TIME_AXIS_HEIGHT,
 } from "./constants.ts";
-import { buildTimelineScale, type BarGeometry } from "./timeline-scale.ts";
-import { DumpBarSegment, segmentsMatch } from "./utils.ts";
+import { DumpTimelineBar } from "./dump-timeline-bar.tsx";
+import { buildTimelineScale } from "./timeline-scale.ts";
+import { DumpBarSegment, dumpSegmentKey, segmentsMatch } from "./utils.ts";
 import {
   Group as DumpGroupModel,
   SelectedDumpContext,
@@ -119,7 +121,13 @@ export interface DumpTimelineChartProps {
 interface TimelineBarsProps {
   layout: LayoutRow[];
   bodyTop: number;
-  getBarGeometry: (time: string) => BarGeometry | null;
+  shouldAnimateEnter: (
+    groupName: string,
+    threadName: string,
+    time: string,
+    rightmostTime: string | undefined,
+  ) => boolean;
+  getBarGeometry: (time: string) => import("./timeline-scale.ts").BarGeometry | null;
   selectedDump: SelectedDumpContext | null;
   hoveredSegment: DumpBarSegment | null;
   onBarClick: (segment: DumpBarSegment) => void;
@@ -129,6 +137,7 @@ interface TimelineBarsProps {
 const TimelineBars: FC<TimelineBarsProps> = ({
   layout,
   bodyTop,
+  shouldAnimateEnter,
   getBarGeometry,
   selectedDump,
   hoveredSegment,
@@ -145,7 +154,7 @@ const TimelineBars: FC<TimelineBarsProps> = ({
     }
   };
 
-  const barHeight = THREAD_ROW_HEIGHT - 10;
+  const barHeight = THREAD_ROW_HEIGHT - THREAD_BAR_VERTICAL_INSET * 2;
 
   return (
     <Group top={bodyTop}>
@@ -155,11 +164,12 @@ const TimelineBars: FC<TimelineBarsProps> = ({
         }
 
         const { thread, groupName, top } = row;
-        const barY = top + 5;
+        const barY = top + THREAD_BAR_VERTICAL_INSET;
+        const rightmostTime = thread.dumps[thread.dumps.length - 1]?.time;
 
         return (
           <g key={`${groupName}-${thread.threadName}`}>
-            {thread.dumps.map((entry, index) => {
+            {thread.dumps.map((entry) => {
               const geom = getBarGeometry(entry.time);
 
               if (!geom) {
@@ -185,31 +195,28 @@ const TimelineBars: FC<TimelineBarsProps> = ({
                 selectedDump.groupName === groupName &&
                 !selected;
 
+              const animateEnter = shouldAnimateEnter(
+                groupName,
+                thread.threadName,
+                entry.time,
+                rightmostTime,
+              );
+
               return (
-                <rect
-                  key={`${entry.time}-${index}`}
-                  aria-label={`${thread.threadName} ${state} at ${entry.time}`}
-                  className="outline-none transition-[stroke,opacity] duration-150"
+                <DumpTimelineBar
+                  key={`${groupName}-${thread.threadName}-${entry.time}`}
+                  animateEnter={animateEnter}
+                  ariaLabel={`${thread.threadName} ${state} at ${entry.time}`}
+                  barHeight={barHeight}
+                  barY={barY}
+                  emphasize={animateEnter}
                   fill={style.color}
-                  height={barHeight}
+                  geom={geom}
+                  highlighted={highlighted || selected}
                   opacity={dimmed ? 0.4 : 1}
-                  role="button"
-                  rx={2}
-                  stroke={
-                    highlighted || selected ? "white" : "transparent"
-                  }
-                  strokeWidth={highlighted || selected ? 2 : 0}
-                  style={{ cursor: "pointer" }}
-                  tabIndex={0}
-                  width={geom.width}
-                  x={geom.x}
-                  y={barY}
-                  onBlur={() => onBarHover(null)}
                   onClick={() => onBarClick(segment)}
-                  onFocus={() => onBarHover(segment)}
+                  onHover={(active) => onBarHover(active ? segment : null)}
                   onKeyDown={(e) => handleBarKeyDown(e, segment)}
-                  onMouseEnter={() => onBarHover(segment)}
-                  onMouseLeave={() => onBarHover(null)}
                 />
               );
             })}
@@ -268,6 +275,34 @@ export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
     () => buildLayout(groups, viewMode),
     [groups, viewMode],
   );
+  const seenSegmentsRef = useRef(new Set<string>());
+
+  const shouldAnimateEnter = useMemo(
+    () =>
+      (
+        groupName: string,
+        threadName: string,
+        time: string,
+        rightmostTime: string | undefined,
+      ) =>
+        time === rightmostTime &&
+        !seenSegmentsRef.current.has(
+          dumpSegmentKey(groupName, threadName, time),
+        ),
+    [],
+  );
+
+  useLayoutEffect(() => {
+    groups.forEach((group) => {
+      group.threads.forEach((thread) => {
+        thread.dumps.forEach((entry) => {
+          seenSegmentsRef.current.add(
+            dumpSegmentKey(group.name, thread.threadName, entry.time),
+          );
+        });
+      });
+    });
+  }, [groups]);
 
   const bodyHeight = useMemo(() => {
     if (layout.length === 0) {
@@ -374,6 +409,7 @@ export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
                         getBarGeometry={timeline.getBarGeometry}
                         hoveredSegment={hoveredSegment}
                         layout={layout}
+                        shouldAnimateEnter={shouldAnimateEnter}
                         selectedDump={selectedDump}
                         onBarClick={onBarClick}
                         onBarHover={onBarHover}

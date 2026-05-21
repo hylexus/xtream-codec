@@ -29,6 +29,8 @@ export const HISTORICAL_BAR_WIDTH = 14;
 export const TIME_AXIS_HEIGHT = 32;
 export const AXIS_BODY_GAP = 12;
 export const THREAD_ROW_HEIGHT = 30;
+/** Vertical inset per row so bars do not touch adjacent thread rows. */
+export const THREAD_BAR_VERTICAL_INSET = 5;
 export const THREAD_LABEL_WIDTH = 200;
 export const GROUP_HEADER_HEIGHT = 36;
 export const GROUP_SECTION_GAP = 12;
