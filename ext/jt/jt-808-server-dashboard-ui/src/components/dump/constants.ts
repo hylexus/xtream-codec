@@ -25,6 +25,9 @@ export const MAX_DUMPS_PER_THREAD = 20;
 /** Initial live window: 15 one-second slots on the axis. */
 export const TIMELINE_WINDOW_MS = 15_000;
 export const LIVE_SLOT_COUNT = TIMELINE_WINDOW_MS / 1000;
+export const SLOT_MS = 1_000;
+/** Max slot-axis length (15→30→60); beyond this use scrollable band scale. */
+export const MAX_SLOT_TIMELINE_COUNT = LIVE_SLOT_COUNT * 4;
 export const HISTORICAL_BAR_WIDTH = 14;
 export const TIME_AXIS_HEIGHT = 32;
 export const AXIS_BODY_GAP = 12;

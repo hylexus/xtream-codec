@@ -234,8 +234,8 @@ const LabelCell: FC<{ row: LayoutRow }> = ({ row }) => {
         className="flex items-center gap-2 px-2 text-sm font-semibold text-foreground"
         style={{ height: GROUP_HEADER_HEIGHT }}
       >
-        <span className="truncate">{row.groupName}</span>
-        <span className="shrink-0 text-xs font-normal text-muted-foreground">
+        <span className="truncate text-accent">{row.groupName}</span>
+        <span className="shrink-0 text-xs font-normal text-accent-foreground">
           {row.threadCount}
         </span>
       </div>
