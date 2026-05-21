@@ -15,8 +15,18 @@ import {
 } from "@/components/icons.tsx";
 
 export const siteConfig = {
-  name: "Xtream",
-  description: "Xtream",
+  name: "Xtream Codec",
+  description: "JT/T 808 服务监控控制台",
+  user: {
+    name: "管理员",
+    email: "admin@example.com",
+  },
+  dashboardTabs: [
+    { id: "overview", label: "Overview" },
+    { id: "instruction", label: "Instruction" },
+    { id: "attachment", label: "Attachment" },
+    { id: "subscriber", label: "Subscriber" },
+  ],
   sidenav: [
     { name: "仪表盘", href: "/dashboard", icon: LuGaugeIcon },
     { name: "指令服务客户端", href: "/instruction", icon: LuCommentsIcon },

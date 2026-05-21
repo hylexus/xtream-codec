@@ -1,24 +1,30 @@
-import { Chip, Spinner, Table, Tooltip } from "@heroui/react";
-import React, { FC, useMemo, useState } from "react";
+import { Chip, Tooltip } from "@heroui/react";
+import { FC, Key, useState } from "react";
 
 import { SessionMonitor } from "./monitor.tsx";
 
-import { PagePagination } from "@/components/page-pagination.tsx";
+import { DataTable } from "@/components/ui/data-table.tsx";
 import { usePageList } from "@/hooks/use-page-list.ts";
 import { Session, SessionType } from "@/types";
 import { request } from "@/utils/request.ts";
 import { LuEyeIcon, LuTrashIcon } from "@/components/icons.tsx";
 
-interface CellProps {
-  handleMonitor: (session: Session) => void;
-  handleDel: (session: Session) => void;
-  session: Session;
-  columnKey: React.Key;
-}
 const ServerMap = {
   INSTRUCTION_SERVER: "808 服务",
   ATTACHMENT_SERVER: "附件服务",
 };
+
+const TABLE_LABEL: Record<SessionType, string> = {
+  instruction: "指令服务在线会话",
+  attachment: "附件服务在线会话",
+};
+
+interface CellProps {
+  handleMonitor: (session: Session) => void;
+  handleDel: (session: Session) => void;
+  session: Session;
+  columnKey: Key;
+}
 
 const SessionCell: FC<CellProps> = ({
   handleMonitor,
@@ -33,30 +39,38 @@ const SessionCell: FC<CellProps> = ({
       return (
         <Tooltip>
           <Tooltip.Trigger>
-            <div className="max-w-[10rem] overflow-hidden whitespace-nowrap text-ellipsis text">
-              {cellValue}
-            </div>
+            <span className="line-clamp-1 font-mono text-sm text-muted">
+              {String(cellValue)}
+            </span>
           </Tooltip.Trigger>
-          <Tooltip.Content>{cellValue}</Tooltip.Content>
+          <Tooltip.Content>{String(cellValue)}</Tooltip.Content>
         </Tooltip>
       );
     case "serverType":
-      return ServerMap[cellValue as keyof typeof ServerMap];
+      return (
+        <span className="text-sm text-foreground">
+          {ServerMap[cellValue as keyof typeof ServerMap]}
+        </span>
+      );
     case "protocolVersion":
-      return String(cellValue).replace("VERSION_", "");
+      return (
+        <span className="text-sm text-foreground">
+          {String(cellValue).replace("VERSION_", "")}
+        </span>
+      );
     case "protocolType":
       return (
-        <Chip color="accent" size="sm">
-          {cellValue}
+        <Chip color="accent" size="sm" variant="soft">
+          {String(cellValue)}
         </Chip>
       );
     case "operation":
       return (
-        <div className="relative flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           <Tooltip>
             <Tooltip.Trigger>
               <span
-                className="inline-flex cursor-pointer text-lg text-default-400 active:opacity-50"
+                className="inline-flex cursor-pointer text-muted transition-colors hover:text-foreground"
                 role="button"
                 tabIndex={0}
                 onClick={() => handleMonitor(session)}
@@ -75,7 +89,7 @@ const SessionCell: FC<CellProps> = ({
           <Tooltip>
             <Tooltip.Trigger>
               <span
-                className="inline-flex cursor-pointer text-lg text-danger active:opacity-50"
+                className="inline-flex cursor-pointer text-danger transition-opacity hover:opacity-80"
                 role="button"
                 tabIndex={0}
                 onClick={() => handleDel(session)}
@@ -94,30 +108,32 @@ const SessionCell: FC<CellProps> = ({
         </div>
       );
     default:
-      return cellValue;
+      return (
+        <span className="line-clamp-1 text-sm text-foreground">
+          {cellValue == null ? "—" : String(cellValue)}
+        </span>
+      );
   }
 };
 
 export interface SessionTableProps {
   type: SessionType;
 }
+
 export const SessionTable: FC<SessionTableProps> = ({ type }) => {
   const { setPage, page, pages, tableData, isLoading, mutate } = usePageList(
     `session/${type}-sessions`,
   );
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Session | null>(null);
 
-  const loadingState =
-    isLoading && tableData?.data?.length === 0 ? "loading" : "idle";
-
   const columns = [
-    { key: "id", label: "会话ID" },
-    { key: "terminalId", label: "终端手机号" },
-    { key: "protocolVersion", label: "808协议版本" },
+    { key: "id", label: "会话 ID", isRowHeader: true },
+    { key: "terminalId", label: "终端" },
+    { key: "protocolVersion", label: "协议版本" },
     { key: "protocolType", label: "协议" },
     { key: "creationTime", label: "创建时间" },
-    { key: "lastCommunicateTime", label: "最近一次通信时间" },
+    { key: "lastCommunicateTime", label: "最后通信" },
     { key: "operation", label: "操作" },
   ];
 
@@ -125,6 +141,7 @@ export const SessionTable: FC<SessionTableProps> = ({ type }) => {
     setSelectedRow(item);
     setIsOpen(true);
   };
+
   const handleDel = async (session: Session) => {
     try {
       const res = await request<{ closed?: boolean }>({
@@ -136,83 +153,36 @@ export const SessionTable: FC<SessionTableProps> = ({ type }) => {
         await mutate();
       }
     } catch {
-      /* 删除失败由后端错误处理；表格保持原状 */
+      /* 保持原状 */
     }
   };
-  const bottomContent = useMemo(() => {
-    return (
-      pages > 0 && (
-        <div className="flex w-full justify-center py-4">
-          <PagePagination page={page} total={pages} onChange={setPage} />
-        </div>
-      )
-    );
-  }, [page, pages, setPage]);
-
-  const topContent = useMemo(() => {
-    return (
-      <p className="text-sm text-muted">总数：{tableData?.total ?? "—"}</p>
-    );
-  }, [tableData?.total]);
 
   const items = tableData?.data ?? [];
-
-  if (loadingState === "loading" && items.length === 0) {
-    return (
-      <>
-        <div className="flex flex-col gap-4">
-          {topContent}
-          <div className="flex justify-center p-12">
-            <Spinner />
-          </div>
-        </div>
-        <SessionMonitor
-          isOpen={isOpen}
-          row={selectedRow}
-          setIsOpen={setIsOpen}
-        />
-      </>
-    );
-  }
+  const total = tableData?.total ?? 0;
+  const loading = isLoading && items.length === 0;
 
   return (
     <>
-      <div className="flex flex-col gap-2">
-        {topContent}
-        <Table.Root className="w-full">
-          <Table.ScrollContainer>
-            <Table.Content aria-label="Example table with dynamic content">
-              <Table.Header>
-                {columns.map((column) => (
-                  <Table.Column
-                    key={String(column.key)}
-                    isRowHeader={column.key === "id"}
-                  >
-                    {column.label}
-                  </Table.Column>
-                ))}
-              </Table.Header>
-              <Table.Body items={items}>
-                {(item) => (
-                  <Table.Row id={String(item?.id)}>
-                    {columns.map((column) => (
-                      <Table.Cell key={String(column.key)}>
-                        <SessionCell
-                          columnKey={column.key}
-                          handleDel={handleDel}
-                          handleMonitor={handleMonitor}
-                          session={item}
-                        />
-                      </Table.Cell>
-                    ))}
-                  </Table.Row>
-                )}
-              </Table.Body>
-            </Table.Content>
-          </Table.ScrollContainer>
-        </Table.Root>
-        {bottomContent}
-      </div>
+      <DataTable
+        ariaLabel={TABLE_LABEL[type]}
+        columns={columns}
+        items={items}
+        label={TABLE_LABEL[type]}
+        loading={loading}
+        page={page}
+        pages={pages}
+        renderCell={(item, columnKey) => (
+          <SessionCell
+            columnKey={columnKey}
+            handleDel={handleDel}
+            handleMonitor={handleMonitor}
+            session={item}
+          />
+        )}
+        searchPlaceholder="搜索会话..."
+        total={total}
+        onPageChange={setPage}
+      />
       <SessionMonitor isOpen={isOpen} row={selectedRow} setIsOpen={setIsOpen} />
     </>
   );

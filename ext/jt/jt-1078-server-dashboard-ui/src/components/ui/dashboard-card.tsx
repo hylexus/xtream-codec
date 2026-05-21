@@ -6,18 +6,16 @@ type DashboardCardProps = ComponentProps<typeof Card> & {
   children: ReactNode;
 };
 
-/** 仪表盘统一卡片容器 — 所有 KPI / 图表 / 表格外层必须使用 */
+/** 仪表盘卡片 — HeroUI Card 默认 variant，无额外主题覆盖 */
 export function DashboardCard({
   children,
   className,
   ...props
 }: DashboardCardProps) {
   return (
-    <div className="h-full min-h-0 w-full">
-      <Card className={clsx("dashboard-card h-full", className)} {...props}>
-        {children}
-      </Card>
-    </div>
+    <Card className={clsx("h-full", className)} variant="default" {...props}>
+      {children}
+    </Card>
   );
 }
 
@@ -37,16 +35,21 @@ export function DashboardCardHeader({
   className,
 }: DashboardCardHeaderProps) {
   return (
-    <div className={clsx("dashboard-card-header", className)}>
-      <div className="min-w-0">
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+    <Card.Header
+      className={clsx(
+        "flex flex-row flex-wrap items-center justify-between gap-3",
+        className,
+      )}
+    >
+      <div className="min-w-0 flex-1">
+        <Card.Title className="text-sm font-semibold">{title}</Card.Title>
         {subtitle ? (
-          <p className="dashboard-page-description mt-0.5">{subtitle}</p>
+          <Card.Description className="mt-0.5">{subtitle}</Card.Description>
         ) : null}
         {legend ? <div className="mt-2">{legend}</div> : null}
       </div>
-      {actions}
-    </div>
+      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+    </Card.Header>
   );
 }
 
@@ -62,14 +65,9 @@ export function DashboardCardBody({
   className,
 }: DashboardCardBodyProps) {
   return (
-    <div
-      className={clsx(
-        flush ? "dashboard-card-body--flush" : "dashboard-card-body",
-        className,
-      )}
-    >
+    <Card.Content className={clsx(flush && "p-0", className)}>
       {children}
-    </div>
+    </Card.Content>
   );
 }
 
@@ -83,6 +81,13 @@ export function DashboardCardFooter({
   className,
 }: DashboardCardFooterProps) {
   return (
-    <div className={clsx("dashboard-card-footer", className)}>{children}</div>
+    <Card.Footer
+      className={clsx(
+        "flex flex-wrap items-center justify-between gap-3 border-t border-separator",
+        className,
+      )}
+    >
+      {children}
+    </Card.Footer>
   );
 }

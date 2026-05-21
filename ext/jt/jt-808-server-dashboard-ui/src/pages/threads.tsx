@@ -51,7 +51,7 @@ export const ThreadsPage = () => {
   }, []);
 
   return (
-    <PageSection description="各调度器线程池的实时配置快照" title="调度器指标">
+    <PageSection>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
         {threads.map((thread: Thread) => (
           <Card

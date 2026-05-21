@@ -1,54 +1,47 @@
-import { Button } from "@heroui/react";
+import { Button, Tabs } from "@heroui/react";
 import { Download, RefreshCw } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { siteConfig } from "@/config/site.ts";
 
 export function DashboardToolbar() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("overview");
-
-  const handleTab = (id: string) => {
-    setActiveTab(id);
-    if (id === "sessions") {
-      navigate("/sessions");
-    } else if (id === "subscribers") {
-      navigate("/subscribers");
-    }
-  };
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
-      <div className="dashboard-segment" role="tablist">
-        {siteConfig.dashboardTabs.map((tab) => (
-          <button
-            key={tab.id}
-            className="dashboard-segment-tab"
-            data-active={activeTab === tab.id}
-            role="tab"
-            type="button"
-            onClick={() => handleTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        selectedKey="overview"
+        variant="secondary"
+        onSelectionChange={(key) => {
+          if (key === "overview") {
+            navigate("/dashboard");
+          } else if (key === "sessions") {
+            navigate("/sessions");
+          } else if (key === "subscribers") {
+            navigate("/subscribers");
+          }
+        }}
+      >
+        <Tabs.ListContainer>
+          <Tabs.List aria-label="仪表盘视图">
+            {siteConfig.dashboardTabs.map((tab) => (
+              <Tabs.Tab key={tab.id} id={tab.id}>
+                {tab.label}
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </Tabs>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          isIconOnly
-          aria-label="刷新"
-          className="text-muted"
-          size="sm"
-          variant="ghost"
-        >
-          <RefreshCw className="size-4" strokeWidth={1.75} />
+        <Button isIconOnly aria-label="刷新" size="sm" variant="ghost">
+          <RefreshCw className="size-4 text-muted" strokeWidth={1.75} />
         </Button>
-        <Button className="text-muted" size="sm" variant="secondary">
+        <Button size="sm" variant="secondary">
           本月
         </Button>
-        <Button className="rounded-xl" size="sm" variant="primary">
+        <Button size="sm" variant="primary">
           <span className="flex items-center gap-1.5">
             <Download className="size-4" strokeWidth={1.75} />
             导出

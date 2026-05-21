@@ -9,14 +9,17 @@ importers:
   .:
     dependencies:
       '@heroui/react':
-        specifier: ^3.0.4
-        version: 3.0.4(@react-spectrum/provider@3.11.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.3.0)
+        specifier: ^3.0.5
+        version: 3.0.5(@react-spectrum/provider@3.11.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.3.0)
       '@heroui/styles':
-        specifier: ^3.0.4
-        version: 3.0.4(tailwind-merge@3.4.0)(tailwindcss@4.3.0)
+        specifier: ^3.0.5
+        version: 3.0.5(tailwind-merge@3.4.0)(tailwindcss@4.3.0)
       '@microsoft/fetch-event-source':
         specifier: ^2.0.1
         version: 2.0.1
+      '@react-spring/web':
+        specifier: ^10.0.3
+        version: 10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tailwindcss/postcss':
         specifier: ^4.3.0
         version: 4.3.0
@@ -24,47 +27,47 @@ importers:
         specifier: ^4.3.0
         version: 4.3.0(vite@7.3.3(@types/node@24.12.3)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.6.0))
       '@visx/axis':
-        specifier: ^3.12.0
-        version: 3.12.0(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       '@visx/curve':
-        specifier: ^3.12.0
-        version: 3.12.0
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11
       '@visx/event':
-        specifier: ^3.12.0
-        version: 3.12.0
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       '@visx/group':
-        specifier: ^3.12.0
-        version: 3.12.0(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       '@visx/legend':
-        specifier: ^3.12.0
-        version: 3.12.0(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       '@visx/marker':
-        specifier: ^3.12.0
-        version: 3.12.0(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       '@visx/mock-data':
-        specifier: ^3.12.0
-        version: 3.12.0
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11
       '@visx/react-spring':
-        specifier: ^3.12.0
-        version: 3.12.0(@react-spring/web@9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@react-spring/web@10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react@19.2.14)(react@19.2.6)
       '@visx/responsive':
-        specifier: ^3.12.0
-        version: 3.12.0(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       '@visx/scale':
-        specifier: ^3.12.0
-        version: 3.12.0
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11
       '@visx/shape':
-        specifier: ^3.12.0
-        version: 3.12.0(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       '@visx/tooltip':
-        specifier: ^3.12.0
-        version: 3.12.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@visx/vendor':
-        specifier: ^3.12.0
-        version: 3.12.0
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11
       '@visx/xychart':
-        specifier: ^3.12.0
-        version: 3.12.0(@react-spring/web@9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 4.0.0-alpha.11
+        version: 4.0.0-alpha.11(@react-spring/web@10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       antd:
         specifier: ^6.3.7
         version: 6.3.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -358,10 +361,6 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/runtime@7.26.0':
-    resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
-    engines: {node: '>=6.9.0'}
-
   '@babel/runtime@7.29.2':
     resolution: {integrity: sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g==}
     engines: {node: '>=6.9.0'}
@@ -618,15 +617,15 @@ packages:
   '@formatjs/intl-localematcher@0.5.7':
     resolution: {integrity: sha512-GGFtfHGQVFe/niOZp24Kal5b2i36eE2bNL0xi9Sg/yd0TR8aLjcteApZdHmismP5QQax1cMnZM9yWySUUjJteA==}
 
-  '@heroui/react@3.0.4':
-    resolution: {integrity: sha512-6y6aXZ9v8W/dNDKA3yP0+VnY3OQUeg8164YnOXVaFd1U8+WbXka1hwPgi3PK/qmMv8W81SdiVnmEZUXjHbXpfw==}
+  '@heroui/react@3.0.5':
+    resolution: {integrity: sha512-kBb3aUcSAJOraPOb2MbOS1yNUcSCc6vnl0zTtzuWvJZabWgSff5Y9FNyXNjk/d56vm2ermfXa/gfBYqTUtRTzA==}
     peerDependencies:
       react: '>=19.0.0'
       react-dom: '>=19.0.0'
       tailwindcss: '>=4.0.0'
 
-  '@heroui/styles@3.0.4':
-    resolution: {integrity: sha512-3zi0cu8PPmMbUdRg7AO486w9uA7ZHuV6m8ab23RQHChJ97q3s/tM13r74l7A963Dif+0ZWpQRiicsUvWuaAcDg==}
+  '@heroui/styles@3.0.5':
+    resolution: {integrity: sha512-5DI5sa7GGe1Uw8PCBhooAIGoqZbcR0ilamPjzgv94qVgolGs9+FqbeNp2bcbyoHJn9+HLKQMYiIa44LwH0VLww==}
     peerDependencies:
       tailwindcss: '>=4.0.0'
 
@@ -1085,32 +1084,32 @@ packages:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-spring/animated@9.7.5':
-    resolution: {integrity: sha512-Tqrwz7pIlsSDITzxoLS3n/v/YCUHQdOIKtOJf4yL6kYVSDTSmVK1LI1Q3M/uu2Sx4X3pIWF3xLUhlsA6SPNTNg==}
+  '@react-spring/animated@10.0.3':
+    resolution: {integrity: sha512-7MrxADV3vaUADn2V9iYhaIL6iOWRx9nCJjYrsk2AHD2kwPr6fg7Pt0v+deX5RnCDmCKNnD6W5fasiyM8D+wzJQ==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@react-spring/core@9.7.5':
-    resolution: {integrity: sha512-rmEqcxRcu7dWh7MnCcMXLvrf6/SDlSokLaLTxiPlAYi11nN3B5oiCUAblO72o+9z/87j2uzxa2Inm8UbLjXA+w==}
+  '@react-spring/core@10.0.3':
+    resolution: {integrity: sha512-D4DwNO68oohDf/0HG2G0Uragzb9IA1oXblxrd6MZAcBcUQG2EHUWXewjdECMPLNmQvlYVyyBRH6gPxXM5DX7DQ==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@react-spring/rafz@9.7.5':
-    resolution: {integrity: sha512-5ZenDQMC48wjUzPAm1EtwQ5Ot3bLIAwwqP2w2owG5KoNdNHpEJV263nGhCeKKmuA3vG2zLLOdu3or6kuDjA6Aw==}
+  '@react-spring/rafz@10.0.3':
+    resolution: {integrity: sha512-Ri2/xqt8OnQ2iFKkxKMSF4Nqv0LSWnxXT4jXFzBDsHgeeH/cHxTLupAWUwmV9hAGgmEhBmh5aONtj3J6R/18wg==}
 
-  '@react-spring/shared@9.7.5':
-    resolution: {integrity: sha512-wdtoJrhUeeyD/PP/zo+np2s1Z820Ohr/BbuVYv+3dVLW7WctoiN7std8rISoYoHpUXtbkpesSKuPIw/6U1w1Pw==}
+  '@react-spring/shared@10.0.3':
+    resolution: {integrity: sha512-geCal66nrkaQzUVhPkGomylo+Jpd5VPK8tPMEDevQEfNSWAQP15swHm+MCRG4wVQrQlTi9lOzKzpRoTL3CA84Q==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@react-spring/types@9.7.5':
-    resolution: {integrity: sha512-HVj7LrZ4ReHWBimBvu2SKND3cDVUPWKLqRTmWe/fNY6o1owGOX0cAHbdPDTMelgBlVbrTKrre6lFkhqGZErK/g==}
+  '@react-spring/types@10.0.3':
+    resolution: {integrity: sha512-H5Ixkd2OuSIgHtxuHLTt7aJYfhMXKXT/rK32HPD/kSrOB6q6ooeiWAXkBy7L8F3ZxdkBb9ini9zP9UwnEFzWgQ==}
 
-  '@react-spring/web@9.7.5':
-    resolution: {integrity: sha512-lmvqGwpe+CSttsWNZVr+Dg62adtKhauGwLyGE/RRyZ8AAMLgb9x3NDMA5RMElXo+IMyTkPp7nxTB8ZQlmhb6JQ==}
+  '@react-spring/web@10.0.3':
+    resolution: {integrity: sha512-ndU+kWY81rHsT7gTFtCJ6mrVhaJ6grFmgTnENipzmKqot4HGf5smPNK+cZZJqoGeDsj9ZsiWPW4geT/NyD484A==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@react-stately/color@3.10.0':
     resolution: {integrity: sha512-P4tlvOYFA8hl/NXiMyPxfM+7rXV01hnwlvGCwbZqUK1aRv0Ry0yGCj2AbSzhYHx7i4J4+CVUJUYozNLzhm+6Sw==}
@@ -1407,8 +1406,8 @@ packages:
   '@types/d3-interpolate@3.0.1':
     resolution: {integrity: sha512-jx5leotSeac3jr0RePOH1KdR9rISG91QIE4Q2PYTu4OymLTZfA3SrnURSLzKH48HmXVUru50b8nje4E79oQSQw==}
 
-  '@types/d3-path@1.0.11':
-    resolution: {integrity: sha512-4pQMp8ldf7UaB/gR8Fvvy69psNHkTpD/pVw3vmEi8iZAB9EPMBruB1JvHO4BIq9QkUUd2lV1F5YXpMNj7JPBpw==}
+  '@types/d3-path@3.1.1':
+    resolution: {integrity: sha512-VMZBYyQvbGmWyWVea0EHs/BwLgxc+MKi1zLDCONksozI4YJMcTt8ZEuIR4Sb1MMTE8MMW49v0IwI5+b7RmfWlg==}
 
   '@types/d3-random@2.2.3':
     resolution: {integrity: sha512-Ghs4R3CcgJ3o6svszRzIH4b8PPYex/COo+rhhZjDAs+bVducXwjmVSi27WcDOaLLCBV2t3tfVH9bYXAL76IvQA==}
@@ -1416,8 +1415,8 @@ packages:
   '@types/d3-scale@4.0.2':
     resolution: {integrity: sha512-Yk4htunhPAwN0XGlIwArRomOjdoBFXC3+kCxK2Ubg7I9shQlVSJy/pG/Ht5ASN+gdMIalpk8TJ5xV74jFsetLA==}
 
-  '@types/d3-shape@1.3.12':
-    resolution: {integrity: sha512-8oMzcd4+poSLGgV0R1Q1rOlx/xdmozS4Xab7np0eamFFUYq71AU9pOCJEFnkXW2aI/oXdVYJzw6pssbSut7Z9Q==}
+  '@types/d3-shape@3.1.7':
+    resolution: {integrity: sha512-VLvUQ33C+3J+8p+Daf+nYSOsjB4GXp19/S/aGo60m9h1v6XaxjiT82lKVWJCfzhtuZ3yD7i/TPeC/fuKLLOSmg==}
 
   '@types/d3-time-format@2.1.0':
     resolution: {integrity: sha512-/myT3I7EwlukNOX2xVdMzb8FRgNzRMpsZddwst9Ld/VFe6LyJyRp0s32l/V9XoUzk+Gqu56F/oGk6507+8BxrA==}
@@ -1516,107 +1515,187 @@ packages:
     resolution: {integrity: sha512-NwjLUnGy8/Zfx23fl50tRC8rYaYnM52xNRYFAXvmiil9yh1+K6aRVQMnzW6gQB/1DLgWt977lYQn7C+wtgXZiA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@visx/annotation@3.12.0':
-    resolution: {integrity: sha512-ZH6Y4jfrb47iEUV9O2itU9TATE5IPzhs5qvP6J7vmv26qkqwDcuE7xN3S3l9R70WjyEKGbpO8js4EijA3FJWkA==}
+  '@visx/annotation@4.0.0-alpha.11':
+    resolution: {integrity: sha512-+baLcTgOkpdPdxs9UtrD8o2Hzz2suZbJFGrilq8xmiiCNfq8KZdVGh6kBKpWNF7MCTcM0A1zRYnwHtPv4qC5ag==}
     peerDependencies:
-      react: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/axis@3.12.0':
-    resolution: {integrity: sha512-8MoWpfuaJkhm2Yg+HwyytK8nk+zDugCqTT/tRmQX7gW4LYrHYLXFUXOzbDyyBakCVaUbUaAhVFxpMASJiQKf7A==}
+  '@visx/axis@4.0.0-alpha.11':
+    resolution: {integrity: sha512-KA+lgT3YLGGqIiuQLNKVIKC7OD0E1Hk04BvxkZdRFNh5IACApyvFs6TBOfVVZKUvVji388VTl6JtDYtWFboitA==}
     peerDependencies:
-      react: ^16.3.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/bounds@3.12.0':
-    resolution: {integrity: sha512-peAlNCUbYaaZ0IO6c1lDdEAnZv2iGPDiLIM8a6gu7CaMhtXZJkqrTh+AjidNcIqITktrICpGxJE/Qo9D099dvQ==}
+  '@visx/bounds@4.0.0-alpha.11':
+    resolution: {integrity: sha512-E5rRYDgwch7CwiDjw+E44z6iWgL2m8phDvzraDFFNb+IoBa3FfVlBBswjV7jJfUzpDb9OqV2UhZfcYyP4Awq/A==}
     peerDependencies:
-      react: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
-      react-dom: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+      react-dom: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
 
-  '@visx/curve@3.12.0':
-    resolution: {integrity: sha512-Ng1mefXIzoIoAivw7dJ+ZZYYUbfuwXgZCgQynShr6ZIVw7P4q4HeQfJP3W24ON+1uCSrzoycHSXRelhR9SBPcw==}
+  '@visx/curve@4.0.0-alpha.11':
+    resolution: {integrity: sha512-17t3mqOiBnOnLAuMRzOrn+TlzU8Yxj0IgqUM/zaTD950X9Z79JaBXuO3+2GEIhldEhr2sytwKZykAGKl0xC1KQ==}
 
-  '@visx/drag@3.12.0':
-    resolution: {integrity: sha512-LXOoPVw//YPjpYhDJYBsCYDuv1QimsXjDV98duH0aCy4V94ediXMQpe2wHq4pnlDobLEB71FjOZMFrbFmqtERg==}
+  '@visx/drag@4.0.0-alpha.11':
+    resolution: {integrity: sha512-Q8HIAG7njTwHfAMcbsG2rpugTsf3kY2drmPjwTZT3nseolgyjDFO824KzPMyNYHXnNFE+vfZPGjMMV+Zx7PMdw==}
     peerDependencies:
-      react: ^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/event@3.12.0':
-    resolution: {integrity: sha512-9Lvw6qJ0Fi+y1vsC1WspfdIKCxHTb7oy59Uql1uBdPGT8zChP0vuxW0jQNQRDbKgoefj4pCXAFi8+MF1mEtVTw==}
-
-  '@visx/glyph@3.12.0':
-    resolution: {integrity: sha512-E9ST9MoPNyXQzjZxYYAGXT4CbBpnB90Qhx8UvUUM2/n/SZUNeH+m6UiB/CzT0jGK2b0lPHF91mlOiQ8JXBRhYg==}
+  '@visx/event@4.0.0-alpha.11':
+    resolution: {integrity: sha512-6Dgc7QYnA3yXlCbBf8g+ZtqxmfOYdPGyVgBSHTqkbO9PaBekFWIXuLgxhdptdh5I8PnzBgtCHVGZb+zug5ex7Q==}
     peerDependencies:
-      react: ^16.3.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/grid@3.12.0':
-    resolution: {integrity: sha512-L4ex2ooSYhwNIxJ3XFIKRhoSvEGjPc2Y3YCrtNB4TV5Ofdj4q0UMOsxfrH23Pr8HSHuQhb6VGMgYoK0LuWqDmQ==}
+  '@visx/glyph@4.0.0-alpha.11':
+    resolution: {integrity: sha512-i7TpyAMqu85IJd8MKsjFJ6B4W4kGGNRhuWlhzhK80RKN/9Sl9ArbS0sYgMddXAQg4Z8c+0bUMnPKV05+xtT35g==}
     peerDependencies:
-      react: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/group@3.12.0':
-    resolution: {integrity: sha512-Dye8iS1alVXPv7nj/7M37gJe6sSKqJLH7x6sEWAsRQ9clI0kFvjbKcKgF+U3aAVQr0NCohheFV+DtR8trfK/Ag==}
+  '@visx/grid@4.0.0-alpha.11':
+    resolution: {integrity: sha512-LdCqOFCWGdRXBFqqXlHiY6iOMxcd7Grge6bejQY3MnUSmztavn5cXFIJcaq1uKr3muhKPK8raTfSCRFcHZJ1XA==}
     peerDependencies:
-      react: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/legend@3.12.0':
-    resolution: {integrity: sha512-Tr6hdauEDXRXVNeNgIQ9JtCCrxn8Fbr8UCVlO9XsSxenk2hBC/2PIY5QPzpnKFEEEuH/C8vhj8T0JfFZV+D9zQ==}
+  '@visx/group@4.0.0-alpha.11':
+    resolution: {integrity: sha512-vop2C75FrLkboko3eSHgD+RWgruFTEx/CcS137kcoGYvEREcz6aSaPkgXfjd9O+Gty6aDqqv0YlWt2WPh8sKlw==}
     peerDependencies:
-      react: ^16.3.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/marker@3.12.0':
-    resolution: {integrity: sha512-11aCWC13+PqbAatNgMVcm33J8PRNdyGiDbfMfwUXt5/FS2XLs2e1fjfhIwAxmCCLZ13FYlabrc1qnjnhwXbTVQ==}
+  '@visx/legend@4.0.0-alpha.11':
+    resolution: {integrity: sha512-SBTcVVOC+3sq1ZfwybdkvUGDlcbIn1+xAkJoG0LYCO6CijexqsFLbmgLDDYfeWRz+gO08QHQPRjxs4H8RO0g5g==}
     peerDependencies:
-      react: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/mock-data@3.12.0':
-    resolution: {integrity: sha512-HI8LKdO3sU2tIBv16ZYRTc2JYsu0Ai/hQc7YUOBqbjhXUW993iCBe98pAgEdHDrSWqK2yvXY4En5ceBTAP34Jw==}
-
-  '@visx/point@3.12.0':
-    resolution: {integrity: sha512-I6UrHoJAEVbx3RORQNupgTiX5EzjuZpiwLPxn8L2mI5nfERotPKi1Yus12Cq2WtXqEBR/WgqTnoImlqOXBykcA==}
-
-  '@visx/react-spring@3.12.0':
-    resolution: {integrity: sha512-ehtmjFrUQx3g0mZ684M4LgI9UfQ84ZWD/m9tKfvXhEm1Vl8D4AjaZ4af1tTOg9S7vk2VlpxvVOVN7+t5pu0nSA==}
+  '@visx/marker@4.0.0-alpha.11':
+    resolution: {integrity: sha512-SFNmJSGC96YV4ruRIMA3N1WycFBRiwD52nB07WTfo8VzwljCCshrf2dt4AxAh/SYA0zyfZuntC3z+99SzAoGtw==}
     peerDependencies:
-      '@react-spring/web': ^9.4.5
-      react: ^16.3.0-0 || ^17.0.0 || ^18.0.0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/responsive@3.12.0':
-    resolution: {integrity: sha512-GV1BTYwAGlk/K5c9vH8lS2syPnTuIqEacI7L6LRPbsuaLscXMNi+i9fZyzo0BWvAdtRV8v6Urzglo++lvAXT1Q==}
+  '@visx/mock-data@4.0.0-alpha.11':
+    resolution: {integrity: sha512-CyMa3mmk0Rg59KPs1Hlaq7fxxwt6urufUhS0URp82o7FMswo0VFMfZ7ULBGqG1Q+IfTUv7B/eMiKxofrN+ee/Q==}
+
+  '@visx/point@4.0.0-alpha.11':
+    resolution: {integrity: sha512-VS/R49yKW+Le2cRIq/1mY/tOk/uA2ZE0RQw45tI3cmNVFmNis5KCwfbXiOy9+f29mXyGhYCH4excD7LSY+DtPA==}
+
+  '@visx/react-spring@4.0.0-alpha.11':
+    resolution: {integrity: sha512-zttJT/Fe439EeulDV00voGuYJlZUnxKayPoMWpAS6nrVxUhxE9GLZSmUEA79df/7idSPks7YyWOOxSVj8FaLmw==}
     peerDependencies:
-      react: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@react-spring/web': ^9.7.5 || ^10.0.0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/scale@3.12.0':
-    resolution: {integrity: sha512-+ubijrZ2AwWCsNey0HGLJ0YKNeC/XImEFsr9rM+Uef1CM3PNM43NDdNTrdBejSlzRq0lcfQPWYMYQFSlkLcPOg==}
-
-  '@visx/shape@3.12.0':
-    resolution: {integrity: sha512-/1l0lrpX9tPic6SJEalryBKWjP/ilDRnQA+BGJTI1tj7i23mJ/J0t4nJHyA1GrL4QA/bM/qTJ35eyz5dEhJc4g==}
+  '@visx/responsive@4.0.0-alpha.11':
+    resolution: {integrity: sha512-TN5ocK2o+C/F2GzECWZMJFAUMq2RoI6sAQbOiib7uIrXNIJSFrSC/MkyUjXMGZ1B7HD7AI+v3I2OzkZJLtuH1A==}
     peerDependencies:
-      react: ^16.3.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/text@3.12.0':
-    resolution: {integrity: sha512-0rbDYQlbuKPhBqXkkGYKFec1gQo05YxV45DORzr6hCyaizdJk1G+n9VkuKSHKBy1vVQhBA0W3u/WXd7tiODQPA==}
+  '@visx/scale@4.0.0-alpha.11':
+    resolution: {integrity: sha512-EDWf5/yBjbvdXxfUM9Wh+EV8r0NzP2+XDp5VeXZhkAqUYNNjWsqhmemXOjKVAt2wZgRwrjErGbDVXA42gMEkPg==}
+
+  '@visx/shape@4.0.0-alpha.11':
+    resolution: {integrity: sha512-n6aZOcYr3SXav9Aye9YsIKVg5fjDmSNniYcw4cWBaRjwNIrspPq4/d0Q8BLS9ZxJydP8Kx1pFPLq0kGL7Z3/gg==}
     peerDependencies:
-      react: ^16.3.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/tooltip@3.12.0':
-    resolution: {integrity: sha512-pWhsYhgl0Shbeqf80qy4QCB6zpq6tQtMQQxKlh3UiKxzkkfl+Metaf9p0/S0HexNi4vewOPOo89xWx93hBeh3A==}
+  '@visx/text@4.0.0-alpha.11':
+    resolution: {integrity: sha512-mXUuJZ0zL5tY2mZR1tRZNL+SMy79ThY6q1MeFCOY6BpAuU7A+gz1ZfvLwnzGEs8oFd2/7WvRpncZdXuT6nahqQ==}
     peerDependencies:
-      react: ^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0
-      react-dom: ^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
-  '@visx/vendor@3.12.0':
-    resolution: {integrity: sha512-SVO+G0xtnL9dsNpGDcjCgoiCnlB3iLSM9KLz1sLbSrV7RaVXwY3/BTm2X9OWN1jH2a9M+eHt6DJ6sE6CXm4cUg==}
-
-  '@visx/voronoi@3.12.0':
-    resolution: {integrity: sha512-U3HWu6g5UjQchFDq8k/A4U9WrlN+80rAFPdGOUvIGOueQw9RmlZlNaeg8IJcQr2yk1s4O/VSpt3nR82zdINWMw==}
+  '@visx/tooltip@4.0.0-alpha.11':
+    resolution: {integrity: sha512-rPvvoeEYapYj978TrvylV+S3FlFAPzlYbyiYGFz2FoWOpfo7mE6xqNonB1kRvgYgj/5VmM3JBfbiAb8iyIQtAA==}
     peerDependencies:
-      react: ^16.3.0-0 || ^17.0.0-0 || ^18.0.0-0
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+      react-dom: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
 
-  '@visx/xychart@3.12.0':
-    resolution: {integrity: sha512-itJ7qvj/STpVmHesVyo2vPOataBM1mgSaf9R6/s4Bpe340wZldfCJ+IqRcNgdtbBagz1Hlr/sRnla4tWE2yw9A==}
+  '@visx/vendor@4.0.0-alpha.11':
+    resolution: {integrity: sha512-GZ2apLax/9SD9g4cT6Fs935bw2K3gNDqNumf/uYBr3hyDx7A4KgtoX2arCM4oqpx91xNEbkZrtbeD6XnxngjsA==}
+
+  '@visx/voronoi@4.0.0-alpha.11':
+    resolution: {integrity: sha512-Y0mhsiCdoLUglBiPyDxwqNAd05Qf0txcVQiShjR2eYWVXr3fIbH1FDkEG8hqmwFyVd4U1CwAb8t59Qs79KlMYg==}
     peerDependencies:
-      '@react-spring/web': ^9.4.5
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      '@types/react': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@visx/xychart@4.0.0-alpha.11':
+    resolution: {integrity: sha512-xeGpjvIMFM/x1L04EbtSn0Unf7fKbU8YMZ/dQc6L72FdEjlm8D7+jfud7qXhM+kgk7jWNJMc6Ct15D/XkbQ8jg==}
+    peerDependencies:
+      '@react-spring/web': ^9.7.5 || ^10.0.0
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+      react-dom: ^16.14.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
 
   '@vitejs/plugin-react@5.2.0':
     resolution: {integrity: sha512-YmKkfhOAi3wsB1PhJq5Scj3GXMn3WvtQ/JC0xoopuHoXSdmtdStOpFrYaT1kie2YgFBcIe64ROzMYRjCrYOdYw==}
@@ -1870,8 +1949,9 @@ packages:
     resolution: {integrity: sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==}
     engines: {node: '>=12'}
 
-  d3-path@1.0.9:
-    resolution: {integrity: sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==}
+  d3-path@3.1.0:
+    resolution: {integrity: sha512-p3KP5HCf/bvjBSSKuXid6Zqijx7wIfNW+J/maPs+iwR35at5JCbLUT0LzF1cnjbCHWhqzQTIN2Jpe8pRebIEFQ==}
+    engines: {node: '>=12'}
 
   d3-random@2.2.2:
     resolution: {integrity: sha512-0D9P8TRj6qDAtHhRQn6EfdOtHMfsUWanl3yb/84C4DqpZ+VsgfI5iTVRNRbELCfNvRfpMr8OrqqUTQ6ANGCijw==}
@@ -1880,11 +1960,9 @@ packages:
     resolution: {integrity: sha512-GZW464g1SH7ag3Y7hXjf8RoUuAFIqklOAq3MRl4OaWabTFJY9PN/E1YklhXLh+OQ3fM9yS2nOkCoS+WLZ6kvxQ==}
     engines: {node: '>=12'}
 
-  d3-shape@1.3.7:
-    resolution: {integrity: sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw==}
-
-  d3-shape@2.1.0:
-    resolution: {integrity: sha512-PnjUqfM2PpskbSLTJvAzp2Wv4CZsnAgTfcVRTwW03QR3MkXF8Uo7B1y/lWkAsmbKwuecto++4NlsYcvYpXpTHA==}
+  d3-shape@3.2.0:
+    resolution: {integrity: sha512-SaLBuwGm3MOViRq2ABk3eLoxwZELpH6zhl3FbAoJ7Vm1gofKx6El1Ib5z23NUEhF9AsGl7y+dzLe5Cw2AArGTA==}
+    engines: {node: '>=12'}
 
   d3-time-format@4.1.0:
     resolution: {integrity: sha512-dJxPBlzC7NugB2PDLwo9Q8JiTR3M3e4/XANkreKSUxF8vvXKqm1Yfq4Q5dl8budlunRVlUUaDUgFt7eA8D6NLg==}
@@ -3018,9 +3096,6 @@ packages:
     resolution: {integrity: sha512-fmfw4XgoDke3kdI6h4xcUz1dG8uaiv5q9gcEwLS4Pnth2kxT+GZ7YehS1JTMGBQmtV7Y4GFGbs2re2NqhdozUg==}
     engines: {node: '>= 0.4'}
 
-  regenerator-runtime@0.14.1:
-    resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
-
   regexp.prototype.flags@1.5.3:
     resolution: {integrity: sha512-vqlC04+RQoFalODCbCumG2xIOvapzVMHwsyIGM/SIE8fRhFFsXeH8/QQ+s0T0kDAhKc4k30s73/0ydkHQz6HlQ==}
     engines: {node: '>= 0.4'}
@@ -3708,10 +3783,6 @@ snapshots:
       '@babel/core': 7.29.0
       '@babel/helper-plugin-utils': 7.27.1
 
-  '@babel/runtime@7.26.0':
-    dependencies:
-      regenerator-runtime: 0.14.1
-
   '@babel/runtime@7.29.2': {}
 
   '@babel/template@7.27.2':
@@ -3923,9 +3994,9 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@heroui/react@3.0.4(@react-spectrum/provider@3.11.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.3.0)':
+  '@heroui/react@3.0.5(@react-spectrum/provider@3.11.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.3.0)':
     dependencies:
-      '@heroui/styles': 3.0.4(tailwind-merge@3.4.0)(tailwindcss@4.3.0)
+      '@heroui/styles': 3.0.5(tailwind-merge@3.4.0)(tailwindcss@4.3.0)
       '@radix-ui/react-avatar': 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@react-aria/i18n': 3.13.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@react-aria/ssr': 3.10.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -3945,7 +4016,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@heroui/styles@3.0.4(tailwind-merge@3.4.0)(tailwindcss@4.3.0)':
+  '@heroui/styles@3.0.5(tailwind-merge@3.4.0)(tailwindcss@4.3.0)':
     dependencies:
       tailwind-variants: 3.2.2(tailwind-merge@3.4.0)(tailwindcss@4.3.0)
       tailwindcss: 4.3.0
@@ -4459,35 +4530,35 @@ snapshots:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
-  '@react-spring/animated@9.7.5(react@19.2.6)':
+  '@react-spring/animated@10.0.3(react@19.2.6)':
     dependencies:
-      '@react-spring/shared': 9.7.5(react@19.2.6)
-      '@react-spring/types': 9.7.5
+      '@react-spring/shared': 10.0.3(react@19.2.6)
+      '@react-spring/types': 10.0.3
       react: 19.2.6
 
-  '@react-spring/core@9.7.5(react@19.2.6)':
+  '@react-spring/core@10.0.3(react@19.2.6)':
     dependencies:
-      '@react-spring/animated': 9.7.5(react@19.2.6)
-      '@react-spring/shared': 9.7.5(react@19.2.6)
-      '@react-spring/types': 9.7.5
+      '@react-spring/animated': 10.0.3(react@19.2.6)
+      '@react-spring/shared': 10.0.3(react@19.2.6)
+      '@react-spring/types': 10.0.3
       react: 19.2.6
 
-  '@react-spring/rafz@9.7.5': {}
+  '@react-spring/rafz@10.0.3': {}
 
-  '@react-spring/shared@9.7.5(react@19.2.6)':
+  '@react-spring/shared@10.0.3(react@19.2.6)':
     dependencies:
-      '@react-spring/rafz': 9.7.5
-      '@react-spring/types': 9.7.5
+      '@react-spring/rafz': 10.0.3
+      '@react-spring/types': 10.0.3
       react: 19.2.6
 
-  '@react-spring/types@9.7.5': {}
+  '@react-spring/types@10.0.3': {}
 
-  '@react-spring/web@9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@react-spring/web@10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
-      '@react-spring/animated': 9.7.5(react@19.2.6)
-      '@react-spring/core': 9.7.5(react@19.2.6)
-      '@react-spring/shared': 9.7.5(react@19.2.6)
-      '@react-spring/types': 9.7.5
+      '@react-spring/animated': 10.0.3(react@19.2.6)
+      '@react-spring/core': 10.0.3(react@19.2.6)
+      '@react-spring/shared': 10.0.3(react@19.2.6)
+      '@react-spring/types': 10.0.3
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
@@ -4588,7 +4659,7 @@ snapshots:
     dependencies:
       '@adobe/react-spectrum': 3.47.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@adobe/react-spectrum-ui': 1.2.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.29.2
       '@swc/helpers': 0.5.13
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
@@ -4722,7 +4793,7 @@ snapshots:
     dependencies:
       '@types/d3-color': 3.1.3
 
-  '@types/d3-path@1.0.11': {}
+  '@types/d3-path@3.1.1': {}
 
   '@types/d3-random@2.2.3': {}
 
@@ -4730,9 +4801,9 @@ snapshots:
     dependencies:
       '@types/d3-time': 3.0.4
 
-  '@types/d3-shape@1.3.12':
+  '@types/d3-shape@3.1.7':
     dependencies:
-      '@types/d3-path': 1.0.11
+      '@types/d3-path': 3.1.1
 
   '@types/d3-time-format@2.1.0': {}
 
@@ -4855,172 +4926,170 @@ snapshots:
       '@typescript-eslint/types': 8.59.2
       eslint-visitor-keys: 5.0.1
 
-  '@visx/annotation@3.12.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@visx/annotation@4.0.0-alpha.11(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
-      '@types/react': 19.2.14
-      '@visx/drag': 3.12.0(react@19.2.6)
-      '@visx/group': 3.12.0(react@19.2.6)
-      '@visx/text': 3.12.0(react@19.2.6)
+      '@visx/drag': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/group': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/text': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       classnames: 2.5.1
-      prop-types: 15.8.1
       react: 19.2.6
       react-use-measure: 2.1.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+    optionalDependencies:
+      '@types/react': 19.2.14
     transitivePeerDependencies:
       - react-dom
 
-  '@visx/axis@3.12.0(react@19.2.6)':
+  '@visx/axis@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
-      '@types/react': 19.2.14
-      '@visx/group': 3.12.0(react@19.2.6)
-      '@visx/point': 3.12.0
-      '@visx/scale': 3.12.0
-      '@visx/shape': 3.12.0(react@19.2.6)
-      '@visx/text': 3.12.0(react@19.2.6)
+      '@visx/group': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/point': 4.0.0-alpha.11
+      '@visx/scale': 4.0.0-alpha.11
+      '@visx/shape': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/text': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       classnames: 2.5.1
-      prop-types: 15.8.1
       react: 19.2.6
-
-  '@visx/bounds@3.12.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
-    dependencies:
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
-      prop-types: 15.8.1
+
+  '@visx/bounds@4.0.0-alpha.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
-
-  '@visx/curve@3.12.0':
-    dependencies:
-      '@types/d3-shape': 1.3.12
-      d3-shape: 1.3.7
-
-  '@visx/drag@3.12.0(react@19.2.6)':
-    dependencies:
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@visx/event': 3.12.0
-      '@visx/point': 3.12.0
-      prop-types: 15.8.1
+      '@types/react-dom': 19.2.3(@types/react@19.2.14)
+
+  '@visx/curve@4.0.0-alpha.11':
+    dependencies:
+      '@visx/vendor': 4.0.0-alpha.11
+
+  '@visx/drag@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
+    dependencies:
+      '@visx/event': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/point': 4.0.0-alpha.11
       react: 19.2.6
-
-  '@visx/event@3.12.0':
-    dependencies:
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@visx/point': 3.12.0
 
-  '@visx/glyph@3.12.0(react@19.2.6)':
+  '@visx/event@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
-      '@types/d3-shape': 1.3.12
+      '@visx/point': 4.0.0-alpha.11
+      react: 19.2.6
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@visx/group': 3.12.0(react@19.2.6)
+
+  '@visx/glyph@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
+    dependencies:
+      '@visx/group': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/vendor': 4.0.0-alpha.11
       classnames: 2.5.1
-      d3-shape: 1.3.7
-      prop-types: 15.8.1
       react: 19.2.6
-
-  '@visx/grid@3.12.0(react@19.2.6)':
-    dependencies:
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@visx/curve': 3.12.0
-      '@visx/group': 3.12.0(react@19.2.6)
-      '@visx/point': 3.12.0
-      '@visx/scale': 3.12.0
-      '@visx/shape': 3.12.0(react@19.2.6)
-      classnames: 2.5.1
-      prop-types: 15.8.1
-      react: 19.2.6
 
-  '@visx/group@3.12.0(react@19.2.6)':
+  '@visx/grid@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
-      '@types/react': 19.2.14
+      '@visx/curve': 4.0.0-alpha.11
+      '@visx/group': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/point': 4.0.0-alpha.11
+      '@visx/scale': 4.0.0-alpha.11
+      '@visx/shape': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       classnames: 2.5.1
-      prop-types: 15.8.1
       react: 19.2.6
+    optionalDependencies:
+      '@types/react': 19.2.14
 
-  '@visx/legend@3.12.0(react@19.2.6)':
+  '@visx/group@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
-      '@types/react': 19.2.14
-      '@visx/group': 3.12.0(react@19.2.6)
-      '@visx/scale': 3.12.0
       classnames: 2.5.1
-      prop-types: 15.8.1
       react: 19.2.6
+    optionalDependencies:
+      '@types/react': 19.2.14
 
-  '@visx/marker@3.12.0(react@19.2.6)':
+  '@visx/legend@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
-      '@types/react': 19.2.14
-      '@visx/group': 3.12.0(react@19.2.6)
-      '@visx/shape': 3.12.0(react@19.2.6)
+      '@visx/group': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/scale': 4.0.0-alpha.11
       classnames: 2.5.1
-      prop-types: 15.8.1
       react: 19.2.6
+    optionalDependencies:
+      '@types/react': 19.2.14
 
-  '@visx/mock-data@3.12.0':
+  '@visx/marker@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
+    dependencies:
+      '@visx/group': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/shape': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      classnames: 2.5.1
+      react: 19.2.6
+    optionalDependencies:
+      '@types/react': 19.2.14
+
+  '@visx/mock-data@4.0.0-alpha.11':
     dependencies:
       '@types/d3-random': 2.2.3
       d3-random: 2.2.2
 
-  '@visx/point@3.12.0': {}
+  '@visx/point@4.0.0-alpha.11': {}
 
-  '@visx/react-spring@3.12.0(@react-spring/web@9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)':
+  '@visx/react-spring@4.0.0-alpha.11(@react-spring/web@10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
-      '@react-spring/web': 9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@types/react': 19.2.14
-      '@visx/axis': 3.12.0(react@19.2.6)
-      '@visx/grid': 3.12.0(react@19.2.6)
-      '@visx/scale': 3.12.0
-      '@visx/text': 3.12.0(react@19.2.6)
+      '@react-spring/web': 10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@visx/axis': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/grid': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/scale': 4.0.0-alpha.11
+      '@visx/text': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       classnames: 2.5.1
-      prop-types: 15.8.1
       react: 19.2.6
+    optionalDependencies:
+      '@types/react': 19.2.14
 
-  '@visx/responsive@3.12.0(react@19.2.6)':
+  '@visx/responsive@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
       '@types/lodash': 4.17.13
-      '@types/react': 19.2.14
       lodash: 4.17.21
-      prop-types: 15.8.1
       react: 19.2.6
-
-  '@visx/scale@3.12.0':
-    dependencies:
-      '@visx/vendor': 3.12.0
-
-  '@visx/shape@3.12.0(react@19.2.6)':
-    dependencies:
-      '@types/d3-path': 1.0.11
-      '@types/d3-shape': 1.3.12
-      '@types/lodash': 4.17.13
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@visx/curve': 3.12.0
-      '@visx/group': 3.12.0(react@19.2.6)
-      '@visx/scale': 3.12.0
-      classnames: 2.5.1
-      d3-path: 1.0.9
-      d3-shape: 1.3.7
-      lodash: 4.17.21
-      prop-types: 15.8.1
-      react: 19.2.6
 
-  '@visx/text@3.12.0(react@19.2.6)':
+  '@visx/scale@4.0.0-alpha.11':
+    dependencies:
+      '@visx/vendor': 4.0.0-alpha.11
+
+  '@visx/shape@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
       '@types/lodash': 4.17.13
-      '@types/react': 19.2.14
+      '@visx/curve': 4.0.0-alpha.11
+      '@visx/group': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/scale': 4.0.0-alpha.11
+      '@visx/vendor': 4.0.0-alpha.11
       classnames: 2.5.1
       lodash: 4.17.21
-      prop-types: 15.8.1
+      react: 19.2.6
+    optionalDependencies:
+      '@types/react': 19.2.14
+
+  '@visx/text@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
+    dependencies:
+      '@types/lodash': 4.17.13
+      classnames: 2.5.1
+      lodash: 4.17.21
       react: 19.2.6
       reduce-css-calc: 1.3.0
-
-  '@visx/tooltip@3.12.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
-    dependencies:
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@visx/bounds': 3.12.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+
+  '@visx/tooltip@4.0.0-alpha.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@visx/bounds': 4.0.0-alpha.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       classnames: 2.5.1
-      prop-types: 15.8.1
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
       react-use-measure: 2.1.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+    optionalDependencies:
+      '@types/react': 19.2.14
+      '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
-  '@visx/vendor@3.12.0':
+  '@visx/vendor@4.0.0-alpha.11':
     dependencies:
       '@types/d3-array': 3.0.3
       '@types/d3-color': 3.1.0
@@ -5028,7 +5097,9 @@ snapshots:
       '@types/d3-format': 3.0.1
       '@types/d3-geo': 3.1.0
       '@types/d3-interpolate': 3.0.1
+      '@types/d3-path': 3.1.1
       '@types/d3-scale': 4.0.2
+      '@types/d3-shape': 3.1.7
       '@types/d3-time': 3.0.0
       '@types/d3-time-format': 2.1.0
       d3-array: 3.2.1
@@ -5037,47 +5108,48 @@ snapshots:
       d3-format: 3.1.0
       d3-geo: 3.1.0
       d3-interpolate: 3.0.1
+      d3-path: 3.1.0
       d3-scale: 4.0.2
+      d3-shape: 3.2.0
       d3-time: 3.1.0
       d3-time-format: 4.1.0
       internmap: 2.0.3
 
-  '@visx/voronoi@3.12.0(react@19.2.6)':
+  '@visx/voronoi@4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
       '@types/d3-voronoi': 1.1.12
-      '@types/react': 19.2.14
       classnames: 2.5.1
       d3-voronoi: 1.1.4
-      prop-types: 15.8.1
       react: 19.2.6
-
-  '@visx/xychart@3.12.0(@react-spring/web@9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
-    dependencies:
-      '@react-spring/web': 9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@types/lodash': 4.17.13
+    optionalDependencies:
       '@types/react': 19.2.14
-      '@visx/annotation': 3.12.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@visx/axis': 3.12.0(react@19.2.6)
-      '@visx/event': 3.12.0
-      '@visx/glyph': 3.12.0(react@19.2.6)
-      '@visx/grid': 3.12.0(react@19.2.6)
-      '@visx/react-spring': 3.12.0(@react-spring/web@9.7.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
-      '@visx/responsive': 3.12.0(react@19.2.6)
-      '@visx/scale': 3.12.0
-      '@visx/shape': 3.12.0(react@19.2.6)
-      '@visx/text': 3.12.0(react@19.2.6)
-      '@visx/tooltip': 3.12.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@visx/vendor': 3.12.0
-      '@visx/voronoi': 3.12.0(react@19.2.6)
+
+  '@visx/xychart@4.0.0-alpha.11(@react-spring/web@10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@react-spring/web': 10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@types/lodash': 4.17.13
+      '@visx/annotation': 4.0.0-alpha.11(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@visx/axis': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/event': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/glyph': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/grid': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/react-spring': 4.0.0-alpha.11(@react-spring/web@10.0.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@types/react@19.2.14)(react@19.2.6)
+      '@visx/responsive': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/scale': 4.0.0-alpha.11
+      '@visx/shape': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/text': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
+      '@visx/tooltip': 4.0.0-alpha.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@visx/vendor': 4.0.0-alpha.11
+      '@visx/voronoi': 4.0.0-alpha.11(@types/react@19.2.14)(react@19.2.6)
       classnames: 2.5.1
       d3-interpolate-path: 2.2.1
-      d3-shape: 2.1.0
       lodash: 4.17.21
       mitt: 2.1.0
-      prop-types: 15.8.1
       react: 19.2.6
-    transitivePeerDependencies:
-      - react-dom
+      react-dom: 19.2.6(react@19.2.6)
+    optionalDependencies:
+      '@types/react': 19.2.14
+      '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
   '@vitejs/plugin-react@5.2.0(vite@7.3.3(@types/node@24.12.3)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.6.0))':
     dependencies:
@@ -5429,7 +5501,7 @@ snapshots:
     dependencies:
       d3-color: 3.1.0
 
-  d3-path@1.0.9: {}
+  d3-path@3.1.0: {}
 
   d3-random@2.2.2: {}
 
@@ -5441,13 +5513,9 @@ snapshots:
       d3-time: 3.1.0
       d3-time-format: 4.1.0
 
-  d3-shape@1.3.7:
+  d3-shape@3.2.0:
     dependencies:
-      d3-path: 1.0.9
-
-  d3-shape@2.1.0:
-    dependencies:
-      d3-path: 1.0.9
+      d3-path: 3.1.0
 
   d3-time-format@4.1.0:
     dependencies:
@@ -5548,7 +5616,7 @@ snapshots:
 
   dom-helpers@5.2.1:
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.29.2
       csstype: 3.2.3
 
   dunder-proto@1.0.1:
@@ -6725,7 +6793,7 @@ snapshots:
 
   react-transition-group@4.4.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.29.2
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -6770,8 +6838,6 @@ snapshots:
       get-intrinsic: 1.3.0
       globalthis: 1.0.4
       which-builtin-type: 1.1.4
-
-  regenerator-runtime@0.14.1: {}
 
   regexp.prototype.flags@1.5.3:
     dependencies:

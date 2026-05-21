@@ -261,11 +261,7 @@ export const CodecMetadataPage = () => {
   }
 
   return (
-    <PageSection
-      className="box-border h-full"
-      description="字段编解码器注册表，可按 key、符号性、字节序等筛选"
-      title="Codec 元数据"
-    >
+    <PageSection className="box-border h-full">
       {topContent}
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
         {tableData?.data?.map((item, idx) => (

@@ -15,7 +15,7 @@ function greetingLabel() {
 
 export function DashboardGreeting() {
   return (
-    <h1 className="dashboard-greeting-title">
+    <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
       {greetingLabel()}，{siteConfig.user.name}
     </h1>
   );

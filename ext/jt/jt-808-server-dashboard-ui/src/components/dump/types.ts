@@ -1,3 +1,14 @@
+export interface StackFrame {
+  classLoaderName: string;
+  moduleName: string;
+  moduleVersion: string;
+  methodName: string;
+  fileName: string;
+  lineNumber: number;
+  className: string;
+  nativeMethod: boolean;
+}
+
 export interface DumpInfo {
   threadName: string;
   threadId: number;
@@ -19,20 +30,13 @@ export interface DumpInfo {
     | "TIMED_WAITING"
     | "TERMINATED";
   priority: number;
-  stackTrace: {
-    classLoaderName: string;
-    moduleName: string;
-    moduleVersion: string;
-    methodName: string;
-    fileName: string;
-    lineNumber: number;
-    className: string;
-    nativeMethod: boolean;
-  }[];
-  lockedMonitors: any[];
-  lockedSynchronizers: any[];
+  stackTrace: StackFrame[];
+  lockedMonitors: unknown[];
+  lockedSynchronizers: unknown[];
   lockInfo: { className: string; identityHashCode: number };
 }
+
+export type ThreadState = DumpInfo["threadState"];
 
 export interface Dump {
   time: string;
@@ -42,24 +46,26 @@ export interface Dump {
   };
 }
 
+export interface ThreadDumpEntry {
+  time: string;
+  dumpInfo: DumpInfo;
+}
+
+export interface Thread {
+  threadName: string;
+  threadId: number;
+  dumps: ThreadDumpEntry[];
+}
+
 export interface Group {
   name: string;
-  threads: [
-    {
-      threadName: string;
-      threadId: number;
-      stackTrace: any;
-      dumps: {
-        time: string;
-        threadState:
-          | "NEW"
-          | "RUNNABLE"
-          | "BLOCKED"
-          | "WAITING"
-          | "TIMED_WAITING"
-          | "TERMINATED";
-      }[];
-      latestDumpInfo?: DumpInfo;
-    },
-  ];
+  threads: Thread[];
+}
+
+export interface SelectedDumpContext {
+  groupName: string;
+  time: string;
+  threadState: ThreadState;
+  focusedThreadName: string;
+  threads: { threadName: string; dumpInfo: DumpInfo }[];
 }

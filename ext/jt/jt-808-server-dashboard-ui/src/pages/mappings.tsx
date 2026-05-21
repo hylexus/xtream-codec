@@ -1,6 +1,5 @@
 import {
   Button,
-  ButtonGroup,
   Card,
   Chip,
   Input,
@@ -9,10 +8,11 @@ import {
   TextField,
   Tooltip,
 } from "@heroui/react";
+import { Segment } from "@/components/ui/segment.tsx";
 import { FC, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
-import { PageHeader } from "@/components/page-header.tsx";
+import { PageShell } from "@/components/ui/page-shell.tsx";
 import { request } from "@/utils/request.ts";
 
 interface HandlerInfo {
@@ -325,23 +325,22 @@ export const MappingsPage = () => {
   };
 
   return (
-    <div className="box-border flex h-full flex-col gap-4">
-      <PageHeader
-        description="按消息 ID、协议版本、处理器等维度查看 JT808 处理器注册情况"
-        title="请求映射"
-      />
+    <PageShell className="h-full">
       <div className="flex shrink-0 flex-wrap items-center gap-4">
-        <ButtonGroup aria-label="分组方式" size="sm">
-          {GROUP_BY_OPTIONS.map((opt) => (
-            <Button
-              key={opt.id}
-              variant={groupBy === opt.id ? "primary" : "ghost"}
-              onPress={() => setGroupBy(opt.id)}
-            >
+        <Segment
+          aria-label="分组方式"
+          selectedKey={groupBy}
+          size="sm"
+          variant="ghost"
+          onSelectionChange={(key) => setGroupBy(String(key))}
+        >
+          {GROUP_BY_OPTIONS.map((opt, index) => (
+            <Segment.Item key={opt.id} id={opt.id}>
+              {index > 0 ? <Segment.Separator /> : null}
               {opt.label}
-            </Button>
+            </Segment.Item>
           ))}
-        </ButtonGroup>
+        </Segment>
         <div className="flex w-96 max-w-full items-center gap-2">
           <TextField
             className="min-w-0 flex-1"
@@ -497,6 +496,6 @@ export const MappingsPage = () => {
           </div>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 };

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from "@heroui/react";
+import { Segment } from "@/components/ui/segment.tsx";
 
 export type FilterOption = {
   key: string;
@@ -12,7 +12,7 @@ type FilterOptionGroupProps = {
   onChange: (key: string) => void;
 };
 
-/** 单选筛选：HeroUI ButtonGroup + primary/ghost 切换 */
+/** 单选筛选：Segment 分段控件 */
 export function FilterOptionGroup({
   label,
   value,
@@ -22,17 +22,19 @@ export function FilterOptionGroup({
   return (
     <div className="flex items-center gap-2">
       <span className="shrink-0 text-xs text-muted">{label}</span>
-      <ButtonGroup size="sm">
-        {options.map((opt) => (
-          <Button
-            key={opt.key}
-            variant={value === opt.key ? "primary" : "ghost"}
-            onPress={() => onChange(opt.key)}
-          >
+      <Segment
+        selectedKey={value}
+        size="sm"
+        variant="ghost"
+        onSelectionChange={(key) => onChange(String(key))}
+      >
+        {options.map((opt, index) => (
+          <Segment.Item key={opt.key} id={opt.key}>
+            {index > 0 ? <Segment.Separator /> : null}
             {opt.label}
-          </Button>
+          </Segment.Item>
         ))}
-      </ButtonGroup>
+      </Segment>
     </div>
   );
 }

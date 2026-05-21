@@ -18,7 +18,6 @@ export const ThemeSwitch = () => {
 
   return (
     <Switch
-      className="scale-105"
       isSelected={resolved === "light"}
       size="lg"
       onChange={(isSelected) => {

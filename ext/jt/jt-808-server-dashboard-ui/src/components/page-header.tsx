@@ -1,52 +1,28 @@
 import clsx from "clsx";
 import { ReactNode } from "react";
 
+import { PageShell } from "@/components/ui/page-shell.tsx";
+
+/** @deprecated 标题由 layout MainHeader 展示 */
 export type PageHeaderProps = {
-  title: string;
+  title?: string;
   description?: string;
   className?: string;
   children?: ReactNode;
 };
 
-export function PageHeader({
-  title,
-  description,
-  className,
-  children,
-}: PageHeaderProps) {
-  return (
-    <div className={clsx("shrink-0", className)}>
-      <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-        {title}
-      </h2>
-      {description ? (
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          {description}
-        </p>
-      ) : null}
-      {children}
-    </div>
-  );
+export function PageHeader({ className, children }: PageHeaderProps) {
+  return <div className={clsx(className)}>{children}</div>;
 }
 
 export type PageSectionProps = {
-  title: string;
+  title?: string;
   description?: string;
   className?: string;
   children: ReactNode;
 };
 
-/** 常规内容页：标题 + 说明 + 主体，统一间距 */
-export function PageSection({
-  title,
-  description,
-  className,
-  children,
-}: PageSectionProps) {
-  return (
-    <div className={clsx("flex flex-col gap-6", className)}>
-      <PageHeader description={description} title={title} />
-      {children}
-    </div>
-  );
+/** 内容页外壳（标题/描述在 MainHeader + routes.ts） */
+export function PageSection({ className, children }: PageSectionProps) {
+  return <PageShell className={className}>{children}</PageShell>;
 }

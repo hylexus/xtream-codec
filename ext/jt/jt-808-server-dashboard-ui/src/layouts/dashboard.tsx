@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import { Navbar } from "@/components/navbar";
+import { MainHeader } from "@/components/layout/main-header.tsx";
 import { Sidebar } from "@/components/sidebar.tsx";
 
 export const DashboardLayout = () => {
@@ -22,7 +22,7 @@ export const DashboardLayout = () => {
   }, []);
 
   return (
-    <div className="relative flex h-dvh min-h-0 overflow-hidden bg-background text-foreground">
+    <div className="dashboard-shell">
       {mobileNavOpen ? (
         <button
           aria-label="关闭导航"
@@ -37,10 +37,17 @@ export const DashboardLayout = () => {
         onCloseMobile={() => setMobileNavOpen(false)}
         onToggleCompact={() => setSidebarCompact((v) => !v)}
       />
-      <div className="dashboard-main-column flex min-w-0 flex-col">
-        <Navbar onOpenMobileNav={() => setMobileNavOpen(true)} />
-        <main className="min-h-0 flex-1 px-3 pb-4 pt-1 md:px-7 md:pb-7 md:pt-3">
-          <div className="mx-auto h-full min-h-0 overflow-y-auto p-5 md:p-8">
+      <div className="dashboard-main flex min-w-0 flex-col">
+        <header className="shrink-0 px-6 pt-6">
+          <div className="mx-auto w-full max-w-[1600px]">
+            <MainHeader
+              onOpenMobileNav={() => setMobileNavOpen(true)}
+              onToggleSidebar={() => setSidebarCompact((v) => !v)}
+            />
+          </div>
+        </header>
+        <main className="min-h-0 flex-1 overflow-y-auto px-6 pb-8">
+          <div className="mx-auto w-full max-w-[1600px]">
             <Outlet />
           </div>
         </main>

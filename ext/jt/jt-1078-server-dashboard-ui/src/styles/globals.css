@@ -3,122 +3,27 @@
 
 @config "../../tailwind.config.js";
 
-/*
- * JT1078 Dashboard 设计令牌 — 详见 docs/DESIGN_GUIDE.md
- * 参照 HeroUI Pro Dashboard 模板（light / dark 双主题）
- */
+/* JT1078 Dashboard — 默认 @heroui/styles 主题，仅保留布局与图表扩展 */
 @layer base {
   html {
     @apply antialiased;
   }
 
-  html:not(.dark) {
-    color-scheme: light;
-
-    --background: #f4f4f5;
-    --foreground: #18181b;
-
-    --surface: #ffffff;
-    --surface-foreground: #18181b;
-    --surface-secondary: #fafafa;
-    --surface-tertiary: #f4f4f5;
-
-    --overlay: #ffffff;
-    --overlay-foreground: #18181b;
-
-    --muted: #71717a;
-
-    --scrollbar: #d4d4d8;
-
-    --default: #f4f4f5;
-    --default-foreground: #18181b;
-
-    --field-background: #ffffff;
-    --field-foreground: #18181b;
-    --field-placeholder: var(--muted);
-    --field-border: #e4e4e7;
-
-    --segment: #e4e4e7;
-    --segment-foreground: #18181b;
-
-    --border: #e4e4e7;
-    --separator: #f4f4f5;
-
-    --accent: #0070f3;
-    --accent-foreground: #ffffff;
-
-    --success: #17c964;
-    --success-foreground: #ffffff;
-
-    --warning: #f5a524;
-    --warning-foreground: #18181b;
-
-    --danger: #f31260;
-    --danger-foreground: #ffffff;
-
-    --backdrop: rgba(0, 0, 0, 0.4);
-
-    --chart-primary: #0070f3;
-    --chart-secondary: #66aaf9;
-    --chart-grid: #e4e4e7;
-
-    --surface-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 12px rgb(0 0 0 / 0.04);
-    --field-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  :root,
+  html:not(.dark),
+  .light,
+  [data-theme="light"] {
+    --chart-primary: var(--accent);
+    --chart-secondary: color-mix(in oklab, var(--accent) 55%, var(--background) 45%);
+    --chart-grid: var(--border);
   }
 
-  html.dark {
-    color-scheme: dark;
-
-    --background: #000000;
-    --foreground: #ffffff;
-
-    --surface: #18181b;
-    --surface-foreground: #ffffff;
-    --surface-secondary: #161618;
-    --surface-tertiary: #27272a;
-
-    --overlay: #18181b;
-    --overlay-foreground: #ffffff;
-
-    --muted: #a1a1aa;
-
-    --scrollbar: #52525b;
-
-    --default: #27272a;
-    --default-foreground: #fafafa;
-
-    --field-background: #18181b;
-    --field-foreground: #fafafa;
-    --field-placeholder: var(--muted);
-    --field-border: rgb(255 255 255 / 0.07);
-
-    --segment: #27272a;
-    --segment-foreground: #fafafa;
-
-    --border: rgb(255 255 255 / 0.06);
-    --separator: rgb(255 255 255 / 0.05);
-
-    --accent: #0070f3;
-    --accent-foreground: #ffffff;
-
-    --success: #17c964;
-    --success-foreground: #ffffff;
-
-    --warning: #f5a524;
-    --warning-foreground: #18181b;
-
-    --danger: #f31260;
-    --danger-foreground: #ffffff;
-
-    --backdrop: rgba(0, 0, 0, 0.65);
-
-    --chart-primary: #0070f3;
-    --chart-secondary: #3b82f6;
-    --chart-grid: rgb(255 255 255 / 0.06);
-
-    --surface-shadow: none;
-    --field-shadow: none;
-    --overlay-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+  html.dark,
+  .dark,
+  [data-theme="dark"] {
+    --chart-primary: var(--accent);
+    --chart-secondary: color-mix(in oklab, var(--accent) 72%, var(--foreground) 28%);
+    --chart-grid: var(--border);
   }
 
   body {
@@ -127,130 +32,26 @@
 }
 
 @layer utilities {
-  /* —— 布局壳层 —— */
-  .dashboard-main-column {
-    @apply relative z-10 min-h-0 flex-1 bg-[#f4f4f5] md:border-l md:border-border;
-  }
-
-  html.dark .dashboard-main-column {
-    @apply border-transparent bg-[#0a0a0a];
+  .dashboard-shell {
+    @apply flex h-dvh min-h-0 overflow-hidden bg-background text-foreground;
   }
 
   .dashboard-sidebar {
-    @apply border-r border-border bg-white;
+    @apply flex h-full shrink-0 flex-col border-r border-border bg-background;
   }
 
-  html.dark .dashboard-sidebar {
-    @apply border-transparent bg-black;
+  .dashboard-main {
+    @apply relative flex min-w-0 flex-1 flex-col border-border bg-background md:border-l;
+  }
+
+  html.dark .dashboard-main {
+    @apply bg-background-secondary;
   }
 
   .dashboard-page {
-    @apply flex flex-col gap-6 md:gap-8;
+    @apply flex flex-col gap-6;
   }
 
-  .dashboard-page-header {
-    @apply shrink-0;
-  }
-
-  .dashboard-page-title {
-    @apply text-xl font-semibold tracking-tight text-foreground sm:text-2xl;
-  }
-
-  .dashboard-page-description {
-    @apply mt-1 max-w-3xl text-sm leading-relaxed text-muted;
-  }
-
-  .dashboard-greeting-title {
-    @apply text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem];
-  }
-
-  /* —— 卡片（KPI / 图表 / 表格统一基类） —— */
-  .dashboard-card {
-    @apply overflow-hidden rounded-2xl border border-border bg-surface;
-    box-shadow: var(--surface-shadow);
-  }
-
-  html.dark .dashboard-card {
-    @apply border-transparent;
-    background-color: #18181b;
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
-  }
-
-  html:not(.dark) .dashboard-card:hover {
-    box-shadow:
-      0 2px 4px rgb(0 0 0 / 0.06),
-      0 8px 20px rgb(0 0 0 / 0.06);
-  }
-
-  html.dark .dashboard-card:hover {
-    background-color: #1f1f23;
-  }
-
-  .dashboard-card-header {
-    @apply flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-5 md:py-4 dark:border-white/[0.06];
-  }
-
-  .dashboard-card-body {
-    @apply p-4 md:p-5;
-  }
-
-  .dashboard-card-body--flush {
-    @apply p-0;
-  }
-
-  .dashboard-card-footer {
-    @apply flex flex-wrap items-center justify-center gap-3 border-t border-border px-4 py-4 dark:border-white/[0.06];
-  }
-
-  /* —— 导航 —— */
-  .dashboard-nav-active {
-    @apply rounded-xl bg-default text-default-foreground shadow-none ring-0;
-  }
-
-  .dashboard-profile-gradient {
-    @apply bg-gradient-to-br from-violet-500 via-fuchsia-500 to-amber-400;
-  }
-
-  /* —— KPI —— */
-  .dashboard-metric-value {
-    @apply text-2xl font-semibold tabular-nums tracking-tight sm:text-3xl;
-  }
-
-  .dashboard-trend-up {
-    @apply inline-flex items-center gap-0.5 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success;
-  }
-
-  .dashboard-trend-down {
-    @apply inline-flex items-center gap-0.5 rounded-full bg-danger/15 px-2 py-0.5 text-xs font-medium text-danger;
-  }
-
-  /* —— 分段 Tab —— */
-  .dashboard-segment {
-    @apply inline-flex rounded-full bg-segment p-1;
-  }
-
-  .dashboard-segment-tab {
-    @apply rounded-full px-4 py-1.5 text-sm font-medium text-muted transition-colors;
-  }
-
-  .dashboard-segment-tab[data-active="true"] {
-    @apply bg-surface text-foreground shadow-sm;
-  }
-
-  html.dark .dashboard-segment-tab[data-active="true"] {
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
-  }
-
-  /* —— 表格 —— */
-  .dashboard-table-scroll {
-    @apply max-h-[70vh];
-  }
-
-  .dashboard-table-cell-text {
-    @apply line-clamp-1 text-sm text-foreground;
-  }
-
-  /* —— 图表 —— */
   .dashboard-chart-grid-line {
     stroke: var(--chart-grid);
   }
@@ -265,10 +66,5 @@
 
   .dashboard-chart-line-secondary {
     stroke: var(--chart-secondary);
-  }
-
-  /* —— 空态 / 加载 —— */
-  .dashboard-loading-panel {
-    @apply flex min-h-[12rem] items-center justify-center p-16;
   }
 }

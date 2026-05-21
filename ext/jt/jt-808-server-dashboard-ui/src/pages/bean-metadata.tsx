@@ -442,11 +442,7 @@ export const BeanMetadataPage = () => {
   }
 
   return (
-    <PageSection
-      className="box-border h-full"
-      description="编解码 Bean 的属性、getter/setter 与长度策略等结构化信息"
-      title="Bean 元数据"
-    >
+    <PageSection className="box-border h-full">
       {topContent}
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
         {tableData?.data?.map((item, idx) => (

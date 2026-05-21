@@ -4,12 +4,11 @@ import {
   ExternalLink as ExternalLinkIcon,
   LifeBuoy,
   PanelLeftClose,
-  PanelLeft,
 } from "lucide-react";
 import { NavLink, useLocation, useRouteLoaderData } from "react-router-dom";
 
 import { ExternalLink } from "@/components/external-link.tsx";
-import { LuChevronRightIcon, LogoIcon } from "@/components/icons";
+import { LogoIcon } from "@/components/icons";
 import { siteConfig } from "@/config/site.ts";
 import { ServerInfo } from "@/types";
 
@@ -30,7 +29,6 @@ type SidebarProps = {
 
 export const Sidebar = ({
   compact,
-  onToggleCompact,
   mobileOpen,
   onCloseMobile,
 }: SidebarProps) => {
@@ -90,7 +88,7 @@ export const Sidebar = ({
         <ExternalLink
           unstyled
           className={clsx(
-            "mb-6 flex w-full items-center gap-3 rounded-2xl px-2 py-2 ring-1 ring-black/5 transition-colors hover:bg-background-tertiary dark:ring-0 dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06)]",
+            "mb-6 flex w-full items-center gap-3 rounded-2xl px-2 py-2 ring-1 ring-black/5 transition-colors hover:bg-background-tertiary dark:ring-0",
             compact ? "justify-center" : "",
           )}
           href={siteConfig.links.github}
@@ -193,21 +191,6 @@ export const Sidebar = ({
           </ExternalLink>
         </div>
       </div>
-
-      <Button
-        isIconOnly
-        aria-label={compact ? "展开侧栏" : "收起侧栏"}
-        className="absolute right-[-11px] top-24 z-20 hidden h-8 w-8 min-w-8 rounded-full border border-border bg-surface text-default-foreground shadow-none ring-1 ring-black/5 hover:bg-default dark:border-white/[0.08] dark:ring-0 dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.07)] md:flex"
-        size="sm"
-        variant="secondary"
-        onPress={onToggleCompact}
-      >
-        {compact ? (
-          <PanelLeft className="size-4" strokeWidth={1.75} />
-        ) : (
-          <LuChevronRightIcon className="rotate-180" size={14} />
-        )}
-      </Button>
     </aside>
   );
 };

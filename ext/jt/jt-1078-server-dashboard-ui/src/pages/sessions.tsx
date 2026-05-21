@@ -7,9 +7,6 @@ import { LoadingPanel } from "@/components/ui/loading-panel.tsx";
 import { usePageList } from "@/hooks/use-page-list.ts";
 import { Jt1078Session } from "@/types";
 
-const PAGE_TITLE = "媒体会话";
-const PAGE_DESCRIPTION = "当前 JT1078 流媒体连接会话列表";
-
 const columns = [
   { key: "id", label: "会话 ID", isRowHeader: true },
   { key: "convertedSim", label: "SIM" },
@@ -24,7 +21,7 @@ function renderSessionCell(item: Jt1078Session, columnKey: Key) {
   const cellValue = item[columnKey as keyof Jt1078Session];
 
   if (cellValue == null) {
-    return <span className="dashboard-table-cell-text">—</span>;
+    return <span className="line-clamp-1 text-sm text-muted">—</span>;
   }
 
   const text = String(cellValue);
@@ -32,7 +29,7 @@ function renderSessionCell(item: Jt1078Session, columnKey: Key) {
   return (
     <Tooltip>
       <Tooltip.Trigger>
-        <p className="dashboard-table-cell-text">{text}</p>
+        <p className="line-clamp-1 text-sm text-foreground">{text}</p>
       </Tooltip.Trigger>
       <Tooltip.Content>{text}</Tooltip.Content>
     </Tooltip>
@@ -44,21 +41,20 @@ export const SessionsPage = () => {
   const { setPage, page, pages, tableData, isLoading } =
     usePageList<Jt1078Session>(path, 10);
 
-  const loading =
-    isLoading && (tableData?.data?.length ?? 0) === 0;
+  const loading = isLoading && (tableData?.data?.length ?? 0) === 0;
   const items = tableData?.data ?? [];
   const total = tableData?.total ?? 0;
 
   if (loading) {
     return (
-      <PageSection description={PAGE_DESCRIPTION} title={PAGE_TITLE}>
+      <PageSection>
         <LoadingPanel />
       </PageSection>
     );
   }
 
   return (
-    <PageSection description={PAGE_DESCRIPTION} title={PAGE_TITLE}>
+    <PageSection>
       <DataTable
         ariaLabel="Sessions"
         columns={columns.map((c) => ({ ...c }))}

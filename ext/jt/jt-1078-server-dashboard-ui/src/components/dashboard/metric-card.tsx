@@ -1,11 +1,8 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
 import clsx from "clsx";
 
 import { CountNumber } from "@/components/dashboard/count-number.tsx";
-import {
-  DashboardCard,
-  DashboardCardBody,
-} from "@/components/ui/dashboard-card.tsx";
+import { DashboardCard, DashboardCardBody } from "@/components/ui/dashboard-card.tsx";
+import { TrendChip } from "@/components/ui/trend-chip.tsx";
 
 type Trend = {
   value: string;
@@ -19,6 +16,7 @@ type MetricCardProps = {
   className?: string;
 };
 
+/** Pro KPI：Revenue / Expenses / Sales / Profit */
 export function MetricCard({
   label,
   value,
@@ -28,28 +26,15 @@ export function MetricCard({
   const numericValue = typeof value === "number";
 
   return (
-    <DashboardCard className={clsx("min-h-[7.5rem]", className)}>
-      <DashboardCardBody>
+    <DashboardCard className={clsx(className)}>
+      <DashboardCardBody className="flex flex-col gap-3 p-6">
         <p className="text-sm font-medium text-muted">{label}</p>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-2">
-          <p className="dashboard-metric-value text-foreground">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground sm:text-3xl">
             {numericValue ? <CountNumber end={value} /> : value}
           </p>
           {trend ? (
-            <span
-              className={
-                trend.direction === "up"
-                  ? "dashboard-trend-up"
-                  : "dashboard-trend-down"
-              }
-            >
-              {trend.direction === "up" ? (
-                <ArrowUp className="size-3" strokeWidth={2.5} />
-              ) : (
-                <ArrowDown className="size-3" strokeWidth={2.5} />
-              )}
-              {trend.value}
-            </span>
+            <TrendChip direction={trend.direction} value={trend.value} />
           ) : null}
         </div>
       </DashboardCardBody>

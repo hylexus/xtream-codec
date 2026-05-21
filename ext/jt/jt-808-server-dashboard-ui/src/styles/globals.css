@@ -3,70 +3,27 @@
 
 @config "../../tailwind.config.js";
 
-/*
- * 深色模式：对齐参考图（纯黑侧栏 / zinc-950 主画布 / zinc-900 卡片块、弱线框 / #006FEE 主色）
- * 浅色模式：保留 HeroUI 默认变量，仅调整仪表盘布局类。
- */
+/* JT808 Dashboard — 默认 @heroui/styles 主题，与 jt-1078-server-dashboard-ui 一致 */
 @layer base {
   html {
     @apply antialiased;
   }
 
-  html.dark {
-    color-scheme: dark;
-
-    /* === 参考设计色板（与 Tailwind zinc / 主蓝对齐）=== */
-    --background: #000000;
-    --foreground: #ffffff;
-
-    --surface: #18181b;
-    --surface-foreground: #ffffff;
-    --surface-secondary: #161618;
-    --surface-tertiary: #27272a;
-
-    --overlay: #18181b;
-    --overlay-foreground: #ffffff;
-
-    --muted: #a1a1aa;
-
-    --scrollbar: #52525b;
-
-    --default: #27272a;
-    --default-foreground: #fafafa;
-
-    --field-background: #18181b;
-    --field-foreground: #fafafa;
-    --field-placeholder: var(--muted);
-    --field-border: rgb(255 255 255 / 0.07);
-
-    --segment: #27272a;
-    --segment-foreground: #fafafa;
-
-    /* 参考图：几乎无线框，用极低对比描边 + 分隔 */
-    --border: rgb(255 255 255 / 0.06);
-    --separator: rgb(255 255 255 / 0.05);
-
-    --accent: #006fee;
-    --accent-foreground: #ffffff;
-
-    --success: #10b981;
-    --success-foreground: #ffffff;
-
-    --warning: #f5a524;
-    --warning-foreground: #18181b;
-
-    --danger: #ef4444;
-    --danger-foreground: #ffffff;
-
-    --backdrop: rgba(0, 0, 0, 0.65);
-
-    --surface-shadow: none;
-    --field-shadow: none;
-    --overlay-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+  :root,
+  html:not(.dark),
+  .light,
+  [data-theme="light"] {
+    --chart-primary: var(--accent);
+    --chart-secondary: color-mix(in oklab, var(--accent) 55%, var(--background) 45%);
+    --chart-grid: var(--border);
   }
 
-  html:not(.dark) {
-    color-scheme: light;
+  html.dark,
+  .dark,
+  [data-theme="dark"] {
+    --chart-primary: var(--accent);
+    --chart-secondary: color-mix(in oklab, var(--accent) 72%, var(--foreground) 28%);
+    --chart-grid: var(--border);
   }
 
   body {
@@ -74,60 +31,57 @@
   }
 }
 
-/* 仪表盘布局：深色为扁平层次（参考图：黑 → zinc-950 → zinc-900，无重阴影） */
 @layer utilities {
-  /* 右侧主画布 */
-  .dashboard-main-column {
-    @apply relative z-10 min-h-0 flex-1 md:border-l md:border-border;
+  .dashboard-shell {
+    @apply flex h-dvh min-h-0 overflow-hidden bg-background text-foreground;
   }
 
-  html:not(.dark) .dashboard-main-column {
-    @apply md:bg-background/45 md:backdrop-blur-md;
-  }
-
-  html.dark .dashboard-main-column {
-    @apply md:border-transparent;
-    background-color: #09090b;
-  }
-
-  /* 侧栏：纯黑，深色下去掉明显竖线 */
   .dashboard-sidebar {
-    @apply border-r border-border bg-background;
+    @apply flex h-full shrink-0 flex-col border-r border-border bg-background;
   }
 
-  html.dark .dashboard-sidebar {
-    border-color: transparent;
-    background-color: #000000;
+  .dashboard-main {
+    @apply relative flex min-w-0 flex-1 flex-col border-border bg-background md:border-l;
   }
 
-  /*
-   * 仪表盘统计卡：参考图 — 无边框色块 + 极弱顶内高光，hover 仅略提亮底色
-   */
-  html.dark .dashboard-stat-card {
-    border-width: 0;
-    border-color: transparent;
-    background-color: #18181b;
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+  html.dark .dashboard-main {
+    @apply bg-background-secondary;
   }
 
-  html.dark .dashboard-stat-card:hover {
-    background-color: #1f1f23;
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.07);
+  .dashboard-page {
+    @apply flex flex-col gap-6;
   }
 
-  html:not(.dark) .dashboard-stat-card {
-    @apply border-0;
-    box-shadow:
-      0 1px 2px rgb(0 0 0 / 0.05),
-      inset 0 1px 0 0 rgb(255 255 255 / 0.7);
+  .dashboard-chart-grid-line {
+    stroke: var(--chart-grid);
   }
 
-  /* 导航激活：参考为 zinc-800 圆角药丸 + 白字，无 accent 竖条 */
-  .dashboard-nav-active {
-    @apply rounded-2xl bg-default text-default-foreground shadow-none ring-0;
+  .dashboard-chart-bar {
+    fill: var(--chart-primary);
   }
 
-  .dashboard-nav-active.compact-nav {
-    @apply rounded-2xl bg-default text-default-foreground shadow-none ring-0;
+  .dashboard-chart-line-primary {
+    stroke: var(--chart-primary);
+  }
+
+  .dashboard-chart-line-secondary {
+    stroke: var(--chart-secondary);
+  }
+
+  /* Pro 排版 utility（与 dashboard-typography.tsx 一致） */
+  .dashboard-label {
+    @apply text-sm font-medium text-muted;
+  }
+
+  .dashboard-value {
+    @apply text-2xl font-semibold tabular-nums tracking-tight text-foreground sm:text-3xl;
+  }
+
+  .dashboard-value-sm {
+    @apply text-lg font-semibold tabular-nums tracking-tight text-foreground;
+  }
+
+  .dashboard-meta {
+    @apply text-xs text-muted;
   }
 }

@@ -7,9 +7,6 @@ import { LoadingPanel } from "@/components/ui/loading-panel.tsx";
 import { usePageList } from "@/hooks/use-page-list.ts";
 import { Jt1078Subscriber } from "@/types";
 
-const PAGE_TITLE = "数据订阅";
-const PAGE_DESCRIPTION = "流媒体通道上的订阅方列表及元数据";
-
 const columns = [
   { key: "id", label: "ID", isRowHeader: true },
   { key: "convertedSim", label: "SIM" },
@@ -27,7 +24,7 @@ function renderSubscriberCell(item: Jt1078Subscriber, columnKey: Key) {
     return (
       <Tooltip>
         <Tooltip.Trigger>
-          <p className="dashboard-table-cell-text">
+          <p className="line-clamp-1 text-sm text-foreground">
             {JSON.stringify(cellValue)}
           </p>
         </Tooltip.Trigger>
@@ -41,11 +38,13 @@ function renderSubscriberCell(item: Jt1078Subscriber, columnKey: Key) {
   }
 
   if (cellValue == null) {
-    return <span className="dashboard-table-cell-text">—</span>;
+    return <span className="line-clamp-1 text-sm text-muted">—</span>;
   }
 
   return (
-    <span className="dashboard-table-cell-text">{String(cellValue)}</span>
+    <span className="line-clamp-1 text-sm text-foreground">
+      {String(cellValue)}
+    </span>
   );
 }
 
@@ -61,14 +60,14 @@ export const SubscribersPage = () => {
 
   if (loading) {
     return (
-      <PageSection description={PAGE_DESCRIPTION} title={PAGE_TITLE}>
+      <PageSection>
         <LoadingPanel />
       </PageSection>
     );
   }
 
   return (
-    <PageSection description={PAGE_DESCRIPTION} title={PAGE_TITLE}>
+    <PageSection>
       <DataTable
         ariaLabel="Subscribers"
         columns={columns.map((c) => ({ ...c }))}

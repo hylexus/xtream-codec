@@ -1,4 +1,9 @@
-import { LuGaugeIcon, LuDesktopIcon, LuTagsIcon } from "@/components/icons.tsx";
+import {
+  Download,
+  LayoutDashboard,
+  Radio,
+  Users,
+} from "lucide-react";
 
 export const siteConfig = {
   name: "Xtream Codec",
@@ -6,11 +11,12 @@ export const siteConfig = {
   user: {
     name: "管理员",
     role: "Admin",
+    email: "admin@example.com",
   },
   sidenav: [
-    { name: "仪表盘", href: "/dashboard", icon: LuGaugeIcon },
-    { name: "媒体会话", href: "/sessions", icon: LuDesktopIcon },
-    { name: "数据订阅", href: "/subscribers", icon: LuTagsIcon },
+    { name: "概览", href: "/dashboard", icon: LayoutDashboard },
+    { name: "媒体会话", href: "/sessions", icon: Radio },
+    { name: "数据订阅", href: "/subscribers", icon: Users },
   ],
   dashboardTabs: [
     { id: "overview", label: "概览" },
@@ -24,3 +30,7 @@ export const siteConfig = {
     sponsor: "https://github.com/hylexus/jt-framework",
   },
 };
+
+export const sidebarFooterLinks = [
+  { name: "下载报告", href: siteConfig.links.docs, icon: Download },
+];
