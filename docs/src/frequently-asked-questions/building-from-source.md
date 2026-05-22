@@ -7,7 +7,7 @@ article: false
 
 ::: info 提示
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.hylexus.xtream%22%20AND%20a:%22xtream-codec-core%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.hylexus.xtream/xtream-codec-core)
 
 一般情况下，你无需编译源码。直接使用已经发布到中央仓库的 **jar包** 即可(点击上面的图标链接查看最新版)。
 

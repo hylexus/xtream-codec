@@ -69,7 +69,7 @@ export function SessionsPreviewTable({
                   <Table.Row id={session.id}>
                     <Table.Cell>
                       <span className="font-mono text-sm text-muted">
-                        #{String(session.id).slice(0, 8)}
+                        #{String(session.id).slice(session.id.length - 8)}
                       </span>
                     </Table.Cell>
                     <Table.Cell>

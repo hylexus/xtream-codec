@@ -10,7 +10,7 @@ tag:
 ## 引入依赖
 
 最新版本请点击
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.hylexus.xtream%22%20AND%20a:%22xtream-codec-core%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.hylexus.xtream/xtream-codec-core.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.hylexus.xtream/xtream-codec-core)
 查看。
 
 ::: tabs#starter
@@ -22,7 +22,7 @@ tag:
 <dependency>
     <groupId>io.github.hylexus.xtream</groupId>
     <artifactId>xtream-codec-core</artifactId>
-    <version>0.5.0-rc.1</version>
+    <version>0.5.0-rc.2</version>
 </dependency>
 ```
 
@@ -30,7 +30,7 @@ tag:
 
 ```groovy
 
-api("io.github.hylexus.xtream:xtream-codec-core:0.5.0-rc.1")
+api("io.github.hylexus.xtream:xtream-codec-core:0.5.0-rc.2")
 ```
 
 :::

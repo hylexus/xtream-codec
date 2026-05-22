@@ -5,6 +5,22 @@ article: false
 
 # Latest
 
+## 0.5.0-rc.2(2026-05-22)
+
+### 🎯 Highlights
+
+`jt-808-server-dashboard-ui` 重构。感谢 [@dfEric](https://github.com/dfEric) 的贡献。
+
+### ⭐ New Features
+
+- [可观测性 #7](https://github.com/hylexus/xtream-codec/issues/7)
+- [核心代码去掉 Lombok #12](https://github.com/hylexus/xtream-codec/issues/12)
+
+### ❤️ Contributors
+
+- [@dfEric](https://github.com/dfEric)
+- [@hylexus](https://github.com/hylexus)
+
 ## 0.5.0-rc.1(2026-01-11)
 
 ### ⭐ New Features

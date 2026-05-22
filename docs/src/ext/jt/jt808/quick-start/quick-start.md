@@ -24,7 +24,7 @@ tag:
 引入为 **808协议** 提供的 `jt-808-server-spring-boot-starter-reactive`。
 
 最新版本请点击
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.hylexus.xtream/jt-808-server-spring-boot-starter-reactive.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.hylexus.xtream%22%20AND%20a:%22jt-808-server-spring-boot-starter-reactive%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.hylexus.xtream/jt-808-server-spring-boot-starter-reactive.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.hylexus.xtream/jt-808-server-spring-boot-starter-reactive)
 查看。
 
 ::: tabs#starter
@@ -36,7 +36,7 @@ tag:
 <dependency>
     <groupId>io.github.hylexus.xtream</groupId>
     <artifactId>jt-808-server-spring-boot-starter-reactive</artifactId>
-    <version>0.5.0-rc.1</version>
+    <version>0.5.0-rc.2</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ tag:
 
 ```groovy
 
-api("io.github.hylexus.xtream:jt-808-server-spring-boot-starter-reactive:0.5.0-rc.1")
+api("io.github.hylexus.xtream:jt-808-server-spring-boot-starter-reactive:0.5.0-rc.2")
 ```
 
 :::
