@@ -32,6 +32,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -50,18 +51,18 @@ public abstract class AbstractXtreamSessionManager<S extends XtreamSession> impl
     protected final AtomicLong tcpSessionCount = new AtomicLong(0);
     protected final AtomicLong udpSessionCount = new AtomicLong(0);
     protected final @Nullable XtreamIntervalChecker checker;
-    protected final Duration maxIdleTime;
+    protected final @Nullable Duration maxIdleTime;
     protected final Clock clock = Clock.system(ZoneId.of("Asia/Shanghai"));
     protected final Lock lock = new ReentrantLock();
     protected final List<XtreamSessionEventListener<S>> listenerList = new ArrayList<>();
 
     public AbstractXtreamSessionManager(
             boolean udpSessionIdleStateCheckerEnabled,
-            UdpSessionIdleStateCheckerProps checkerProps,
+            @Nullable UdpSessionIdleStateCheckerProps checkerProps,
             XtreamSessionIdGenerator idGenerator) {
 
         this.sessionIdGenerator = idGenerator;
-        if (udpSessionIdleStateCheckerEnabled) {
+        if (udpSessionIdleStateCheckerEnabled && checkerProps != null) {
             this.checker = new XtreamIntervalChecker(
                     "session-checker",
                     checkerProps.getCheckInterval(),
@@ -76,7 +77,7 @@ public abstract class AbstractXtreamSessionManager<S extends XtreamSession> impl
         } else {
             this.checker = null;
         }
-        this.maxIdleTime = checkerProps.getMaxIdleTime();
+        this.maxIdleTime = checkerProps != null ? checkerProps.getMaxIdleTime() : null;
     }
 
     @Override
@@ -117,7 +118,7 @@ public abstract class AbstractXtreamSessionManager<S extends XtreamSession> impl
     }
 
     protected boolean isExpired(S session, Instant now) {
-        return now.minus(this.maxIdleTime).isAfter(session.lastCommunicateTime());
+        return now.minus(Objects.requireNonNull(this.maxIdleTime)).isAfter(session.lastCommunicateTime());
     }
 
     @Override

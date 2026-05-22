@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - feature/debug_ui
     paths:
       - 'docs/**'
       - '.github/workflows/deploy-docs.yml'

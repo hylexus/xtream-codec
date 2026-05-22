@@ -21,10 +21,11 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamResponse;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSession;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionIdGenerator;
 import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.UdpSessionIdleStateCheckerProps;
+import org.jspecify.annotations.Nullable;
 
 public class DefaultXtreamSessionManager extends AbstractXtreamSessionManager<XtreamSession> {
 
-    public DefaultXtreamSessionManager(boolean udpSessionIdleStateCheckerEnabled, UdpSessionIdleStateCheckerProps udpSessionIdleStateCheckerProps, XtreamSessionIdGenerator idGenerator) {
+    public DefaultXtreamSessionManager(boolean udpSessionIdleStateCheckerEnabled, @Nullable UdpSessionIdleStateCheckerProps udpSessionIdleStateCheckerProps, XtreamSessionIdGenerator idGenerator) {
         super(udpSessionIdleStateCheckerEnabled, udpSessionIdleStateCheckerProps, idGenerator);
     }
 
