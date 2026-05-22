@@ -331,7 +331,7 @@ configure(subprojects) {
     }
 
     apply(plugin = "maven-publish")
-    val stagingRepositoryPath = xtreamConfig.centralPortalArtifactsTempDir
+    val stagingRepositoryPath = xtreamConfig.centralPortalArtifactsTempDir + "/${project.name}"
     if (isMavenPublications()) {
         if (xtreamConfig.centralPortalMavenRepoEnabled) {
             apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")

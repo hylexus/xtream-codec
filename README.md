@@ -90,6 +90,17 @@
         - [https://sample-videos.com/index.php#sample-flv-video](https://sample-videos.com/index.php#sample-flv-video)
         - ...
 
+## JT/T 808 QuickStart
+
+```shell
+# 支持 amd64 和 arm64 两种架构
+docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/jt-808-server-quick-start-with-dashboard:latest
+```
+
+启动后访问: [http://localhost:8888/dashboard-ui/](http://localhost:8888/dashboard-ui/) ，首页截图如下：
+
+![jt-808-docker-quickstart.png](docs/src/.vuepress/public/img/readme/jt-808-docker-quickstart.png)
+
 ## Roadmap / 版本路线图
 
 通过 [GitHub Milestones](https://github.com/hylexus/xtream-codec/milestones) 管理未来的版本计划
