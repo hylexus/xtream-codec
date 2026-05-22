@@ -4,13 +4,7 @@ import { ReactNode } from "react";
 
 const iconClass = "size-3.5 shrink-0";
 
-function ToolbarButton({
-  label,
-  icon,
-}: {
-  label: string;
-  icon: ReactNode;
-}) {
+function ToolbarButton({ label, icon }: { label: string; icon: ReactNode }) {
   return (
     <Button size="sm" variant="secondary">
       <span className="flex items-center gap-1.5">

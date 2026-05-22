@@ -1,5 +1,6 @@
-import { scaleBand } from "@visx/scale";
 import type { ScaleBand } from "@visx/vendor/d3-scale";
+
+import { scaleBand } from "@visx/scale";
 
 import {
   HISTORICAL_BAR_WIDTH,
@@ -118,10 +119,7 @@ export const shouldUseHistoricalScale = (
   );
 };
 
-const buildContinuousBandScale = (
-  domain: string[],
-  plotWidth: number,
-) => {
+const buildContinuousBandScale = (domain: string[], plotWidth: number) => {
   const scale = scaleBand<string>({
     domain,
     range: [0, plotWidth],
@@ -143,14 +141,9 @@ const buildSlotTimelineScale = (
 ): TimelineScaleConfig => {
   const windowMs = slotCount * SLOT_MS;
   const windowEndMs = windowStartMs + windowMs;
-  const plotWidth =
-    plotContainerWidth * (slotCount / LIVE_SLOT_COUNT);
+  const plotWidth = plotContainerWidth * (slotCount / LIVE_SLOT_COUNT);
   const scrollable = slotCount > LIVE_SLOT_COUNT;
-  const dataTimes = getOrderedTimesInWindow(
-    windowStartMs,
-    groups,
-    windowMs,
-  );
+  const dataTimes = getOrderedTimesInWindow(windowStartMs, groups, windowMs);
   const timeToIndex = new Map(dataTimes.map((t, i) => [t, i]));
   const slotWidth = plotWidth / slotCount;
   const axisScale = scaleBand<string>({
@@ -193,10 +186,7 @@ export const buildTimelineScale = (
   const allOrderedTimes = getOrderedDumpTimes(groups);
 
   if (!shouldUseHistoricalScale(windowStartMs, allOrderedTimes)) {
-    const slotCount = resolveTimelineSlotCount(
-      windowStartMs,
-      allOrderedTimes,
-    );
+    const slotCount = resolveTimelineSlotCount(windowStartMs, allOrderedTimes);
 
     return buildSlotTimelineScale(
       windowStartMs,

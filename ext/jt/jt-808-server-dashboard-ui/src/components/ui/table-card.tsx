@@ -28,7 +28,7 @@ export function TableCard({
   children,
 }: TableCardProps) {
   return (
-    <DashboardCard>
+    <DashboardCard className="flex h-full min-h-0 flex-col">
       <DashboardCardHeader
         actions={
           <div className="flex flex-wrap items-center gap-2">
@@ -47,6 +47,7 @@ export function TableCard({
             </div>
           </div>
         }
+        className="py-2.5"
         title={
           <span className="flex flex-wrap items-center gap-2">
             <span>{title}</span>
@@ -58,7 +59,9 @@ export function TableCard({
           </span>
         }
       />
-      <DashboardCardBody flush>{children}</DashboardCardBody>
+      <DashboardCardBody flush className="min-h-0 flex-1">
+        {children}
+      </DashboardCardBody>
       {footer ? <DashboardCardFooter>{footer}</DashboardCardFooter> : null}
     </DashboardCard>
   );

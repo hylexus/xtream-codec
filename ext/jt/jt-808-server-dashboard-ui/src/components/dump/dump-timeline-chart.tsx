@@ -80,9 +80,7 @@ const buildLayout = (
     });
   } else {
     const flatThreads = groups
-      .flatMap((group) =>
-        group.threads.map((thread) => ({ group, thread })),
-      )
+      .flatMap((group) => group.threads.map((thread) => ({ group, thread })))
       .sort((a, b) => {
         const g = a.group.name.localeCompare(b.group.name);
 
@@ -127,7 +125,9 @@ interface TimelineBarsProps {
     time: string,
     rightmostTime: string | undefined,
   ) => boolean;
-  getBarGeometry: (time: string) => import("./timeline-scale.ts").BarGeometry | null;
+  getBarGeometry: (
+    time: string,
+  ) => import("./timeline-scale.ts").BarGeometry | null;
   selectedDump: SelectedDumpContext | null;
   hoveredSegment: DumpBarSegment | null;
   onBarClick: (segment: DumpBarSegment) => void;
@@ -371,6 +371,7 @@ export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
                   plotContainerWidth,
                   timeline.plotWidth,
                 );
+
                 return (
                   <div
                     className={clsx(
@@ -409,8 +410,8 @@ export const DumpTimelineChart: FC<DumpTimelineChartProps> = ({
                         getBarGeometry={timeline.getBarGeometry}
                         hoveredSegment={hoveredSegment}
                         layout={layout}
-                        shouldAnimateEnter={shouldAnimateEnter}
                         selectedDump={selectedDump}
+                        shouldAnimateEnter={shouldAnimateEnter}
                         onBarClick={onBarClick}
                         onBarHover={onBarHover}
                       />

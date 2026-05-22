@@ -34,9 +34,6 @@ export function SessionsPreviewTable({
 }: SessionsPreviewTableProps) {
   return (
     <TableCard
-      searchPlaceholder="搜索会话..."
-      title="最近会话"
-      total={total}
       footer={
         <>
           <p className="text-sm text-muted">
@@ -50,6 +47,9 @@ export function SessionsPreviewTable({
           </Link>
         </>
       }
+      searchPlaceholder="搜索会话..."
+      title="最近会话"
+      total={total}
     >
       {loading ? (
         <LoadingPanel />

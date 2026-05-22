@@ -42,10 +42,6 @@ export function DataTable<T extends { id?: string }>({
 }: DataTableProps<T>) {
   return (
     <TableCard
-      searchPlaceholder={searchPlaceholder}
-      title={label}
-      total={total}
-      toolbar={toolbar}
       footer={
         <>
           <p className="text-sm text-muted">共 {total} 条</p>
@@ -54,6 +50,10 @@ export function DataTable<T extends { id?: string }>({
           ) : null}
         </>
       }
+      searchPlaceholder={searchPlaceholder}
+      title={label}
+      toolbar={toolbar}
+      total={total}
     >
       {loading && items.length === 0 ? (
         <LoadingPanel />

@@ -1,139 +1,137 @@
 import { ParentSize } from "@visx/responsive";
 import {
-  AnimatedGrid,
   AnimatedAxis,
+  AnimatedGrid,
   AnimatedLineSeries,
+  Tooltip,
   XYChart,
 } from "@visx/xychart";
-import { lightTheme, darkTheme, XYChartTheme, Tooltip } from "@visx/xychart";
-import { FC, useEffect, useState } from "react";
-import { useTheme } from "@heroui/react";
 import { curveLinear } from "@visx/curve";
+import { useTheme } from "@heroui/react";
+import { FC, useEffect, useMemo, useState } from "react";
 
-interface Threads {
+import {
+  dashboardXyThemeForMode,
+  resolveDashboardThemeMode,
+} from "@/components/dashboard/chart-theme.ts";
+
+type ThreadPoint = {
   date: string;
   started: number;
   peak: number;
   live: number;
   daemon: number;
-}
-
-export type XYChartProps = {
-  width: number;
-  height: number;
-  data: Threads[];
 };
 
-interface chartProps {
-  data: Threads;
+const SERIES = ["started", "peak", "live", "daemon"] as const;
+
+const CHART_MARGIN = { top: 8, right: 8, bottom: 24, left: 36 };
+
+type ThreadsChartsProps = {
+  data: ThreadPoint;
   maxLength?: number;
-}
-const getDate = (d: Threads) => d.date;
-
-export const LineCharts = ({ width, height, data }: XYChartProps) => {
-  const [theme, setTheme] = useState<XYChartTheme>(darkTheme);
-  const { theme: webTheme } = useTheme();
-
-  useEffect(() => {
-    if (webTheme === "light") {
-      setTheme(lightTheme);
-    } else {
-      setTheme(darkTheme);
-    }
-  }, [webTheme]);
-
-  const config = {
-    x: { type: "band", paddingInner: 0.3 } as const,
-    y: { type: "linear" } as const,
-  };
-
-  return (
-    <XYChart
-      captureEvents={true}
-      height={Math.min(400, height)}
-      theme={theme}
-      width={width}
-      xScale={config.x}
-      yScale={config.y}
-    >
-      <AnimatedGrid columns={false} numTicks={4} />
-      <AnimatedAxis orientation="bottom" tickFormat={getDate} />
-      <AnimatedAxis numTicks={4} orientation="left" />
-      <AnimatedLineSeries
-        curve={curveLinear}
-        data={data}
-        dataKey="started"
-        xAccessor={getDate}
-        yAccessor={(d) => d.started}
-      />
-      <AnimatedLineSeries
-        curve={curveLinear}
-        data={data}
-        dataKey="peak"
-        xAccessor={getDate}
-        yAccessor={(d) => d.peak}
-      />
-      <AnimatedLineSeries
-        curve={curveLinear}
-        data={data}
-        dataKey="live"
-        xAccessor={getDate}
-        yAccessor={(d) => d.live}
-      />
-      <AnimatedLineSeries
-        curve={curveLinear}
-        data={data}
-        dataKey="daemon"
-        xAccessor={getDate}
-        yAccessor={(d) => d.daemon}
-      />
-      <Tooltip
-        detectBounds
-        showDatumGlyph
-        showSeriesGlyphs
-        snapTooltipToDatumX
-        snapTooltipToDatumY
-        renderTooltip={({ tooltipData }) => {
-          const datum = tooltipData?.nearestDatum?.datum as Threads | undefined;
-          const seriesKey = tooltipData?.nearestDatum?.key as
-            | keyof Threads
-            | undefined;
-
-          return (
-            <div>
-              <div>{datum?.date}</div>
-              {seriesKey && datum && (
-                <div>
-                  <strong>{String(seriesKey)}</strong>{" "}
-                  {datum[seriesKey] as number}
-                </div>
-              )}
-            </div>
-          );
-        }}
-      />
-    </XYChart>
-  );
 };
 
-export const ThreadsCharts: FC<chartProps> = ({ data, maxLength = 20 }) => {
-  const [threads, setThreads] = useState<Threads[]>([]);
+export const ThreadsCharts: FC<ThreadsChartsProps> = ({
+  data,
+  maxLength = 20,
+}) => {
+  const { theme: webTheme } = useTheme();
+  const resolvedMode = resolveDashboardThemeMode(
+    typeof webTheme === "string" ? webTheme : undefined,
+  );
+  const [series, setSeries] = useState<ThreadPoint[]>([]);
+
+  const xyTheme = useMemo(
+    () => dashboardXyThemeForMode(typeof webTheme === "string" ? webTheme : undefined),
+    [webTheme],
+  );
+
+  const tickFill = resolvedMode === "light" ? "#52525b" : "#a1a1aa";
 
   useEffect(() => {
-    setThreads((pre) => {
-      if (pre.length > maxLength) {
-        pre.shift();
-      }
+    setSeries((prev) => {
+      const next = prev.length >= maxLength ? prev.slice(1) : prev;
 
-      return pre.concat([data]);
+      return [...next, data];
     });
   }, [data, maxLength]);
 
   return (
-    <ParentSize>
-      {({ width, height }) => (
-        <LineCharts data={threads} height={height} width={width} />
-      )}
-    </ParentSize>
+    <div className="h-full min-h-0 w-full">
+      <ParentSize debounceTime={10}>
+        {({ width, height }) => (
+          <XYChart
+            captureEvents
+            height={Math.max(height, 1)}
+            margin={CHART_MARGIN}
+            theme={xyTheme}
+            width={width}
+            xScale={{ type: "band", paddingInner: 0.35 }}
+            yScale={{ type: "linear" }}
+          >
+            <AnimatedGrid columns={false} numTicks={3} strokeDasharray="4 4" />
+            <AnimatedAxis
+              numTicks={4}
+              orientation="bottom"
+              tickFormat={(d) => String(d)}
+              tickLabelProps={() => ({
+                fill: tickFill,
+                fontSize: 10,
+                textAnchor: "middle",
+              })}
+            />
+            <AnimatedAxis
+              numTicks={3}
+              orientation="left"
+              tickLabelProps={() => ({
+                fill: tickFill,
+                fontSize: 10,
+                textAnchor: "end",
+              })}
+            />
+            {SERIES.map((key) => (
+              <AnimatedLineSeries
+                key={key}
+                curve={curveLinear}
+                data={series}
+                dataKey={key}
+                strokeWidth={2.5}
+                xAccessor={(d) => d.date}
+                yAccessor={(d) => d[key]}
+              />
+            ))}
+            <Tooltip
+              detectBounds
+              showDatumGlyph
+              showSeriesGlyphs
+              snapTooltipToDatumX
+              snapTooltipToDatumY
+              renderTooltip={({ tooltipData }) => {
+                const datum = tooltipData?.nearestDatum?.datum as
+                  | ThreadPoint
+                  | undefined;
+                const key = tooltipData?.nearestDatum?.key as
+                  | (typeof SERIES)[number]
+                  | undefined;
+
+                if (!datum || !key) {
+                  return null;
+                }
+
+                return (
+                  <div className="text-xs">
+                    <div>{datum.date}</div>
+                    <div>
+                      <strong>{key}</strong> {datum[key]}
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          </XYChart>
+        )}
+      </ParentSize>
+    </div>
   );
 };

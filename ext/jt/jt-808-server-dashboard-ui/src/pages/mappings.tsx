@@ -8,10 +8,10 @@ import {
   TextField,
   Tooltip,
 } from "@heroui/react";
-import { Segment } from "@/components/ui/segment.tsx";
 import { FC, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
+import { Segment } from "@/components/ui/segment.tsx";
 import { PageShell } from "@/components/ui/page-shell.tsx";
 import { request } from "@/utils/request.ts";
 
@@ -330,8 +330,7 @@ export const MappingsPage = () => {
         <Segment
           aria-label="分组方式"
           selectedKey={groupBy}
-          size="sm"
-          variant="ghost"
+          variant="default"
           onSelectionChange={(key) => setGroupBy(String(key))}
         >
           {GROUP_BY_OPTIONS.map((opt, index) => (

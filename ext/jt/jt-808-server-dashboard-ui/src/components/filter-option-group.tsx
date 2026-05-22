@@ -12,7 +12,7 @@ type FilterOptionGroupProps = {
   onChange: (key: string) => void;
 };
 
-/** 单选筛选：Segment 分段控件 */
+/** 单选筛选：Tabs 分段样式（Segment 封装） */
 export function FilterOptionGroup({
   label,
   value,
@@ -24,8 +24,7 @@ export function FilterOptionGroup({
       <span className="shrink-0 text-xs text-muted">{label}</span>
       <Segment
         selectedKey={value}
-        size="sm"
-        variant="ghost"
+        variant="default"
         onSelectionChange={(key) => onChange(String(key))}
       >
         {options.map((opt, index) => (

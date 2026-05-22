@@ -1,10 +1,10 @@
 import { PageSection } from "@/components/page-header.tsx";
-import { DumpGroup } from "@/components/dump/group.tsx";
+import { DumpView } from "@/components/dump/dump-view.tsx";
 
 export const DumpPage = () => {
   return (
     <PageSection>
-      <DumpGroup />
+      <DumpView />
     </PageSection>
   );
 };

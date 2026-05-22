@@ -2,23 +2,19 @@ import {
   EventSourceMessage,
   fetchEventSource,
 } from "@microsoft/fetch-event-source";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import { DumpViewMode, MAX_DUMPS_PER_THREAD } from "./constants.ts";
+import { DumpDetailDrawer } from "./dump-ui.tsx";
+import { DumpTimelineChart } from "./dump-timeline-chart.tsx";
+import { Dump, Group, SelectedDumpContext, ThreadDumpEntry } from "./types.ts";
+import { DumpBarSegment, collectThreadsAtDump } from "./utils.ts";
 
 import { Segment } from "@/components/ui/segment.tsx";
 
-import { DumpViewMode, MAX_DUMPS_PER_THREAD } from "./constants.ts";
-import { DumpDetailDrawer } from "./dump-detail-drawer.tsx";
-import { DumpTimelineChart } from "./dump-timeline-chart.tsx";
-import {
-  Dump,
-  Group,
-  SelectedDumpContext,
-  ThreadDumpEntry,
-} from "./types.ts";
-import { DumpBarSegment, collectThreadsAtDump } from "./utils.ts";
-
-export const DumpGroup = () => {
-  const windowStartMs = useRef(Date.now()).current;
+/** Thread Dump 页：SSE 订阅 + 时间轴 + 详情抽屉 */
+export function DumpView() {
+  const [windowStartMs] = useState(() => Date.now());
   const [groups, setGroups] = useState<Group[]>([]);
   const [viewMode, setViewMode] = useState<DumpViewMode>("grouped");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -180,13 +176,14 @@ export const DumpGroup = () => {
         <Segment
           aria-label="展示方式"
           selectedKey={viewMode}
-          size="sm"
-          variant="ghost"
+          variant="default"
           onSelectionChange={(key) => setViewMode(key as DumpViewMode)}
         >
           <Segment.Item id="grouped">分组</Segment.Item>
-          <Segment.Separator />
-          <Segment.Item id="flat">平铺</Segment.Item>
+          <Segment.Item id="flat">
+            <Segment.Separator />
+            平铺
+          </Segment.Item>
         </Segment>
         <span className="text-xs text-muted-foreground">
           {groups.length} 个分组 ·{" "}
@@ -216,4 +213,4 @@ export const DumpGroup = () => {
       />
     </div>
   );
-};
+}

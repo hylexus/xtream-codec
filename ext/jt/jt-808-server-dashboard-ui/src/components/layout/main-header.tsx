@@ -4,7 +4,7 @@ import { Bell, Menu, PanelLeft, Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 import { ExternalLink } from "@/components/external-link.tsx";
-import { DashboardGreeting } from "@/components/dashboard/greeting.tsx";
+import { DashboardGreeting } from "@/components/dashboard/dashboard-widgets.tsx";
 import { GiteeIcon, GithubIcon, LuHeatIcon } from "@/components/icons";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { metaForPath } from "@/config/routes.ts";
@@ -73,7 +73,13 @@ export function MainHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-        <Button isIconOnly aria-label="搜索" className="hidden sm:flex" size="sm" variant="ghost">
+        <Button
+          isIconOnly
+          aria-label="搜索"
+          className="hidden sm:flex"
+          size="sm"
+          variant="ghost"
+        >
           <Search className="size-[1.125rem] text-muted" strokeWidth={1.75} />
         </Button>
         <Button
@@ -100,7 +106,12 @@ export function MainHeader({
           <GiteeIcon className="size-5" />
         </ExternalLink>
         <ThemeSwitch />
-        <Button className="hidden sm:flex" size="sm" variant="primary" onPress={handleSponsor}>
+        <Button
+          className="hidden sm:flex"
+          size="sm"
+          variant="primary"
+          onPress={handleSponsor}
+        >
           <span className="flex items-center gap-1.5">
             <LuHeatIcon className="size-4" />
             赞助

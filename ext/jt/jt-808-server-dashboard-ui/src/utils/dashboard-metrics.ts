@@ -54,6 +54,22 @@ export const REQUEST_METRIC_KEYS = [
   },
 ] as const;
 
+export const CHANNEL_METRIC_ROWS = SESSION_METRIC_KEYS.map(
+  (session, index) => ({
+    session,
+    request: REQUEST_METRIC_KEYS[index],
+  }),
+);
+
+export function channelShortLabel(session: {
+  protocolType: string;
+  serverRole: string;
+}) {
+  const role = session.serverRole === "附件服务器" ? "附件" : "指令";
+
+  return `${session.protocolType} · ${role}`;
+}
+
 export function asMetricSlice(value: unknown): MetricSlice {
   if (value != null && typeof value === "object") {
     return value as MetricSlice;
@@ -96,8 +112,48 @@ export function subscriberTotal(metrics: Metrics): number {
   );
 }
 
-export function sessionBarValues(metrics: Metrics): number[] {
-  return SESSION_METRIC_KEYS.map(
-    (item) => sliceForKey(metrics, item.key).current ?? 0,
-  );
+export function threadLiveCount(metrics: Metrics): number | null {
+  const threads = metrics.threads;
+
+  if (threads == null || typeof threads !== "object") {
+    return null;
+  }
+
+  const live = (threads as { live?: number }).live;
+
+  return typeof live === "number" ? live : null;
+}
+
+export type TrafficChartPoint = {
+  date: string;
+  tcp: number;
+  udp: number;
+};
+
+/** 流量趋势图单帧：各协议活跃会话合计 */
+export function trafficChartPoint(
+  metrics: Metrics,
+  time: string,
+): TrafficChartPoint {
+  return {
+    date: time ? time.slice(11, 19) : "",
+    tcp: sumSessionCurrent(metrics, "TCP"),
+    udp: sumSessionCurrent(metrics, "UDP"),
+  };
+}
+
+export function threadChartPoint(metrics: Metrics, time: string) {
+  const empty = {
+    date: time.slice(11, 19),
+    started: 0,
+    peak: 0,
+    live: 0,
+    daemon: 0,
+  };
+
+  if (metrics.threads == null || typeof metrics.threads !== "object") {
+    return empty;
+  }
+
+  return { ...empty, ...metrics.threads };
 }

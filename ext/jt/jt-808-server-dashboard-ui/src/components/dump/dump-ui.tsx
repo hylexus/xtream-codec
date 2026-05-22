@@ -6,63 +6,97 @@ import {
   useOverlayState,
 } from "@heroui/react";
 import clsx from "clsx";
-import { FC, useEffect, useMemo, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
+
+import { THREAD_STATE_STYLES } from "./constants.ts";
+import { DumpInfo, SelectedDumpContext, StackFrame } from "./types.ts";
+import { formatDumpTimeLabel } from "./utils.ts";
 
 import { subtitle } from "@/components/primitives.ts";
 
-import { THREAD_STATE_STYLES } from "./constants.ts";
-import { StackTraceView } from "./stack-trace.tsx";
-import { DumpInfo, SelectedDumpContext } from "./types.ts";
-import { formatDumpTimeLabel } from "./utils.ts";
+const frameLocation = (frame: StackFrame) => {
+  if (frame.fileName != null) {
+    return `${frame.fileName}:${frame.lineNumber}`;
+  }
+  if (frame.nativeMethod) {
+    return "Native Method";
+  }
 
-const ThreadMeta: FC<{ dump: DumpInfo }> = ({ dump }) => (
-  <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-    <div>
-      <span className="text-muted">Thread ID: </span>
-      <span className="text-foreground">{dump.threadId}</span>
+  return "Unknown";
+};
+
+export function StackTraceView({ frames }: { frames: StackFrame[] }) {
+  return (
+    <div className="overflow-x-auto rounded-md border border-border bg-zinc-950 p-4 font-mono text-xs leading-relaxed">
+      {frames.map((frame, i) => {
+        const isNative = frame.nativeMethod;
+
+        return (
+          <div key={i} className={isNative ? "text-warning" : "text-zinc-300"}>
+            <span className="text-zinc-500">{"    at "}</span>
+            <span className="text-sky-400">{frame.className}</span>
+            <span className="text-zinc-500">.</span>
+            <span className="text-amber-200">{frame.methodName}</span>
+            <span className="text-zinc-500">({frameLocation(frame)})</span>
+            {isNative && (
+              <span className="ml-2 font-semibold text-warning">[native]</span>
+            )}
+          </div>
+        );
+      })}
     </div>
-    <div>
-      <span className="text-muted">Priority: </span>
-      <span className="text-foreground">{dump.priority}</span>
-    </div>
-    <div>
-      <span className="text-muted">Daemon: </span>
-      <span className="text-foreground">{dump.daemon ? "Yes" : "No"}</span>
-    </div>
-    <div>
-      <span className="text-muted">Blocked Count: </span>
-      <span className="text-foreground">{dump.blockedCount}</span>
-    </div>
-    <div>
-      <span className="text-muted">Blocked Time: </span>
-      <span className="text-foreground">{dump.blockedTime}</span>
-    </div>
-    <div>
-      <span className="text-muted">Waited Count: </span>
-      <span className="text-foreground">{dump.waitedCount}</span>
-    </div>
-    <div>
-      <span className="text-muted">Waited Time: </span>
-      <span className="text-foreground">{dump.waitedTime}</span>
-    </div>
-    {dump.lockName && (
-      <div className="col-span-2">
-        <span className="text-muted">Lock: </span>
-        <span className="text-foreground">{dump.lockName}</span>
+  );
+}
+
+function ThreadMeta({ dump }: { dump: DumpInfo }) {
+  return (
+    <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+      <div>
+        <span className="text-muted">Thread ID: </span>
+        <span className="text-foreground">{dump.threadId}</span>
       </div>
-    )}
-    {dump.lockOwnerName && (
-      <div className="col-span-2">
-        <span className="text-muted">Lock Owner: </span>
-        <span className="text-foreground">
-          {dump.lockOwnerName} (ID: {dump.lockOwnerId})
-        </span>
+      <div>
+        <span className="text-muted">Priority: </span>
+        <span className="text-foreground">{dump.priority}</span>
       </div>
-    )}
-  </div>
-);
+      <div>
+        <span className="text-muted">Daemon: </span>
+        <span className="text-foreground">{dump.daemon ? "Yes" : "No"}</span>
+      </div>
+      <div>
+        <span className="text-muted">Blocked Count: </span>
+        <span className="text-foreground">{dump.blockedCount}</span>
+      </div>
+      <div>
+        <span className="text-muted">Blocked Time: </span>
+        <span className="text-foreground">{dump.blockedTime}</span>
+      </div>
+      <div>
+        <span className="text-muted">Waited Count: </span>
+        <span className="text-foreground">{dump.waitedCount}</span>
+      </div>
+      <div>
+        <span className="text-muted">Waited Time: </span>
+        <span className="text-foreground">{dump.waitedTime}</span>
+      </div>
+      {dump.lockName && (
+        <div className="col-span-2">
+          <span className="text-muted">Lock: </span>
+          <span className="text-foreground">{dump.lockName}</span>
+        </div>
+      )}
+      {dump.lockOwnerName && (
+        <div className="col-span-2">
+          <span className="text-muted">Lock Owner: </span>
+          <span className="text-foreground">
+            {dump.lockOwnerName} (ID: {dump.lockOwnerId})
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export interface DumpDetailDrawerProps {
   context: SelectedDumpContext | null;
@@ -71,12 +105,12 @@ export interface DumpDetailDrawerProps {
   onThreadHover?: (threadName: string | null) => void;
 }
 
-export const DumpDetailDrawer: FC<DumpDetailDrawerProps> = ({
+export function DumpDetailDrawer({
   context,
   isOpen,
   onOpenChange,
   onThreadHover,
-}) => {
+}: DumpDetailDrawerProps) {
   const drawerState = useOverlayState({ isOpen, onOpenChange });
   const [activeThreadName, setActiveThreadName] = useState<string | null>(null);
 
@@ -96,9 +130,7 @@ export const DumpDetailDrawer: FC<DumpDetailDrawerProps> = ({
     );
   }, [context, activeThreadName]);
 
-  const stateStyle = context
-    ? THREAD_STATE_STYLES[context.threadState]
-    : null;
+  const stateStyle = context ? THREAD_STATE_STYLES[context.threadState] : null;
 
   return (
     <Drawer state={drawerState}>
@@ -165,14 +197,14 @@ export const DumpDetailDrawer: FC<DumpDetailDrawerProps> = ({
                                   : "text-muted-foreground hover:bg-background-tertiary hover:text-foreground",
                               )}
                               type="button"
+                              onClick={() =>
+                                setActiveThreadName(thread.threadName)
+                              }
                               onMouseEnter={() => {
                                 setActiveThreadName(thread.threadName);
                                 onThreadHover?.(thread.threadName);
                               }}
                               onMouseLeave={() => onThreadHover?.(null)}
-                              onClick={() =>
-                                setActiveThreadName(thread.threadName)
-                              }
                             >
                               <div className="truncate font-medium">
                                 {thread.threadName}
@@ -186,10 +218,7 @@ export const DumpDetailDrawer: FC<DumpDetailDrawerProps> = ({
                       })}
                     </ul>
                   </ScrollShadow>
-                  <ScrollShadow
-                    hideScrollBar
-                    className="min-w-0 flex-1 p-4"
-                  >
+                  <ScrollShadow hideScrollBar className="min-w-0 flex-1 p-4">
                     <div className="space-y-4">
                       <ThreadMeta dump={activeThread.dumpInfo} />
                       <div>
@@ -214,4 +243,4 @@ export const DumpDetailDrawer: FC<DumpDetailDrawerProps> = ({
       </Drawer.Backdrop>
     </Drawer>
   );
-};
+}

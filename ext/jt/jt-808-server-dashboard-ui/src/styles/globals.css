@@ -13,17 +13,29 @@
   html:not(.dark),
   .light,
   [data-theme="light"] {
-    --chart-primary: var(--accent);
-    --chart-secondary: color-mix(in oklab, var(--accent) 55%, var(--background) 45%);
-    --chart-grid: var(--border);
+    --dashboard-series-1: #006fee;
+    --dashboard-series-2: #17c964;
+    --dashboard-series-3: #f5a524;
+    --dashboard-series-4: #f31260;
+    --chart-grid: color-mix(in oklab, var(--border) 85%, transparent);
+    --chart-primary: var(--dashboard-series-1);
+    --chart-secondary: var(--dashboard-series-2);
+    --chart-area-primary: color-mix(in oklab, var(--dashboard-series-1) 22%, transparent);
+    --chart-area-secondary: color-mix(in oklab, var(--dashboard-series-2) 18%, transparent);
   }
 
   html.dark,
   .dark,
   [data-theme="dark"] {
-    --chart-primary: var(--accent);
-    --chart-secondary: color-mix(in oklab, var(--accent) 72%, var(--foreground) 28%);
-    --chart-grid: var(--border);
+    --dashboard-series-1: #338ef7;
+    --dashboard-series-2: #4ade80;
+    --dashboard-series-3: #fbbf24;
+    --dashboard-series-4: #fb7185;
+    --chart-grid: color-mix(in oklab, var(--border) 70%, transparent);
+    --chart-primary: var(--dashboard-series-1);
+    --chart-secondary: var(--dashboard-series-2);
+    --chart-area-primary: color-mix(in oklab, var(--dashboard-series-1) 28%, transparent);
+    --chart-area-secondary: color-mix(in oklab, var(--dashboard-series-2) 22%, transparent);
   }
 
   body {
@@ -49,7 +61,7 @@
   }
 
   .dashboard-page {
-    @apply flex flex-col gap-6;
+    @apply mx-auto flex w-full max-w-[1600px] flex-col gap-4;
   }
 
   .dashboard-chart-grid-line {
@@ -74,14 +86,30 @@
   }
 
   .dashboard-value {
-    @apply text-2xl font-semibold tabular-nums tracking-tight text-foreground sm:text-3xl;
+    @apply text-xl font-semibold tabular-nums leading-none tracking-tight text-foreground sm:text-2xl;
   }
 
   .dashboard-value-sm {
-    @apply text-lg font-semibold tabular-nums tracking-tight text-foreground;
+    @apply text-lg font-semibold tabular-nums tracking-tight text-foreground sm:text-xl;
   }
 
   .dashboard-meta {
     @apply text-xs text-muted;
+  }
+
+  .dashboard-meta-sm {
+    @apply text-sm text-muted;
+  }
+
+  /* Segment：按文案宽度撑开，避免 HeroUI tabs 默认 w-full 导致换行 */
+  .segment-control .tabs__list[data-orientation="horizontal"] {
+    width: auto;
+    max-width: none;
+  }
+
+  .segment-control .tabs__tab {
+    width: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 }

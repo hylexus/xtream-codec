@@ -66,9 +66,7 @@ export const ThreadsPage = () => {
                 time: {thread.time.slice(0, -4)}
               </p>
               {thread.remark && (
-                <p className="mb-2 text-sm text-muted">
-                  {thread.remark}
-                </p>
+                <p className="mb-2 text-sm text-muted">{thread.remark}</p>
               )}
               {thread.metadata && (
                 <JsonPreview json={thread.metadata} page="threads-metadata" />

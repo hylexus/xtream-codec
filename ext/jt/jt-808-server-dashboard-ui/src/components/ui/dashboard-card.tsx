@@ -12,7 +12,11 @@ export function DashboardCard({
   ...props
 }: DashboardCardProps) {
   return (
-    <Card className={clsx("h-full", className)} variant="default" {...props}>
+    <Card
+      className={clsx("h-full rounded-2xl shadow-sm", className)}
+      variant="default"
+      {...props}
+    >
       {children}
     </Card>
   );
@@ -36,7 +40,7 @@ export function DashboardCardHeader({
   return (
     <Card.Header
       className={clsx(
-        "flex flex-row flex-wrap items-center justify-between gap-3",
+        "flex flex-row flex-wrap items-center justify-between gap-2 px-5 py-3.5",
         className,
       )}
     >
@@ -50,7 +54,9 @@ export function DashboardCardHeader({
         {legend ? <div className="mt-2">{legend}</div> : null}
       </div>
       {actions ? (
-        <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {actions}
+        </div>
       ) : null}
     </Card.Header>
   );

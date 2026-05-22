@@ -1,8 +1,4 @@
-import {
-  Group,
-  SelectedDumpContext,
-  ThreadState,
-} from "./types.ts";
+import { Group, SelectedDumpContext, ThreadState } from "./types.ts";
 
 /** Backend: yyyy-MM-dd HH:mm:ss.SSS (GMT+8) */
 export const parseDumpTime = (time: string): number => {
@@ -38,9 +34,7 @@ export const getOrderedDumpTimes = (groups: Group[]): string[] => {
     });
   });
 
-  return Array.from(times).sort(
-    (a, b) => parseDumpTime(a) - parseDumpTime(b),
-  );
+  return Array.from(times).sort((a, b) => parseDumpTime(a) - parseDumpTime(b));
 };
 
 export const collectThreadsAtDump = (

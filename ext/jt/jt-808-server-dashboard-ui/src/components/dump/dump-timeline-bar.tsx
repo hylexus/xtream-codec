@@ -1,7 +1,7 @@
+import type { BarGeometry } from "./timeline-scale.ts";
+
 import { animated, useSpring } from "@react-spring/web";
 import { FC, KeyboardEvent, useEffect, useState } from "react";
-
-import type { BarGeometry } from "./timeline-scale.ts";
 
 const SPRING_CONFIG = { tension: 280, friction: 26 };
 
@@ -75,9 +75,7 @@ const BarRect: FC<BarRectProps> = ({
   />
 );
 
-const EnteringBar: FC<
-  DumpTimelineBarProps & { onEntered: () => void }
-> = ({
+const EnteringBar: FC<DumpTimelineBarProps & { onEntered: () => void }> = ({
   geom,
   barY,
   barHeight,
