@@ -46,7 +46,7 @@ open class XtreamCodecFrontendBuildExtension @Inject constructor(objects: Object
     /** 构建命令，可以自定义（默认 pnpm） */
     val buildCommand: Property<String> = objects.property(String::class.java).convention(
         """
-        |pnpm install --ignore-scripts=false
+        |pnpm install --ignore-scripts=false --only-built-dependencies=[]
         |pnpm run build --mode production
         """.trimMargin()
     )
