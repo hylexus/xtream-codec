@@ -18,7 +18,9 @@ package io.github.hylexus.xtream.debug.ext.jt1078.pubsub;
 
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Session;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078SessionEventListener;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 // @Component
 public class LocalDebugJt1078SessionEventListener implements Jt1078SessionEventListener {
 

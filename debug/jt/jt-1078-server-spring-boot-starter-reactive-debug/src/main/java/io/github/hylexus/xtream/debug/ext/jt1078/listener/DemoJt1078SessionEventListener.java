@@ -18,10 +18,12 @@ package io.github.hylexus.xtream.debug.ext.jt1078.listener;
 
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078Session;
 import io.github.hylexus.xtream.codec.ext.jt1078.spec.Jt1078SessionEventListener;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+@NullMarked
 @Component
 public class DemoJt1078SessionEventListener implements Jt1078SessionEventListener {
 

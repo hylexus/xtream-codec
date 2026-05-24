@@ -18,10 +18,12 @@ package io.github.hylexus.xtream.debug.ext.jt808.listener;
 
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionEventListener;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+@NullMarked
 @Component
 public class DemoJt808SessionEventListener implements Jt808SessionEventListener {
     private static final Logger log = LoggerFactory.getLogger(DemoJt808SessionEventListener.class);

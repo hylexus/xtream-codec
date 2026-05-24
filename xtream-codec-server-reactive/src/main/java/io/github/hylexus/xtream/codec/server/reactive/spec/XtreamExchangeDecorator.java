@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec;
 
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -31,10 +32,10 @@ import java.util.Map;
 public class XtreamExchangeDecorator implements XtreamExchange {
 
     protected final XtreamExchange delegate;
-    protected XtreamRequest request;
-    protected XtreamResponse response;
+    protected @Nullable XtreamRequest request;
+    protected @Nullable XtreamResponse response;
 
-    public XtreamExchangeDecorator(XtreamExchange delegate, XtreamRequest request, XtreamResponse response) {
+    public XtreamExchangeDecorator(XtreamExchange delegate, @Nullable XtreamRequest request, @Nullable XtreamResponse response) {
         this.delegate = delegate;
         this.request = request;
         this.response = response;

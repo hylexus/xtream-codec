@@ -20,8 +20,10 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.UdpXtreamFilter;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamExchange;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamFilterChain;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.NullMarked;
 import reactor.core.publisher.Mono;
 
+@NullMarked
 public class PackageDelimiterRemoverFilter implements UdpXtreamFilter {
 
     @Override
