@@ -26,14 +26,14 @@ dependencies {
         apiBom("xtream-codec-server-reactive")
         apiBom("jt-808-server-spring-boot-starter-reactive")
         apiBom("jt-808-server-dashboard-spring-boot-starter-reactive")
-        xtreamConfig.thirdpartyDependencies().forEach { dep->
+        xtreamConfig.thirdpartyDependencies().forEach { dep ->
             api($$"$${dep.name}:${$${dep.versionPropertyName}}")
         }
     }
 }
 
 val mavenRepoConfig = xtreamConfig.mavenRepoConfig
-val stagingRepositoryPath = xtreamConfig.centralPortalBomTempDir
+val stagingRepositoryPath = xtreamConfig.centralPortalBomTempDir + "/${project.name}"
 if (xtreamConfig.centralPortalMavenRepoEnabled) {
     apply(plugin = "io.gitee.pkmer.pkmerboot-central-publisher")
     // 延迟配置，在插件完全应用后再执行
