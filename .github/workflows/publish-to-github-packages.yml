@@ -96,6 +96,8 @@ jobs:
           GRADLE_CMD="$GRADLE_CMD -P xtream.maven.repo.github.enabled=true"
           GRADLE_CMD="$GRADLE_CMD -P xtream.frontend.build.jt-808-server-dashboard-ui.enabled=true"
           GRADLE_CMD="$GRADLE_CMD -P xtream.backend.build.checkstyle.enabled=true"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.backend.build.errorprone.enabled=true"
+          GRADLE_CMD="$GRADLE_CMD -P xtream.backend.build.license-checker.enabled=true"
 
           # 处理跳过测试
           if ${{ 

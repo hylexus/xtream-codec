@@ -46,4 +46,4 @@ jobs:
           cache-write-only: false
 
       - name: Build with Gradle Wrapper
-        run: ./gradlew clean build -P xtream.backend.build.checkstyle.enabled=true
+        run: ./gradlew clean build -P xtream.backend.build.checkstyle.enabled=true -P xtream.backend.build.errorprone.enabled=true -P xtream.backend.build.license-checker.enabled=true
