@@ -12,7 +12,7 @@ tag:
 
 ## 介绍 <Badge text="0.4.0" type="tip" vertical="top"/> <Badge text="Experimental" type="danger" vertical="top" />
 
-`TLV（Type-Length-Value）` 是一种广泛应用于二进制协议中的数据编码格式，常用于高效、灵活地序列化结构化数据。
+`TLV（Tag-Length-Value）` 是一种广泛应用于二进制协议中的数据编码格式，常用于高效、灵活地序列化结构化数据。
 
 从版本 <Badge text="0.4.0" type="tip" vertical="middle" /> 开始，**xtream-codec** 引入了对 `TLV` 类型的内置支持，
 允许开发者通过注解定义 `TLV` 格式的消息体。

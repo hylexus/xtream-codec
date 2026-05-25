@@ -29,7 +29,8 @@ public class RustStyleDebugEntity01Flatten {
     private int usernameLength;
 
     // 用户名 String, "UTF-8"
-    @Preset.RustStyle.str(lengthExpression = "getUsernameLength()")
+    // @Preset.RustStyle.str(lengthExpression = "getUsernameLength()")
+    @Preset.RustStyle.str(lengthExpressions = @Expression(spel = "getUsernameLength()",mvel = "self.getUsernameLength()",aviator = "self.usernameLength"))
     private String username;
 
     // 下一个字段(password)长度 无符号数 2字节
@@ -37,7 +38,8 @@ public class RustStyleDebugEntity01Flatten {
     private int passwordLength;
 
     // 密码 String, "GBK"
-    @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+    // @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+    @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpressions = @Expression(spel = "getPasswordLength()",mvel = "self.getPasswordLength()",aviator = "self.passwordLength"))
     private String password;
 
     // 生日 String[8], "yyyyMMdd", "UTF-8" 8字节

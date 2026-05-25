@@ -1,18 +1,17 @@
 @Setter
 @Getter
 @ToString
-public class RustStyleDebugEntity01Nested {
+// 这里使用了 prependLengthFieldType 和 prependLengthFieldLength 属性
+// 从而省略了 msgBodyLength, usernameLength 和 passwordLength
+public class RustStyleDebugEntity01NestedSimple {
 
     // 整个 Header 封装到一个实体类中
     @Preset.RustStyle.struct
     private Header header;
 
-    // 消息体长度 无符号数 2字节
-    @Preset.RustStyle.u16
-    private int msgBodyLength;
-
     // 整个 Body 封装到一个实体类中
-    @Preset.RustStyle.struct
+    // prependLengthFieldType: 前面自动添加一个u16(2字节)类型字段作为该字段的长度字段
+    @Preset.RustStyle.struct(prependLengthFieldLength = 2)
     private Body body;
 
     // 下面是 Header 和 Body 实体类的声明
@@ -35,25 +34,17 @@ public class RustStyleDebugEntity01Nested {
         private int msgType;
     }
 
-
     @Data
     public static class Body {
-        // 下一个字段长度 无符号数 2字节
-        @Preset.RustStyle.u16
-        private int usernameLength;
 
         // 用户名 String, "UTF-8"
-        // @Preset.RustStyle.str(lengthExpression = "getUsernameLength()")
-        @Preset.RustStyle.str(lengthExpressions = @Expression(spel = "getUsernameLength()", mvel = "self.getUsernameLength()", aviator = "self.usernameLength"))
+        // prependLengthFieldType: 前面自动添加一个u16类型字段作为该字段的长度字段
+        @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u16)
         private String username;
 
-        // 下一个字段长度 无符号数 2字节
-        @Preset.RustStyle.u16
-        private int passwordLength;
-
         // 密码 String, "GBK"
-        // @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
-        @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpressions = @Expression(spel = "getPasswordLength()", mvel = "self.getPasswordLength()", aviator = "self.passwordLength"))
+        // prependLengthFieldType: 前面自动添加一个u16类型(2字节)字段作为该字段的长度字段
+        @Preset.RustStyle.str(charset = XtreamConstants.CHARSET_NAME_GBK, prependLengthFieldLength = 2)
         private String password;
 
         // 生日 String[8], "yyyyMMdd", "UTF-8"

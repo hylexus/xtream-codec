@@ -5,18 +5,17 @@ article: false
 
 # 0x0200-位置信息汇报
 
-## 示例1 - Map
+## 示例1 - @XtreamMapField
 
-使用 `@XtreamFieldMapDescriptor` 来描述附加项。
+使用 `@XtreamMapField` 来解析附加项。为统一风格，内置了两个别名注解：
+
+- `@Preset.RustStyle.simple_map`
+- `@Preset.JtStyle.SimpleMap`
 
 ::: warning 提示
 
-不太推荐使用 `@XtreamFieldMapDescriptor`，因为：
-
-- 注解配置繁琐
-- 极其不方便调试
-
-推荐示例2 中的写法。
+- `@XtreamMapField` 注解的使用有点繁琐，不太方便调试
+- 如果需要调试，可以使用示例2 中的自定义 `FieldCodec` 的写法
 
 :::
 

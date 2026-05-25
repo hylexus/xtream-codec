@@ -66,6 +66,7 @@ public @interface XtreamField {
      * 反序列化时当前属性的长度。
      *
      * @see #lengthExpression()
+     * @see #lengthExpressions()
      */
     int length() default -1;
 
@@ -74,7 +75,17 @@ public @interface XtreamField {
      * <p>
      * 目前仅仅支持 <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL</a> 语法。
      *
+     * <h4>示例</h4>
+     * <pre>{@code
+     * @XtreamField(lengthExpression = "getUsernameLength()") // SpEL
+     * private String username;
+     * // 等价于
+     * @XtreamField(lengthExpressions = @Expression(spel = "getUsernameLength()", mvel = "", aviator = ""))
+     * private String username;
+     * }</pre>
+     *
      * @see #length()
+     * @see #lengthExpressions()
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
      */
     String lengthExpression() default "";
@@ -82,10 +93,27 @@ public @interface XtreamField {
     /**
      * 反序列化时当前属性的长度。当长度无法直接确定时，可以指定一个表达式来确定长度。
      * <p>
-     * 目前仅仅支持 <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL</a> 语法。
+     * 目前支持下面三种表达式：
+     * <ol>
+     *     <li><a href="https://docs.spring.io/spring-framework/reference/core/expressions.html">SpEL</a></li>
+     *     <li><a href="http://mvel.documentnode.com/">MVEL</a></li>
+     *     <li><a href="https://github.com/killme2008/aviatorscript">Aviator</a></li>
+     * </ol>
+     *
+     * <h4>示例</h4>
+     * <pre>{@code
+     * @XtreamField(lengthExpression = "getUsernameLength()") // SpEL
+     * private String username;
+     * // 等价于
+     * @XtreamField(lengthExpressions = @Expression(spel = "getUsernameLength()", mvel = "", aviator = ""))
+     * private String username;
+     * }</pre>
      *
      * @see #length()
+     * @see #lengthExpression()
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
+     * @see <a href="http://mvel.documentnode.com/">MVEL</a>
+     * @see <a href="https://github.com/killme2008/aviatorscript">Aviator</a>
      * @since 0.4.0
      */
     @ApiStatus.Experimental
@@ -182,6 +210,7 @@ public @interface XtreamField {
     /**
      * 当且仅当 {@code condition} 为 {@code true} 时，当前属性才会被序列化/反序列化。
      *
+     * @see #conditions()
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
      */
     String condition() default "";
@@ -189,6 +218,7 @@ public @interface XtreamField {
     /**
      * 当且仅当 {@code condition} 为 {@code true} 时，当前属性才会被序列化/反序列化。
      *
+     * @see #condition()
      * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html">SpEL 官方文档</a>
      * @since 0.4.0
      */

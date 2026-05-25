@@ -1,18 +1,17 @@
 @Setter
 @Getter
 @ToString
-public class JtStyleDebugEntity01Nested {
+// 这里使用了 prependLengthFieldType 和 prependLengthFieldLength 属性
+// 从而省略了 msgBodyLength, usernameLength 和 passwordLength
+public class JtStyleDebugEntity01NestedSimple {
 
     // 整个 Header 封装到一个实体类中
     @Preset.JtStyle.Object
     private Header header;
 
-    // 消息体长度 无符号数 2字节
-    @Preset.JtStyle.Word
-    private int msgBodyLength;
-
     // 整个 Body 封装到一个实体类中
-    @Preset.JtStyle.Object
+    // prependLengthFieldType: 前面自动添加一个u16(2字节)类型字段作为该字段的长度字段
+    @Preset.JtStyle.Object(prependLengthFieldLength = 2)
     private Body body;
 
     // 下面是 Header 和 Body 实体类的声明
@@ -35,25 +34,17 @@ public class JtStyleDebugEntity01Nested {
         private int msgType;
     }
 
-
     @Data
     public static class Body {
-        // 下一个字段长度 无符号数 2字节
-        @Preset.JtStyle.Word
-        private int usernameLength;
 
         // 用户名 String, "UTF-8"
-        // @Preset.JtStyle.Str(charset = "UTF-8", lengthExpression = "getUsernameLength()")
-        @Preset.JtStyle.Str(charset = "UTF-8", lengthExpressions = @Expression(spel = "getUsernameLength()", mvel = "self.getUsernameLength()", aviator = "self.usernameLength"))
+        // prependLengthFieldType: 前面自动添加一个u16类型字段作为该字段的长度字段
+        @Preset.JtStyle.Str(charset = "UTF-8", prependLengthFieldType = PrependLengthFieldType.u16)
         private String username;
 
-        // 下一个字段长度 无符号数 2字节
-        @Preset.JtStyle.Word
-        private int passwordLength;
-
         // 密码 String, "GBK"
-        // @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
-        @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpressions = @Expression(spel = "getPasswordLength()", mvel = "self.getPasswordLength()", aviator = "self.passwordLength"))
+        // prependLengthFieldType: 前面自动添加一个u16类型(2字节)字段作为该字段的长度字段
+        @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, prependLengthFieldLength = 2)
         private String password;
 
         // 生日 String[8], "yyyyMMdd", "UTF-8"

@@ -46,16 +46,10 @@ open class XtreamCodecFrontendBuildExtension @Inject constructor(objects: Object
     /** 构建命令，可以自定义（默认 pnpm） */
     val buildCommand: Property<String> = objects.property(String::class.java).convention(
         """
-        |pnpm install
+        |pnpm install --registry https://registry.npmmirror.com
         |pnpm run build --mode production
         """.trimMargin()
     )
-    // val buildCommand: Property<String> = objects.property(String::class.java).convention(
-    //     """
-    //     |pnpm install --registry https://registry.npmmirror.com
-    //     |pnpm run build --mode production
-    //     """.trimMargin()
-    // )
 
     /**
      * 自定义前端构建命令执行逻辑。

@@ -114,6 +114,8 @@ public class BuiltinMessage0200 {
             key = @Key(type = KeyType.u8),
             valueLength = @ValueLength(type = ValueLengthType.u8),
             value = @Value(
+                    // 位置汇报消息一般不会在服务端编码
+                    // 所以这个 encoder 可以删掉(编码时才需要, 解码时用 decoder 属性)
                     encoder = @ValueEncoder(
                             params = {@EncoderParam(charset = "GBK")},
                             matchers = {
@@ -157,6 +159,7 @@ public class BuiltinMessage0200 {
                                     @ValueMatcher(matchU8 = 0x66, valueEntity = LocationItem0x66.class, desc = "苏标: 胎压监测系统报警信息，定义见表 4-18"),
                                     @ValueMatcher(matchU8 = 0x67, valueEntity = LocationItem0x67.class, desc = "苏标: 盲区监测系统报警信息，定义见表 4-20"),
                             },
+                            // 其他未知的附加项 都解码为十六进制字符串
                             fallbackMatchers = {
                                     @FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
                             }

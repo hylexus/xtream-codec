@@ -26,9 +26,17 @@ tag:
 
 @[code](@src/core/entity-codec/demo01/RustStyleDebugEntity01Flatten.java)
 
+@tab:active Rust 命名风格(简化)#rust-style-simple
+
+@[code java{30,35}](@src/core/entity-codec/demo01/RustStyleDebugEntity01FlattenSimple.java)
+
 @tab 原始命名风格#raw-style
 
 @[code](@src/core/entity-codec/demo01/RawStyleDebugEntity01Flatten.java)
+
+@tab 原始命名风格(简化)#raw-style-simple
+
+@[code java{31,36}](@src/core/entity-codec/demo01/RawStyleDebugEntity01FlattenSimple.java)
 
 @tab JT/T 808 命名风格#jt-style
 
@@ -36,7 +44,7 @@ tag:
 
 @tab JT/T 808 命名风格(简化)#jt-style-simple
 
-@[code](@src/core/entity-codec/demo01/JtStyleDebugEntity01FlattenSimple.java)
+@[code java{31,36}](@src/core/entity-codec/demo01/JtStyleDebugEntity01FlattenSimple.java)
 
 :::
 

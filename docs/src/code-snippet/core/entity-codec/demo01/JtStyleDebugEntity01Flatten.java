@@ -5,7 +5,7 @@ public class JtStyleDebugEntity01Flatten {
     /// ///////////////////// header
     // 固定为 0x80901234
     @Preset.JtStyle.Dword
-    private int magicNumber = 0x80901234;
+    private long magicNumber = 0x80901234L;
 
     // 主版本号 无符号数 1字节
     @Preset.JtStyle.Byte
@@ -29,7 +29,8 @@ public class JtStyleDebugEntity01Flatten {
     private int usernameLength;
 
     // 用户名 String, "UTF-8"
-    @Preset.JtStyle.Str(charset = "UTF-8", lengthExpression = "getUsernameLength()")
+    // @Preset.JtStyle.Str(charset = "UTF-8", lengthExpression = "getUsernameLength()")
+    @Preset.JtStyle.Str(charset = "UTF-8", lengthExpressions = @Expression(spel = "getUsernameLength()",mvel = "self.getUsernameLength()",aviator = "self.usernameLength"))
     private String username;
 
     // 下一个字段长度 无符号数 2字节
@@ -37,7 +38,8 @@ public class JtStyleDebugEntity01Flatten {
     private int passwordLength;
 
     // 密码 String, "GBK"
-    @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+    // @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpression = "getPasswordLength()")
+    @Preset.JtStyle.Str(charset = XtreamConstants.CHARSET_NAME_GBK, lengthExpressions = @Expression(spel = "getPasswordLength()",mvel = "self.getPasswordLength()",aviator = "self.passwordLength"))
     private String password;
 
     // 生日 String[8], "yyyyMMdd", "UTF-8"
@@ -52,7 +54,7 @@ public class JtStyleDebugEntity01Flatten {
     @Preset.JtStyle.Word
     private int age;
 
-    // 状态 有符号数 2字节
+    // 状态 无符号数 2字节
     @Preset.JtStyle.Word
-    private short status;
+    private int status;
 }

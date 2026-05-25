@@ -26,13 +26,25 @@ tag:
 
 @[code](@src/core/entity-codec/demo01/RustStyleDebugEntity01Nested.java)
 
+@tab:active Rust 命名风格(简化)#rust-style-simple
+
+@[code java{14,42,47}](@src/core/entity-codec/demo01/RustStyleDebugEntity01NestedSimple.java)
+
 @tab 原始命名风格#raw-style
 
 @[code](@src/core/entity-codec/demo01/RawStyleDebugEntity01Nested.java)
 
+@tab 原始命名风格(简化)#raw-style-simple
+
+@[code java{14,42,47}](@src/core/entity-codec/demo01/RawStyleDebugEntity01NestedSimple.java)
+
 @tab JT/T 808 命名风格#jt-style
 
 @[code](@src/core/entity-codec/demo01/JtStyleDebugEntity01Nested.java)
+
+@tab JT/T 808 命名风格(简化)#jt-style-simple
+
+@[code java{14,42,47}](@src/core/entity-codec/demo01/JtStyleDebugEntity01NestedSimple.java)
 
 :::
 
