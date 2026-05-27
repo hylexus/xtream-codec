@@ -5,6 +5,12 @@ article: false
 
 # Latest
 
+## 0.5.0-rc.3(2026-05-27)
+
+### ⭐ New Features
+
+- 重构 `AbstractMapFieldCodec`
+
 ## 0.5.0-rc.2(2026-05-22)
 
 ### 🎯 Highlights
