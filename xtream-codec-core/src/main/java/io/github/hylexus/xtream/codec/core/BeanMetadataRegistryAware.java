@@ -16,8 +16,18 @@
 
 package io.github.hylexus.xtream.codec.core;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+
 public interface BeanMetadataRegistryAware {
 
-    void setBeanMetadataRegistry(int version, BeanMetadataRegistry registry);
+    void setBeanMetadataRegistry(BeanMetadataRegistry registry);
+
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated(since = "0.5.0-rc.3", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.0.0")
+    default void setBeanMetadataRegistry(@Nullable Integer version, BeanMetadataRegistry registry) {
+        this.setBeanMetadataRegistry(registry);
+    }
 
 }

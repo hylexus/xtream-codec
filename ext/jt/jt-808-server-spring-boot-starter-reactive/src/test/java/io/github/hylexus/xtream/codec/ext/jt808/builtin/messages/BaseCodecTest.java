@@ -119,9 +119,10 @@ public class BaseCodecTest {
             }
 
             assertion.accept(instance, decode, hexString);
+
+            assertEquals(1, buffer.refCnt());
         } finally {
             XtreamBytes.releaseBuf(buffer);
-            assertEquals(0, buffer.refCnt());
         }
     }
 

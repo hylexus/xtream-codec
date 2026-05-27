@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.tracker;
 
+import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.AbstractMapFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodecs;
@@ -26,6 +27,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.NullMarked;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -77,8 +79,18 @@ public class CodecDebugEntity02 {
     @Preset.JtStyle.Object(desc = "附加项列表", fieldCodec = LocationExtraItemFieldCodec.class)
     private Map<Short, Object> extraItems;
 
-    public static class LocationExtraItemFieldCodec extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec> {
-        public LocationExtraItemFieldCodec() {
+    @NullMarked
+    public static final class LocationExtraItemFieldCodec extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec> {
+
+        @FieldCodecCreator
+        public LocationExtraItemFieldCodec(BeanMetadataRegistry registry, int version) {
+            super(registry, version);
+        }
+
+        @Override
+        protected void initValueCodec(int version, BeanMetadataRegistry registry) {
+            this.registerValueFieldCodec((short) 0x01, U32FieldCodecs.LONG_INSTANCE);
+            this.registerValueFieldCodec((short) 0x02, U16FieldCodecs.INTEGER_INSTANCE);
         }
 
         @Override
@@ -89,15 +101,6 @@ public class CodecDebugEntity02 {
         @Override
         protected U8FieldCodecs.U8FieldCodec getValueLengthFieldCodec() {
             return U8FieldCodecs.SHORT_INSTANCE;
-        }
-
-        @Override
-        protected FieldCodec<?> getValueFieldCodec(Short key) {
-            return switch (key) {
-                case 0x01 -> U32FieldCodecs.LONG_INSTANCE;
-                case 0x02 -> U16FieldCodecs.INTEGER_INSTANCE;
-                default -> throw new UnsupportedOperationException();
-            };
         }
 
     }

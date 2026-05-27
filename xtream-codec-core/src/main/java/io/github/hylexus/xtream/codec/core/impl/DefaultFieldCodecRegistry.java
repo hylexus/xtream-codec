@@ -21,7 +21,6 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
-import io.github.hylexus.xtream.codec.core.BeanMetadataRegistryAware;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.NumberEndian;
@@ -396,14 +395,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
             }
 
             Objects.requireNonNull(beanMetadataRegistry);
-            final FieldCodec<?> newInstance = BeanUtils.createFieldCodecInstance(codecClass, beanMetadataRegistry, version);
-            if (newInstance instanceof BeanMetadataRegistryAware registryAware) {
-                registryAware.setBeanMetadataRegistry(version, beanMetadataRegistry);
-            }
-            if (newInstance instanceof FieldCodecRegistryAware aware) {
-                aware.setFieldCodecRegistry(this);
-            }
-            return newInstance;
+            return BeanUtils.createFieldCodecInstance(codecClass, beanMetadataRegistry, version);
         }
 
         if (targetEntityClass != null && !(Objects.equals(Object.class, targetEntityClass))) {

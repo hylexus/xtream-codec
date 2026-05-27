@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.impl.codec;
 import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
@@ -44,7 +45,15 @@ public class EntityFieldCodec<E> implements FieldCodec<Object> {
     protected final BeanMetadata beanMetadata;
 
     public EntityFieldCodec(int version, BeanMetadataRegistry registry, Class<E> entityClass) {
+        if (XtreamTypes.isBasicType(entityClass)) {
+            // 不支持基础数据类型，只支持实体类
+            throw new IllegalArgumentException("`entityClass` must be a entity class");
+        }
         this.beanMetadata = registry.getBeanMetadata(entityClass, version);
+    }
+
+    public EntityFieldCodec(BeanMetadata beanMetadata) {
+        this.beanMetadata = beanMetadata;
     }
 
     @Override

@@ -16,10 +16,14 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
+import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
+import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
+import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.tracker.*;
+import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.jspecify.annotations.Nullable;
@@ -39,11 +43,59 @@ public abstract class AbstractMapFieldCodec<
         VLFC extends IntegralFieldCodec
         > implements FieldCodec<Object> {
 
+    protected final BeanMetadataRegistry registry;
+    protected final Map<K, FieldCodec<?>> keyFieldCodecInstances;
+
+    @FieldCodecCreator
+    public AbstractMapFieldCodec(BeanMetadataRegistry registry, int version) {
+        this.registry = registry;
+        this.keyFieldCodecInstances = new LinkedHashMap<>();
+        this.initValueCodec(version, registry);
+    }
+
+    /**
+     * @see #registerValueFieldCodec(Object, FieldCodec)
+     * @see #registerValueFieldCodec(int, Object, Class)
+     */
+    protected abstract void initValueCodec(int version, BeanMetadataRegistry registry);
+
+    public void registerValueFieldCodec(K key, FieldCodec<?> fieldCodec) {
+        this.keyFieldCodecInstances.put(key, fieldCodec);
+    }
+
+    public void registerValueFieldCodec(int version, K key, Class<?> cls) {
+        final FieldCodec<?> newInstance;
+        if (FieldCodec.class.isAssignableFrom(cls)) {
+            if (!CustomFieldCodec.class.isAssignableFrom(cls)) {
+                throw new IllegalArgumentException("cls must be a subclass of CustomFieldCodec");
+            }
+            newInstance = BeanUtils.createFieldCodecInstance(cls, registry, version);
+        } else {
+            if (XtreamTypes.isBasicType(cls)) {
+                // 不支持基础数据类型，只支持实体类
+                throw new IllegalArgumentException("cls must be a entity class");
+            }
+            final BeanMetadata beanMetadata = registry.getBeanMetadata(cls, version);
+            newInstance = new EntityFieldCodec(beanMetadata);
+        }
+        this.keyFieldCodecInstances.put(key, newInstance);
+    }
+
     protected abstract FieldCodec getKeyFieldCodec();
 
     protected abstract VLFC getValueLengthFieldCodec();
 
-    protected abstract FieldCodec getValueFieldCodec(K key);
+    protected FieldCodec getValueFieldCodec(K key) {
+        final FieldCodec<?> fieldCodec = this.keyFieldCodecInstances.get(key);
+        if (fieldCodec == null) {
+            if (key instanceof Number number) {
+                throw new UnsupportedOperationException("Unsupported key: " + key + "(0x" + FormatUtils.toHexString(number.longValue(), 2) + ")");
+            } else {
+                throw new UnsupportedOperationException("Unsupported key: " + key);
+            }
+        }
+        return fieldCodec;
+    }
 
     @Override
     public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {

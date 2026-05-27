@@ -17,10 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
-import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.AlarmIdentifier;
-import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x64;
-import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x12;
-import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x13;
+import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.*;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +31,83 @@ class BuiltinMessage0200Sample2Test extends BaseCodecTest {
     final LocalDateTime time = LocalDateTime.of(2014, 10, 21, 19, 51, 9);
 
     @Test
-    void testEncode() {
+    void test() {
+        codec(Jt808ProtocolVersion.VERSION_2011, terminalId2011, createEntity(), (expected, actual, hexString) -> {
+            doCompare(expected, actual);
+        }, false);
+
+        codec(Jt808ProtocolVersion.VERSION_2013, terminalId2013, createEntity(), (expected, actual, hexString) -> {
+            doCompare(expected, actual);
+        }, false);
+
+        codec(Jt808ProtocolVersion.VERSION_2019, terminalId2019, createEntity(), (expected, actual, hexString) -> {
+            doCompare(expected, actual);
+        }, true);
+    }
+
+    private static void doCompare(BuiltinMessage0200Sample2 expected, BuiltinMessage0200Sample2 actual) {
+        assertEquals(expected.getAlarmFlag(), actual.getAlarmFlag());
+        assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(expected.getLatitude(), actual.getLatitude());
+        assertEquals(expected.getLongitude(), actual.getLongitude());
+        assertEquals(expected.getAltitude(), actual.getAltitude());
+        assertEquals(expected.getSpeed(), actual.getSpeed());
+        assertEquals(expected.getDirection(), actual.getDirection());
+        assertEquals(expected.getTime(), actual.getTime());
+        final Map<Short, Object> expectedExtraItems = expected.getExtraItems();
+        final Map<Short, Object> actualExtraItems = actual.getExtraItems();
+        assertEquals(expectedExtraItems.size(), actualExtraItems.size());
+        for (Map.Entry<Short, Object> entry : expectedExtraItems.entrySet()) {
+            final Short key = entry.getKey();
+            switch (key) {
+                case 0x12 -> {
+                    final LocationItem0x12 e = (LocationItem0x12) entry.getValue();
+                    final LocationItem0x12 a = (LocationItem0x12) actualExtraItems.get(key);
+                    assertEquals(e.getLocationType(), a.getLocationType());
+                    assertEquals(e.getAreaId(), a.getAreaId());
+                    assertEquals(e.getDirection(), a.getDirection());
+                }
+                case 0x13 -> {
+                    final LocationItem0x13 e = (LocationItem0x13) entry.getValue();
+                    final LocationItem0x13 a = (LocationItem0x13) actualExtraItems.get(key);
+                    assertEquals(e.getLineId(), a.getLineId());
+                    assertEquals(e.getLineDrivenTime(), a.getLineDrivenTime());
+                    assertEquals(e.getResult(), a.getResult());
+                }
+                case 0x64 -> {
+                    final LocationItem0x64 e = (LocationItem0x64) entry.getValue();
+                    final LocationItem0x64 a = (LocationItem0x64) actualExtraItems.get(key);
+                    doCompareItem64(e, a);
+                }
+                default -> assertEquals(entry.getValue(), actualExtraItems.get(key));
+            }
+        }
+    }
+
+    private static void doCompareItem64(LocationItem0x64 e, LocationItem0x64 a) {
+        assertEquals(e.getAlarmId(), a.getAlarmId());
+        assertEquals(e.getStatus(), a.getStatus());
+        assertEquals(e.getAlarmType(), a.getAlarmType());
+        assertEquals(e.getAlarmLevel(), a.getAlarmLevel());
+        assertEquals(e.getSpeedOfFrontObject(), a.getSpeedOfFrontObject());
+        assertEquals(e.getDistanceToFrontObject(), a.getDistanceToFrontObject());
+        assertEquals(e.getDeviationType(), a.getDeviationType());
+        assertEquals(e.getRoadSignType(), a.getRoadSignType());
+        assertEquals(e.getRoadSignData(), a.getRoadSignData());
+        assertEquals(e.getSpeed(), a.getSpeed());
+        assertEquals(e.getHeight(), a.getHeight());
+        assertEquals(e.getLatitude(), a.getLatitude());
+        assertEquals(e.getLongitude(), a.getLongitude());
+        assertEquals(e.getDatetime(), a.getDatetime());
+        assertEquals(e.getVehicleStatus(), a.getVehicleStatus());
+        assertEquals(e.getAlarmIdentifier().getTerminalId(), a.getAlarmIdentifier().getTerminalId());
+        assertEquals(e.getAlarmIdentifier().getTime(), a.getAlarmIdentifier().getTime());
+        assertEquals(e.getAlarmIdentifier().getSequence(), a.getAlarmIdentifier().getSequence());
+        assertEquals(e.getAlarmIdentifier().getAttachmentCount(), a.getAlarmIdentifier().getAttachmentCount());
+        assertEquals(e.getAlarmIdentifier().getReserved(), a.getAlarmIdentifier().getReserved());
+    }
+
+    private BuiltinMessage0200Sample2 createEntity() {
         final BuiltinMessage0200Sample2 entity = new BuiltinMessage0200Sample2();
         entity.setAlarmFlag(123L);
         entity.setStatus(222);
@@ -50,6 +123,7 @@ class BuiltinMessage0200Sample2Test extends BaseCodecTest {
         extraItems.put((short) 0x02, 222);
         extraItems.put((short) 0x03, 666);
         extraItems.put((short) 0x04, 333);
+        extraItems.put((short) 0x11, new LocationItem0x11((short) 1, 666L));
         extraItems.put((short) 0x25, 777L);
         extraItems.put((short) 0x30, (short) 33);
         extraItems.put((short) 0x12, new LocationItem0x12().setLocationType((short) 1).setAreaId(0).setDirection((short) 1));
@@ -80,53 +154,7 @@ class BuiltinMessage0200Sample2Test extends BaseCodecTest {
                 )
         );
         entity.setExtraItems(extraItems);
-
-        final String hex = encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019, 0x0200);
-        assertEquals("7e0200407c010000000001391234432900000000007b000000de01d907f2073d336c029a004e000014102119510901040000006f020200de0302029a0402014d2504000003093001211206010000000001130700000001000000310137642f000000dedf6f03420b0c0d0e0f04d201d907f2073d336c1410211951090001313233343536371410211951090101008e7e", hex);
+        return entity;
     }
 
-    @Test
-    void testDecode() {
-        final BuiltinMessage0200Sample2 entity = decodeAsEntity(BuiltinMessage0200Sample2.class, "0200407c010000000001391234432900000000007b000000de01d907f2073d336c029a004e000014102119510901040000006f020200de0302029a0402014d2504000003093001211206010000000001130700000001000000310137642f000000dedf6f03420b0c0d0e0f04d201d907f2073d336c1410211951090001313233343536371410211951090101008e");
-
-        assertEquals(123L, entity.getAlarmFlag());
-        assertEquals(222, entity.getStatus());
-        assertEquals(31000562, entity.getLatitude());
-        assertEquals(121451372, entity.getLongitude());
-        assertEquals(666, entity.getAltitude());
-        assertEquals(78, entity.getSpeed());
-        assertEquals(0, entity.getDirection());
-        assertEquals(time, entity.getTime());
-
-        final Map<Short, Object> extraItems = entity.getExtraItems();
-        assertEquals(111L, extraItems.get((short) 0x01));
-        assertEquals(222, extraItems.get((short) 0x02));
-        assertEquals(666, extraItems.get((short) 0x03));
-        assertEquals(333, extraItems.get((short) 0x04));
-        assertEquals(777L, extraItems.get((short) 0x25));
-        assertEquals((short) 33, extraItems.get((short) 0x30));
-        assertEquals((short) 55, extraItems.get((short) 0x31));
-
-        final LocationItem0x64 item64 = (LocationItem0x64) extraItems.get((short) 0x64);
-        assertEquals(222L, item64.getAlarmId());
-        assertEquals((short) 223, item64.getStatus());
-        assertEquals((short) 111, item64.getAlarmType());
-        assertEquals((short) 3, item64.getAlarmLevel());
-        assertEquals((short) 66, item64.getSpeedOfFrontObject());
-        assertEquals((short) 11, item64.getDistanceToFrontObject());
-        assertEquals((short) 12, item64.getDeviationType());
-        assertEquals((short) 13, item64.getRoadSignType());
-        assertEquals((short) 14, item64.getRoadSignData());
-        assertEquals((short) 15, item64.getSpeed());
-        assertEquals(1234, item64.getHeight());
-        assertEquals(31000562L, item64.getLatitude());
-        assertEquals(121451372L, item64.getLongitude());
-        assertEquals(time, item64.getDatetime());
-        assertEquals(1, item64.getVehicleStatus());
-        assertEquals("1234567", item64.getAlarmIdentifier().getTerminalId());
-        assertEquals(time, item64.getAlarmIdentifier().getTime());
-        assertEquals((short) 1, item64.getAlarmIdentifier().getSequence());
-        assertEquals((short) 1, item64.getAlarmIdentifier().getAttachmentCount());
-        assertEquals((short) 0, item64.getAlarmIdentifier().getReserved());
-    }
 }

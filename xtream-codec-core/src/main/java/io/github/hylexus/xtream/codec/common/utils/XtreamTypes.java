@@ -32,9 +32,6 @@ public class XtreamTypes {
     static final Map<Class<?>, Integer> NUMBER_SIZE_MAPPING = new HashMap<>();
     static final Map<Class<?>, Integer> BASIC_SIZE_MAPPING = new HashMap<>();
 
-    static final Set<Class<?>> NUMBER_TYPES = Collections.unmodifiableSet(NUMBER_SIZE_MAPPING.keySet());
-    static final Set<Class<?>> BASIC_TYPES = Collections.unmodifiableSet(BASIC_SIZE_MAPPING.keySet());
-
     static {
         NUMBER_SIZE_MAPPING.put(byte.class, 1);
         NUMBER_SIZE_MAPPING.put(Byte.class, 1);
@@ -74,6 +71,9 @@ public class XtreamTypes {
         BASIC_SIZE_MAPPING.put(DwordWrapper.class, -1);
         BASIC_SIZE_MAPPING.put(WordWrapper.class, -1);
     }
+
+    static final Set<Class<?>> NUMBER_TYPES = Collections.unmodifiableSet(NUMBER_SIZE_MAPPING.keySet());
+    static final Set<Class<?>> BASIC_TYPES = Collections.unmodifiableSet(BASIC_SIZE_MAPPING.keySet());
 
     public static boolean isNumberType(Class<?> targetType) {
         return NUMBER_TYPES.contains(targetType);

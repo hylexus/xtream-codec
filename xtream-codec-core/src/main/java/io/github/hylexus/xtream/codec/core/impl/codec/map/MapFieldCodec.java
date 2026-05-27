@@ -55,7 +55,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
     }
 
     /**
-     * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry, int)
+     * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry, Integer)
      */
     @SuppressWarnings("unused")
     @FieldCodecCreator
