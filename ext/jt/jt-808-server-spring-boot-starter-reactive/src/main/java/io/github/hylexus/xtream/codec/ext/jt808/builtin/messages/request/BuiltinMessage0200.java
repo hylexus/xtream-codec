@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x64;

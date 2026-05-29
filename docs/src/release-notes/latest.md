@@ -21,6 +21,9 @@ article: false
 - `XtreamMapField.Key`
     - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.Key`
     - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.Key` 替代
+- `XtreamMapField.ValueLength`
+    - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.ValueLength`
+    - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength` 替代
 
 ## 0.5.0-rc.3(2026-05-27)
 

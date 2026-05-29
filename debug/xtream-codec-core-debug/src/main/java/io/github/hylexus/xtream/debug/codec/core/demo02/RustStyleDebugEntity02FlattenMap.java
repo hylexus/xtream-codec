@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodecs;
@@ -107,7 +108,7 @@ public class RustStyleDebugEntity02FlattenMap {
             // key: u8 类型(1字节) 1~255 用 short 避免溢出
             key = @Key(type = KeyType.u8),
             // key 的长度字段: u8 类型(1字节)
-            valueLength = @XtreamMapField.ValueLength(type = LengthFieldType.u8),
+            valueLength = @ValueLength(type = LengthFieldType.u8),
             // value: 根据 key 的值来决定类型
             value = @XtreamMapField.Value(
                     encoder = @XtreamMapField.ValueEncoder(

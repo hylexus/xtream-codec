@@ -21,7 +21,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
-import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.map.MapFieldCodec;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
@@ -71,15 +71,6 @@ public @interface XtreamMapField {
 
     @AliasFor(annotation = XtreamField.class, attribute = "desc")
     String desc() default "";
-
-    @interface ValueLength {
-        int[] version() default {ALL_VERSION};
-
-        /**
-         * 用来描述 {@link java.util.Map} 中 {@code Value} 的长度的类型
-         */
-        LengthFieldType type();
-    }
 
     @interface Value {
         ValueEncoder encoder() default @ValueEncoder();

@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
@@ -392,14 +393,14 @@ public class SimpleMapMetadataRegistry {
     }
 
     private static ValueLengthMeta createValueLengthMeta(int targetVersion, XtreamMapField xtreamMapField) {
-        final VersionMatchResult<XtreamMapField.ValueLength> matchResult = matchVersion(
+        final VersionMatchResult<ValueLength> matchResult = matchVersion(
                 targetVersion,
                 Arrays.stream(xtreamMapField.valueLength()).map(it -> new HasVersions<>(it.version(), it)),
                 HasVersion::data);
 
         log.debug("ValueLength: targetVersion={}, {}", targetVersion, matchResult);
         if (matchResult.matched()) {
-            final XtreamMapField.ValueLength valueLengthType = matchResult.source();
+            final ValueLength valueLengthType = matchResult.source();
             return new ValueLengthMeta(targetVersion, valueLengthType.type());
         }
         throw new IllegalArgumentException("No value length type found for target version " + targetVersion);
