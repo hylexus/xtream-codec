@@ -19,11 +19,13 @@ package io.github.hylexus.xtream.debug.codec.core.democustomannotation;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.NullMarked;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+@NullMarked
 public class MyDateTypeFieldCodec implements FieldCodec<LocalDate> {
 
     final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");

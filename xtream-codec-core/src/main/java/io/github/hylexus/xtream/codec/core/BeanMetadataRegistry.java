@@ -53,14 +53,13 @@ public interface BeanMetadataRegistry {
 
     @Nullable
     default FieldCodec<?> getOrCreateFieldCodec(
-            int version,
             @Nullable XtreamDataType targetType,
             @Nullable Class<? extends FieldCodec<?>> codecClass,
             @Nullable String charset,
             @Nullable Class<?> targetEntityClass) {
 
         return this.getFieldCodecRegistry()
-                .getOrCreateFieldCodec(version, this, targetType, codecClass, charset, targetEntityClass);
+                .getOrCreateFieldCodec(this, targetType, codecClass, charset, targetEntityClass);
     }
 
     /**

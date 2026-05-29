@@ -25,6 +25,7 @@ import io.github.hylexus.xtream.codec.common.bean.impl.SequenceBeanPropertyMetad
 import io.github.hylexus.xtream.codec.core.*;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamEntity;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.github.hylexus.xtream.codec.core.utils.ReflectionUtils;
 import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
@@ -177,6 +178,7 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
             } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.map) {
                 final MapBeanPropertyMetadata mapMedata = new MapBeanPropertyMetadata(basicPropertyMetadata, fieldCodecRegistry, this);
                 pdList.add(mapMedata);
+                throw new IllegalStateException("Deprecated MapBeanPropertyMetadata. Use " + XtreamMapField.class.getSimpleName() + " instead");
             } else if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.dynamic) {
                 pdList.add(basicPropertyMetadata);
             } else {

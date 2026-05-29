@@ -26,11 +26,11 @@ import org.junit.jupiter.api.Assertions;
 
 import java.util.function.BiConsumer;
 
-class BaseFieldCodecTest {
+public class BaseFieldCodecTest {
     protected final EntityCodec entityCodec = EntityCodec.DEFAULT;
     protected final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
 
-    <T> void codec(int version, T instance, BiConsumer<T, T> assertion) {
+    protected <T> void codec(int version, T instance, BiConsumer<T, T> assertion) {
         final ByteBuf buffer = allocator.buffer();
         try {
             final CodecTracker encodeTracker = new CodecTracker();

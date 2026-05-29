@@ -31,12 +31,12 @@ public class BuiltinLocationMessageExtraItemFieldCodec
     // implements BeanMetadataRegistryAware
 
     @FieldCodecCreator
-    public BuiltinLocationMessageExtraItemFieldCodec(BeanMetadataRegistry registry, int version) {
-        super(registry, version);
+    public BuiltinLocationMessageExtraItemFieldCodec(BeanMetadataRegistry registry) {
+        super(registry);
     }
 
     @Override
-    protected void initValueCodec(int version, BeanMetadataRegistry registry) {
+    protected void initValueCodec(BeanMetadataRegistry registry) {
         this.registerValueFieldCodec((short) 0x01, U32FieldCodecs.LONG_INSTANCE);
         this.registerValueFieldCodec((short) 0x02, U16FieldCodecs.INTEGER_INSTANCE);
         this.registerValueFieldCodec((short) 0x03, U16FieldCodecs.INTEGER_INSTANCE);
@@ -55,16 +55,16 @@ public class BuiltinLocationMessageExtraItemFieldCodec
         // 1. 自定义编解码器 -- 传入编解码器实例
         // this.registerValueFieldCodec((short) 0x11, LocationItem0x11FieldCodec.INSTANCE);
         // 2. 自定义编解码器 -- 传入编解码器 Class
-        // this.registerValueFieldCodec(version, (short) 0x11, LocationItem0x11FieldCodec.class);
+        // this.registerValueFieldCodec((short) 0x11, LocationItem0x11FieldCodec.class);
         // 3. 直接传入实体类类型
-        this.registerValueFieldCodec(version, (short) 0x11, LocationItem0x11.class);
+        this.registerValueFieldCodec((short) 0x11, LocationItem0x11.class);
 
-        this.registerValueFieldCodec(version, (short) 0x12, LocationItem0x12.class);
-        this.registerValueFieldCodec(version, (short) 0x13, LocationItem0x13.class);
-        this.registerValueFieldCodec(version, (short) 0x64, LocationItem0x64.class);
-        this.registerValueFieldCodec(version, (short) 0x65, LocationItem0x65.class);
-        this.registerValueFieldCodec(version, (short) 0x66, LocationItem0x66.class);
-        this.registerValueFieldCodec(version, (short) 0x67, LocationItem0x67.class);
+        this.registerValueFieldCodec((short) 0x12, LocationItem0x12.class);
+        this.registerValueFieldCodec((short) 0x13, LocationItem0x13.class);
+        this.registerValueFieldCodec((short) 0x64, LocationItem0x64.class);
+        this.registerValueFieldCodec((short) 0x65, LocationItem0x65.class);
+        this.registerValueFieldCodec((short) 0x66, LocationItem0x66.class);
+        this.registerValueFieldCodec((short) 0x67, LocationItem0x67.class);
     }
 
     @Override
@@ -86,8 +86,8 @@ public class BuiltinLocationMessageExtraItemFieldCodec
             if (locationType == 0) {
                 return new LocationItem0x11(locationType, null);
             }
-            final long areaId = input.readUnsignedInt();
-            return new LocationItem0x11(locationType, areaId);
+            final long locationId = input.readUnsignedInt();
+            return new LocationItem0x11(locationType, locationId);
         }
 
         @Override

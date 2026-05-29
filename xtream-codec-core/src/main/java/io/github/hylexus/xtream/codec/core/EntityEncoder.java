@@ -46,7 +46,7 @@ public class EntityEncoder {
     }
 
     // todo 优化
-    public void encode(int version, Object instance, ByteBuf target) {
+    public void encode(int version, @Nullable Object instance, ByteBuf target) {
         switch (instance) {
             case null -> {
                 // ignored
@@ -105,7 +105,7 @@ public class EntityEncoder {
         this.encodeWithTracker(XtreamField.ALL_VERSION, instance, target, tracker);
     }
 
-    public void encodeWithTracker(int version, Object instance, ByteBuf target, CodecTracker tracker) {
+    public void encodeWithTracker(int version, @Nullable Object instance, ByteBuf target, CodecTracker tracker) {
         switch (instance) {
             case null -> {
                 // ignored

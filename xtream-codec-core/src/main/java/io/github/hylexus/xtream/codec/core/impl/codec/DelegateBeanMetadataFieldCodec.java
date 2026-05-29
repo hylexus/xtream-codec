@@ -40,28 +40,28 @@ import java.util.Objects;
  * @since 0.0.1
  */
 public class DelegateBeanMetadataFieldCodec implements FieldCodec<Object> {
-    private final BeanMetadata beanMetadata;
+    private final Class<?> targetEntityClass;
 
-    public DelegateBeanMetadataFieldCodec(BeanMetadata beanMetadata) {
-        this.beanMetadata = beanMetadata;
+    public DelegateBeanMetadataFieldCodec(Class<?> targetEntityClass) {
+        this.targetEntityClass = targetEntityClass;
     }
 
     @Override
     public Object deserialize(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
-        return context.entityDecoder().decode(context.version(), beanMetadata, input);
+        return context.entityDecoder().decode(context.version(), this.targetEntityClass, input);
     }
 
     @Override
     public Object deserializeWithTracker(BeanPropertyMetadata propertyMetadata, DeserializeContext context, ByteBuf input, int length) {
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         if (XtreamTypes.isBasicType(propertyMetadata.rawClass())) {
-            return context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, codecTracker);
+            return context.entityDecoder().decodeWithTracker(context.version(), this.targetEntityClass, input, codecTracker);
         } else {
             final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(propertyMetadata, this.getClass().getSimpleName(), null);
             final Object instance;
             try {
                 final int indexBeforeRead = input.readerIndex();
-                instance = context.entityDecoder().decodeWithTracker(context.version(), beanMetadata, input, codecTracker);
+                instance = context.entityDecoder().decodeWithTracker(context.version(), this.targetEntityClass, input, codecTracker);
                 nestedFieldSpan.setHexString(FormatUtils.toHexString(input, indexBeforeRead, input.readerIndex() - indexBeforeRead));
             } finally {
                 codecTracker.finishCurrentSpan();
@@ -72,19 +72,19 @@ public class DelegateBeanMetadataFieldCodec implements FieldCodec<Object> {
 
     @Override
     public void serialize(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
-        context.entityEncoder().encode(context.version(), this.beanMetadata, instance, output);
+        context.entityEncoder().encode(context.version(), instance, output);
     }
 
     @Override
     public void serializeWithTracker(BeanPropertyMetadata propertyMetadata, SerializeContext context, ByteBuf output, @Nullable Object instance) {
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         if (XtreamTypes.isBasicType(propertyMetadata.rawClass())) {
-            context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, codecTracker);
+            context.entityEncoder().encodeWithTracker(context.version(), instance, output, codecTracker);
         } else {
             final NestedFieldSpan nestedFieldSpan = codecTracker.startNewNestedFieldSpan(propertyMetadata, this.getClass().getSimpleName(), null);
             try {
                 final int indexBeforeWrite = output.writerIndex();
-                context.entityEncoder().encodeWithTracker(context.version(), this.beanMetadata, instance, output, codecTracker);
+                context.entityEncoder().encodeWithTracker(context.version(), instance, output, codecTracker);
                 nestedFieldSpan.setHexString(FormatUtils.toHexString(output, indexBeforeWrite, output.writerIndex() - indexBeforeWrite));
             } finally {
                 codecTracker.finishCurrentSpan();

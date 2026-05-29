@@ -26,7 +26,7 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.FieldCodecRegistry;
 import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
-import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
+import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.impl.codec.AbstractFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.DelegateBeanMetadataFieldCodec;
 import io.github.hylexus.xtream.codec.core.tracker.*;
@@ -55,7 +55,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
     }
 
     /**
-     * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry, Integer)
+     * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry)
      */
     @SuppressWarnings("unused")
     @FieldCodecCreator
@@ -82,7 +82,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
                 final Object mapKey = entry.getKey();
                 final Object mapValue = entry.getValue();
                 // 1. key
-                final XtreamMapField.PaddingType paddingType = keyMeta.paddingType();
+                final PaddingType paddingType = keyMeta.paddingType();
                 switch (paddingType) {
                     case NONE -> keyCodec.serialize(propertyMetadata, context, output, mapKey);
                     case LEFT -> XtreamBytes.writeCharSequenceWithLeftPadding(output, (CharSequence) mapKey, keyMeta.resolvedCharset(), keyMeta.sizeInBytes(), keyMeta.paddingElement());
@@ -131,13 +131,13 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
                 // 1. key
                 final Object mapKey = entry.getKey();
                 codecTracker.updateTrackerHints(MapEntryItemSpan.Type.KEY);
-                final XtreamMapField.PaddingType paddingType = keyMeta.paddingType();
-                if (paddingType == XtreamMapField.PaddingType.NONE) {
+                final PaddingType paddingType = keyMeta.paddingType();
+                if (paddingType == PaddingType.NONE) {
                     keyCodec.serializeWithTracker(propertyMetadata, context, output, mapKey);
                 } else {
                     final int indexBeforeWrite = output.writerIndex();
                     final String str = (String) mapKey;
-                    if (paddingType == XtreamMapField.PaddingType.LEFT) {
+                    if (paddingType == PaddingType.LEFT) {
                         XtreamBytes.writeCharSequenceWithLeftPadding(output, str, keyMeta.resolvedCharset(), keyMeta.sizeInBytes(), keyMeta.paddingElement());
                     } else {
                         XtreamBytes.writeCharSequenceWithRightPadding(output, str, keyMeta.resolvedCharset(), keyMeta.sizeInBytes(), keyMeta.paddingElement());
@@ -266,7 +266,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
                     .orElseThrow(() -> new IllegalArgumentException("Can not determine [FieldCodec] for " + javaType));
         }
 
-        return new DelegateBeanMetadataFieldCodec(context.beanMetadataRegistry().getBeanMetadata(javaType, context.version()));
+        return new DelegateBeanMetadataFieldCodec(javaType);
     }
 
     private FieldCodec<?> getValueDecoder(MapMeta mapMeta, Object key) {

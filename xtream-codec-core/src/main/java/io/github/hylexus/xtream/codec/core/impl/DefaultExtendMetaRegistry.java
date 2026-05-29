@@ -155,7 +155,7 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
             throw new IllegalArgumentException("No `[" + FallbackValueMatcher.class.getName() + "]` found for target version " + targetVersion);
         }
         final String detectedCharset = detectCharset(fallbackValueMatcher.valueType(), fallbackValueMatcher.valueCodec(), fallbackValueMatcher.charset(), null);
-        final FieldCodec<Object> valueCodec = createValueCodec(targetVersion, fallbackValueMatcher.valueType(), fallbackValueMatcher.valueCodec(), null, detectedCharset);
+        final FieldCodec<Object> valueCodec = createValueCodec(fallbackValueMatcher.valueType(), fallbackValueMatcher.valueCodec(), null, detectedCharset);
         if (valueCodec == null) {
             throw new IllegalArgumentException("Unsupported valueType: " + fallbackValueMatcher.valueType());
         }
@@ -201,7 +201,7 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
                     final ValueMatcher matcher = hasVersion.data();
                     final String detectedCharset = detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
                     final String finalCharset = detectedCharset != null ? detectedCharset : fallbackCharset;
-                    final FieldCodec<Object> valueCodec = createValueCodec(targetVersion, matcher.valueType(), matcher.valueCodec(), matcher.valueEntity(), finalCharset);
+                    final FieldCodec<Object> valueCodec = createValueCodec(matcher.valueType(), matcher.valueCodec(), matcher.valueEntity(), finalCharset);
                     if (valueCodec == null) {
                         throw new IllegalArgumentException("Unsupported valueType: " + matcher.valueType());
                     }
@@ -327,13 +327,12 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
     @Nullable
     @SuppressWarnings("unchecked")
     private FieldCodec<Object> createValueCodec(
-            int version,
             XtreamDataType valueType,
             Class<? extends FieldCodec<?>> valueCodecClass,
             @Nullable Class<?> valueEntityClass,
             @Nullable String actualCharset) {
 
-        final FieldCodec<?> instance = this.beanMetadataRegistry.getOrCreateFieldCodec(version, valueType, valueCodecClass, actualCharset, valueEntityClass);
+        final FieldCodec<?> instance = this.beanMetadataRegistry.getOrCreateFieldCodec(valueType, valueCodecClass, actualCharset, valueEntityClass);
         return (FieldCodec<Object>) instance;
     }
 

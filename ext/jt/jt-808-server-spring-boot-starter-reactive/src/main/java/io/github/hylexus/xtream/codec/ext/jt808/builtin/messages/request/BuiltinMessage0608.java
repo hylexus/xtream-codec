@@ -105,13 +105,13 @@ public class BuiltinMessage0608 {
             while (input.isReadable() && remainingItemCount-- > 0) {
                 final Object item = switch (msgType) {
                     // 查询圆形区域数据
-                    case 1 -> context.entityDecoder().decode(BuiltinMessage8600V2019.class, input);
+                    case 1 -> context.entityDecoder().decode(context.version(), BuiltinMessage8600V2019.class, input);
                     // 查询矩形区域数据
-                    case 2 -> context.entityDecoder().decode(BuiltinMessage8602V2019.class, input);
+                    case 2 -> context.entityDecoder().decode(context.version(), BuiltinMessage8602V2019.class, input);
                     // 查询多边形区域数据
-                    case 3 -> context.entityDecoder().decode(BuiltinMessage8604V2019.class, input);
+                    case 3 -> context.entityDecoder().decode(context.version(), BuiltinMessage8604V2019.class, input);
                     // 查询线路数据
-                    case 4 -> context.entityDecoder().decode(BuiltinMessage8606V2019.class, input);
+                    case 4 -> context.entityDecoder().decode(context.version(), BuiltinMessage8606V2019.class, input);
                     default -> throw new UnsupportedOperationException("未知消息类型 type:" + msgType);
                 };
                 result.add(item);

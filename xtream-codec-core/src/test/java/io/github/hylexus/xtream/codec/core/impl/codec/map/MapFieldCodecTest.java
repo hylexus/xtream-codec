@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.core.impl.codec;
+package io.github.hylexus.xtream.codec.core.impl.codec.map;
 
+import io.github.hylexus.xtream.codec.core.impl.codec.BaseFieldCodecTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -38,15 +39,21 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
             final Map<Object, Object> assertionMap = assertion.getMap();
             assertFalse(instanceMap.isEmpty());
             assertEquals(instanceMap.size(), assertionMap.size());
+
+            assertNotEquals(instanceMap.get(5), assertionMap.get(5));
+            assertEquals("010203", assertionMap.get(5));
+
             assertEquals(instanceMap.get(11), assertionMap.get(11));
             assertEquals(instanceMap.get(12), assertionMap.get(12));
             assertEquals(instanceMap.get(13), assertionMap.get(13));
             assertEquals(instanceMap.get(14), assertionMap.get(14));
-            assertNotEquals(instanceMap.get(5), assertionMap.get(5));
-            assertEquals("010203", assertionMap.get(5));
             assertEquals(instanceMap.get(61), assertionMap.get(61));
             assertEquals(instanceMap.get(62), assertionMap.get(62));
             assertEquals(instanceMap.get(63), assertionMap.get(63));
+
+            assertEquals(instanceMap.get(71), assertionMap.get(71));
+            assertEquals(instanceMap.get(81), assertionMap.get(81));
+            assertEquals(instanceMap.get(91), assertionMap.get(91));
         });
 
     }
@@ -71,6 +78,8 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
             assertEquals(instanceMap.get(61L), assertionMap.get(61L));
             assertEquals(instanceMap.get(62L), assertionMap.get(62L));
             assertEquals(instanceMap.get(63L), assertionMap.get(63L));
+            assertEquals(instanceMap.get(71L), assertionMap.get(71L));
+            assertEquals(instanceMap.get(91L), assertionMap.get(91L));
         });
     }
 
@@ -95,6 +104,8 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
             assertEquals(instanceMap.get("配置项61"), assertionMap.get("配置项61"));
             assertEquals(instanceMap.get("配置项62"), assertionMap.get("配置项62"));
             assertEquals(instanceMap.get("配置项63"), assertionMap.get("配置项63"));
+            assertEquals(instanceMap.get("配置项71"), assertionMap.get("配置项71"));
+            assertEquals(instanceMap.get("配置项91"), assertionMap.get("配置项91"));
         });
     }
 
@@ -109,8 +120,9 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
         map.put(62, "李四");
         map.put(63, "王五");
         map.put(64, "赵六");
-        map.put(71, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date()));
-        map.put(81, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date()));
+        map.put(71, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date(System.currentTimeMillis() / 1000 * 1000)));
+        map.put(81, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date(System.currentTimeMillis() / 1000 * 1000)));
+        map.put(91, new MapFieldEntity.NestedEntity02("哈😁哈", 111));
 
         return new MapFieldEntity()
                 .setMessageId(255)
@@ -128,8 +140,9 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
         map.put("配置项62", "李四");
         map.put("配置项63", "王五");
         map.put("配置项64", "赵六");
-        map.put("配置项71", new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date()));
-        map.put("配置项81", new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date()));
+        map.put("配置项71", new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date(System.currentTimeMillis() / 1000 * 1000)));
+        map.put("配置项81", new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date(System.currentTimeMillis() / 1000 * 1000)));
+        map.put("配置项91", new MapFieldEntity.NestedEntity02("哈😁哈", 111));
 
         return new MapFieldEntity()
                 .setMessageId(255)
@@ -148,9 +161,9 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
         map.put(62L, "李四");
         map.put(63L, "王五");
         map.put(64L, "赵六");
-        map.put(71L, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date()));
-        map.put(81L, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date()));
-
+        map.put(71L, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date(System.currentTimeMillis() / 1000 * 1000)));
+        map.put(81L, new MapFieldEntity.NestedEntity01().setId(123).setName("哈哈哈").setDate(new Date(System.currentTimeMillis() / 1000 * 1000)));
+        map.put(91L, new MapFieldEntity.NestedEntity02("哈😁哈", 111));
         return new MapFieldEntity()
                 .setMessageId(255)
                 .setMap(map);

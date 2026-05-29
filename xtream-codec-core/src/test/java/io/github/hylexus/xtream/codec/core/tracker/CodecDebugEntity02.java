@@ -83,12 +83,12 @@ public class CodecDebugEntity02 {
     public static final class LocationExtraItemFieldCodec extends AbstractMapFieldCodec<Short, U8FieldCodecs.U8FieldCodec> {
 
         @FieldCodecCreator
-        public LocationExtraItemFieldCodec(BeanMetadataRegistry registry, int version) {
-            super(registry, version);
+        public LocationExtraItemFieldCodec(BeanMetadataRegistry registry) {
+            super(registry);
         }
 
         @Override
-        protected void initValueCodec(int version, BeanMetadataRegistry registry) {
+        protected void initValueCodec(BeanMetadataRegistry registry) {
             this.registerValueFieldCodec((short) 0x01, U32FieldCodecs.LONG_INSTANCE);
             this.registerValueFieldCodec((short) 0x02, U16FieldCodecs.INTEGER_INSTANCE);
         }

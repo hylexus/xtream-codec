@@ -41,7 +41,6 @@ public interface FieldCodecRegistry {
 
     @Nullable
     FieldCodec<?> getOrCreateFieldCodec(
-            int version,
             @Nullable BeanMetadataRegistry beanMetadataRegistry,
             @Nullable XtreamDataType targetType,
             @Nullable Class<? extends FieldCodec<?>> codecClass,

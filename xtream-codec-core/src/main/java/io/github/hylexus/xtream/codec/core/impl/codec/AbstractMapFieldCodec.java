@@ -16,7 +16,6 @@
 
 package io.github.hylexus.xtream.codec.core.impl.codec;
 
-import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
@@ -47,36 +46,35 @@ public abstract class AbstractMapFieldCodec<
     protected final Map<K, FieldCodec<?>> keyFieldCodecInstances;
 
     @FieldCodecCreator
-    public AbstractMapFieldCodec(BeanMetadataRegistry registry, int version) {
+    public AbstractMapFieldCodec(BeanMetadataRegistry registry) {
         this.registry = registry;
         this.keyFieldCodecInstances = new LinkedHashMap<>();
-        this.initValueCodec(version, registry);
+        this.initValueCodec(registry);
     }
 
     /**
      * @see #registerValueFieldCodec(Object, FieldCodec)
-     * @see #registerValueFieldCodec(int, Object, Class)
+     * @see #registerValueFieldCodec(Object, Class)
      */
-    protected abstract void initValueCodec(int version, BeanMetadataRegistry registry);
+    protected abstract void initValueCodec(BeanMetadataRegistry registry);
 
     public void registerValueFieldCodec(K key, FieldCodec<?> fieldCodec) {
         this.keyFieldCodecInstances.put(key, fieldCodec);
     }
 
-    public void registerValueFieldCodec(int version, K key, Class<?> cls) {
+    public void registerValueFieldCodec(K key, Class<?> cls) {
         final FieldCodec<?> newInstance;
         if (FieldCodec.class.isAssignableFrom(cls)) {
             if (!CustomFieldCodec.class.isAssignableFrom(cls)) {
                 throw new IllegalArgumentException("cls must be a subclass of CustomFieldCodec");
             }
-            newInstance = BeanUtils.createFieldCodecInstance(cls, registry, version);
+            newInstance = BeanUtils.createFieldCodecInstance(cls, registry);
         } else {
             if (XtreamTypes.isBasicType(cls)) {
                 // 不支持基础数据类型，只支持实体类
                 throw new IllegalArgumentException("cls must be a entity class");
             }
-            final BeanMetadata beanMetadata = registry.getBeanMetadata(cls, version);
-            newInstance = new EntityFieldCodec(beanMetadata);
+            newInstance = new EntityFieldCodec(cls);
         }
         this.keyFieldCodecInstances.put(key, newInstance);
     }

@@ -168,7 +168,7 @@ public interface FieldCodec<T> {
     }
 
     /**
-     * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry, Integer)
+     * @see BeanUtils#createFieldCodecInstance(Class, BeanMetadataRegistry)
      */
     @Documented
     @Target({ElementType.CONSTRUCTOR})

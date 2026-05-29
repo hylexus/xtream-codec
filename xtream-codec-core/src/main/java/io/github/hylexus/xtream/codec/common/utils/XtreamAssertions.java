@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.common.utils;
 
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.Nullable;
 
 import java.util.function.Predicate;
@@ -28,6 +29,7 @@ public abstract class XtreamAssertions {
     private XtreamAssertions() {
     }
 
+    @Contract(value = "false, _ -> fail", pure = true)
     public static void assertTrue(boolean condition, String message) {
         if (!condition) {
             throw new AssertionError(message);
@@ -73,6 +75,7 @@ public abstract class XtreamAssertions {
         return t;
     }
 
+    @Contract(value = "null, _ -> fail", pure = true)
     public static String assertNotBlank(@Nullable String string, String error) {
         if (string == null || string.isBlank()) {
             throw new IllegalArgumentException(error);

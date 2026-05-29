@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.core.annotation.map;
 
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
@@ -100,13 +101,6 @@ public @interface XtreamMapField {
          */
         byte paddingElement() default 0x30;
 
-    }
-
-    // todo 改为 io.github.hylexus.xtream.codec.core.annotation.PaddingType
-    enum PaddingType {
-        LEFT,
-        RIGHT,
-        NONE
     }
 
     @interface ValueLength {

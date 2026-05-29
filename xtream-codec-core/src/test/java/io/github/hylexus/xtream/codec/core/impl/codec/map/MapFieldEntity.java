@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package io.github.hylexus.xtream.codec.core.impl.codec;
+package io.github.hylexus.xtream.codec.core.impl.codec.map;
 
+import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamDateTimeField;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
+import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
+import io.github.hylexus.xtream.codec.core.impl.codec.U32FieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import lombok.Data;
@@ -26,6 +29,7 @@ import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 import static io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.*;
 import static io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.KeyType.*;
@@ -94,6 +98,8 @@ public class MapFieldEntity {
                                     @ValueMatcher(version = 0, matchU16 = 63, valueCodec = StringFieldCodecs.StringFieldCodecGb2312.class),
                                     @ValueMatcher(version = 0, matchU16 = 64, valueType = XtreamDataType.string),
                                     @ValueMatcher(version = 0, matchU16 = 71, valueEntity = NestedEntity01.class),
+                                    @ValueMatcher(version = 0, matchU16 = 81, valueEntity = NestedEntity01.class),
+                                    @ValueMatcher(version = 0, matchU16 = 91, valueEntity = NestedEntity02.class),
 
                                     @ValueMatcher(version = 1, matchU32 = 11L, valueType = XtreamDataType.i8),
                                     @ValueMatcher(version = 1, matchU32 = 12L, valueType = XtreamDataType.u16),
@@ -104,6 +110,7 @@ public class MapFieldEntity {
                                     @ValueMatcher(version = 1, matchU32 = 63L, valueType = XtreamDataType.string_gbk),
                                     @ValueMatcher(version = 1, matchU32 = 64L, valueCodec = StringFieldCodecs.StringFieldCodec.class, charset = "utf-8"),
                                     @ValueMatcher(version = 1, matchU32 = 71L, valueEntity = NestedEntity01.class),
+                                    @ValueMatcher(version = 1, matchU32 = 91, valueEntity = NestedEntity02.class),
 
                                     @ValueMatcher(version = 2, matchString = "配置项11", valueType = XtreamDataType.i8),
                                     @ValueMatcher(version = 2, matchString = "配置项12", valueType = XtreamDataType.u16_le),
@@ -115,6 +122,7 @@ public class MapFieldEntity {
                                     @ValueMatcher(version = 2, matchString = "配置项63", valueCodec = StringFieldCodecs.StringFieldCodecGb2312.class),
                                     @ValueMatcher(version = 2, matchString = "配置项64", valueType = XtreamDataType.string),
                                     @ValueMatcher(version = 2, matchString = "配置项71", valueEntity = NestedEntity01.class),
+                                    @ValueMatcher(version = 2, matchString = "配置项91", valueEntity = NestedEntity02.class),
                             },
                             fallbackMatchers = {
                                     @FallbackValueMatcher(version = ALL_VERSION, valueType = XtreamDataType.string_hex, charset = "HEX"),
@@ -136,5 +144,31 @@ public class MapFieldEntity {
 
         @XtreamDateTimeField(charset = "utf-8", pattern = "yyyy-MM-dd HH:mm:ss", prependLengthFieldType = PrependLengthFieldType.u8)
         private Date date;
+
+        @Override
+        public final boolean equals(Object o) {
+            if (!(o instanceof final NestedEntity01 that)) {
+                return false;
+            }
+
+            return id == that.id
+                   && Objects.equals(name, that.name)
+                   && Objects.equals(date == null ? null : date.toInstant(), that.date == null ? null : that.date.toInstant());
+        }
+
+        @Override
+        public int hashCode() {
+            int result = id;
+            result = 31 * result + Objects.hashCode(name);
+            result = 31 * result + Objects.hashCode(date);
+            return result;
+        }
+    }
+
+    public record NestedEntity02(
+            @Preset.RustStyle.str(prependLengthFieldType = PrependLengthFieldType.u8)
+            String name,
+            @Preset.RustStyle.u32
+            long age) {
     }
 }

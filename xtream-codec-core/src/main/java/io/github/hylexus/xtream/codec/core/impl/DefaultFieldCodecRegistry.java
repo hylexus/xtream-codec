@@ -16,7 +16,6 @@
 
 package io.github.hylexus.xtream.codec.core.impl;
 
-import io.github.hylexus.xtream.codec.common.bean.BeanMetadata;
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.common.utils.XtreamTypes;
@@ -338,7 +337,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
 
         if (xtreamField.fieldCodec() != FieldCodec.Placeholder.class) {
             final Class<? extends FieldCodec<?>> aClass = xtreamField.fieldCodec();
-            final FieldCodec<?> newInstance = this.getOrCreateFieldCodec(metadata.version(), metadata.beanMetadataRegistry(), null, aClass, xtreamField.charset(), null);
+            final FieldCodec<?> newInstance = this.getOrCreateFieldCodec(metadata.beanMetadataRegistry(), null, aClass, xtreamField.charset(), null);
             return Optional.ofNullable(newInstance);
         }
 
@@ -347,8 +346,8 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         }
 
         if (metadata.isRecordClass()) {
-            final BeanMetadata beanMetadata = metadata.beanMetadataRegistry().getBeanMetadata(metadata.rawClass(), metadata.version());
-            return Optional.of(new DelegateBeanMetadataFieldCodec(beanMetadata));
+            // final BeanMetadata beanMetadata = metadata.beanMetadataRegistry().getBeanMetadata(metadata.rawClass(), metadata.version());
+            return Optional.of(new DelegateBeanMetadataFieldCodec(metadata.rawClass()));
         }
 
         final Class<?> rawClassType = metadata.rawClass();
@@ -368,7 +367,6 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
     @Nullable
     @Override
     public FieldCodec<?> getOrCreateFieldCodec(
-            int version,
             @Nullable BeanMetadataRegistry beanMetadataRegistry,
             @Nullable XtreamDataType targetType,
             @Nullable Class<? extends FieldCodec<?>> codecClass,
@@ -395,7 +393,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
             }
 
             Objects.requireNonNull(beanMetadataRegistry);
-            return BeanUtils.createFieldCodecInstance(codecClass, beanMetadataRegistry, version);
+            return BeanUtils.createFieldCodecInstance(codecClass, beanMetadataRegistry);
         }
 
         if (targetEntityClass != null && !(Objects.equals(Object.class, targetEntityClass))) {
@@ -404,8 +402,8 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
                 return this.getFieldCodecForAtomicDataType(targetEntityClass)
                         .orElseThrow(() -> new IllegalArgumentException("Cannot found FieldCodec for AtomicDataType [" + targetEntityClass.getName() + "]"));
             }
-            final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(targetEntityClass, version);
-            return new DelegateBeanMetadataFieldCodec(beanMetadata);
+            // final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(targetEntityClass, version);
+            return new DelegateBeanMetadataFieldCodec(targetEntityClass);
         }
 
         return null;

@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
+import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
@@ -49,6 +50,7 @@ import static java.util.Objects.requireNonNull;
 public class SimpleMapMetadataRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleMapMetadataRegistry.class);
+    // targetVersion -> field -> MapMeta
     private static final ConcurrentMap<Integer, ConcurrentMap<Field, MapMeta>> CACHE = new ConcurrentHashMap<>();
 
     static MapMeta getOrCreateMapMetadata(FieldCodec.CodecContext codecContext, BeanPropertyMetadata propertyMetadata) {
@@ -147,29 +149,27 @@ public class SimpleMapMetadataRegistry {
         final int matchedVersion = matchResult.version();
         final XtreamMapField.FallbackValueMatcher matcher = matchResult.source();
         final String actualCharset = detectCharset(matcher, commonParam.stringTypeCharset());
-        final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, targetVersion, actualCharset, matcher);
+        final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, actualCharset, matcher);
         return new FallbackValueMatcherMeta(matchedVersion, matcher.valueType(), requireNonNull(valueCodec), actualCharset);
     }
 
     @Nullable
     private static FieldCodec<Object> createValueCodec(
             BeanMetadataRegistry beanMetadataRegistry,
-            int version,
             @Nullable String actualCharset,
             XtreamMapField.ValueMatcher matcher) {
 
-        return createValueCodec(beanMetadataRegistry, version,
+        return createValueCodec(beanMetadataRegistry,
                 matcher.valueType(), matcher.valueCodec(), matcher.valueEntity(), actualCharset);
     }
 
     @Nullable
     private static FieldCodec<Object> createValueCodec(
             BeanMetadataRegistry beanMetadataRegistry,
-            int version,
             @Nullable String actualCharset,
             XtreamMapField.FallbackValueMatcher matcher) {
 
-        return createValueCodec(beanMetadataRegistry, version,
+        return createValueCodec(beanMetadataRegistry,
                 matcher.valueType(), matcher.valueCodec(), null, actualCharset);
     }
 
@@ -177,13 +177,12 @@ public class SimpleMapMetadataRegistry {
     @SuppressWarnings("unchecked")
     private static FieldCodec<Object> createValueCodec(
             BeanMetadataRegistry beanMetadataRegistry,
-            int version,
             XtreamDataType valueType,
             Class<? extends FieldCodec<?>> valueCodecClass,
             @Nullable Class<?> valueEntityClass,
             @Nullable String actualCharset) {
 
-        final FieldCodec<?> instance = beanMetadataRegistry.getOrCreateFieldCodec(version, valueType, valueCodecClass, actualCharset, valueEntityClass);
+        final FieldCodec<?> instance = beanMetadataRegistry.getOrCreateFieldCodec(valueType, valueCodecClass, actualCharset, valueEntityClass);
         return (FieldCodec<Object>) instance;
     }
 
@@ -310,7 +309,7 @@ public class SimpleMapMetadataRegistry {
                 .map(hasVersion -> {
                     final XtreamMapField.ValueMatcher matcher = hasVersion.data();
                     final String actualCharset = detectCharset(matcher, encoderCommonParam, decoderCommonParam);
-                    final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, targetVersion, actualCharset, matcher);
+                    final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, actualCharset, matcher);
                     if (valueCodec == null) {
                         throw new IllegalArgumentException("Unsupported valueType: " + matcher.valueType());
                     }
@@ -512,11 +511,11 @@ public class SimpleMapMetadataRegistry {
             int sizeInBytes,
             String charset,
             Charset resolvedCharset,
-            XtreamMapField.PaddingType paddingType,
+            PaddingType paddingType,
             byte paddingElement,
             FieldCodec<Object> codec
     ) {
-        public KeyMeta(int version, XtreamMapField.KeyType type, int sizeInBytes, String charset, XtreamMapField.PaddingType paddingType, byte paddingElement, FieldCodec<Object> codec) {
+        public KeyMeta(int version, XtreamMapField.KeyType type, int sizeInBytes, String charset, PaddingType paddingType, byte paddingElement, FieldCodec<Object> codec) {
             this(version, type, sizeInBytes, charset, Charset.forName(charset), paddingType, paddingElement, codec);
         }
     }
