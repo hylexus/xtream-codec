@@ -45,10 +45,10 @@ public class RustStyleDebugEntity03ForDecode {
                     decoder = @XtreamMapField.ValueDecoder(
                             params = @XtreamMapField.DecoderParam(charset = "gbk"),
                             matchers = {
-                                    @XtreamMapField.ValueMatcher(matchU16 = 1, valueType = XtreamDataType.string_utf8),
-                                    @XtreamMapField.ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string_utf8),
-                                    @XtreamMapField.ValueMatcher(matchU16 = 3, valueType = XtreamDataType.u16),
-                                    @XtreamMapField.ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string)
+                                    @ValueMatcher(matchU16 = 1, valueType = XtreamDataType.string_utf8),
+                                    @ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string_utf8),
+                                    @ValueMatcher(matchU16 = 3, valueType = XtreamDataType.u16),
+                                    @ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string)
                             },
                             fallbackMatchers = @FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
                     )

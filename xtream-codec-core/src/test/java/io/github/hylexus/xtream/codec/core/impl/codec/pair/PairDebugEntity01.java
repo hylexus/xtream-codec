@@ -46,7 +46,6 @@ public class PairDebugEntity01 {
     @Preset.RustStyle.u32
     private Long id;
 
-
     @XtreamPairFieldSequence(
             prependLengthFieldType = PrependLengthFieldType.u16,
             decoder = @XtreamPairFieldSequence.Decoder(

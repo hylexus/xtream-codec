@@ -24,6 +24,7 @@ import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.ext.*;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
+import io.github.hylexus.xtream.codec.core.impl.DefaultExtendMetaRegistry;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.CodecCharset;
@@ -158,7 +159,7 @@ public class SimpleMapMetadataRegistry {
     private static FieldCodec<Object> createValueCodec(
             BeanMetadataRegistry beanMetadataRegistry,
             @Nullable String actualCharset,
-            XtreamMapField.ValueMatcher matcher) {
+            ValueMatcher matcher) {
 
         return createValueCodec(beanMetadataRegistry,
                 matcher.valueType(), matcher.valueCodec(), matcher.valueEntity(), actualCharset);
@@ -201,7 +202,7 @@ public class SimpleMapMetadataRegistry {
 
     @Nullable
     static String detectCharset(
-            XtreamMapField.ValueMatcher matcher,
+            ValueMatcher matcher,
             @Nullable EncoderCommonParam encoderCommonParam,
             @Nullable DecoderCommonParam decoderCommonParam) {
 
@@ -261,20 +262,6 @@ public class SimpleMapMetadataRegistry {
         };
     }
 
-    private static Object readKey(KeyMeta keyMeta, XtreamMapField.ValueMatcher valueMatcher) {
-        final KeyType keyType = keyMeta.type();
-        return switch (keyType) {
-            case i8 -> valueMatcher.matchI8();
-            case u8 -> valueMatcher.matchU8();
-            case i16 -> valueMatcher.matchI16();
-            case u16 -> valueMatcher.matchU16();
-            case i32 -> valueMatcher.matchI32();
-            case u32 -> valueMatcher.matchU32();
-            case i64 -> valueMatcher.matchI64();
-            case str_gbk, str_gb_2312, str_utf8, str -> assertNotBlank(valueMatcher.matchString(), "key cannot be empty");
-        };
-    }
-
     record DecoderCommonParam(int version, String stringTypeCharset) {
         @SuppressWarnings("redundent")
         DecoderCommonParam {
@@ -291,36 +278,42 @@ public class SimpleMapMetadataRegistry {
             BeanMetadataRegistry beanMetadataRegistry,
             int targetVersion,
             KeyMeta keyMeta,
-            XtreamMapField.ValueMatcher[] valueMatchers,
+            ValueMatcher[] valueMatchers,
             @Nullable EncoderCommonParam encoderCommonParam,
             @Nullable DecoderCommonParam decoderCommonParam) {
 
-        final Map<Object, List<XtreamMapField.ValueMatcher>> historyValueMatchersByVersion = new HashMap<>();
+        final Map<Object, List<ValueMatcher>> historyValueMatchersByVersion = new HashMap<>();
         final List<ValueMatcherMeta> results = Arrays.stream(valueMatchers)
                 .flatMap(matcher -> {
                     final int[] version = matcher.version();
                     final Map<Integer, Integer> duplicateVersions = findDuplicateVersions(version);
                     if (!duplicateVersions.isEmpty()) {
                         final String tips = duplicateVersions.entrySet().stream().map(it -> "version: " + it.getKey() + ", times: " + it.getValue()).collect(Collectors.joining("\n- ", "- ", ""));
-                        throw new IllegalArgumentException("Duplicate versions [@" + XtreamMapField.ValueMatcher.class.getName() + "]\n" + tips);
+                        throw new IllegalArgumentException("Duplicate versions [@" + ValueMatcher.class.getName() + "]\n" + tips);
                     }
                     return Arrays.stream(version).mapToObj(v -> new HasVersion<>(v, matcher));
                 })
                 .filter(hasVersion -> isVersionMatched(targetVersion, hasVersion.version()))
-                .map(hasVersion -> {
-                    final XtreamMapField.ValueMatcher matcher = hasVersion.data();
+                .flatMap(hasVersion -> {
+                    final ValueMatcher matcher = hasVersion.data();
                     final String actualCharset = detectCharset(matcher, encoderCommonParam, decoderCommonParam);
                     final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, actualCharset, matcher);
                     if (valueCodec == null) {
                         throw new IllegalArgumentException("Unsupported valueType: " + matcher.valueType());
                     }
 
-                    final Object key = readKey(keyMeta, matcher);
-                    final ValueMatcherMeta valueMatcherMeta = new ValueMatcherMeta(hasVersion.version(), key, matcher.valueType(), valueCodec, actualCharset);
+                    final List<?> keyList = DefaultExtendMetaRegistry.readKey(keyMeta.type, matcher);
+                    if (keyList == null) {
+                        return Stream.empty();
+                    }
+                    // todo 多值处理
+                    return keyList.stream().map(key -> {
+                        final ValueMatcherMeta valueMatcherMeta = new ValueMatcherMeta(hasVersion.version(), key, matcher.valueType(), valueCodec, actualCharset);
 
-                    historyValueMatchersByVersion.computeIfAbsent(key, k -> new ArrayList<>()).add(matcher);
+                        historyValueMatchersByVersion.computeIfAbsent(key, k -> new ArrayList<>()).add(matcher);
 
-                    return valueMatcherMeta;
+                        return valueMatcherMeta;
+                    });
                 }).toList();
 
         historyValueMatchersByVersion.entrySet().stream()
@@ -328,7 +321,7 @@ public class SimpleMapMetadataRegistry {
                 .findFirst()
                 .ifPresent(entry -> {
                     final Object key = entry.getKey();
-                    final List<XtreamMapField.ValueMatcher> annotations = entry.getValue();
+                    final List<ValueMatcher> annotations = entry.getValue();
                     final String error = annotations.stream().map(Object::toString).collect(Collectors.joining("\n\t"));
                     log.warn("Duplicate valueMatchers. Key: {}", key);
                     throw new IllegalArgumentException("Duplicate valueMatchers." + "\nKey: " + key + "\nComponents:\n\t" + error);

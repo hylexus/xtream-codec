@@ -115,11 +115,11 @@ class BuiltinMessage8103Sample3Test extends BaseCodecTest {
                         decoder = @ValueDecoder(
                                 params = @DecoderParam(charset = XtreamConstants.CHARSET_NAME_GBK),
                                 matchers = {
-                                        @XtreamMapField.ValueMatcher(matchU32 = 0x0001, valueType = XtreamDataType.u32),
-                                        @XtreamMapField.ValueMatcher(matchU32 = 0x0040, valueType = XtreamDataType.string_gbk),
-                                        @XtreamMapField.ValueMatcher(matchU32 = 0x0081, valueType = XtreamDataType.u16),
-                                        @XtreamMapField.ValueMatcher(matchU32 = 0x0082, valueType = XtreamDataType.u16),
-                                        @XtreamMapField.ValueMatcher(matchU32 = 0x0084, valueType = XtreamDataType.u8),
+                                        @ValueMatcher(matchU32 = 0x0001, valueType = XtreamDataType.u32),
+                                        @ValueMatcher(matchU32 = 0x0040, valueType = XtreamDataType.string_gbk),
+                                        @ValueMatcher(matchU32 = 0x0081, valueType = XtreamDataType.u16),
+                                        @ValueMatcher(matchU32 = 0x0082, valueType = XtreamDataType.u16),
+                                        @ValueMatcher(matchU32 = 0x0084, valueType = XtreamDataType.u8),
                                 },
                                 fallbackMatchers = @FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
                         )

@@ -17,15 +17,14 @@
 package io.github.hylexus.xtream.codec.core.annotation.map;
 
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
-import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.ext.FallbackValueMatcher;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueMatcher;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.map.MapFieldCodec;
-import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -105,36 +104,6 @@ public @interface XtreamMapField {
         int[] version() default {ALL_VERSION};
 
         String charset() default DEFAULT_CHARSET;
-    }
-
-    @interface ValueMatcher {
-        int[] version() default {ALL_VERSION};
-
-        byte matchI8() default -1;
-
-        short matchU8() default -1;
-
-        short matchI16() default -1;
-
-        int matchU16() default -1;
-
-        long matchU32() default -1;
-
-        int matchI32() default -1;
-
-        long matchI64() default -1;
-
-        String matchString() default "";
-
-        String charset() default "";
-
-        XtreamDataType valueType() default XtreamDataType.placeholder;
-
-        Class<? extends FieldCodec<?>> valueCodec() default FieldCodec.Placeholder.class;
-
-        Class<?> valueEntity() default Object.class;
-
-        String desc() default "";
     }
 
 }

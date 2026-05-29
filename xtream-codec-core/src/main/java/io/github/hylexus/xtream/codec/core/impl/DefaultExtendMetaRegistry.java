@@ -401,7 +401,7 @@ public class DefaultExtendMetaRegistry implements ExtendMetaRegistry {
         return duplicates;
     }
 
-    private static @Nullable List<?> readKey(KeyType keyType, ValueMatcher valueMatcher) {
+    public static @Nullable List<?> readKey(KeyType keyType, ValueMatcher valueMatcher) {
         checkExclusive(valueMatcher);
         return switch (keyType) {
             case i8 -> readI8Key(valueMatcher);

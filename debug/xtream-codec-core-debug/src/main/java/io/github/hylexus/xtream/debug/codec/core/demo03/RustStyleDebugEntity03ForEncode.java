@@ -16,10 +16,7 @@
 
 package io.github.hylexus.xtream.debug.codec.core.demo03;
 
-import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
-import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
+import io.github.hylexus.xtream.codec.core.annotation.ext.*;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
@@ -47,10 +44,10 @@ public class RustStyleDebugEntity03ForEncode {
                     encoder = @XtreamMapField.ValueEncoder(
                             params = @XtreamMapField.EncoderParam(charset = "utf-8"),
                             matchers = {
-                                    @XtreamMapField.ValueMatcher(matchU16 = 1, valueType = XtreamDataType.string),
-                                    @XtreamMapField.ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string),
-                                    @XtreamMapField.ValueMatcher(matchU16 = 3, valueType = XtreamDataType.u16),
-                                    @XtreamMapField.ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string_gbk)
+                                    @ValueMatcher(matchU16 = 1, valueType = XtreamDataType.string),
+                                    @ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string),
+                                    @ValueMatcher(matchU16 = 3, valueType = XtreamDataType.u16),
+                                    @ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string_gbk)
                             }
                     )
             )

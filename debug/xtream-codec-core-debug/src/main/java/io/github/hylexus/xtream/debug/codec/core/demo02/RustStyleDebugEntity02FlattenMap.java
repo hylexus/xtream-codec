@@ -112,26 +112,26 @@ public class RustStyleDebugEntity02FlattenMap {
                             params = @XtreamMapField.EncoderParam(charset = "gbk"),
                             matchers = {
                                     // 0x01 dword(u32): 里程，单位为 1/10km
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x01, valueType = XtreamDataType.u32),
+                                    @ValueMatcher(matchU8 = 0x01, valueType = XtreamDataType.u32),
                                     // 0x02 word(u16): 油量，单位为 1/10L
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x02, valueType = XtreamDataType.u16),
+                                    @ValueMatcher(matchU8 = 0x02, valueType = XtreamDataType.u16),
                                     // 0x03 word(u16): 行驶记录功能获取的速度，单位为 1/10km/h
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x03, valueCodec = U16FieldCodecs.U16FieldCodec.class),
+                                    @ValueMatcher(matchU8 = 0x03, valueCodec = U16FieldCodecs.U16FieldCodec.class),
                                     // 0x04 word(u16): 需要人工确认报警事件的ID，从 1 开始
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x04, valueType = XtreamDataType.u16),
+                                    @ValueMatcher(matchU8 = 0x04, valueType = XtreamDataType.u16),
                             }
                     ),
                     decoder = @XtreamMapField.ValueDecoder(
                             params = @XtreamMapField.DecoderParam(charset = "gbk"),
                             matchers = {
                                     // 0x01 dword(u32): 里程，单位为 1/10km
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x01, valueType = XtreamDataType.u32),
+                                    @ValueMatcher(matchU8 = 0x01, valueType = XtreamDataType.u32),
                                     // 0x02 word(u16): 油量，单位为 1/10L
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x02, valueType = XtreamDataType.u16),
+                                    @ValueMatcher(matchU8 = 0x02, valueType = XtreamDataType.u16),
                                     // 0x03 word(u16): 行驶记录功能获取的速度，单位为 1/10km/h
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x03, valueCodec = U16FieldCodecs.U16FieldCodec.class),
+                                    @ValueMatcher(matchU8 = 0x03, valueCodec = U16FieldCodecs.U16FieldCodec.class),
                                     // 0x04 word(u16): 需要人工确认报警事件的ID，从 1 开始
-                                    @XtreamMapField.ValueMatcher(matchU8 = 0x04, valueType = XtreamDataType.u16),
+                                    @ValueMatcher(matchU8 = 0x04, valueType = XtreamDataType.u16),
                             },
                             // 其他 key 都转为十六进制字符串
                             fallbackMatchers = {
