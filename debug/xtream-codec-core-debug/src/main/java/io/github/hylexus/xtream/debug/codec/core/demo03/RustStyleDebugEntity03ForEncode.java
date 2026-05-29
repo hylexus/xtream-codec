@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.debug.codec.core.demo03;
 
+import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
@@ -39,7 +40,7 @@ public class RustStyleDebugEntity03ForEncode {
     private int msgId;
 
     @Preset.RustStyle.simple_map(
-            key = @XtreamMapField.Key(type = KeyType.u16),
+            key = @Key(type = KeyType.u16),
             valueLength = @XtreamMapField.ValueLength(type = LengthFieldType.u8),
             value = @XtreamMapField.Value(
                     encoder = @XtreamMapField.ValueEncoder(

@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.impl.codec.map;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamDateTimeField;
+import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
@@ -44,9 +45,9 @@ public class MapFieldEntity {
 
     @XtreamMapField(
             key = {
-                    @XtreamMapField.Key(version = 0, type = u16),
-                    @XtreamMapField.Key(version = {1}, type = u32),
-                    @XtreamMapField.Key(version = 2, type = str_gbk, sizeInBytes = 8, paddingType = PaddingType.LEFT, paddingElement = 'x'),
+                    @Key(version = 0, type = u16),
+                    @Key(version = {1}, type = u32),
+                    @Key(version = 2, type = str_gbk, sizeInBytes = 8, paddingType = PaddingType.LEFT, paddingElement = 'x'),
                     // @XtreamMapField.Key(version = 2, type = str, sizeInBytes = 11,charset = "UTF-8"),
                     // @XtreamMapField.Key(version = 2, type = str, sizeInBytes = 8,charset = "gb2312"),
             },

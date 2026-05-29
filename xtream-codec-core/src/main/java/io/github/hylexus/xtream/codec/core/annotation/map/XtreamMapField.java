@@ -18,10 +18,9 @@ package io.github.hylexus.xtream.codec.core.annotation.map;
 
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.map.MapFieldCodec;
@@ -72,38 +71,6 @@ public @interface XtreamMapField {
 
     @AliasFor(annotation = XtreamField.class, attribute = "desc")
     String desc() default "";
-
-    @interface Key {
-        int[] version() default {ALL_VERSION};
-
-        /**
-         * {@link java.util.Map} 中 {@code Key} 的类型
-         */
-        KeyType type() default KeyType.u8;
-
-        /**
-         * 仅仅 {@link String} 类型的 {@code Key} 用到
-         */
-        int sizeInBytes() default -1;
-
-        /**
-         * 仅仅 {@link String} 类型的 {@code Key} 用到
-         */
-        String charset() default DEFAULT_CHARSET;
-
-        /**
-         * 仅仅 {@link String} 类型的 {@code Key} 用到
-         */
-        PaddingType paddingType() default PaddingType.NONE;
-
-        /**
-         * 仅仅 {@link String} 类型的 {@code Key} 用到
-         * <p>
-         * {@code 0x30(48) == "0".getBytes()[0];}
-         */
-        byte paddingElement() default 0x30;
-
-    }
 
     @interface ValueLength {
         int[] version() default {ALL_VERSION};

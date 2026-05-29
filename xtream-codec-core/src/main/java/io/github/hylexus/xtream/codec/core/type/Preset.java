@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.*;
+import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import org.jetbrains.annotations.ApiStatus;
 import org.springframework.core.annotation.AliasFor;
@@ -707,7 +708,7 @@ public @interface Preset {
         @interface simple_map {
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "key")
-            XtreamMapField.Key[] key();
+            Key[] key();
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "valueLength")
             XtreamMapField.ValueLength[] valueLength();
@@ -1329,7 +1330,7 @@ public @interface Preset {
         @interface SimpleMap {
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "key")
-            XtreamMapField.Key[] key();
+            Key[] key();
 
             @AliasFor(annotation = XtreamMapField.class, attribute = "valueLength")
             XtreamMapField.ValueLength[] valueLength();

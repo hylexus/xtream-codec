@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
@@ -253,12 +254,12 @@ public class SimpleMapMetadataRegistry {
         return null;
     }
 
-    private static FieldCodec<Object> createKeyCodec(XtreamMapField.Key key) {
+    private static FieldCodec<Object> createKeyCodec(Key key) {
         final KeyType keyType = key.type();
         return switch (keyType) {
             case i8, u8, i16, u16, i32, u32, i64,
                  str_gbk, str_utf8, str_gb_2312 -> keyType.dataType().codec();
-            case str -> StringFieldCodecs.createStringCodecAndCastToObject(requireNonNull(key.charset(), XtreamMapField.Key.class.getName() + ".charset() is required"));
+            case str -> StringFieldCodecs.createStringCodecAndCastToObject(requireNonNull(key.charset(), Key.class.getName() + ".charset() is required"));
         };
     }
 
@@ -355,7 +356,7 @@ public class SimpleMapMetadataRegistry {
         return duplicates;
     }
 
-    static String parseKeyCharset(XtreamMapField.Key key) {
+    static String parseKeyCharset(Key key) {
         final KeyType type = key.type();
         return switch (type) {
             case str_gb_2312 -> XtreamConstants.CHARSET_NAME_GB_2312;
@@ -367,14 +368,14 @@ public class SimpleMapMetadataRegistry {
     }
 
     private static KeyMeta createKeyMeta(int targetVersion, XtreamMapField xtreamMapField) {
-        final VersionMatchResult<XtreamMapField.Key> matchResult = matchVersion(
+        final VersionMatchResult<Key> matchResult = matchVersion(
                 targetVersion,
                 Arrays.stream(xtreamMapField.key()).map(it -> new HasVersions<>(it.version(), it)),
                 HasVersion::data
         );
         log.debug("KEY: targetVersion={}, {}", targetVersion, matchResult);
         if (matchResult.matched()) {
-            final XtreamMapField.Key key = requireNonNull(matchResult.source());
+            final Key key = requireNonNull(matchResult.source());
 
             final int sizeInBytes = key.type().dataType().sizeInBytes() <= 0
                     ? key.sizeInBytes()
@@ -387,7 +388,7 @@ public class SimpleMapMetadataRegistry {
             return new KeyMeta(targetVersion, key.type(), sizeInBytes, keyCharset, key.paddingType(), key.paddingElement(), keyCodec);
         }
 
-        throw new IllegalArgumentException("No `[" + XtreamMapField.Key.class.getName() + "]` found for target version " + targetVersion);
+        throw new IllegalArgumentException("No `[" + Key.class.getName() + "]` found for target version " + targetVersion);
     }
 
     private static ValueLengthMeta createValueLengthMeta(int targetVersion, XtreamMapField xtreamMapField) {
