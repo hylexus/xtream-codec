@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
+import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.github.hylexus.xtream.codec.core.type.Preset;

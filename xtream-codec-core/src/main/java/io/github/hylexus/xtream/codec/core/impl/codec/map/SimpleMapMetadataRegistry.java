@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
@@ -252,16 +253,16 @@ public class SimpleMapMetadataRegistry {
     }
 
     private static FieldCodec<Object> createKeyCodec(XtreamMapField.Key key) {
-        final XtreamMapField.KeyType keyType = key.type();
+        final KeyType keyType = key.type();
         return switch (keyType) {
             case i8, u8, i16, u16, i32, u32, i64,
-                 str_gbk, str_utf8, str_gb_2312 -> keyType.type().codec();
+                 str_gbk, str_utf8, str_gb_2312 -> keyType.dataType().codec();
             case str -> StringFieldCodecs.createStringCodecAndCastToObject(requireNonNull(key.charset(), XtreamMapField.Key.class.getName() + ".charset() is required"));
         };
     }
 
     private static Object readKey(KeyMeta keyMeta, XtreamMapField.ValueMatcher valueMatcher) {
-        final XtreamMapField.KeyType keyType = keyMeta.type();
+        final KeyType keyType = keyMeta.type();
         return switch (keyType) {
             case i8 -> valueMatcher.matchI8();
             case u8 -> valueMatcher.matchU8();
@@ -354,7 +355,7 @@ public class SimpleMapMetadataRegistry {
     }
 
     static String parseKeyCharset(XtreamMapField.Key key) {
-        final XtreamMapField.KeyType type = key.type();
+        final KeyType type = key.type();
         return switch (type) {
             case str_gb_2312 -> XtreamConstants.CHARSET_NAME_GB_2312;
             case str_gbk -> XtreamConstants.CHARSET_NAME_GBK;
@@ -374,9 +375,9 @@ public class SimpleMapMetadataRegistry {
         if (matchResult.matched()) {
             final XtreamMapField.Key key = requireNonNull(matchResult.source());
 
-            final int sizeInBytes = key.type().type().sizeInBytes() <= 0
+            final int sizeInBytes = key.type().dataType().sizeInBytes() <= 0
                     ? key.sizeInBytes()
-                    : key.type().type().sizeInBytes();
+                    : key.type().dataType().sizeInBytes();
             if (sizeInBytes <= 0) {
                 throw new IllegalArgumentException("Invalid sizeInBytes: " + sizeInBytes);
             }
@@ -507,7 +508,7 @@ public class SimpleMapMetadataRegistry {
 
     record KeyMeta(
             int version,
-            XtreamMapField.KeyType type,
+            KeyType type,
             int sizeInBytes,
             String charset,
             Charset resolvedCharset,
@@ -515,7 +516,7 @@ public class SimpleMapMetadataRegistry {
             byte paddingElement,
             FieldCodec<Object> codec
     ) {
-        public KeyMeta(int version, XtreamMapField.KeyType type, int sizeInBytes, String charset, PaddingType paddingType, byte paddingElement, FieldCodec<Object> codec) {
+        public KeyMeta(int version, KeyType type, int sizeInBytes, String charset, PaddingType paddingType, byte paddingElement, FieldCodec<Object> codec) {
             this(version, type, sizeInBytes, charset, Charset.forName(charset), paddingType, paddingElement, codec);
         }
     }

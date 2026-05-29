@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.map.MapFieldCodec;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
@@ -184,31 +185,6 @@ public @interface XtreamMapField {
         Class<? extends FieldCodec<?>> valueCodec() default FieldCodec.Placeholder.class;
 
         String charset() default "";
-    }
-
-    enum KeyType {
-        i8(XtreamDataType.i8),
-        u8(XtreamDataType.u8),
-        i16(XtreamDataType.i16),
-        u16(XtreamDataType.u16),
-        i32(XtreamDataType.i32),
-        u32(XtreamDataType.u32),
-        i64(XtreamDataType.i64),
-        str(XtreamDataType.string),
-        str_gb_2312(XtreamDataType.string_gb_2312),
-        str_gbk(XtreamDataType.string_gbk),
-        str_utf8(XtreamDataType.string_utf8),
-        ;
-
-        private final XtreamDataType type;
-
-        KeyType(XtreamDataType type) {
-            this.type = type;
-        }
-
-        public XtreamDataType type() {
-            return type;
-        }
     }
 
     enum ValueLengthType {

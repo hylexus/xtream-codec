@@ -31,8 +31,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.github.hylexus.xtream.codec.core.annotation.ext.KeyType.*;
 import static io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.*;
-import static io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.KeyType.*;
 
 @Data
 @Accessors(chain = true)

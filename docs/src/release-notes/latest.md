@@ -12,6 +12,9 @@ article: false
 - `@XtreamMapField.PaddingType`
     - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.PaddingType`
     - 使用 `io.github.hylexus.xtream.codec.core.annotation.PaddingType` 替代
+- `XtreamMapField.KeyType`
+    - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.KeyType`
+    - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.KeyType` 替代
 
 ## 0.5.0-rc.3(2026-05-27)
 
