@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x64;
@@ -113,7 +114,7 @@ public class BuiltinMessage0200 {
     @Preset.JtStyle.SimpleMap(
             desc = "附加项列表",
             key = @Key(type = KeyType.u8),
-            valueLength = @ValueLength(type = ValueLengthType.u8),
+            valueLength = @ValueLength(type = LengthFieldType.u8),
             value = @Value(
                     // 位置汇报消息一般不会在服务端编码
                     // 所以这个 encoder 可以删掉(编码时才需要, 解码时用 decoder 属性)

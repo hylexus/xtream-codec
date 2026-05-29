@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.impl.codec.map;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamDateTimeField;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.U32FieldCodecs;
@@ -50,8 +51,8 @@ public class MapFieldEntity {
                     // @XtreamMapField.Key(version = 2, type = str, sizeInBytes = 8,charset = "gb2312"),
             },
             valueLength = {
-                    @XtreamMapField.ValueLength(version = 0, type = ValueLengthType.u8),
-                    @XtreamMapField.ValueLength(version = {1, 2}, type = ValueLengthType.u16),
+                    @XtreamMapField.ValueLength(version = 0, type = LengthFieldType.u8),
+                    @XtreamMapField.ValueLength(version = {1, 2}, type = LengthFieldType.u16),
             },
             value = @Value(
                     // 编码(序列化)配置

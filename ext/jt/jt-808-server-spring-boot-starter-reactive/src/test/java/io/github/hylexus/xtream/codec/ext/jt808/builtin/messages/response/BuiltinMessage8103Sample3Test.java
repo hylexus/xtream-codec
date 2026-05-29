@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -109,7 +110,7 @@ class BuiltinMessage8103Sample3Test extends BaseCodecTest {
 
         @Preset.JtStyle.SimpleMap(
                 key = @Key(type = KeyType.u32),
-                valueLength = @ValueLength(type = ValueLengthType.u8),
+                valueLength = @ValueLength(type = LengthFieldType.u8),
                 value = @Value(
                         decoder = @ValueDecoder(
                                 params = @DecoderParam(charset = XtreamConstants.CHARSET_NAME_GBK),

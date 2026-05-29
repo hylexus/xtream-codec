@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.map.MapFieldCodec;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
@@ -110,7 +111,7 @@ public @interface XtreamMapField {
         /**
          * 用来描述 {@link java.util.Map} 中 {@code Value} 的长度的类型
          */
-        ValueLengthType type();
+        LengthFieldType type();
     }
 
     @interface Value {
@@ -187,23 +188,4 @@ public @interface XtreamMapField {
         String charset() default "";
     }
 
-    enum ValueLengthType {
-        i8(XtreamDataType.i8),
-        u8(XtreamDataType.u8),
-        i16(XtreamDataType.i16),
-        u16(XtreamDataType.u16),
-        i32(XtreamDataType.i32),
-        u32(XtreamDataType.u32),
-        ;
-
-        private final XtreamDataType type;
-
-        ValueLengthType(XtreamDataType type) {
-            this.type = type;
-        }
-
-        public XtreamDataType type() {
-            return type;
-        }
-    }
 }

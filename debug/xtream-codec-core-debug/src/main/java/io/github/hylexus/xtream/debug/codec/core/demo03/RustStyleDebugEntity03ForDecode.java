@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.debug.codec.core.demo03;
 
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -40,7 +41,7 @@ public class RustStyleDebugEntity03ForDecode {
 
     @Preset.RustStyle.simple_map(
             key = @XtreamMapField.Key(type = KeyType.u16),
-            valueLength = @XtreamMapField.ValueLength(type = XtreamMapField.ValueLengthType.u8),
+            valueLength = @XtreamMapField.ValueLength(type = LengthFieldType.u8),
             value = @XtreamMapField.Value(
                     decoder = @XtreamMapField.ValueDecoder(
                             params = @XtreamMapField.DecoderParam(charset = "gbk"),

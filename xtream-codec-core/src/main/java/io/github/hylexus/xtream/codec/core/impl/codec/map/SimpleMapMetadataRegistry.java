@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
@@ -523,10 +524,10 @@ public class SimpleMapMetadataRegistry {
 
     record ValueLengthMeta(
             int version,
-            XtreamMapField.ValueLengthType type,
+            LengthFieldType type,
             FieldCodec<Object> codec) {
 
-        public ValueLengthMeta(int version, XtreamMapField.ValueLengthType type) {
+        public ValueLengthMeta(int version, LengthFieldType type) {
             this(version, type, type.type().codec());
         }
     }

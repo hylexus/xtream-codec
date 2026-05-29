@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.debug.ext.jt808.message;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
+import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
@@ -75,7 +76,7 @@ public class DemoLocationMsg03 extends AbstractJt808Message {
     // 长度：消息体长度减去前面的 28 字节
     @Preset.JtStyle.SimpleMap(
             key = @Key(type = KeyType.u8),
-            valueLength = @ValueLength(type = ValueLengthType.u8),
+            valueLength = @ValueLength(type = LengthFieldType.u8),
             value = @Value(
                     encoder = @ValueEncoder(
                             params = @EncoderParam(charset = XtreamConstants.CHARSET_NAME_GBK),
