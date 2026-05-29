@@ -108,7 +108,7 @@ public class SimpleMapMetadataRegistry {
                 targetVersion,
                 Arrays.stream(value.decoder().params()).map(param -> new HasVersions<>(param.version(), param)),
                 hasVersion -> {
-                    final XtreamMapField.DecoderParam data = hasVersion.data();
+                    final ValueDecoderCommonParam data = hasVersion.data();
                     return new DecoderCommonParam(hasVersion.version(), data.charset());
                 }
         );

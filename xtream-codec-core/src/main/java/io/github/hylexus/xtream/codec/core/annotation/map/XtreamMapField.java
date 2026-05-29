@@ -19,10 +19,7 @@ package io.github.hylexus.xtream.codec.core.annotation.map;
 import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.annotation.ext.FallbackValueMatcher;
-import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueMatcher;
+import io.github.hylexus.xtream.codec.core.annotation.ext.*;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.map.MapFieldCodec;
 import org.springframework.core.annotation.AliasFor;
@@ -79,7 +76,7 @@ public @interface XtreamMapField {
     }
 
     @interface ValueDecoder {
-        DecoderParam[] params() default {@DecoderParam};
+        ValueDecoderCommonParam[] params() default {@ValueDecoderCommonParam};
 
         ValueMatcher[] matchers() default {};
 
@@ -96,12 +93,6 @@ public @interface XtreamMapField {
         int[] version() default {ALL_VERSION};
 
         boolean writeNumberAsLittleEndian() default false;
-
-        String charset() default DEFAULT_CHARSET;
-    }
-
-    @interface DecoderParam {
-        int[] version() default {ALL_VERSION};
 
         String charset() default DEFAULT_CHARSET;
     }

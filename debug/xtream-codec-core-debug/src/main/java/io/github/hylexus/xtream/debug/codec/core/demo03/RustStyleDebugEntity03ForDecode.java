@@ -43,7 +43,7 @@ public class RustStyleDebugEntity03ForDecode {
             valueLength = @ValueLength(type = LengthFieldType.u8),
             value = @XtreamMapField.Value(
                     decoder = @XtreamMapField.ValueDecoder(
-                            params = @XtreamMapField.DecoderParam(charset = "gbk"),
+                            params = @ValueDecoderCommonParam(charset = "gbk"),
                             matchers = {
                                     @ValueMatcher(matchU16 = 1, valueType = XtreamDataType.string_utf8),
                                     @ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string_utf8),

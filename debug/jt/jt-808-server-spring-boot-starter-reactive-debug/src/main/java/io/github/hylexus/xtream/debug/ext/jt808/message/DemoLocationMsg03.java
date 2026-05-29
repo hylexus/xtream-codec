@@ -96,7 +96,7 @@ public class DemoLocationMsg03 extends AbstractJt808Message {
                             }
                     ),
                     decoder = @ValueDecoder(
-                            params = @DecoderParam(charset = XtreamConstants.CHARSET_NAME_GBK),
+                            params = @ValueDecoderCommonParam(charset = XtreamConstants.CHARSET_NAME_GBK),
                             matchers = {
                                     @ValueMatcher(matchU8 = 0x01, valueType = XtreamDataType.u32, desc = "里程，DWORD，1/10km，对应车上里程表读数"),
                                     @ValueMatcher(matchU8 = 0x02, valueType = XtreamDataType.u16, desc = "油量，WORD，1/10L，对应车上油量表读数"),

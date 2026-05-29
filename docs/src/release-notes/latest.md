@@ -30,6 +30,9 @@ article: false
 - `XtreamMapField.ValueMatcher`
     - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.ValueMatcher`
     - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.ValueMatcher` 代替
+- `XtreamMapField.DecoderParam`
+    - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.DecoderParam`
+    - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.ValueDecoderCommonParam` 代替
 
 ## 0.5.0-rc.3(2026-05-27)
 

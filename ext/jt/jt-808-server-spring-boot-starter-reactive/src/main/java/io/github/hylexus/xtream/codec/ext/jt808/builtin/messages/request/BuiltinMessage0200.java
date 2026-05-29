@@ -19,7 +19,6 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.annotation.ext.*;
-import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x64;
@@ -133,14 +132,10 @@ public class BuiltinMessage0200 {
                                     @ValueMatcher(matchU8 = 0x2B, valueType = i32, desc = "模拟量，bit0-15,AD0,bit16-31,AD1"),
                                     @ValueMatcher(matchU8 = 0x30, valueType = u8, desc = "数据类型为 BYTE，无线通信网络信号强度"),
                                     @ValueMatcher(matchU8 = 0x31, valueType = u8, desc = "数据类型为 BYTE，GNSS定位卫星数"),
-                                    @ValueMatcher(matchU8 = 0x64, valueEntity = LocationItem0x64.class, desc = "苏标: 高级驾驶辅助报警信息，定义见表 4-15"),
-                                    @ValueMatcher(matchU8 = 0x65, valueEntity = LocationItem0x65.class, desc = "苏标: 驾驶员状态监测系统报警信息，定义见表 4-17"),
-                                    @ValueMatcher(matchU8 = 0x66, valueEntity = LocationItem0x66.class, desc = "苏标: 胎压监测系统报警信息，定义见表 4-18"),
-                                    @ValueMatcher(matchU8 = 0x67, valueEntity = LocationItem0x67.class, desc = "苏标: 盲区监测系统报警信息，定义见表 4-20"),
                             }
                     ),
                     decoder = @ValueDecoder(
-                            params = {@DecoderParam(charset = "GBK")},
+                            params = {@ValueDecoderCommonParam(charset = "GBK")},
                             matchers = {
                                     @ValueMatcher(matchU8 = 0x01, valueType = u32, desc = "里程，DWORD，1/10km，对应车上里程表读数"),
                                     @ValueMatcher(matchU8 = 0x02, valueType = u16, desc = "油量，WORD，1/10L，对应车上油量表读数"),

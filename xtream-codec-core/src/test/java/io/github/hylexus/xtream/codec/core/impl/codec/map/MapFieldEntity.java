@@ -86,8 +86,8 @@ public class MapFieldEntity {
                     // 解码(反序列化)配置
                     decoder = @ValueDecoder(
                             params = {
-                                    @DecoderParam(version = 1, charset = "UTF-8"),
-                                    @DecoderParam(version = {0, 2}, charset = "gbk"),
+                                    @ValueDecoderCommonParam(version = 1, charset = "UTF-8"),
+                                    @ValueDecoderCommonParam(version = {0, 2}, charset = "gbk"),
                             },
                             matchers = {
                                     @ValueMatcher(version = 0, matchU16 = 11, valueType = XtreamDataType.i8),

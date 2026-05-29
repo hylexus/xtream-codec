@@ -113,7 +113,7 @@ class BuiltinMessage8103Sample3Test extends BaseCodecTest {
                 valueLength = @ValueLength(type = LengthFieldType.u8),
                 value = @Value(
                         decoder = @ValueDecoder(
-                                params = @DecoderParam(charset = XtreamConstants.CHARSET_NAME_GBK),
+                                params = @ValueDecoderCommonParam(charset = XtreamConstants.CHARSET_NAME_GBK),
                                 matchers = {
                                         @ValueMatcher(matchU32 = 0x0001, valueType = XtreamDataType.u32),
                                         @ValueMatcher(matchU32 = 0x0040, valueType = XtreamDataType.string_gbk),

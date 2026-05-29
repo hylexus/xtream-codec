@@ -79,7 +79,7 @@ public class RustStyleRecordTest {
                                     }
                             ),
                             decoder = @ValueDecoder(
-                                    params = {@DecoderParam(charset = "UTF-8")},
+                                    params = {@ValueDecoderCommonParam(charset = "UTF-8")},
                                     matchers = {
                                             @ValueMatcher(matchU16 = 1, valueType = XtreamDataType.u32),
                                             // charset 从 params 继承而来(UTF-8)

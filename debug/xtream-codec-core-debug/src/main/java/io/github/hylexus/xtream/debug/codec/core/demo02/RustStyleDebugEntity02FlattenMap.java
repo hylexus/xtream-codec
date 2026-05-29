@@ -122,7 +122,7 @@ public class RustStyleDebugEntity02FlattenMap {
                             }
                     ),
                     decoder = @XtreamMapField.ValueDecoder(
-                            params = @XtreamMapField.DecoderParam(charset = "gbk"),
+                            params = @ValueDecoderCommonParam(charset = "gbk"),
                             matchers = {
                                     // 0x01 dword(u32): 里程，单位为 1/10km
                                     @ValueMatcher(matchU8 = 0x01, valueType = XtreamDataType.u32),
