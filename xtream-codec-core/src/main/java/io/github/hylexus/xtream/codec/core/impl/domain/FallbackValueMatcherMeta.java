@@ -35,4 +35,11 @@ public record FallbackValueMatcherMeta(
     public FallbackValueMatcherMeta {
     }
 
+    /**
+     * 用于不需要 {@link #description()} 的场景
+     * （如 {@link io.github.hylexus.xtream.codec.core.impl.codec.map.SimpleMapMetadataRegistry}）。
+     */
+    public FallbackValueMatcherMeta(int version, XtreamDataType valueType, FieldCodec<Object> codec, @Nullable String charset) {
+        this(version, valueType, codec, charset, "");
+    }
 }

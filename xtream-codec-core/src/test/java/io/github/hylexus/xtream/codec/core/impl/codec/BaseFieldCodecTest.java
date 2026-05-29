@@ -34,12 +34,12 @@ public class BaseFieldCodecTest {
         final ByteBuf buffer = allocator.buffer();
         try {
             final CodecTracker encodeTracker = new CodecTracker();
-            this.entityCodec.encode(version, instance, buffer, null);
+            this.entityCodec.encode(version, instance, buffer, encodeTracker);
             encodeTracker.visit();
             System.out.println(FormatUtils.toHexString(buffer));
             @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) instance.getClass();
             final CodecTracker decodeTracker = new CodecTracker();
-            final T decode = this.entityCodec.decode(version, cls, buffer, null);
+            final T decode = this.entityCodec.decode(version, cls, buffer, decodeTracker);
             decodeTracker.visit();
             assertion.accept(instance, decode);
         } finally {

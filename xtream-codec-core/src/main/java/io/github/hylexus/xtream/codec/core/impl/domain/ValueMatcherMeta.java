@@ -39,4 +39,12 @@ public record ValueMatcherMeta(
     @SuppressWarnings("unused")
     public ValueMatcherMeta {
     }
+
+    /**
+     * 用于不需要 {@link #length()}、{@link #valueEntity()}、{@link #description()} 的场景
+     * （如 {@link io.github.hylexus.xtream.codec.core.impl.codec.map.SimpleMapMetadataRegistry}）。
+     */
+    public ValueMatcherMeta(int version, Object key, XtreamDataType valueType, FieldCodec<Object> valueCodec, @Nullable String charset) {
+        this(version, key, 0, valueType, valueCodec, void.class, charset, "");
+    }
 }

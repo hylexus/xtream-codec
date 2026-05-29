@@ -29,6 +29,11 @@ import io.github.hylexus.xtream.codec.core.annotation.NumberSignedness;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.impl.codec.AbstractFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.DelegateBeanMetadataFieldCodec;
+import io.github.hylexus.xtream.codec.core.impl.domain.KeyMeta;
+import io.github.hylexus.xtream.codec.core.impl.domain.ValueMatcherMeta;
+import io.github.hylexus.xtream.codec.core.impl.codec.map.SimpleMapMetadataRegistry.DecoderValueMeta;
+import io.github.hylexus.xtream.codec.core.impl.codec.map.SimpleMapMetadataRegistry.EncoderValueMeta;
+import io.github.hylexus.xtream.codec.core.impl.codec.map.SimpleMapMetadataRegistry.MapMeta;
 import io.github.hylexus.xtream.codec.core.tracker.*;
 import io.github.hylexus.xtream.codec.core.utils.BeanUtils;
 import io.netty.buffer.ByteBuf;
@@ -40,7 +45,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
-import static io.github.hylexus.xtream.codec.core.impl.codec.map.SimpleMapMetadataRegistry.*;
 import static java.util.Objects.requireNonNull;
 
 public class MapFieldCodec extends AbstractFieldCodec<Object> {
@@ -48,6 +52,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
 
     @SuppressWarnings("all")
     private final BeanMetadataRegistry beanMetadataRegistry;
+    private final SimpleMapMetadataRegistry simpleMapMetadataRegistry;
 
     @SuppressWarnings("unused")
     private MapFieldCodec() {
@@ -61,6 +66,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
     @FieldCodecCreator
     public MapFieldCodec(BeanMetadataRegistry beanMetadataRegistry, FieldCodecRegistry fieldCodecRegistry) {
         this.beanMetadataRegistry = requireNonNull(beanMetadataRegistry);
+        this.simpleMapMetadataRegistry = new SimpleMapMetadataRegistry(beanMetadataRegistry);
         XtreamAssertions.assertSame(fieldCodecRegistry, beanMetadataRegistry.getFieldCodecRegistry());
     }
 
@@ -69,7 +75,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         if (value == null) {
             return;
         }
-        final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
+        final SimpleMapMetadataRegistry.MapMeta mapMeta = simpleMapMetadataRegistry.getOrCreateMapMetadata(context, propertyMetadata);
         @SuppressWarnings("unchecked") final Map<Object, Object> map = (Map<Object, Object>) value;
 
         final KeyMeta keyMeta = mapMeta.keyMeta();
@@ -110,7 +116,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         if (value == null) {
             return;
         }
-        final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
+        final SimpleMapMetadataRegistry.MapMeta mapMeta = simpleMapMetadataRegistry.getOrCreateMapMetadata(context, propertyMetadata);
         @SuppressWarnings("unchecked") final Map<Object, Object> map = (Map<Object, Object>) value;
 
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
@@ -174,7 +180,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
                 ? input // all remaining
                 : input.readSlice(length);
         @SuppressWarnings({"unchecked"}) final Map<Object, @Nullable Object> map = (Map<Object, Object>) propertyMetadata.containerInstanceFactory().create();
-        final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
+        final SimpleMapMetadataRegistry.MapMeta mapMeta = simpleMapMetadataRegistry.getOrCreateMapMetadata(context, propertyMetadata);
         final KeyMeta keyMeta = mapMeta.keyMeta();
         final int keyLength = mapMeta.keyMeta().sizeInBytes();
         final FieldCodec<Object> keyCodec = keyMeta.codec();
@@ -208,7 +214,7 @@ public class MapFieldCodec extends AbstractFieldCodec<Object> {
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         final MapFieldSpan mapFieldSpan = codecTracker.startNewMapFieldSpan(propertyMetadata, this.getClass().getSimpleName());
         @SuppressWarnings({"unchecked"}) final Map<Object, @Nullable Object> map = (Map<Object, Object>) propertyMetadata.containerInstanceFactory().create();
-        final SimpleMapMetadataRegistry.MapMeta mapMeta = getOrCreateMapMetadata(context, propertyMetadata);
+        final SimpleMapMetadataRegistry.MapMeta mapMeta = simpleMapMetadataRegistry.getOrCreateMapMetadata(context, propertyMetadata);
         int sequence = 0;
         final KeyMeta keyMeta = mapMeta.keyMeta();
         final int keyLength = mapMeta.keyMeta().sizeInBytes();

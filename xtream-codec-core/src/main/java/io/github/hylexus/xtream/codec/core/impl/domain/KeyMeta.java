@@ -23,6 +23,8 @@ import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.github.hylexus.xtream.codec.core.type.simple.DataField;
 import io.netty.buffer.ByteBuf;
 
+import java.nio.charset.Charset;
+
 /**
  * @author hylexus
  * @see io.github.hylexus.xtream.codec.core.annotation.ext.Key
@@ -32,12 +34,17 @@ public record KeyMeta(
         KeyType type,
         int sizeInBytes,
         String charset,
+        Charset resolvedCharset,
         PaddingType paddingType,
         byte paddingElement,
         FieldCodec<Object> codec
 ) {
 
     @SuppressWarnings("unused")
+    public KeyMeta(int version, KeyType type, int sizeInBytes, String charset, PaddingType paddingType, byte paddingElement, FieldCodec<Object> codec) {
+        this(version, type, sizeInBytes, charset, Charset.forName(charset), paddingType, paddingElement, codec);
+    }
+
     public KeyMeta {
     }
 

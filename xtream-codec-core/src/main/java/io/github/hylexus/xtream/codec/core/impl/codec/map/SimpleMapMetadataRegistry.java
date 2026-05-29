@@ -17,34 +17,35 @@
 package io.github.hylexus.xtream.codec.core.impl.codec.map;
 
 import io.github.hylexus.xtream.codec.common.bean.BeanPropertyMetadata;
-import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
-import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.annotation.ext.*;
+import io.github.hylexus.xtream.codec.core.annotation.ext.FallbackValueMatcher;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueDecoderCommonParam;
+import io.github.hylexus.xtream.codec.core.annotation.ext.ValueMatcher;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
-import io.github.hylexus.xtream.codec.core.impl.DefaultExtendMetaRegistry;
-import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
-import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
-import io.github.hylexus.xtream.codec.core.type.CodecCharset;
-import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
+import io.github.hylexus.xtream.codec.core.impl.codec.utils.HasVersion;
+import io.github.hylexus.xtream.codec.core.impl.codec.utils.HasVersions;
+import io.github.hylexus.xtream.codec.core.impl.codec.utils.MetadataUtils;
+import io.github.hylexus.xtream.codec.core.impl.codec.utils.VersionMatchResult;
+import io.github.hylexus.xtream.codec.core.impl.domain.FallbackValueMatcherMeta;
+import io.github.hylexus.xtream.codec.core.impl.domain.KeyMeta;
+import io.github.hylexus.xtream.codec.core.impl.domain.ValueLengthMeta;
+import io.github.hylexus.xtream.codec.core.impl.domain.ValueMatcherMeta;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static io.github.hylexus.xtream.codec.common.utils.XtreamAssertions.assertNotBlank;
 import static java.util.Objects.requireNonNull;
 
 // todo 移动到 BeanMetadataRegistry ?
@@ -52,18 +53,23 @@ import static java.util.Objects.requireNonNull;
 public class SimpleMapMetadataRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleMapMetadataRegistry.class);
-    // targetVersion -> field -> MapMeta
-    private static final ConcurrentMap<Integer, ConcurrentMap<Field, MapMeta>> CACHE = new ConcurrentHashMap<>();
 
-    static MapMeta getOrCreateMapMetadata(FieldCodec.CodecContext codecContext, BeanPropertyMetadata propertyMetadata) {
+    private final BeanMetadataRegistry beanMetadataRegistry;
+    // targetVersion -> field -> MapMeta
+    private final ConcurrentMap<Integer, ConcurrentMap<Field, MapMeta>> cache = new ConcurrentHashMap<>();
+
+    public SimpleMapMetadataRegistry(BeanMetadataRegistry beanMetadataRegistry) {
+        this.beanMetadataRegistry = requireNonNull(beanMetadataRegistry);
+    }
+
+    MapMeta getOrCreateMapMetadata(FieldCodec.CodecContext codecContext, BeanPropertyMetadata propertyMetadata) {
         final int targetVersion = codecContext.version();
         final Field field = propertyMetadata.field();
-        final ConcurrentMap<Field, MapMeta> map = CACHE.computeIfAbsent(targetVersion, k -> new ConcurrentHashMap<>());
+        final ConcurrentMap<Field, MapMeta> map = cache.computeIfAbsent(targetVersion, k -> new ConcurrentHashMap<>());
         return map.computeIfAbsent(field, f -> {
             try {
                 final XtreamMapField xtreamMapField = propertyMetadata.findAnnotation(XtreamMapField.class).orElseThrow();
-                final BeanMetadataRegistry beanMetadataRegistry = codecContext.beanMetadataRegistry();
-                final MapMeta mapMeta = doCreateMapMetadata(beanMetadataRegistry, targetVersion, xtreamMapField);
+                final MapMeta mapMeta = doCreateMapMetadata(targetVersion, xtreamMapField);
                 if (log.isDebugEnabled()) {
                     log.debug("Field:{}, MapMeta: {}", field.toGenericString(), mapMeta);
                 }
@@ -75,21 +81,21 @@ public class SimpleMapMetadataRegistry {
         });
     }
 
-    private static MapMeta doCreateMapMetadata(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, XtreamMapField xtreamMapField) {
+    private MapMeta doCreateMapMetadata(int targetVersion, XtreamMapField xtreamMapField) {
         final KeyMeta keyMeta = createKeyMeta(targetVersion, xtreamMapField);
         final ValueLengthMeta valueLengthMeta = createValueLengthMeta(targetVersion, xtreamMapField);
-        final ValueMeta valueMeta = createValueMeta(beanMetadataRegistry, targetVersion, keyMeta, xtreamMapField.value());
+        final ValueMeta valueMeta = createValueMeta(targetVersion, keyMeta, xtreamMapField.value());
         return new MapMeta(keyMeta, valueLengthMeta, valueMeta);
     }
 
-    private static ValueMeta createValueMeta(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, KeyMeta keyMeta, XtreamMapField.Value value) {
-        final EncoderValueMeta encoderValueMeta = createEncoderValueMata(beanMetadataRegistry, targetVersion, keyMeta, value);
-        final DecoderValueMeta decoderValueMeta = createDecoderValueMata(beanMetadataRegistry, targetVersion, keyMeta, value);
+    private ValueMeta createValueMeta(int targetVersion, KeyMeta keyMeta, XtreamMapField.Value value) {
+        final EncoderValueMeta encoderValueMeta = createEncoderValueMata(targetVersion, keyMeta, value);
+        final DecoderValueMeta decoderValueMeta = createDecoderValueMata(targetVersion, keyMeta, value);
         return new ValueMeta(encoderValueMeta, decoderValueMeta);
     }
 
-    private static EncoderValueMeta createEncoderValueMata(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, KeyMeta keyMeta, XtreamMapField.Value value) {
-        final VersionMatchResult<EncoderCommonParam> matchResult = matchVersion(
+    private EncoderValueMeta createEncoderValueMata(int targetVersion, KeyMeta keyMeta, XtreamMapField.Value value) {
+        final VersionMatchResult<EncoderCommonParam> matchResult = HasVersions.matchVersion(
                 targetVersion,
                 Arrays.stream(value.encoder().params()).map(param -> new HasVersions<>(param.version(), param)),
                 hasVersion -> {
@@ -99,12 +105,12 @@ public class SimpleMapMetadataRegistry {
         );
         final EncoderCommonParam commonParam = matchResult.matched() ? matchResult.source() : new EncoderCommonParam(targetVersion, false, XtreamMapField.DEFAULT_CHARSET);
         log.debug("EncoderCommonParam: {}", matchResult);
-        final List<ValueMatcherMeta> encoderValueMatchers = createValueMatcherMetaList(beanMetadataRegistry, targetVersion, keyMeta, value.encoder().matchers(), commonParam, null);
+        final List<ValueMatcherMeta> encoderValueMatchers = createValueMatcherMetaList(targetVersion, keyMeta, value.encoder().matchers(), commonParam, null);
         return new EncoderValueMeta(commonParam, encoderValueMatchers);
     }
 
-    private static DecoderValueMeta createDecoderValueMata(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, KeyMeta keyType, XtreamMapField.Value value) {
-        final VersionMatchResult<DecoderCommonParam> matchResult = matchVersion(
+    private DecoderValueMeta createDecoderValueMata(int targetVersion, KeyMeta keyType, XtreamMapField.Value value) {
+        final VersionMatchResult<DecoderCommonParam> matchResult = HasVersions.matchVersion(
                 targetVersion,
                 Arrays.stream(value.decoder().params()).map(param -> new HasVersions<>(param.version(), param)),
                 hasVersion -> {
@@ -116,8 +122,8 @@ public class SimpleMapMetadataRegistry {
                 ? matchResult.source()
                 : new DecoderCommonParam(targetVersion, XtreamMapField.DEFAULT_CHARSET);
         log.debug("DecoderCommonParam: {}", matchResult);
-        final FallbackValueMatcherMeta fallbackValueMatcherMeta = createFallbackValueMatcherMeta(beanMetadataRegistry, targetVersion, value.decoder().fallbackMatchers(), commonParam);
-        final List<ValueMatcherMeta> decoderValueMatchers = createValueMatcherMetaList(beanMetadataRegistry, targetVersion, keyType, value.decoder().matchers(), null, commonParam);
+        final FallbackValueMatcherMeta fallbackValueMatcherMeta = createFallbackValueMatcherMeta(targetVersion, value.decoder().fallbackMatchers(), commonParam);
+        final List<ValueMatcherMeta> decoderValueMatchers = createValueMatcherMetaList(targetVersion, keyType, value.decoder().matchers(), null, commonParam);
         return new DecoderValueMeta(commonParam, fallbackValueMatcherMeta, decoderValueMatchers);
     }
 
@@ -135,11 +141,11 @@ public class SimpleMapMetadataRegistry {
         return valueMatchersByKey;
     }
 
-    private static FallbackValueMatcherMeta createFallbackValueMatcherMeta(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, FallbackValueMatcher[] matchers, DecoderCommonParam commonParam) {
+    private FallbackValueMatcherMeta createFallbackValueMatcherMeta(int targetVersion, FallbackValueMatcher[] matchers, DecoderCommonParam commonParam) {
         if (matchers.length == 0) {
             throw new IllegalArgumentException("No fallbackValueMatcher found");
         }
-        final VersionMatchResult<FallbackValueMatcher> matchResult = matchVersion(
+        final VersionMatchResult<FallbackValueMatcher> matchResult = HasVersions.matchVersion(
                 targetVersion,
                 Arrays.stream(matchers).map(it -> new HasVersions<>(it.version(), it)),
                 HasVersion::data
@@ -151,53 +157,13 @@ public class SimpleMapMetadataRegistry {
         final int matchedVersion = matchResult.version();
         final FallbackValueMatcher matcher = matchResult.source();
         final String actualCharset = detectCharset(matcher, commonParam.stringTypeCharset());
-        final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, actualCharset, matcher);
+        final FieldCodec<Object> valueCodec = MetadataUtils.createValueCodec(this.beanMetadataRegistry, matcher.valueType(), matcher.valueCodec(), null, actualCharset);
         return new FallbackValueMatcherMeta(matchedVersion, matcher.valueType(), requireNonNull(valueCodec), actualCharset);
     }
 
     @Nullable
-    private static FieldCodec<Object> createValueCodec(
-            BeanMetadataRegistry beanMetadataRegistry,
-            @Nullable String actualCharset,
-            ValueMatcher matcher) {
-
-        return createValueCodec(beanMetadataRegistry,
-                matcher.valueType(), matcher.valueCodec(), matcher.valueEntity(), actualCharset);
-    }
-
-    @Nullable
-    private static FieldCodec<Object> createValueCodec(
-            BeanMetadataRegistry beanMetadataRegistry,
-            @Nullable String actualCharset,
-            FallbackValueMatcher matcher) {
-
-        return createValueCodec(beanMetadataRegistry,
-                matcher.valueType(), matcher.valueCodec(), null, actualCharset);
-    }
-
-    @Nullable
-    @SuppressWarnings("unchecked")
-    private static FieldCodec<Object> createValueCodec(
-            BeanMetadataRegistry beanMetadataRegistry,
-            XtreamDataType valueType,
-            Class<? extends FieldCodec<?>> valueCodecClass,
-            @Nullable Class<?> valueEntityClass,
-            @Nullable String actualCharset) {
-
-        final FieldCodec<?> instance = beanMetadataRegistry.getOrCreateFieldCodec(valueType, valueCodecClass, actualCharset, valueEntityClass);
-        return (FieldCodec<Object>) instance;
-    }
-
-    private static String firstOr(@Nullable String charset, @Nullable String fallbackCharset) {
-        if (StringUtils.hasText(charset)) {
-            return charset;
-        }
-        return requireNonNull(fallbackCharset);
-    }
-
-    @Nullable
     static String detectCharset(FallbackValueMatcher matcher, String fallbackCharset) {
-        return detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
+        return MetadataUtils.detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
     }
 
     @Nullable
@@ -209,58 +175,82 @@ public class SimpleMapMetadataRegistry {
         final String fallbackCharset = encoderCommonParam != null
                 ? encoderCommonParam.stringTypeCharset()
                 : requireNonNull(decoderCommonParam, "Only one of DecoderCommonParam and EncoderCommonParam can be null.").stringTypeCharset();
-        return detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
+        return MetadataUtils.detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
     }
 
-    @Nullable
-    static String detectCharset(
-            XtreamDataType valueType,
-            @Nullable Class<? extends FieldCodec<?>> codecClass,
-            @Nullable String charset,
-            @Nullable String commonCharset) {
-
-        if (!valueType.isPlaceholder()) {
-            final CodecCharset codecCharset = valueType.codecCharset();
-            return switch (codecCharset) {
-                case DYNAMIC -> assertNotBlank(firstOr(charset, commonCharset), "charset is empty");
-                case UTF_8,
-                     GBK, GB_2312,
-                     BCD_8421, HEX -> codecCharset.charsetName();
-                case UNSUPPORTED -> null;
-            };
-        }
-
-        if (codecClass != null && !Objects.equals(FieldCodec.Placeholder.class, codecClass)) {
-            if (StringFieldCodecs.StringFieldCodec.class.equals(codecClass)) {
-                return assertNotBlank(firstOr(charset, commonCharset), "charset is empty");
-            }
-            if (CharSequenceFieldCodec.class.isAssignableFrom(codecClass)) {
-                if (StringFieldCodecs.StringFieldCodecGbk.class.equals(codecClass)) {
-                    return XtreamConstants.CHARSET_NAME_GBK;
-                } else if (StringFieldCodecs.StringFieldCodecGb2312.class.equals(codecClass)) {
-                    return XtreamConstants.CHARSET_NAME_GB_2312;
-                } else if (StringFieldCodecs.StringFieldCodecUtf8.class.equals(codecClass)) {
-                    return XtreamConstants.CHARSET_NAME_UTF8;
-                } else if (StringFieldCodecs.StringFieldCodecBcd8421.class.equals(codecClass)) {
-                    return XtreamConstants.CHARSET_NAME_BCD_8421;
-                } else if (StringFieldCodecs.StringFieldCodecHex.class.equals(codecClass)) {
-                    return XtreamConstants.CHARSET_NAME_HEX;
-                } else {
-                    return assertNotBlank(firstOr(charset, commonCharset), "charset is empty");
-                }
-            }
-        }
-        return null;
+    private KeyMeta createKeyMeta(int targetVersion, XtreamMapField xtreamMapField) {
+        return MetadataUtils.createKeyMeta(targetVersion, xtreamMapField.key());
     }
 
-    private static FieldCodec<Object> createKeyCodec(Key key) {
-        final KeyType keyType = key.type();
-        return switch (keyType) {
-            case i8, u8, i16, u16, i32, u32, i64,
-                 str_gbk, str_utf8, str_gb_2312 -> keyType.dataType().codec();
-            case str -> StringFieldCodecs.createStringCodecAndCastToObject(requireNonNull(key.charset(), Key.class.getName() + ".charset() is required"));
-        };
+    private ValueLengthMeta createValueLengthMeta(int targetVersion, XtreamMapField xtreamMapField) {
+        return MetadataUtils.createValueLengthMeta(targetVersion, xtreamMapField.valueLength());
     }
+
+    private List<ValueMatcherMeta> createValueMatcherMetaList(
+            int targetVersion,
+            KeyMeta keyMeta,
+            ValueMatcher[] valueMatchers,
+            @Nullable EncoderCommonParam encoderCommonParam,
+            @Nullable DecoderCommonParam decoderCommonParam) {
+
+        final Map<Object, ValueMatcherMeta> resultMap = new LinkedHashMap<>();
+        Arrays.stream(valueMatchers)
+                .flatMap(matcher -> {
+                    final int[] version = matcher.version();
+                    final Map<Integer, Integer> duplicateVersions = MetadataUtils.findDuplicateVersions(version);
+                    if (!duplicateVersions.isEmpty()) {
+                        final String tips = duplicateVersions.entrySet().stream().map(it -> "version: " + it.getKey() + ", times: " + it.getValue()).collect(Collectors.joining("\n- ", "- ", ""));
+                        throw new IllegalArgumentException("Duplicate versions [@" + ValueMatcher.class.getName() + "]\n" + tips);
+                    }
+                    return Arrays.stream(version).mapToObj(v -> new HasVersion<>(v, matcher));
+                })
+                .filter(hasVersion -> MetadataUtils.isVersionMatched(targetVersion, hasVersion.version()))
+                .forEach(hasVersion -> {
+                    final ValueMatcher matcher = hasVersion.data();
+                    final String actualCharset = detectCharset(matcher, encoderCommonParam, decoderCommonParam);
+                    final FieldCodec<Object> valueCodec = MetadataUtils.createValueCodec(this.beanMetadataRegistry, matcher.valueType(), matcher.valueCodec(), matcher.valueEntity(), actualCharset);
+                    if (valueCodec == null) {
+                        throw new IllegalArgumentException("Unsupported valueType: " + matcher.valueType());
+                    }
+
+                    final List<?> keyList = MetadataUtils.readKey(keyMeta.type(), matcher);
+                    if (keyList == null) {
+                        return;
+                    }
+                    for (Object key : keyList) {
+                        final ValueMatcherMeta newMatcher = new ValueMatcherMeta(hasVersion.version(), key, matcher.valueType(), valueCodec, actualCharset);
+
+                        final ValueMatcherMeta existedMatcher = resultMap.get(key);
+                        if (existedMatcher == null) {
+                            resultMap.put(key, newMatcher);
+                        } else {
+                            final int existedVersion = existedMatcher.version();
+                            final int newVersion = newMatcher.version();
+                            if (existedVersion == XtreamField.ALL_VERSION) {
+                                if (newVersion == XtreamField.ALL_VERSION) {
+                                    throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + MetadataUtils.formateKey(key) + "\n"
+                                                                       + "- " + existedMatcher + "\n"
+                                                                       + "- " + newMatcher);
+                                } else {
+                                    resultMap.put(key, newMatcher);
+                                }
+                            } else {
+                                if (newVersion != XtreamField.ALL_VERSION) {
+                                    throw new IllegalArgumentException("Duplicate valueMatcher. Key: " + MetadataUtils.formateKey(key) + "\n"
+                                                                       + "- " + existedMatcher + "\n"
+                                                                       + "- " + newMatcher);
+                                }
+                            }
+                        }
+                    }
+                });
+
+        return List.copyOf(resultMap.values());
+    }
+
+    // ========================================================================
+    // Inner Records (SimpleMap-specific)
+    // ========================================================================
 
     record DecoderCommonParam(int version, String stringTypeCharset) {
         @SuppressWarnings("redundent")
@@ -274,253 +264,12 @@ public class SimpleMapMetadataRegistry {
         }
     }
 
-    private static List<ValueMatcherMeta> createValueMatcherMetaList(
-            BeanMetadataRegistry beanMetadataRegistry,
-            int targetVersion,
-            KeyMeta keyMeta,
-            ValueMatcher[] valueMatchers,
-            @Nullable EncoderCommonParam encoderCommonParam,
-            @Nullable DecoderCommonParam decoderCommonParam) {
-
-        final Map<Object, List<ValueMatcher>> historyValueMatchersByVersion = new HashMap<>();
-        final List<ValueMatcherMeta> results = Arrays.stream(valueMatchers)
-                .flatMap(matcher -> {
-                    final int[] version = matcher.version();
-                    final Map<Integer, Integer> duplicateVersions = findDuplicateVersions(version);
-                    if (!duplicateVersions.isEmpty()) {
-                        final String tips = duplicateVersions.entrySet().stream().map(it -> "version: " + it.getKey() + ", times: " + it.getValue()).collect(Collectors.joining("\n- ", "- ", ""));
-                        throw new IllegalArgumentException("Duplicate versions [@" + ValueMatcher.class.getName() + "]\n" + tips);
-                    }
-                    return Arrays.stream(version).mapToObj(v -> new HasVersion<>(v, matcher));
-                })
-                .filter(hasVersion -> isVersionMatched(targetVersion, hasVersion.version()))
-                .flatMap(hasVersion -> {
-                    final ValueMatcher matcher = hasVersion.data();
-                    final String actualCharset = detectCharset(matcher, encoderCommonParam, decoderCommonParam);
-                    final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, actualCharset, matcher);
-                    if (valueCodec == null) {
-                        throw new IllegalArgumentException("Unsupported valueType: " + matcher.valueType());
-                    }
-
-                    final List<?> keyList = DefaultExtendMetaRegistry.readKey(keyMeta.type, matcher);
-                    if (keyList == null) {
-                        return Stream.empty();
-                    }
-                    // todo 多值处理
-                    return keyList.stream().map(key -> {
-                        final ValueMatcherMeta valueMatcherMeta = new ValueMatcherMeta(hasVersion.version(), key, matcher.valueType(), valueCodec, actualCharset);
-
-                        historyValueMatchersByVersion.computeIfAbsent(key, k -> new ArrayList<>()).add(matcher);
-
-                        return valueMatcherMeta;
-                    });
-                }).toList();
-
-        historyValueMatchersByVersion.entrySet().stream()
-                .filter(entry -> entry.getValue().size() > 1)
-                .findFirst()
-                .ifPresent(entry -> {
-                    final Object key = entry.getKey();
-                    final List<ValueMatcher> annotations = entry.getValue();
-                    final String error = annotations.stream().map(Object::toString).collect(Collectors.joining("\n\t"));
-                    log.warn("Duplicate valueMatchers. Key: {}", key);
-                    throw new IllegalArgumentException("Duplicate valueMatchers." + "\nKey: " + key + "\nComponents:\n\t" + error);
-                });
-        return results;
-    }
-
-    static Map<Integer, Integer> findDuplicateVersions(int[] version) {
-        final Map<Integer, Integer> countMap = new HashMap<>();
-
-        for (final int num : version) {
-            countMap.put(num, countMap.getOrDefault(num, 0) + 1);
-        }
-
-        // 过滤出出现次数 >= 2 的（即重复的）
-        final Map<Integer, Integer> duplicates = new HashMap<>();
-        for (Map.Entry<Integer, Integer> entry : countMap.entrySet()) {
-            if (entry.getValue() >= 2) {
-                duplicates.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        return duplicates;
-    }
-
-    static String parseKeyCharset(Key key) {
-        final KeyType type = key.type();
-        return switch (type) {
-            case str_gb_2312 -> XtreamConstants.CHARSET_NAME_GB_2312;
-            case str_gbk -> XtreamConstants.CHARSET_NAME_GBK;
-            case str_utf8 -> XtreamConstants.CHARSET_NAME_UTF8;
-            case str -> key.charset();
-            default -> XtreamMapField.DEFAULT_CHARSET;
-        };
-    }
-
-    private static KeyMeta createKeyMeta(int targetVersion, XtreamMapField xtreamMapField) {
-        final VersionMatchResult<Key> matchResult = matchVersion(
-                targetVersion,
-                Arrays.stream(xtreamMapField.key()).map(it -> new HasVersions<>(it.version(), it)),
-                HasVersion::data
-        );
-        log.debug("KEY: targetVersion={}, {}", targetVersion, matchResult);
-        if (matchResult.matched()) {
-            final Key key = requireNonNull(matchResult.source());
-
-            final int sizeInBytes = key.type().dataType().sizeInBytes() <= 0
-                    ? key.sizeInBytes()
-                    : key.type().dataType().sizeInBytes();
-            if (sizeInBytes <= 0) {
-                throw new IllegalArgumentException("Invalid sizeInBytes: " + sizeInBytes);
-            }
-            final FieldCodec<Object> keyCodec = createKeyCodec(key);
-            final String keyCharset = parseKeyCharset(key);
-            return new KeyMeta(targetVersion, key.type(), sizeInBytes, keyCharset, key.paddingType(), key.paddingElement(), keyCodec);
-        }
-
-        throw new IllegalArgumentException("No `[" + Key.class.getName() + "]` found for target version " + targetVersion);
-    }
-
-    private static ValueLengthMeta createValueLengthMeta(int targetVersion, XtreamMapField xtreamMapField) {
-        final VersionMatchResult<ValueLength> matchResult = matchVersion(
-                targetVersion,
-                Arrays.stream(xtreamMapField.valueLength()).map(it -> new HasVersions<>(it.version(), it)),
-                HasVersion::data);
-
-        log.debug("ValueLength: targetVersion={}, {}", targetVersion, matchResult);
-        if (matchResult.matched()) {
-            final ValueLength valueLengthType = matchResult.source();
-            return new ValueLengthMeta(targetVersion, valueLengthType.type());
-        }
-        throw new IllegalArgumentException("No value length type found for target version " + targetVersion);
-    }
-
-    private static boolean isVersionMatched(int targetVersion, int versionCandidate) {
-        return targetVersion == versionCandidate || versionCandidate == XtreamField.ALL_VERSION;
-    }
-
-
-    record HasVersions<S>(int[] version, S source) {
-
-        @SuppressWarnings("redundent")
-        HasVersions {
-        }
-
-        @Override
-        public String toString() {
-            return new StringJoiner(", ", HasVersions.class.getSimpleName() + "[", "]")
-                    .add("version=" + Arrays.toString(version))
-                    .add("source=" + source)
-                    .toString();
-        }
-    }
-
-    record HasVersion<S>(int version, S data) {
-        @SuppressWarnings("redundent")
-        HasVersion {
-        }
-
-        @Override
-        public String toString() {
-            return new StringJoiner(", ", HasVersion.class.getSimpleName() + "[", "]")
-                    .add("version=" + version)
-                    .add("data=" + data)
-                    .toString();
-        }
-    }
-
-    private record VersionMatchResult<S>(boolean matched, int version, @Nullable S source) {
-        @SuppressWarnings("redundent")
-        private VersionMatchResult {
-        }
-
-        @Override
-        public S source() {
-            if (this.source == null) {
-                throw new IllegalStateException("source cannot be null");
-            }
-            return source;
-        }
-    }
-
-    static <S, T> VersionMatchResult<T> matchVersion(int targetVersion, Stream<HasVersions<S>> stream, Function<HasVersion<S>, T> mapper) {
-        final Map<Integer, List<HasVersion<S>>> group = stream
-                .flatMap(it -> {
-                    final int[] version = it.version();
-                    if (version.length > 1) {
-                        if (Arrays.binarySearch(version, XtreamMapField.ALL_VERSION) >= 0) {
-                            throw new IllegalArgumentException(
-                                    "Cannot use `XtreamMapField.ALL_VERSION` with other versions\n"
-                                    + "Components:\n\n" + it.source());
-                        }
-                    }
-                    return Arrays.stream(version)
-                            .mapToObj(v -> new HasVersion<>(v, it.source()));
-                })
-                .collect(Collectors.groupingBy(HasVersion::version));
-
-        for (Map.Entry<Integer, List<HasVersion<S>>> entry : group.entrySet()) {
-            final int v = entry.getKey();
-            final List<HasVersion<S>> list = entry.getValue();
-            if (list.size() > 1) {
-                throw new IllegalArgumentException(
-                        "Duplicate version(" + list.getFirst().data().getClass().getSimpleName()
-                        + ").\nKey: " + v
-                        + "\nComponents: \n\t" + list.stream().limit(5).map(HasVersion::data).map(Object::toString).collect(Collectors.joining("\n\t")));
-            }
-        }
-
-        final List<HasVersion<S>> matchedList = group.get(targetVersion);
-        if (matchedList != null) {
-            final HasVersion<S> first = matchedList.getFirst();
-            return new VersionMatchResult<>(true, first.version(), mapper.apply(first));
-        }
-
-        if (targetVersion == XtreamField.ALL_VERSION) {
-            return new VersionMatchResult<>(false, 0, null);
-        }
-
-        final List<HasVersion<S>> defaultList = group.get(XtreamMapField.ALL_VERSION);
-        if (defaultList != null) {
-            final HasVersion<S> first = defaultList.getFirst();
-            return new VersionMatchResult<>(true, first.version(), mapper.apply(first));
-        }
-
-        return new VersionMatchResult<>(false, 0, null);
-    }
-
     record MapMeta(
             KeyMeta keyMeta,
             ValueLengthMeta valueLengthMeta,
             ValueMeta valueMeta) {
         @SuppressWarnings("redundent")
         MapMeta {
-        }
-    }
-
-    record KeyMeta(
-            int version,
-            KeyType type,
-            int sizeInBytes,
-            String charset,
-            Charset resolvedCharset,
-            PaddingType paddingType,
-            byte paddingElement,
-            FieldCodec<Object> codec
-    ) {
-        public KeyMeta(int version, KeyType type, int sizeInBytes, String charset, PaddingType paddingType, byte paddingElement, FieldCodec<Object> codec) {
-            this(version, type, sizeInBytes, charset, Charset.forName(charset), paddingType, paddingElement, codec);
-        }
-    }
-
-    record ValueLengthMeta(
-            int version,
-            LengthFieldType type,
-            FieldCodec<Object> codec) {
-
-        public ValueLengthMeta(int version, LengthFieldType type) {
-            this(version, type, type.type().codec());
         }
     }
 
@@ -559,29 +308,6 @@ public class SimpleMapMetadataRegistry {
 
         public DecoderValueMeta(DecoderCommonParam commonParam, FallbackValueMatcherMeta fallbackValueMatcher, List<ValueMatcherMeta> decoderValueMatchers) {
             this(commonParam, fallbackValueMatcher, decoderValueMatchers, valueMatcherToMap(decoderValueMatchers));
-        }
-    }
-
-    record ValueMatcherMeta(
-            int version,
-            Object key,
-            XtreamDataType valueType,
-            FieldCodec<Object> valueCodec,
-            @Nullable String charset) {
-
-        @SuppressWarnings("redundent")
-        public ValueMatcherMeta {
-        }
-    }
-
-    record FallbackValueMatcherMeta(
-            int version,
-            XtreamDataType valueType,
-            FieldCodec<Object> codec,
-            @Nullable String charset) {
-
-        @SuppressWarnings("redundent")
-        FallbackValueMatcherMeta {
         }
     }
 }

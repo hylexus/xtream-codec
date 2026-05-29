@@ -72,7 +72,7 @@ class BuiltinMessage0200Test extends BaseCodecTest {
 
             compareItem64(expectedExtraItems, actualExtraItems);
 
-        });
+        }, true);
     }
 
     private static void compareItem64(Map<Short, Object> expectedExtraItems, Map<Short, Object> actualExtraItems) {

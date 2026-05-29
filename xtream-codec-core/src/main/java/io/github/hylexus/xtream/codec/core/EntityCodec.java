@@ -70,7 +70,7 @@ public class EntityCodec {
         return this.decode(XtreamField.ALL_VERSION, entityClass, source, tracker);
     }
 
-    public <T> T decode(int version, Class<T> entityClass, ByteBuf source, CodecTracker tracker) {
+    public <T> T decode(int version, Class<T> entityClass, ByteBuf source, @Nullable CodecTracker tracker) {
         if (tracker == null) {
             return entityDecoder.decode(version, entityClass, source);
         } else {

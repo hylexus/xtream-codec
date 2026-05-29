@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.impl.domain;
 
+import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 
 /**
@@ -24,6 +25,11 @@ import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
  */
 public record ValueLengthMeta(
         int version,
-        LengthFieldType type
+        LengthFieldType type,
+        FieldCodec<Object> codec
 ) {
+
+    public ValueLengthMeta(int version, LengthFieldType type) {
+        this(version, type, type.type().codec());
+    }
 }

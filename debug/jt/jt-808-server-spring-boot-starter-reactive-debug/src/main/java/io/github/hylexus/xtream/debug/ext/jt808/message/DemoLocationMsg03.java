@@ -18,7 +18,6 @@ package io.github.hylexus.xtream.debug.ext.jt808.message;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.annotation.ext.*;
-import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
@@ -28,13 +27,18 @@ import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.Lo
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.LocationItem0x67;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.AbstractJt808Message;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Request;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import static io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.*;
 
+@Getter
+@Setter
+@ToString
 public class DemoLocationMsg03 extends AbstractJt808Message {
 
     public DemoLocationMsg03(Jt808Request request) {
@@ -117,25 +121,4 @@ public class DemoLocationMsg03 extends AbstractJt808Message {
     )
     private Map<Short, Object> extraItems;
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", DemoLocationMsg03.class.getSimpleName() + "[", "]")
-                .add("alarmFlag=" + alarmFlag)
-                .add("status=" + status)
-                .add("latitude=" + latitude)
-                .add("longitude=" + longitude)
-                .add("altitude=" + altitude)
-                .add("speed=" + speed)
-                .add("direction=" + direction)
-                .add("time=" + time)
-                .add("extraItems=" + extraItems)
-                .add("protocolType=" + protocolType)
-                .add("requestId='" + requestId + "'")
-                .add("traceId='" + traceId + "'")
-                .add("serverType=" + serverType)
-                .add("header=" + header)
-                .add("calculatedCheckSum=" + calculatedCheckSum)
-                .add("originalCheckSum=" + originalCheckSum)
-                .toString();
-    }
 }

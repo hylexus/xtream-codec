@@ -44,6 +44,8 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
             assertEquals("010203", assertionMap.get(5));
 
             assertEquals(instanceMap.get(11), assertionMap.get(11));
+            assertNotNull(instanceMap.get(111));
+            assertEquals(instanceMap.get(111), assertionMap.get(111));
             assertEquals(instanceMap.get(12), assertionMap.get(12));
             assertEquals(instanceMap.get(13), assertionMap.get(13));
             assertEquals(instanceMap.get(14), assertionMap.get(14));
@@ -113,6 +115,7 @@ class MapFieldCodecTest extends BaseFieldCodecTest {
         final LinkedHashMap<Object, Object> map = new LinkedHashMap<>();
         map.put(5, new byte[]{1, 2, 3});
         map.put(11, (byte) 127);
+        map.put(111, (byte) -128);
         map.put(12, (1 << 16) - 1);
         map.put(13, (1L << 32) - 1);
         map.put(14, 1L);

@@ -90,7 +90,7 @@ public class MapFieldEntity {
                                     @ValueDecoderCommonParam(version = {0, 2}, charset = "gbk"),
                             },
                             matchers = {
-                                    @ValueMatcher(version = 0, matchU16 = 11, valueType = XtreamDataType.i8),
+                                    @ValueMatcher(version = 0, matchU16 = {11, 111}, valueType = XtreamDataType.i8),
                                     @ValueMatcher(version = 0, matchU16 = 12, valueType = XtreamDataType.u16_le),
                                     @ValueMatcher(version = 0, matchU16 = 13, valueType = XtreamDataType.u32),
                                     @ValueMatcher(version = 0, matchU16 = 14, valueCodec = U32FieldCodecs.U32FieldCodec.class),

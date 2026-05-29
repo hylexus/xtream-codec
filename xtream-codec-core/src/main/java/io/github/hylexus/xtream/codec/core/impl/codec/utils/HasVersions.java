@@ -36,7 +36,7 @@ public record HasVersions<T>(int[] version, T source) {
                         if (Arrays.binarySearch(version, XtreamMapField.ALL_VERSION) >= 0) {
                             throw new IllegalArgumentException(
                                     "Cannot use `XtreamMapField.ALL_VERSION` with other versions\n"
-                                            + "Components:\n\n" + it.source());
+                                    + "Components:\n\n" + it.source());
                         }
                     }
                     return Arrays.stream(version)
@@ -50,8 +50,8 @@ public record HasVersions<T>(int[] version, T source) {
             if (list.size() > 1) {
                 throw new IllegalArgumentException(
                         "Duplicate version(" + list.getFirst().data().getClass().getSimpleName()
-                                + ").\nKey: " + (v == XtreamField.ALL_VERSION ? v + "(XtreamField.ALL_VERSION)" : v)
-                                + "\nComponents: \n\t" + list.stream().limit(5).map(HasVersion::data).map(Object::toString).collect(Collectors.joining("\n\t")));
+                        + ").\nKey: " + (v == XtreamField.ALL_VERSION ? v + "(XtreamField.ALL_VERSION)" : v)
+                        + "\nComponents: \n\t" + list.stream().limit(5).map(HasVersion::data).map(Object::toString).collect(Collectors.joining("\n\t")));
             }
         }
 
