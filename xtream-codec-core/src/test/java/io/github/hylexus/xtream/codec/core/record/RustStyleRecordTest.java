@@ -20,10 +20,8 @@ import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.EntityCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
-import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
+import io.github.hylexus.xtream.codec.core.annotation.ext.*;
+import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.XtreamDataType;
@@ -58,51 +56,51 @@ public class RustStyleRecordTest {
                             encoder = @ValueEncoder(
                                     params = {@EncoderParam(charset = "GBK")},
                                     matchers = {
-                                            @ValueMatcher(matchU16 = 1, valueType = XtreamDataType.u32),
-                                            @ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string_utf8),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 1, valueType = XtreamDataType.u32),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string_utf8),
                                             // charset 从 params 继承而来(GBK)
-                                            @ValueMatcher(matchU16 = 3, valueType = XtreamDataType.string),
-                                            @ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string_gbk),
-                                            @ValueMatcher(matchU16 = 5, valueType = XtreamDataType.string, charset = "utf-8"),
-                                            @ValueMatcher(matchU16 = 6, valueType = XtreamDataType.string, charset = "utf-8"),
-                                            @ValueMatcher(matchU16 = 7, valueType = XtreamDataType.string_gb_2312),
-                                            @ValueMatcher(matchU16 = 8, valueType = XtreamDataType.i8),
-                                            @ValueMatcher(matchU16 = 9, valueType = XtreamDataType.u8),
-                                            @ValueMatcher(matchU16 = 10, valueType = XtreamDataType.i16),
-                                            @ValueMatcher(matchU16 = 11, valueType = XtreamDataType.i16_le),
-                                            @ValueMatcher(matchU16 = 12, valueType = XtreamDataType.u16),
-                                            @ValueMatcher(matchU16 = 13, valueType = XtreamDataType.u16_le),
-                                            @ValueMatcher(matchU16 = 14, valueType = XtreamDataType.i32),
-                                            @ValueMatcher(matchU16 = 15, valueType = XtreamDataType.i32_le),
-                                            @ValueMatcher(matchU16 = 16, valueType = XtreamDataType.u32),
-                                            @ValueMatcher(matchU16 = 17, valueType = XtreamDataType.u32_le),
-                                            @ValueMatcher(matchU16 = 18, valueType = XtreamDataType.i64),
-                                            @ValueMatcher(matchU16 = 19, valueType = XtreamDataType.i64_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 3, valueType = XtreamDataType.string),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string_gbk),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 5, valueType = XtreamDataType.string, charset = "utf-8"),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 6, valueType = XtreamDataType.string, charset = "utf-8"),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 7, valueType = XtreamDataType.string_gb_2312),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 8, valueType = XtreamDataType.i8),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 9, valueType = XtreamDataType.u8),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 10, valueType = XtreamDataType.i16),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 11, valueType = XtreamDataType.i16_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 12, valueType = XtreamDataType.u16),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 13, valueType = XtreamDataType.u16_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 14, valueType = XtreamDataType.i32),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 15, valueType = XtreamDataType.i32_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 16, valueType = XtreamDataType.u32),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 17, valueType = XtreamDataType.u32_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 18, valueType = XtreamDataType.i64),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 19, valueType = XtreamDataType.i64_le),
                                     }
                             ),
                             decoder = @ValueDecoder(
                                     params = {@DecoderParam(charset = "UTF-8")},
                                     matchers = {
-                                            @ValueMatcher(matchU16 = 1, valueType = XtreamDataType.u32),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 1, valueType = XtreamDataType.u32),
                                             // charset 从 params 继承而来(UTF-8)
-                                            @ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string),
-                                            @ValueMatcher(matchU16 = 3, valueType = XtreamDataType.string_gbk),
-                                            @ValueMatcher(matchU16 = 4, valueCodec = StringFieldCodecs.StringFieldCodecGbk.class),
-                                            @ValueMatcher(matchU16 = 5, valueCodec = StringFieldCodecs.StringFieldCodec.class, charset = "utf-8"),
-                                            @ValueMatcher(matchU16 = 6, valueType = XtreamDataType.string, charset = "utf-8"),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 2, valueType = XtreamDataType.string),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 3, valueType = XtreamDataType.string_gbk),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 4, valueCodec = StringFieldCodecs.StringFieldCodecGbk.class),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 5, valueCodec = StringFieldCodecs.StringFieldCodec.class, charset = "utf-8"),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 6, valueType = XtreamDataType.string, charset = "utf-8"),
                                             // 这里没匹配7，走 FallbackValueMatcher 逻辑(hexString)
-                                            @ValueMatcher(matchU16 = 8, valueType = XtreamDataType.i8_as_int),
-                                            @ValueMatcher(matchU16 = 9, valueType = XtreamDataType.u8),
-                                            @ValueMatcher(matchU16 = 10, valueType = XtreamDataType.i16),
-                                            @ValueMatcher(matchU16 = 11, valueType = XtreamDataType.i16_le),
-                                            @ValueMatcher(matchU16 = 12, valueType = XtreamDataType.u16),
-                                            @ValueMatcher(matchU16 = 13, valueType = XtreamDataType.u16_le),
-                                            @ValueMatcher(matchU16 = 14, valueType = XtreamDataType.i32),
-                                            @ValueMatcher(matchU16 = 15, valueType = XtreamDataType.i32_le),
-                                            @ValueMatcher(matchU16 = 16, valueType = XtreamDataType.u32),
-                                            @ValueMatcher(matchU16 = 17, valueType = XtreamDataType.u32_le),
-                                            @ValueMatcher(matchU16 = 18, valueType = XtreamDataType.i64),
-                                            @ValueMatcher(matchU16 = 19, valueType = XtreamDataType.i64_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 8, valueType = XtreamDataType.i8_as_int),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 9, valueType = XtreamDataType.u8),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 10, valueType = XtreamDataType.i16),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 11, valueType = XtreamDataType.i16_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 12, valueType = XtreamDataType.u16),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 13, valueType = XtreamDataType.u16_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 14, valueType = XtreamDataType.i32),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 15, valueType = XtreamDataType.i32_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 16, valueType = XtreamDataType.u32),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 17, valueType = XtreamDataType.u32_le),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 18, valueType = XtreamDataType.i64),
+                                            @XtreamMapField.ValueMatcher(matchU16 = 19, valueType = XtreamDataType.i64_le),
                                     },
                                     // 没有匹配到的key 统一在这里处理
                                     fallbackMatchers = {

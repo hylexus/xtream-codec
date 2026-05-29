@@ -24,6 +24,9 @@ article: false
 - `XtreamMapField.ValueLength`
     - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.ValueLength`
     - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength` 替代
+- `XtreamMapField.FallbackValueMatcher`
+    - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.FallbackValueMatcher`
+    - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.FallbackValueMatcher` 代替
 
 ## 0.5.0-rc.3(2026-05-27)
 

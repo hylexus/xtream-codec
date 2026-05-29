@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.impl.codec.map;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamDateTimeField;
+import io.github.hylexus.xtream.codec.core.annotation.ext.FallbackValueMatcher;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;

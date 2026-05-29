@@ -18,10 +18,7 @@ package io.github.hylexus.xtream.debug.codec.core.demo02;
 
 import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
-import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
-import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
+import io.github.hylexus.xtream.codec.core.annotation.ext.*;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.impl.codec.U16FieldCodecs;
@@ -138,7 +135,7 @@ public class RustStyleDebugEntity02FlattenMap {
                             },
                             // 其他 key 都转为十六进制字符串
                             fallbackMatchers = {
-                                    @XtreamMapField.FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
+                                    @FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
                             }
                     )
             )

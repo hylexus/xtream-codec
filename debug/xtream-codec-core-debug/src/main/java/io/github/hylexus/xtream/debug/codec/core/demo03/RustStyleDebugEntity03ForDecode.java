@@ -16,10 +16,7 @@
 
 package io.github.hylexus.xtream.debug.codec.core.demo03;
 
-import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
-import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
+import io.github.hylexus.xtream.codec.core.annotation.ext.*;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
 import io.github.hylexus.xtream.codec.core.type.Preset;
@@ -53,7 +50,7 @@ public class RustStyleDebugEntity03ForDecode {
                                     @XtreamMapField.ValueMatcher(matchU16 = 3, valueType = XtreamDataType.u16),
                                     @XtreamMapField.ValueMatcher(matchU16 = 4, valueType = XtreamDataType.string)
                             },
-                            fallbackMatchers = @XtreamMapField.FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
+                            fallbackMatchers = @FallbackValueMatcher(valueCodec = StringFieldCodecs.StringFieldCodecHex.class)
                     )
             )
     )

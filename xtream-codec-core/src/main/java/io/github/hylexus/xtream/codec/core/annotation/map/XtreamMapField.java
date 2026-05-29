@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.core.ContainerInstanceFactory;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
+import io.github.hylexus.xtream.codec.core.annotation.ext.FallbackValueMatcher;
 import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
 import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
 import io.github.hylexus.xtream.codec.core.impl.codec.BytesFieldCodecs;
@@ -134,16 +135,6 @@ public @interface XtreamMapField {
         Class<?> valueEntity() default Object.class;
 
         String desc() default "";
-    }
-
-    @interface FallbackValueMatcher {
-        int[] version() default {ALL_VERSION};
-
-        XtreamDataType valueType() default XtreamDataType.placeholder;
-
-        Class<? extends FieldCodec<?>> valueCodec() default FieldCodec.Placeholder.class;
-
-        String charset() default "";
     }
 
 }

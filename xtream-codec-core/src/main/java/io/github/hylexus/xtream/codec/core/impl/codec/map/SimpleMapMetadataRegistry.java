@@ -22,10 +22,7 @@ import io.github.hylexus.xtream.codec.core.BeanMetadataRegistry;
 import io.github.hylexus.xtream.codec.core.FieldCodec;
 import io.github.hylexus.xtream.codec.core.annotation.PaddingType;
 import io.github.hylexus.xtream.codec.core.annotation.XtreamField;
-import io.github.hylexus.xtream.codec.core.annotation.ext.Key;
-import io.github.hylexus.xtream.codec.core.annotation.ext.KeyType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
-import io.github.hylexus.xtream.codec.core.annotation.ext.ValueLength;
+import io.github.hylexus.xtream.codec.core.annotation.ext.*;
 import io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField;
 import io.github.hylexus.xtream.codec.core.impl.codec.CharSequenceFieldCodec;
 import io.github.hylexus.xtream.codec.core.impl.codec.StringFieldCodecs;
@@ -137,11 +134,11 @@ public class SimpleMapMetadataRegistry {
         return valueMatchersByKey;
     }
 
-    private static FallbackValueMatcherMeta createFallbackValueMatcherMeta(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, XtreamMapField.FallbackValueMatcher[] matchers, DecoderCommonParam commonParam) {
+    private static FallbackValueMatcherMeta createFallbackValueMatcherMeta(BeanMetadataRegistry beanMetadataRegistry, int targetVersion, FallbackValueMatcher[] matchers, DecoderCommonParam commonParam) {
         if (matchers.length == 0) {
             throw new IllegalArgumentException("No fallbackValueMatcher found");
         }
-        final VersionMatchResult<XtreamMapField.FallbackValueMatcher> matchResult = matchVersion(
+        final VersionMatchResult<FallbackValueMatcher> matchResult = matchVersion(
                 targetVersion,
                 Arrays.stream(matchers).map(it -> new HasVersions<>(it.version(), it)),
                 HasVersion::data
@@ -151,7 +148,7 @@ public class SimpleMapMetadataRegistry {
             throw new IllegalArgumentException("No fallbackValueMatcher found");
         }
         final int matchedVersion = matchResult.version();
-        final XtreamMapField.FallbackValueMatcher matcher = matchResult.source();
+        final FallbackValueMatcher matcher = matchResult.source();
         final String actualCharset = detectCharset(matcher, commonParam.stringTypeCharset());
         final FieldCodec<Object> valueCodec = createValueCodec(beanMetadataRegistry, actualCharset, matcher);
         return new FallbackValueMatcherMeta(matchedVersion, matcher.valueType(), requireNonNull(valueCodec), actualCharset);
@@ -171,7 +168,7 @@ public class SimpleMapMetadataRegistry {
     private static FieldCodec<Object> createValueCodec(
             BeanMetadataRegistry beanMetadataRegistry,
             @Nullable String actualCharset,
-            XtreamMapField.FallbackValueMatcher matcher) {
+            FallbackValueMatcher matcher) {
 
         return createValueCodec(beanMetadataRegistry,
                 matcher.valueType(), matcher.valueCodec(), null, actualCharset);
@@ -198,7 +195,7 @@ public class SimpleMapMetadataRegistry {
     }
 
     @Nullable
-    static String detectCharset(XtreamMapField.FallbackValueMatcher matcher, String fallbackCharset) {
+    static String detectCharset(FallbackValueMatcher matcher, String fallbackCharset) {
         return detectCharset(matcher.valueType(), matcher.valueCodec(), matcher.charset(), fallbackCharset);
     }
 
