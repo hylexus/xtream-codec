@@ -59,6 +59,7 @@ include("debug:jt:jt-1078-server-spring-boot-starter-reactive-debug")
 include("debug:jt:jt-808-server-spring-boot-starter-reactive-debug")
 
 include("quick-start")
+include("quick-start:custom-annotation-server")
 include("quick-start:jt")
 include("quick-start:jt:jt-808-attachment-server-quick-start-blocking")
 include("quick-start:jt:jt-808-attachment-server-quick-start-nonblocking")

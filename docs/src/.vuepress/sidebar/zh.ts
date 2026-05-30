@@ -83,6 +83,18 @@ export const zhSidebar = sidebar({
                     ]
                 },
                 {
+                    text: "示例", icon: "server", collapsible: false,
+                    children: [
+                        {
+                            text: "自定义注解示例", icon: "server", collapsible: false, children: [
+                                '/guide/server/samples/custom-demo-protocol/README.md',
+                                '/guide/server/samples/custom-demo-protocol/protocol.md',
+                                '/guide/server/samples/custom-demo-protocol/handler-demo.md',
+                            ]
+                        },
+                    ]
+                },
+                {
                     text: "核心组件", icon: 'layer-group', collapsible: false, children: [
                         '/guide/server/core-component/netty-handler-adapter.md',
                         '/guide/server/core-component/xtream-handler.md',
