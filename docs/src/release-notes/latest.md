@@ -7,6 +7,10 @@ article: false
 
 ## 0.5.0(2026-05-30)
 
+### 📔 Documentation
+
+- 新增 [服务端自定义注解示例](https://hylexus.github.io/xtream-codec/guide/server/samples/custom-demo-protocol/) 文档
+
 ### ⚠️ Breaking Changes
 
 - `@XtreamMapField.PaddingType`

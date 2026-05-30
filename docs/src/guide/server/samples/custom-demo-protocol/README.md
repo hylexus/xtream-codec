@@ -5,6 +5,12 @@ article: false
 
 # 自定义注解
 
+:::tip 传送门
+
+当前示例源码位于 [quick-start/custom-annotation-server](https://github.com/hylexus/xtream-codec/blob/develop/quick-start/custom-annotation-server/README.md)
+
+:::
+
 本例将演示如何通过框架提供的元注解机制（`@XtreamRequestHandler`、`@XtreamRequestHandlerMapping`），**自行定义**一套协议的注解。
 
 ## 场景

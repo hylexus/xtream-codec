@@ -13,6 +13,12 @@ tag:
 
 # 注解与 Handler 实现详解
 
+:::tip 传送门
+
+当前示例源码位于 [quick-start/custom-annotation-server](https://github.com/hylexus/xtream-codec/blob/develop/quick-start/custom-annotation-server/README.md)
+
+:::
+
 ## 概述
 
 本例通过自定义注解 + 继承框架 HandlerMapping 的方式，将 X-IoT Demo 协议的消息分发逻辑与业务处理解耦。核心流程：
