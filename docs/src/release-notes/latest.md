@@ -5,7 +5,7 @@ article: false
 
 # Latest
 
-## 0.5.0-rc.4
+## 0.5.0(2026-05-30)
 
 ### ⚠️ Breaking Changes
 
@@ -33,6 +33,10 @@ article: false
 - `XtreamMapField.DecoderParam`
     - 删除 `io.github.hylexus.xtream.codec.core.annotation.map.XtreamMapField.DecoderParam`
     - 使用 `io.github.hylexus.xtream.codec.core.annotation.ext.ValueDecoderCommonParam` 代替
+
+### ⭐ New Features
+
+- 新增内置编解码器 `StringFieldCodecAscII`
 
 ## 0.5.0-rc.3(2026-05-27)
 

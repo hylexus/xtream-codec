@@ -1,7 +1,7 @@
 {
   "name": "jt-1078-server-dashboard-ui",
   "private": true,
-  "version": "0.5.0-rc.3",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
