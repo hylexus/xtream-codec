@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 public final class StringFieldCodecs {
 
     public static final FieldCodec<String> INSTANCE_UTF8 = new StringFieldCodecUtf8();
+    public static final FieldCodec<String> INSTANCE_ASCII = new StringFieldCodecAscII();
     public static final FieldCodec<String> INSTANCE_GBK = new StringFieldCodecGbk();
     public static final FieldCodec<String> INSTANCE_GB_2312 = new StringFieldCodecGb2312();
     public static final FieldCodec<String> INSTANCE_BCD_8421 = new StringFieldCodecBcd8421();
@@ -52,6 +53,7 @@ public final class StringFieldCodecs {
             case XtreamConstants.CHARSET_NAME_GBK -> INSTANCE_GBK;
             case XtreamConstants.CHARSET_NAME_GB_2312 -> INSTANCE_GB_2312;
             case XtreamConstants.CHARSET_NAME_UTF8 -> INSTANCE_UTF8;
+            case XtreamConstants.CHARSET_NAME_ASCII -> INSTANCE_ASCII;
             case XtreamConstants.CHARSET_NAME_BCD_8421 -> INSTANCE_BCD_8421;
             case XtreamConstants.CHARSET_NAME_HEX -> INSTANCE_HEX;
             default -> {
@@ -107,6 +109,12 @@ public final class StringFieldCodecs {
     public static final class StringFieldCodecUtf8 extends StringFieldCodec {
         private StringFieldCodecUtf8() {
             super(XtreamConstants.CHARSET_UTF8);
+        }
+    }
+
+    public static final class StringFieldCodecAscII extends StringFieldCodec {
+        private StringFieldCodecAscII() {
+            super(XtreamConstants.CHARSET_ASCII);
         }
     }
 

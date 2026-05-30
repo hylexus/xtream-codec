@@ -175,7 +175,7 @@ public final class MetadataUtils {
             final CodecCharset codecCharset = valueType.codecCharset();
             return switch (codecCharset) {
                 case DYNAMIC -> assertNotBlank(firstOr(charset, commonCharset), "charset is empty");
-                case UTF_8,
+                case UTF_8, ASCII,
                      GBK, GB_2312,
                      BCD_8421, HEX -> codecCharset.charsetName();
                 case UNSUPPORTED -> null;

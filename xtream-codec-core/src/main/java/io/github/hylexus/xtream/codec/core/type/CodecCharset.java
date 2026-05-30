@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamConstants;
 
 public enum CodecCharset {
     UTF_8(XtreamConstants.CHARSET_NAME_UTF8),
+    ASCII(XtreamConstants.CHARSET_NAME_ASCII),
     GBK(XtreamConstants.CHARSET_NAME_GBK),
     GB_2312(XtreamConstants.CHARSET_NAME_GB_2312),
     BCD_8421(XtreamConstants.CHARSET_NAME_BCD_8421),

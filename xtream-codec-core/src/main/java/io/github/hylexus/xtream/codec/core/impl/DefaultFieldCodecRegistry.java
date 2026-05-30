@@ -265,6 +265,7 @@ public class DefaultFieldCodecRegistry implements FieldCodecRegistry {
         });
 
         registry.register(StringFieldCodecs.INSTANCE_UTF8, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_UTF8, false);
+        registry.register(StringFieldCodecs.INSTANCE_ASCII, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_ASCII, false);
         registry.register(StringFieldCodecs.INSTANCE_GBK, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_GBK, false);
         registry.register(StringFieldCodecs.INSTANCE_GB_2312, String.class, XtreamDataType.string.sizeInBytes(), XtreamConstants.CHARSET_NAME_GB_2312, false);
 

@@ -99,6 +99,12 @@ public enum XtreamDataType {
             return CodecCharset.UTF_8;
         }
     },
+    string_ascii(-1, StringFieldCodecs.INSTANCE_ASCII, false, of(String.class)) {
+        @Override
+        public CodecCharset codecCharset() {
+            return CodecCharset.ASCII;
+        }
+    },
     string_hex(-1, StringFieldCodecs.INSTANCE_HEX, false, of(String.class)) {
         @Override
         public CodecCharset codecCharset() {
