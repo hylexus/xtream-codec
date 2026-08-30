@@ -5,6 +5,21 @@ article: false
 
 # Latest
 
+## 0.10.0 (2026-08-30)
+
+### 🐞 Bug Fixes
+
+- 修复 JT/T 808 2019 版 `0x0107` 查询终端属性应答中制造商 ID 字段长度错误的问题，由 11 字节修正为 5 字节 [#13](https://github.com/hylexus/xtream-codec/pull/13)
+
+### 🚀 Improvements
+
+- 补充 JT/T 808 2019 版及多版本合一 `0x0107` 消息的回归测试与 Dashboard 调试报文
+
+### ❤️ Contributors
+
+- [@yeluod](https://github.com/yeluod)
+- [@hylexus](https://github.com/hylexus)
+
 ## 0.9.0 (2026-08-22)
 
 ### ⭐ New Features
