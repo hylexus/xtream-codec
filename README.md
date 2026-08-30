@@ -58,28 +58,59 @@
 - `xtream == Extensible + Stream`(发音特点合成)
     - `Extensible`: 可扩展
     - `Stream`: <span style="color:red;font-weight:bold;">非阻塞</span>
-      的流式编程([projectreactor](https://projectreactor.io))
+      的流式编程 ([projectreactor](https://projectreactor.io))
 - `codec == Coder + Decoder`
 
 ## Intro / 介绍
 
 该项目是一个基于 [projectreactor](https://projectreactor.io/) 的、和具体协议无关的、异步的、<span style="color:red;">非阻塞的</span>、TCP/UDP 服务端实现。
 
+### Design Philosophy / 设计理念
+
+该项目最初的设计目标，是把开发者熟悉的 **Spring MVC 请求处理模式复刻到 TCP/UDP 技术栈**：让二进制私有协议也能像 Web 应用一样，将请求路由、处理器调用、参数解析、返回值处理、过滤器和统一异常处理拆分成职责清晰、可以独立扩展的组件。
+
+随着实现逐步深入，项目最终主要采用了更适合 Netty 异步 I/O 的 **Spring WebFlux** 设计。当前服务端请求处理主链路、核心接口的职责划分和响应式编排方式都直接来源于 Spring WebFlux；部分基础类型也是在 Spring 对应实现的基础上移植并针对 TCP/UDP 场景改造的。
+
+这套设计复刻的是 Spring 的 **编程模型、组件边界和扩展机制**，不是把 TCP/UDP 包装成 HTTP。TCP/UDP 连接与数据收发仍由 Reactor Netty 和 Xtream 自己的服务器组件负责，Spring 容器主要用于发现、装配和配置各类扩展组件。
+
+| Spring / Spring WebFlux        | Xtream                               | 职责                               |
+|--------------------------------|--------------------------------------|------------------------------------|
+| `ServerWebExchange`            | `XtreamExchange`                     | 聚合请求、响应、会话和请求级上下文 |
+| `WebFilter` / `WebFilterChain` | `XtreamFilter` / `XtreamFilterChain` | 组成请求过滤器链                   |
+| `DispatcherHandler`            | `DispatcherXtreamHandler`            | 编排请求分发流程                   |
+| `HandlerMapping`               | `XtreamHandlerMapping`               | 根据协议请求找到处理器对象         |
+| `HandlerAdapter`               | `XtreamHandlerAdapter`               | 识别并执行不同类型的处理器         |
+| `HandlerResultHandler`         | `XtreamHandlerResultHandler`         | 处理业务返回值并写出协议响应       |
+| `WebExceptionHandler`          | `XtreamRequestExceptionHandler`      | 统一处理请求链路中的异常           |
+
+核心处理流程与 WebFlux 一致：
+
+```text
+请求解码 → FilterChain → HandlerMapping → HandlerAdapter → HandlerResultHandler → 响应编码与写出
+```
+
+`XtreamHandlerMapping` 返回的是 `Object`，而不是某个固定的处理器接口；具体如何执行该对象由匹配的 `XtreamHandlerAdapter` 决定。因此，基于注解的处理器、`SimpleXtreamRequestHandler` 和任意自定义处理器对象可以共存于同一套分发管线中。
+
+详细设计与扩展原理：
+
+- [DispatcherXtreamHandler 请求分发机制](docs/src/guide/server/request-processing/dispatcher-handler.md)
+- [JT/T 808 自定义请求处理器](docs/src/ext/jt/jt808/customization/request-handler.md)
+
 同时提供了基于 [xtream-codec-server-reactive](xtream-codec-server-reactive) 的 [JT/T 808 协议](ext/jt/jt-808-server-spring-boot-starter-reactive) 和 `JT/T 1078 协议` 的服务端实现：
 
 - JT/T 808 协议
-    - 支持多版本(**V2013,V2019**)
+    - 支持多版本 (**V2013,V2019**)
     - 支持分包
     - 支持加解密
     - 支持指令下发
     - 支持苏标附件服务
     - 支持链路数据订阅
     - 提供了一个基于 **Spring Boot** 的 **Dashboard**
-- JT/T 1078 协议(开发中)
+- JT/T 1078 协议 (开发中)
     - quick-start
         - [基于 Webflux](quick-start/jt/jt-1078-server-quick-start-nonblocking/docker/jt-1078-server-quick-start-nonblocking)
         - [基于 Servlet](quick-start/jt/jt-1078-server-quick-start-blocking/docker/jt-1078-server-quick-start-blocking)
-    - 参考资料(以下排名不分先后):
+    - 参考资料 (以下排名不分先后):
         - [https://rtmp.veriskope.com/pdf/video_file_format_spec_v10.pdf](https://rtmp.veriskope.com/pdf/video_file_format_spec_v10.pdf)
         - [Gitee - matrixy/jtt1078-video-server](https://gitee.com/matrixy/jtt1078-video-server)
         - [Gitee - sky/jt1078](https://gitee.com/hui_hui_zhou/open-source-repository)
@@ -157,7 +188,7 @@ docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/
 
 - 国内站点: https://iotplanet.top/xtream-codec/
 - Github: https://hylexus.github.io/xtream-codec/
-- DeepWiki(**AI** 生成): https://deepwiki.com/hylexus/xtream-codec/
+- DeepWiki (**AI** 生成): https://deepwiki.com/hylexus/xtream-codec/
 
 ## QuickStart / 快速入门
 
@@ -197,7 +228,7 @@ docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/
 ## TODO / 待办
 
 - [JT/T 1078 扩展](ext/jt/jt-1078-server-spring-boot-starter-reactive)
-    - [ ] 代码简化(80%)
+    - [ ] 代码简化 (80%)
     - [ ] 码流断开时未消费的数据未释放的问题
     - 协议
         - [x] TCP
