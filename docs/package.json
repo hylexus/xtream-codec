@@ -19,7 +19,7 @@
     "@vuepress/plugin-search": "2.0.0-rc.131",
     "@vuepress/plugin-slimsearch": "2.0.0-rc.131",
     "sass-embedded": "^1.103.1",
-    "vue": "^3.5.41",
+    "vue": "^3.5.42",
     "vuepress": "2.0.0-rc.30",
     "vuepress-plugin-llms": "1.0.1",
     "vuepress-shared": "2.0.0-rc.107",
