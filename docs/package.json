@@ -15,14 +15,14 @@
     "docs:update-package": "pnpm dlx vp-update"
   },
   "devDependencies": {
-    "@vuepress/bundler-vite": "2.0.0-rc.30",
-    "@vuepress/plugin-search": "2.0.0-rc.131",
-    "@vuepress/plugin-slimsearch": "2.0.0-rc.131",
-    "sass-embedded": "^1.103.1",
-    "vue": "^3.5.42",
-    "vuepress": "2.0.0-rc.30",
+    "@vuepress/bundler-vite": "2.0.0-rc.31",
+    "@vuepress/plugin-search": "2.0.0-rc.134",
+    "@vuepress/plugin-slimsearch": "2.0.0-rc.134",
+    "sass-embedded": "^1.104.1",
+    "vue": "^3.5.43",
+    "vuepress": "2.0.0-rc.31",
     "vuepress-plugin-llms": "1.0.1",
-    "vuepress-shared": "2.0.0-rc.107",
-    "vuepress-theme-hope": "2.0.0-rc.107"
+    "vuepress-shared": "2.0.0-rc.109",
+    "vuepress-theme-hope": "2.0.0-rc.109"
   }
 }
