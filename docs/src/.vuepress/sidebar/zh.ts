@@ -50,6 +50,10 @@ export const zhSidebar = sidebar({
                     ]
                 },
                 {
+                    text: "动态编解码", icon: "code", collapsible: false,
+                    children: ['/guide/core/dynamic/README.md']
+                },
+                {
                     text: "示例", icon: "server", collapsible: false,
                     children: [
                         {

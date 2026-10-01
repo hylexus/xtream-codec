@@ -52,6 +52,7 @@ include("ext:jt:jt-1078-server-dashboard-spring-boot-starter-reactive")
 
 include("debug")
 include("debug:xtream-codec-core-debug")
+include("debug:xtream-codec-debugger-app")
 include("debug:xtream-codec-server-reactive-debug-tcp")
 include("debug:xtream-codec-server-reactive-debug-udp")
 include("debug:jt")

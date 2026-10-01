@@ -19,7 +19,8 @@ package io.github.hylexus.xtream.codec.core.tracker;
 import org.jspecify.annotations.Nullable;
 
 /**
- * 编解码跟踪诊断信息。
+ * 编解码跟踪诊断信息。原有 byteOffset 保留给现有消费者；
+ * 新增的 bitOffset 可精确定位共享字节中的失败位置，旧调用方可以保持为空。
  *
  * @author hylexus
  * @author Codex (AI)
@@ -30,6 +31,11 @@ public record CodecTraceDiagnostic(
         String message,
         @Nullable String nodeId,
         @Nullable Integer byteOffset,
-        @Nullable String exceptionType
+        @Nullable String exceptionType,
+        @Nullable Long bitOffset
 ) {
+    public CodecTraceDiagnostic(String level, String message, @Nullable String nodeId,
+                                @Nullable Integer byteOffset, @Nullable String exceptionType) {
+        this(level, message, nodeId, byteOffset, exceptionType, null);
+    }
 }

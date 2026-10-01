@@ -1,0 +1,13 @@
+{
+  "name": "xtream-codec-debugger-ui",
+  "version": "0.11.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check src/app.js && node --check src/completion.js",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {"ajv": "8.17.1"}
+}

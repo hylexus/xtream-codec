@@ -222,7 +222,7 @@ configure(subprojects) {
 
         // Select projects to examine for dependencies.
         // Defaults to current project and all its subprojects
-//        projects = project.subprojects.toTypedArray()
+        // projects = project.subprojects.toTypedArray()
         projects = arrayOf(project)
 
         // Don't include artifacts of project's own group into the report
@@ -547,6 +547,7 @@ fun isJavaProject(project: Project): Boolean {
             mavenPublications.contains(project.name)
                     || setOf(
                 "xtream-codec-core-debug",
+                "xtream-codec-debugger-app",
                 "xtream-codec-server-reactive-debug-tcp",
                 "xtream-codec-server-reactive-debug-udp",
                 "jt-808-server-spring-boot-starter-reactive-debug",

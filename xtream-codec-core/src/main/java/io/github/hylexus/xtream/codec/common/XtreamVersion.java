@@ -17,7 +17,7 @@
 package io.github.hylexus.xtream.codec.common;
 
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 当前类是从 `org.springframework.core.SpringVersion` 复制过来修改的。
@@ -36,8 +36,7 @@ public final class XtreamVersion {
         return (version != null ? version : def);
     }
 
-    @Nullable
-    public static String getVersion() {
+    public static @Nullable String getVersion() {
         final Package pkg = XtreamVersion.class.getPackage();
         return (pkg != null ? pkg.getImplementationVersion() : null);
     }

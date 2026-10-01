@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "messageId", "name": "消息 ID", "type": "u16" },
+    { "id": "bodyProps", "name": "消息体属性", "type": "u16" },
+    { "id": "protocolVersion", "name": "协议版本号", "type": "u8" },
+    { "id": "terminalId", "name": "终端 ID", "type": "bcd", "length": { "fixed": 10, "unit": "byte" } },
+    { "id": "serialNo", "name": "消息流水号", "type": "u16" },
+    {
+      "id": "subpackage", "name": "分包信息", "type": "struct",
+      "when": { "ref": "bodyProps", "op": "bitSet", "value": "8192" },
+      "fields": [
+        { "id": "total", "name": "分包总数", "type": "u16" },
+        { "id": "index", "name": "包序号", "type": "u16" }
+      ]
+    },
+    { "id": "bodyLength", "name": "消息体长度", "type": "derived", "ref": "bodyProps", "options": { "bitOffset": 0, "bitWidth": 10 } },
+    {
+      "id": "body", "name": "定位数据批量上传", "type": "struct",
+      "length": { "ref": "bodyLength", "unit": "byte" },
+      "fields": [
+        { "id": "count", "name": "数据项个数", "type": "u16" },
+        { "id": "type", "name": "位置数据类型", "type": "u8" },
+        {
+          "id": "itemList", "name": "位置数据列表", "type": "array",
+          "length": { "ref": "count", "unit": "item" },
+          "item": {
+            "id": "item", "type": "struct",
+            "fields": [
+              {
+                "id": "locationData", "name": "位置汇报数据体", "type": "struct",
+                "length": { "prefixBits": 16, "unit": "byte" },
+                "fields": [
+                  { "id": "alarmFlag", "type": "u32" },
+                  { "id": "status", "type": "u32" },
+                  { "id": "latitude", "type": "u32" },
+                  { "id": "longitude", "type": "u32" },
+                  { "id": "altitude", "type": "u16" },
+                  { "id": "speed", "type": "u16" },
+                  { "id": "direction", "type": "u16" },
+                  { "id": "time", "type": "bcd", "length": { "fixed": 6, "unit": "byte" } }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    { "id": "checksum", "name": "校验码", "type": "u8" }
+  ]
+}

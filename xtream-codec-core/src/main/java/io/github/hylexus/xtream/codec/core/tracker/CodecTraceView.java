@@ -22,6 +22,8 @@ import java.util.*;
 
 /**
  * 面向 Web 调试页面的编解码跟踪视图。
+ * 节点保留字节范围以兼容已有消费者，同时可选携带精确位范围；
+ * 字节索引用于从原始 HEX 定位覆盖该字节的所有字段。
  *
  * @author hylexus
  * @author Codex (AI)
@@ -52,6 +54,7 @@ public record CodecTraceView(
     }
 
     private static Node toViewNode(CodecTraceNode source, @Nullable String payloadHex, List<Node> nodes, Map<Integer, List<String>> nodeIdsByByteOffset) {
+        // 同时生成树形视图和扁平索引，页面无需再次遍历整棵树查找节点。
         final List<Node> children = new ArrayList<>();
         final Node node = new Node(
                 source.getId(),
@@ -69,7 +72,9 @@ public record CodecTraceView(
                 source.getStatus(),
                 Map.copyOf(source.getAttributes()),
                 List.copyOf(source.getDiagnostics()),
-                children
+                children,
+                source.getBitStart(),
+                source.getBitEnd()
         );
         nodes.add(node);
         indexByteRange(source, nodeIdsByByteOffset);
@@ -80,6 +85,7 @@ public record CodecTraceView(
     }
 
     private static @Nullable String resolveHex(CodecTraceNode source, @Nullable String payloadHex) {
+        // 节点未显式保存 HEX 时，按其字节范围从完整报文切片。
         if (source.getHex() != null || payloadHex == null) {
             return source.getHex();
         }
@@ -94,6 +100,7 @@ public record CodecTraceView(
     }
 
     private static void indexByteRange(CodecTraceNode source, Map<Integer, List<String>> nodeIdsByByteOffset) {
+        // 共享字节可以关联多个位字段，因此索引值是节点 ID 列表。
         final Integer byteStart = source.getByteStart();
         final Integer byteEnd = source.getByteEnd();
         if (byteStart == null || byteEnd == null || byteStart < 0 || byteEnd <= byteStart) {
@@ -126,7 +133,17 @@ public record CodecTraceView(
             CodecTraceStatus status,
             Map<String, Object> attributes,
             List<CodecTraceDiagnostic> diagnostics,
-            List<Node> children
+            List<Node> children,
+            @Nullable Long bitStart,
+            @Nullable Long bitEnd
     ) {
+        public Node(String id, @Nullable String parentId, CodecTraceNodeKind kind, String name,
+                    @Nullable String path, @Nullable String javaType, @Nullable String processorType,
+                    @Nullable Object value, @Nullable String valueSummary, @Nullable Integer byteStart,
+                    @Nullable Integer byteEnd, @Nullable String hex, CodecTraceStatus status,
+                    Map<String, Object> attributes, List<CodecTraceDiagnostic> diagnostics, List<Node> children) {
+            this(id, parentId, kind, name, path, javaType, processorType, value, valueSummary,
+                    byteStart, byteEnd, hex, status, attributes, diagnostics, children, null, null);
+        }
     }
 }

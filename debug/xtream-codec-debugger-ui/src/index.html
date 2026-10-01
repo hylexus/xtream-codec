@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>二进制编解码工作台</title>
+    <link rel="stylesheet" href="/style.css">
+    <script type="module" src="/app.js"></script>
+</head>
+<body>
+<header><div><span class="eyebrow">XTREAM CODEC</span><h1>二进制编解码工作台</h1></div><span class="badge">协议无关 · 双向调试</span></header>
+<main>
+    <nav aria-label="调试模式"><button id="dynamic-mode" class="active">自由组合</button><button id="entity-mode">实体类</button><span id="status" role="status">正在连接服务…</span></nav>
+    <!-- 模式专属输入只负责选择实体或定义结构，后续值、HEX 与结果面板共用。 -->
+    <section id="entity-panel" hidden>
+        <div class="row"><label>搜索实体<input id="entity-search" placeholder="名称或目录标识"></label><label>实体<select id="entity-select"></select></label><button id="entity-template">载入初始值</button></div>
+    </section>
+    <section><label>目标协议版本<input id="version" type="number" min="-2147483648" max="2147483647" step="1" placeholder="留空使用默认定义"></label><p class="muted">两种模式均适用；自由组合模式在编译时选择该版本的字段。此参数与 schemaVersion 无关。</p></section>
+    <section id="schema-panel">
+        <div class="section-heading"><h2>结构定义</h2><div class="actions"><button id="example">载入示例</button><button id="import">导入 JSON</button><button id="export">导出 JSON</button><button id="add-field" class="primary">添加字段</button></div></div>
+        <input id="import-file" type="file" accept=".json,application/json" hidden>
+        <div id="fields" class="field-tree"></div>
+        <details id="schema-details"><summary>定义 JSON · 完整属性</summary><textarea id="schema-json" spellcheck="false" aria-label="结构定义 JSON" aria-describedby="schema-help"></textarea><div id="schema-completions" role="listbox" aria-label="定义补全" hidden></div><button id="schema-complete" type="button">补全</button><button id="apply-json">应用定义 JSON</button><p class="muted" id="schema-help">点击补全或按 Ctrl + Space 提示属性、枚举和字段引用；方向键选择，Enter 或 Tab 插入，Esc 关闭。<a href="/dynamic-codec-schema.json" download>下载 JSON Schema</a>。JSON 与字段树使用同一份定义。</p></details>
+    </section>
+    <!-- 编码与解码分别保留输入，方便同一结构进行连续往返调试。 -->
+    <div class="input-grid">
+        <section><div class="section-heading"><h2>编码值</h2><button id="encode" class="primary">编码 → HEX</button></div><textarea id="values" spellcheck="false" aria-label="编码值 JSON"></textarea></section>
+        <section><div class="section-heading"><h2>解码字节</h2><button id="decode" class="primary">解码 → 值</button></div><textarea id="hex" spellcheck="false" aria-label="解码 HEX" placeholder="输入原始 HEX，允许空白"></textarea><p class="muted">只处理原始字节，复制时保留原始 HEX。</p></section>
+    </div>
+    <!-- 结果同时包含完整值和部分 Trace，执行失败时仍可定位已完成字段。 -->
+    <section id="result-panel" hidden>
+        <div class="section-heading"><h2>执行结果</h2><div class="actions"><button id="copy-hex">复制 HEX</button><button id="use-result">结果作为输入</button></div></div>
+        <div id="metrics" class="metrics"></div><pre id="error" class="error" hidden></pre>
+        <div class="result-grid"><pre id="result-values"></pre><div><h3>原始字节 · 点击定位字段</h3><div id="bytes" class="bytes"></div><div id="bits" class="bits"></div><p id="remaining" class="muted"></p></div></div>
+        <h3>字段跟踪 · 点击定位字节与 bit</h3><div id="trace" class="trace-tree"></div><pre id="node-detail"></pre>
+    </section>
+</main>
+<!-- 常用属性使用表单，复杂分支和扩展配置通过附加 JSON 保留完整 DSL 能力。 -->
+<dialog id="field-dialog"><form id="field-form"><h2 id="field-title">字段定义</h2><div class="form-grid">
+    <label>字段标识<input id="field-id" required pattern="[A-Za-z_][A-Za-z0-9_]*"></label><label>显示名称<input id="field-name"></label>
+    <label>类型<input id="field-type" list="field-types" required placeholder="如 u16、i32、u3"><datalist id="field-types"></datalist></label><label>浮点数 / 位串位宽<input id="field-bits" type="number" min="1" placeholder="整数类型无需填写"></label>
+    <label>字节序<select id="field-endian"><option value="">默认大端</option><option value="big">big</option><option value="little">little</option></select></label>
+    <label>位序<select id="field-order"><option value="">默认 msb0</option><option>msb0</option><option>lsb0</option></select></label>
+    <label>字符集<input id="field-charset" placeholder="UTF-8"></label><label>长度来源<select id="field-length-kind"><option value="">无</option><option value="fixed">固定</option><option value="ref">引用</option><option value="prefixBits">前置长度</option><option value="remaining">容器剩余</option></select></label>
+    <label>长度值 / 引用<input id="field-length-value"></label><label>长度单位<select id="field-unit"><option>byte</option><option>bit</option><option>item</option></select></label>
+    <label>对齐位数<input id="field-align" type="number" placeholder="8"></label><label>填充位<select id="field-fill"><option value="">默认 0</option><option>0</option><option>1</option></select></label>
+</div><label>其他属性 JSON<textarea id="field-extra" spellcheck="false"></textarea></label><p class="muted">可配置 versions（例如 [2013,2019]）、when、ref、computedLengthOf、expression、variants、options。省略 versions 表示默认定义。条件 op：eq、ne、gt、gte、lt、lte、bitSet、bitClear；表达式 op：add、sub、mul、div、mod、and、or、xor、shl、shr、eq、ne、gt、gte、lt、lte、all、any、not。可用扩展：<span id="available-extensions">无</span></p><pre id="field-error" class="error" hidden></pre><div class="dialog-actions"><button type="button" id="cancel-field">取消</button><button type="submit" class="primary">保存字段</button></div></form></dialog>
+</body>
+</html>

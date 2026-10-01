@@ -39,6 +39,9 @@ public class CodecTraceNode {
     private @Nullable String valueSummary;
     private @Nullable Integer byteStart;
     private @Nullable Integer byteEnd;
+    // 位范围可选，旧的实体编解码路径仍只提供字节范围。
+    private @Nullable Long bitStart;
+    private @Nullable Long bitEnd;
     private @Nullable String hex;
     private CodecTraceStatus status = CodecTraceStatus.STARTED;
     private final Map<String, Object> attributes = new LinkedHashMap<>();
@@ -121,6 +124,26 @@ public class CodecTraceNode {
 
     public @Nullable String getHex() {
         return hex;
+    }
+
+    /**
+     * 返回相对于本次编解码起点的位范围起点。
+     *
+     * @since 0.11.0
+     */
+    public @Nullable Long getBitStart() {
+        return bitStart;
+    }
+
+    public @Nullable Long getBitEnd() {
+        return bitEnd;
+    }
+
+    public CodecTraceNode setBitRange(@Nullable Long bitStart, @Nullable Long bitEnd) {
+        // 范围采用左闭右开约定，与字节范围一致，便于高亮重叠字段。
+        this.bitStart = bitStart;
+        this.bitEnd = bitEnd;
+        return this;
     }
 
     public CodecTraceNode setHex(@Nullable String hex) {

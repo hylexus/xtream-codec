@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    {"id": "messageId", "name": "消息 ID", "type": "u16"},
+    {
+      "id": "reserved", "name": "消息体属性保留位", "type": "u1",
+      "generated": {"constant": 0}
+    },
+    {
+      "id": "versionFlag", "name": "版本标识", "type": "u1", "versions": [2011, 2013],
+      "generated": {"constant": 0}
+    },
+    {
+      "id": "versionFlag", "name": "版本标识", "type": "u1", "versions": [2019],
+      "generated": {"constant": 1}
+    },
+    {"id": "hasSubpackage", "name": "分包标识", "type": "u1"},
+    {"id": "encryption", "name": "加密方式", "type": "u3"},
+    {"id": "bodyLength", "name": "消息体长度", "type": "u10", "computedLengthOf": "body"},
+    {"id": "protocolVersion", "name": "协议版本号", "type": "u8", "versions": [2019]},
+    {
+      "id": "terminalId", "name": "终端手机号", "type": "bcd",
+      "length": {"fixed": 6, "unit": "byte"},
+      "versions": [2011, 2013]
+    },
+    {
+      "id": "terminalId", "name": "终端 ID", "type": "bcd",
+      "length": {"fixed": 10, "unit": "byte"},
+      "versions": [2019]
+    },
+    {"id": "serialNo", "name": "消息流水号", "type": "u16"},
+    {
+      "id": "subpackage", "name": "分包信息", "type": "struct",
+      "when": {"ref": "hasSubpackage", "op": "eq", "value": "1"},
+      "fields": [
+        {"id": "total", "name": "分包总数", "type": "u16"},
+        {"id": "index", "name": "包序号", "type": "u16"}
+      ]
+    },
+    {
+      "id": "body", "name": "服务器补传分包请求", "type": "struct",
+      "length": {"ref": "bodyLength", "unit": "byte"},
+      "fields": [
+        {"id": "originalMessageFlowId", "name": "原始消息流水号", "type": "u16"},
+        {
+          "id": "packageCount", "name": "重传包总数", "type": "u8", "versions": [2011, 2013],
+          "generated": {"countOf": "packageIdList"}
+        },
+        {
+          "id": "packageCount", "name": "重传包总数", "type": "u16", "versions": [2019],
+          "generated": {"countOf": "packageIdList"}
+        },
+        {
+          "id": "packageIdList", "name": "重传包 ID 列表", "type": "array",
+          "length": {"ref": "packageCount", "unit": "item"},
+          "item": {"id": "packageId", "type": "u16"}
+        }
+      ]
+    },
+    {
+      "id": "checksum", "name": "校验码", "type": "u8",
+      "generated": {
+        "checksum": {"algorithm": "xor8", "range": "messageId..body"}
+      }
+    }
+  ]
+}

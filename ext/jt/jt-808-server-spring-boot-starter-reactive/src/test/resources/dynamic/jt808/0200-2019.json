@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "messageId", "name": "消息 ID", "type": "u16" },
+    { "id": "bodyProps", "name": "消息体属性", "type": "u16" },
+    { "id": "protocolVersion", "name": "协议版本号", "type": "u8" },
+    { "id": "terminalId", "name": "终端 ID", "type": "bcd", "length": { "fixed": 10, "unit": "byte" } },
+    { "id": "serialNo", "name": "消息流水号", "type": "u16" },
+    {
+      "id": "subpackage", "name": "分包信息", "type": "struct",
+      "when": { "ref": "bodyProps", "op": "bitSet", "value": "8192" },
+      "fields": [
+        { "id": "total", "name": "分包总数", "type": "u16" },
+        { "id": "index", "name": "包序号", "type": "u16" }
+      ]
+    },
+    { "id": "bodyLength", "name": "消息体长度", "type": "derived", "ref": "bodyProps", "options": { "bitOffset": 0, "bitWidth": 10 } },
+    {
+      "id": "body", "name": "位置信息汇报", "type": "struct",
+      "length": { "ref": "bodyLength", "unit": "byte" },
+      "fields": [
+        { "id": "alarmFlag", "name": "报警标志", "type": "u32" },
+        { "id": "status", "name": "状态", "type": "u32" },
+        { "id": "latitude", "name": "纬度", "type": "u32" },
+        { "id": "longitude", "name": "经度", "type": "u32" },
+        { "id": "altitude", "name": "高程", "type": "u16" },
+        { "id": "speed", "name": "速度", "type": "u16" },
+        { "id": "direction", "name": "方向", "type": "u16" },
+        { "id": "time", "name": "BCD 时间 yyMMddHHmmss", "type": "bcd", "length": { "fixed": 6, "unit": "byte" } },
+        {
+          "id": "extraItems", "name": "附加信息", "type": "tlv",
+          "length": { "remaining": true, "unit": "byte" },
+          "options": { "keyBits": 8, "lengthBits": 8 },
+          "variants": {
+            "1": { "id": "mileage", "name": "里程", "type": "u32" },
+            "2": { "id": "fuel", "name": "油量", "type": "u16" }
+          }
+        }
+      ]
+    },
+    { "id": "checksum", "name": "校验码", "type": "u8" }
+  ]
+}

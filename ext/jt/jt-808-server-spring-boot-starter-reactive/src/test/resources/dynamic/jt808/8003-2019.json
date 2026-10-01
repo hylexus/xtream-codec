@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "messageId", "name": "消息 ID", "type": "u16" },
+    { "id": "bodyProps", "name": "消息体属性", "type": "u16" },
+    { "id": "protocolVersion", "name": "协议版本号", "type": "u8" },
+    { "id": "terminalId", "name": "终端 ID", "type": "bcd", "length": { "fixed": 10, "unit": "byte" } },
+    { "id": "serialNo", "name": "消息流水号", "type": "u16" },
+    {
+      "id": "subpackage", "name": "分包信息", "type": "struct",
+      "when": { "ref": "bodyProps", "op": "bitSet", "value": "8192" },
+      "fields": [
+        { "id": "total", "name": "分包总数", "type": "u16" },
+        { "id": "index", "name": "包序号", "type": "u16" }
+      ]
+    },
+    { "id": "bodyLength", "name": "消息体长度", "type": "derived", "ref": "bodyProps", "options": { "bitOffset": 0, "bitWidth": 10 } },
+    {
+      "id": "body", "name": "服务器补传分包请求", "type": "struct",
+      "length": { "ref": "bodyLength", "unit": "byte" },
+      "fields": [
+        { "id": "originalMessageFlowId", "name": "原始消息流水号", "type": "u16" },
+        { "id": "packageCount", "name": "重传包总数", "type": "u16" },
+        {
+          "id": "packageIdList", "name": "重传包 ID 列表", "type": "array",
+          "length": { "ref": "packageCount", "unit": "item" },
+          "item": { "id": "packageId", "type": "u16" }
+        }
+      ]
+    },
+    { "id": "checksum", "name": "校验码", "type": "u8" }
+  ]
+}

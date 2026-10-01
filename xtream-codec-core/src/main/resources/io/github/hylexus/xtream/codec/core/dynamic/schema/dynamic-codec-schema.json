@@ -1,0 +1,1504 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:xtream-codec:dynamic:schema:1",
+  "title": "Xtream 动态二进制结构定义",
+  "description": "结构约束由此资源描述；引用可见性、版本选择、区间依赖和实际边界由编译器与执行器校验。",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/field"
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "fields"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "field": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[ui]([1-9]|[1-5][0-9]|6[0-4])$",
+              "examples": [
+                "u8",
+                "u16",
+                "u32",
+                "u64",
+                "i8",
+                "i16",
+                "i32",
+                "i64"
+              ]
+            },
+            {
+              "enum": [
+                "float",
+                "string",
+                "bcd",
+                "hex",
+                "bytes",
+                "bits",
+                "padding",
+                "align",
+                "struct",
+                "array",
+                "derived",
+                "tlv",
+                "map",
+                "pair",
+                "choice",
+                "extension"
+              ]
+            }
+          ]
+        },
+        "bits": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "endian": {
+          "enum": [
+            "big",
+            "little"
+          ]
+        },
+        "bitOrder": {
+          "enum": [
+            "msb0",
+            "lsb0"
+          ]
+        },
+        "length": {
+          "$ref": "#/$defs/length"
+        },
+        "charset": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alignTo": {
+          "enum": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64
+          ]
+        },
+        "fillBit": {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+        },
+        "computedLengthOf": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.\\.[A-Za-z_][A-Za-z0-9_]*)?$"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "item": {
+          "$ref": "#/$defs/field"
+        },
+        "variants": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[0-9]+$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "defaultVariant": {
+          "$ref": "#/$defs/field"
+        },
+        "when": {
+          "$ref": "#/$defs/condition"
+        },
+        "expression": {
+          "$ref": "#/$defs/expression"
+        },
+        "generated": {
+          "$ref": "#/$defs/generated"
+        },
+        "options": {
+          "$ref": "#/$defs/options"
+        },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": -2147483648,
+            "maximum": 2147483647
+          }
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "struct"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "fields"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "fields"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "array"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "item"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "item"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "choice",
+                  "pair",
+                  "tlv",
+                  "map"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "variants"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "variants"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "choice"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "ref"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "defaultVariant"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "derived"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "oneOf": [
+              {
+                "required": [
+                  "expression"
+                ],
+                "not": {
+                  "required": [
+                    "ref"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "ref",
+                  "options"
+                ],
+                "properties": {
+                  "options": {
+                    "required": [
+                      "bitOffset",
+                      "bitWidth"
+                    ]
+                  }
+                },
+                "not": {
+                  "required": [
+                    "expression"
+                  ]
+                }
+              }
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "expression"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "align"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "alignTo"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "alignTo"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "float"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "bits"
+            ],
+            "properties": {
+              "bits": {
+                "enum": [
+                  32,
+                  64
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "bits"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "bits"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "not": {
+                  "enum": [
+                    "float",
+                    "bits"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "bits"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "string"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {},
+          "else": {
+            "not": {
+              "required": [
+                "charset"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "string",
+                  "bcd",
+                  "hex",
+                  "bytes",
+                  "padding",
+                  "extension",
+                  "array",
+                  "tlv",
+                  "map",
+                  "pair"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "length"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "struct",
+                  "string",
+                  "bcd",
+                  "hex",
+                  "bytes",
+                  "padding",
+                  "extension",
+                  "array",
+                  "tlv",
+                  "map",
+                  "pair"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {},
+          "else": {
+            "not": {
+              "required": [
+                "length"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "computedLengthOf"
+            ]
+          },
+          "then": {
+            "properties": {
+              "type": {
+                "type": "string",
+                "pattern": "^u([1-9]|[1-5][0-9]|6[0-4])$"
+              }
+            },
+            "not": {
+              "required": [
+                "generated"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "generated"
+            ]
+          },
+          "then": {
+            "properties": {
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[ui]([1-9]|[1-5][0-9]|6[0-4])$",
+                    "examples": [
+                      "u8",
+                      "u16",
+                      "u32",
+                      "u64",
+                      "i8",
+                      "i16",
+                      "i32",
+                      "i64"
+                    ]
+                  },
+                  {
+                    "enum": [
+                      "float",
+                      "string",
+                      "bcd",
+                      "hex",
+                      "bytes",
+                      "bits"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "generated"
+            ],
+            "properties": {
+              "generated": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "countOf"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "checksum"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "type": {
+                "type": "string",
+                "pattern": "^u([1-9]|[1-5][0-9]|6[0-4])$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "pair"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "options": {
+                "not": {
+                  "required": [
+                    "lengthBits"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "not": {
+                  "enum": [
+                    "array",
+                    "tlv",
+                    "map",
+                    "pair"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "length": {
+                "properties": {
+                  "unit": {
+                    "enum": [
+                      "bit",
+                      "byte"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "generated"
+            ],
+            "properties": {
+              "generated": {
+                "required": [
+                  "checksum"
+                ],
+                "properties": {
+                  "checksum": {
+                    "required": [
+                      "algorithm"
+                    ],
+                    "properties": {
+                      "algorithm": {
+                        "enum": [
+                          "xor8",
+                          "sum8"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "type": {
+                "const": "u8"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "generated"
+            ],
+            "properties": {
+              "generated": {
+                "required": [
+                  "checksum"
+                ],
+                "properties": {
+                  "checksum": {
+                    "required": [
+                      "algorithm"
+                    ],
+                    "properties": {
+                      "algorithm": {
+                        "enum": [
+                          "crc32",
+                          "crc32c"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "type": {
+                "const": "u32"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "length": {
+      "type": "object",
+      "properties": {
+        "fixed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+        },
+        "prefixBits": {
+          "enum": [
+            8,
+            16,
+            32
+          ]
+        },
+        "remaining": {
+          "type": "boolean"
+        },
+        "unit": {
+          "enum": [
+            "bit",
+            "byte",
+            "item"
+          ]
+        },
+        "expression": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "required": [
+        "unit"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "fixed"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "prefixBits"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              },
+              {
+                "required": [
+                  "remaining"
+                ],
+                "properties": {
+                  "remaining": {
+                    "const": true
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "ref"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "fixed"
+                ]
+              },
+              {
+                "required": [
+                  "prefixBits"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              },
+              {
+                "required": [
+                  "remaining"
+                ],
+                "properties": {
+                  "remaining": {
+                    "const": true
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "prefixBits"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "fixed"
+                ]
+              },
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              },
+              {
+                "required": [
+                  "remaining"
+                ],
+                "properties": {
+                  "remaining": {
+                    "const": true
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "expression"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "fixed"
+                ]
+              },
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "prefixBits"
+                ]
+              },
+              {
+                "required": [
+                  "remaining"
+                ],
+                "properties": {
+                  "remaining": {
+                    "const": true
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "remaining"
+          ],
+          "properties": {
+            "remaining": {
+              "const": true
+            }
+          },
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "fixed"
+                ]
+              },
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "prefixBits"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "remaining"
+            ],
+            "properties": {
+              "remaining": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "enum": [
+                  "bit",
+                  "byte"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "expression": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+        },
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        "op": {
+          "enum": [
+            "add",
+            "+",
+            "sub",
+            "-",
+            "mul",
+            "*",
+            "div",
+            "/",
+            "mod",
+            "%",
+            "bitAnd",
+            "&",
+            "bitOr",
+            "|",
+            "bitXor",
+            "^",
+            "xor",
+            "bitNot",
+            "~",
+            "shl",
+            "<<",
+            "shr",
+            ">>",
+            "eq",
+            "==",
+            "ne",
+            "!=",
+            "gt",
+            ">",
+            "gte",
+            ">=",
+            "lt",
+            "<",
+            "lte",
+            "<=",
+            "and",
+            "&&",
+            "all",
+            "or",
+            "||",
+            "any",
+            "not",
+            "!"
+          ]
+        },
+        "args": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "engine": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bindings": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "not": {
+              "const": "self"
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+          }
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "ref"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "value"
+                ]
+              },
+              {
+                "required": [
+                  "op"
+                ]
+              },
+              {
+                "required": [
+                  "engine"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "value"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "op"
+                ]
+              },
+              {
+                "required": [
+                  "engine"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "op"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "value"
+                ]
+              },
+              {
+                "required": [
+                  "engine"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "engine"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "value"
+                ]
+              },
+              {
+                "required": [
+                  "op"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "engine"
+            ]
+          },
+          "then": {
+            "required": [
+              "source",
+              "bindings"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "source"
+                  ]
+                },
+                {
+                  "required": [
+                    "bindings"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "op"
+            ]
+          },
+          "then": {
+            "required": [
+              "args"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "args"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "enum": [
+                  "not",
+                  "!",
+                  "bitNot",
+                  "~"
+                ]
+              }
+            },
+            "required": [
+              "op"
+            ]
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "minItems": 1,
+                "maxItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "args": {
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        }
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "bitSet",
+            "bitClear"
+          ]
+        },
+        "value": {
+          "type": "string"
+        },
+        "expression": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "ref",
+            "op",
+            "value"
+          ],
+          "not": {
+            "required": [
+              "expression"
+            ]
+          }
+        },
+        {
+          "required": [
+            "expression"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "op"
+                ]
+              },
+              {
+                "required": [
+                  "value"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "generated": {
+      "type": "object",
+      "properties": {
+        "constant": {
+          "not": {
+            "type": "null"
+          }
+        },
+        "countOf": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "expression": {
+          "$ref": "#/$defs/expression"
+        },
+        "checksum": {
+          "$ref": "#/$defs/checksum"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "constant"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "countOf"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              },
+              {
+                "required": [
+                  "checksum"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "countOf"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "constant"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              },
+              {
+                "required": [
+                  "checksum"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "expression"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "constant"
+                ]
+              },
+              {
+                "required": [
+                  "countOf"
+                ]
+              },
+              {
+                "required": [
+                  "checksum"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "checksum"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "constant"
+                ]
+              },
+              {
+                "required": [
+                  "countOf"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "checksum": {
+      "type": "object",
+      "properties": {
+        "algorithm": {
+          "enum": [
+            "xor8",
+            "sum8",
+            "crc32",
+            "crc32c"
+          ]
+        },
+        "range": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.\\.[A-Za-z_][A-Za-z0-9_]*)?$"
+        }
+      },
+      "required": [
+        "algorithm",
+        "range"
+      ],
+      "additionalProperties": false
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "keyBits": {
+          "enum": [
+            8,
+            16,
+            32
+          ]
+        },
+        "lengthBits": {
+          "enum": [
+            8,
+            16,
+            32
+          ]
+        },
+        "padByte": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "padSide": {
+          "enum": [
+            "left",
+            "right"
+          ]
+        },
+        "stripPadding": {
+          "type": "boolean"
+        },
+        "lengthUnit": {
+          "enum": [
+            "bit",
+            "byte"
+          ]
+        },
+        "bitOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bitWidth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "extensionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
