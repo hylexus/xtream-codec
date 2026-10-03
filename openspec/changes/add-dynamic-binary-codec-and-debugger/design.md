@@ -106,6 +106,14 @@ Java 请求的 mode 使用 `DebugCodecMode`（ENTITY/DYNAMIC），direction 使�
 
 未传 tracker 的执行走不创建节点的路径。计划可并发复用，但值树和单次执行上下文不共享可变状态。用同一结构验证 tracker 与非 tracker 路径字节和结果相等；用基准测试观察相对于现有实体编解码路径的开销，性能门槛以回归趋势而非未经测量的固定倍率表示。
 
+### 8. React 可视化工作台
+
+本轮将 debug/xtream-codec-debugger-ui 迁移为 React、HeroUI 3、Tailwind 4 和 Vite，由 pnpm 管理。工作台使用通用 /api/v1 调试合同，开发时通过 Vite 代理连接独立应用，生产产物继续随 Java 应用打包；不加入 1078 或 808 协议假设，暂不迁入 808 Dashboard。JT1078 调试前端保持原有实现。
+
+前端打包统一使用仓库的 XtreamCodecFrontendBuildExtension，由根项目构建任务执行锁文件安装、前端测试和 Vite 构建，再通过 copyFrontendDist 复制到独立应用资源目录。构建开关默认开启以保证首次启动可用，关闭后沿用已生成资源。插件提供 additionalInputs，跟踪 Vite 与 TypeScript 配置、入口 HTML、workspace、测试和共享 JSON Schema，避免增量构建遗漏这些变化。复制前清理旧哈希产物，生成资源不提交到 Git。
+
+页面提供深色与明亮主题，以颜色区分数值、文本、容器和生成字段。编辑器直接操作原有 DynamicSchema 与独立字段值，提供递归结构、数组、增删改复制和排序；完整 JSON 编辑及导入导出保留高级 DSL 属性。值按字段标识绑定，排序不改变字段值；大整数保持无损。实体和动态模式分别保存输入草稿，单字段试验使用独立动态定义。后端执行仍是唯一二进制编解码实现，页面不模拟结果。结果展示原始 HEX、精确 bit 范围、校验核对、剩余输入和部分失败 Trace。组件、API 合同及主题样式保持独立，便于验收后复制到 Dashboard。
+
 ## Risks / Trade-offs
 
 - **DSL 覆盖范围过大导致模型堆积专用属性** → 先实现公共节点和边界规则，专用格式通过注册扩展接入；按能力映射表及规格场景验收，不复制注解属性全集。

@@ -84,3 +84,10 @@
 
 - [x] 13.1 core 仅保留 annotations 的 API 依赖，databind 改为 compileOnly，移除生产 starter-json；独立应用显式依赖 databind，延迟初始化动态结构 JSON 转换器并更新依赖说明。
 - [x] 13.2 在不含 Jackson 实现的运行环境中验证实体与动态编解码、自定义转换器和 JSON Schema 资源读取；检查运行时依赖与发布元数据，并通过提交前检查、文档构建及 OpenSpec 严格校验。
+
+## 14. React 可视化工作台
+
+- [x] 14.1 将 debug/xtream-codec-debugger-ui 迁移为 pnpm、Vite、React、HeroUI 3 工作台，并接通独立 Java 应用的生产资源打包；实现深色彩色主题、明亮模式、响应式布局与持久化草稿。
+- [x] 14.2 实现字段新增、修改、复制、删除、拖拽和键盘排序、递归 struct 与 array 定义及字段值编辑，保留完整 DSL 属性、JSON 导入导出及补全。
+- [x] 14.3 接入通用调试 API，实现实体模式、单字段试验、版本选择、双向编解码、校验结果、失败诊断及 HEX/bit/Trace 双向定位。
+- [x] 14.4 完成编辑数据一致性回归测试、实际后端联调、明暗主题及交互验收、生产构建和 OpenSpec 校验，补充启动与验收说明。

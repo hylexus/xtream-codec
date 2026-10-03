@@ -1,0 +1,73 @@
+import { useEffect, useState } from 'react';
+import { Button, ColorSwatchPicker, Popover } from '@heroui/react';
+import { Palette } from 'lucide-react';
+
+const COLORS = [
+  { id: 'violet', name: '紫罗兰', hex: '#8052e4' },
+  { id: 'blue', name: '湛蓝', hex: '#2563eb' },
+  { id: 'cyan', name: '青色', hex: '#087f92' },
+  { id: 'green', name: '翡翠绿', hex: '#047857' },
+  { id: 'yellow', name: '金黄', hex: '#a16207' },
+  { id: 'orange', name: '琥珀橙', hex: '#c2410c' },
+  { id: 'red', name: '红色', hex: '#dc2626' },
+  { id: 'rose', name: '玫红', hex: '#be185d' },
+  { id: 'magenta', name: '洋红', hex: '#a21caf' },
+];
+
+export function ThemeColorPicker() {
+  const [color, setColor] = useState(
+    () =>
+      COLORS.find((item) => item.id === document.documentElement.dataset.themeColor)?.id ||
+      COLORS[0].id,
+  );
+  const selectedColor = COLORS.find((item) => item.id === color) || COLORS[0];
+  useEffect(() => {
+    document.documentElement.dataset.themeColor = color;
+    const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (icon) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="${selectedColor.hex}"/><text x="16" y="22" fill="white" text-anchor="middle" font-family="monospace" font-size="18">01</text></svg>`;
+      icon.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    }
+    try {
+      localStorage.setItem('xtream-codec-theme-color', color);
+    } catch {
+      // 浏览器禁用存储时仍允许切换当前页面的主题色。
+    }
+  }, [color, selectedColor.hex]);
+  return (
+    <Popover>
+      <Button
+        size="sm"
+        variant="ghost"
+        isIconOnly
+        className="theme-color-trigger"
+        aria-label={`选择主题色，当前为${selectedColor.name}`}
+      >
+        <Palette size={18} />
+      </Button>
+      <Popover.Content className="theme-color-popover" placement="bottom end">
+        <Popover.Dialog aria-label="选择主题色">
+          <ColorSwatchPicker
+            aria-label="主题色"
+            className="theme-color-grid"
+            variant="square"
+            value={selectedColor.hex}
+            onChange={(value) => {
+              const nextColor = COLORS.find(
+                (item) => item.hex === value.toString('hex').toLowerCase(),
+              );
+              if (nextColor) setColor(nextColor.id);
+            }}
+          >
+            {COLORS.map((item) => (
+              <ColorSwatchPicker.Item key={item.id} color={item.hex} aria-label={item.name}>
+                <ColorSwatchPicker.Swatch />
+                <ColorSwatchPicker.Indicator />
+              </ColorSwatchPicker.Item>
+            ))}
+          </ColorSwatchPicker>
+        </Popover.Dialog>
+      </Popover.Content>
+    </Popover>
+  );
+}

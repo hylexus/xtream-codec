@@ -65,6 +65,7 @@ class XtreamCodecFrontendBuildPlugin : Plugin<Project> {
                     inputs.dir(projectDir.resolve("src"))
                     inputs.file(projectDir.resolve("package.json"))
                     inputs.file(projectDir.resolve("pnpm-lock.yaml"))
+                    inputs.files(extension.additionalInputs)
                     outputs.dir(distDir)
 
                     doFirst {

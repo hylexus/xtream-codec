@@ -1,6 +1,7 @@
 package io.github.hylexus.xtream.codec.gradle.plugins
 
 import org.gradle.api.Action
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -12,6 +13,9 @@ import javax.inject.Inject
  * 前端构建扩展配置
  *
  * 每个子项目都可以单独配置自己的前端项目路径、构建输出、目标静态目录等。
+ *
+ * @author Codex (AI)
+ * @author hylexus
  */
 open class XtreamCodecFrontendBuildExtension @Inject constructor(objects: ObjectFactory) {
 
@@ -31,6 +35,9 @@ open class XtreamCodecFrontendBuildExtension @Inject constructor(objects: Object
     val frontendDistDir: DirectoryProperty = objects.directoryProperty().convention(
         frontendProjectDir.map { it.dir("dist") }
     )
+
+    /** src、package.json 和锁文件以外的构建输入，例如 Vite 配置或共享 JSON Schema。 */
+    val additionalInputs: ConfigurableFileCollection = objects.fileCollection()
 
     /** 后端静态资源目录（前端构建产物要复制到这里） */
     val backendStaticDir: DirectoryProperty = objects.directoryProperty()

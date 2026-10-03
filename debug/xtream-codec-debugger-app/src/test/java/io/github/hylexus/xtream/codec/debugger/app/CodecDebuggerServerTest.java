@@ -56,12 +56,18 @@ class CodecDebuggerServerTest {
             final var page = get(base + "/");
             assertEquals(200, page.statusCode());
             assertTrue(page.body().contains("二进制编解码工作台"));
-            final var script = get(base + "/app.js");
+            // 根据 HTML 中的引用检查 Vite 哈希资源，避免测试绑定某次构建的文件名。
+            final var scriptMatcher = java.util.regex.Pattern.compile("src=\"(/assets/[^\"]+\\.js)\"").matcher(page.body());
+            assertTrue(scriptMatcher.find());
+            final var script = get(base + scriptMatcher.group(1));
             assertEquals(200, script.statusCode());
-            assertTrue(script.body().contains("writeText(latest.hex)"));
-            assertFalse(script.body().contains("writeText('7e'"));
-            assertEquals(200, get(base + "/style.css").statusCode());
-            assertEquals(200, get(base + "/completion.js").statusCode());
+            assertTrue(script.headers().firstValue("Content-Type").orElseThrow().startsWith("text/javascript"));
+            final var styleMatcher = java.util.regex.Pattern.compile("href=\"(/assets/[^\"]+\\.css)\"").matcher(page.body());
+            assertTrue(styleMatcher.find());
+            final var style = get(base + styleMatcher.group(1));
+            assertEquals(200, style.statusCode());
+            assertTrue(style.headers().firstValue("Content-Type").orElseThrow().startsWith("text/css"));
+            assertEquals(404, get(base + "/assets/missing.js").statusCode());
             final var jsonSchema = get(base + "/dynamic-codec-schema.json");
             assertEquals(200, jsonSchema.statusCode());
             assertTrue(jsonSchema.headers().firstValue("Content-Type").orElseThrow().startsWith("application/schema+json"));
