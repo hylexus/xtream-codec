@@ -153,7 +153,7 @@ object XtreamConfig {
         val defaultSpringCloudBomVersion: String get() = getOrLoadConfigAsString("defaultSpringCloudBomVersion")
 
         // frontend
-        val buildCodecDebuggerUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.xtream-codec-debugger-ui.enabled")
+        val buildCodecStudioUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.xtream-codec-studio-ui.enabled")
         val buildJt808DashboardUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt-808-server-dashboard-ui.enabled")
         val buildJt808DebugUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt-808-server-spring-boot-starter-debug-ui.enabled")
         val buildJt808QuickstartUi: Boolean get() = getOrLoadConfigAsBoolean("xtream.frontend.build.jt-808-server-quick-start-with-storage-ui.enabled")

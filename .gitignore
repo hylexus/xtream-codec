@@ -59,7 +59,7 @@ logs/
 node_modules/
 
 /debug/**/.idea/
-/debug/xtream-codec-debugger-app/src/main/resources/ui/
+/xtream-codec-studio-app/src/main/resources/ui/
 /debug/jt/jt-808-server-spring-boot-starter-reactive-debug/src/main/resources/static/
 /ext/jt/jt-808-server-dashboard-spring-boot-starter-reactive/src/main/resources/static/dashboard/
 /dev-tools-local/

@@ -1,0 +1,29 @@
+# Proposal
+
+## Why
+
+现有调试器每种模式只保留一份草稿，全页面共用一次执行结果，不能并行维护多个报文。将其升级为 Xtream Codec Studio，让协议样例成为可分类、保存和恢复的文档，同时保持编解码引擎及其既有 API 不变。
+
+## What Changes
+
+- **BREAKING** 将独立应用与前端移至顶层 xtream-codec-studio-app、xtream-codec-studio-ui，更新启动命令和构建配置；core.debugger 名称保持不变。
+- 多文档标签支持新建、重命名、复制、保存、关闭；编辑内容、未完成 JSON、执行状态及最近结果独立。
+- 左侧目录树管理报文与嵌套文件夹，支持移动、删除和打开文档。
+- 底部运行面板支持展开、折叠、调整高度和最大化，跟随当前文档展示结果。
+- 后端工作区支持默认文件存储、SQLite、部署配置与自定义存储 SPI；前端 IndexedDB 用于恢复草稿。
+- 保存文档及最近结果快照，提供文档和工作区导入导出、保存冲突检查及旧浏览器草稿迁移。
+
+## Capabilities
+
+### New Capabilities
+
+- `studio-editor`: Studio 产品、顶层应用、多文档编辑器及运行面板。
+- `studio-workspace`: 目录与文档、持久化存储、恢复及数据交换合同。
+
+### Modified Capabilities
+
+无。通用调试器的既有规格尚位于未归档变更中，本次新增工作区能力不修改编解码合同。
+
+## Impact
+
+影响独立应用、React 前端、Gradle 模块与前端配置、文档；新增 SQLite JDBC 依赖和工作区 API。编解码、实体目录及 core 公共 API 保持兼容。首版是单用户工作区，不增加账号、协同编辑或 Dashboard 页面；存储选择在启动时完成。

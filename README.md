@@ -181,6 +181,8 @@ docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/
 │     ├── xtream-codec-server-reactive-debug-tcp        ## xtream-codec-server-reactive TCP 调试(不用理会)
 │     └── xtream-codec-server-reactive-debug-udp        ## xtream-codec-server-reactive UDP 调试(不用理会)
 ├── xtream-codec-core                                   ## xtream-codec-core 核心编解码模块
+├── xtream-codec-studio-app                             ## 独立报文编辑器、编解码调试与持久工作区
+├── xtream-codec-studio-ui                              ## Studio 前端（React + HeroUI 3 + Vite）
 └── xtream-codec-server-reactive                        ## 异步非阻塞的 TCP/UDP 服务端实现
 ```
 
