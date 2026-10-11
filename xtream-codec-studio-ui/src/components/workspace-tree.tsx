@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type DragEvent } from 'react';
 import { Button, Dropdown, Label } from '@heroui/react';
 import {
   ChevronDown,
@@ -9,19 +9,69 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import type { WorkspaceEntry } from '../workspace';
+import { canMoveEntry } from '../workspace';
+
+const ENTRY_DRAG_TYPE = 'application/x-xtream-studio-entry';
 
 export function WorkspaceTree({
   entries,
   activeId,
   onOpen,
   onAction,
+  onMove,
+  isDisabled,
 }: {
   entries: WorkspaceEntry[];
   activeId: string | null;
   onOpen: (entry: WorkspaceEntry) => void;
   onAction: (entry: WorkspaceEntry, action: string) => void;
+  onMove: (entry: WorkspaceEntry, parentId: string | null) => void;
+  isDisabled: boolean;
 }) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  // undefined 表示没有落点，null 表示根目录。
+  const [dropTarget, setDropTarget] = useState<string | null>();
+  const clearDrag = () => {
+    setDraggedId(null);
+    setDropTarget(undefined);
+  };
+  const dragOver = (event: DragEvent<HTMLDivElement>, parentId: string | null) => {
+    event.stopPropagation();
+    if (!draggedId) return;
+    if (isDisabled || !canMoveEntry(entries, draggedId, parentId)) {
+      event.dataTransfer.dropEffect = 'none';
+      setDropTarget(undefined);
+      return;
+    }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    setDropTarget(parentId);
+  };
+  const dragLeave = (event: DragEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDropTarget(undefined);
+  };
+  const drop = (event: DragEvent<HTMLDivElement>, parentId: string | null) => {
+    event.stopPropagation();
+    const entry = entries.find((item) => item.id === draggedId);
+    clearDrag();
+    // 只接受本文件树发起的拖动，标签拖动和外部文件不会触发目录写入。
+    if (
+      isDisabled ||
+      !entry ||
+      event.dataTransfer.getData(ENTRY_DRAG_TYPE) !== entry.id ||
+      !canMoveEntry(entries, entry.id, parentId)
+    )
+      return;
+    event.preventDefault();
+    if (parentId !== null)
+      setCollapsed((old) => {
+        const next = new Set(old);
+        next.delete(parentId);
+        return next;
+      });
+    onMove(entry, parentId);
+  };
   const render = (parentId: string | null, depth: number) =>
     entries
       .filter((entry) => entry.parentId === parentId)
@@ -35,8 +85,23 @@ export function WorkspaceTree({
         return (
           <div key={entry.id}>
             <div
-              className={`workspace-tree-row ${activeId === entry.id ? 'active' : ''}`}
+              className={`workspace-tree-row ${activeId === entry.id ? 'active' : ''} ${draggedId === entry.id ? 'tree-dragging' : ''} ${dropTarget === entry.id ? 'tree-drop-target' : ''}`}
               style={{ paddingLeft: depth * 12 }}
+              draggable={!isDisabled}
+              onDragStart={(event) => {
+                if (isDisabled || (event.target as Element).closest('.tree-menu')) {
+                  event.preventDefault();
+                  return;
+                }
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData(ENTRY_DRAG_TYPE, entry.id);
+                setDraggedId(entry.id);
+                setDropTarget(undefined);
+              }}
+              onDragOver={(event) => dragOver(event, entry.id)}
+              onDragLeave={dragLeave}
+              onDrop={(event) => drop(event, entry.id)}
+              onDragEnd={clearDrag}
             >
               <Button
                 variant="ghost"
@@ -107,6 +172,18 @@ export function WorkspaceTree({
       });
   return (
     <div className="workspace-tree" aria-label="我的报文目录">
+      {draggedId && (
+        <div
+          className={`workspace-tree-root-drop ${dropTarget === null ? 'tree-drop-target' : ''}`}
+          aria-label="移动到根目录"
+          onDragOver={(event) => dragOver(event, null)}
+          onDragLeave={dragLeave}
+          onDrop={(event) => drop(event, null)}
+        >
+          <FolderOpen size={14} />
+          <span>移到根目录</span>
+        </div>
+      )}
       {entries.length ? (
         render(null, 0)
       ) : (

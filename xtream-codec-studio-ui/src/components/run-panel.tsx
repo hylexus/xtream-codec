@@ -1,14 +1,18 @@
 import { Button } from '@heroui/react';
+import { useRef } from 'react';
 import { ChevronDown, Maximize2, Minimize2, Terminal, X } from 'lucide-react';
 import { TraceViewer } from './trace-viewer';
 import { isStale } from '../workspace';
 import type { DocumentTab } from '../workspace';
+import { PanelResizer } from './panel-resizer';
+import { DEFAULT_LAYOUT } from '../layout';
 
 export function RunPanel({
   tabs,
   activeId,
   theme,
   height,
+  maxHeight,
   maximized,
   pending,
   onHeight,
@@ -21,6 +25,7 @@ export function RunPanel({
   activeId: string;
   theme: 'dark' | 'light';
   height: number;
+  maxHeight: number;
   maximized: boolean;
   pending: boolean;
   onHeight: (height: number) => void;
@@ -29,43 +34,30 @@ export function RunPanel({
   onNotice: (message: string) => void;
   onReuse: (id: string) => void;
 }) {
+  const panel = useRef<HTMLElement>(null);
   const active = tabs.find((tab) => tab.id === activeId);
   return (
     <section
+      ref={panel}
       className={`run-dock ${maximized ? 'maximized' : ''}`}
       style={maximized ? undefined : { height }}
       aria-label="运行面板"
     >
-      <div
-        className="run-resize"
-        role="separator"
-        aria-label="调整运行面板高度"
-        aria-orientation="horizontal"
-        tabIndex={0}
-        aria-valuemin={180}
-        aria-valuemax={window.innerHeight - 180}
-        aria-valuenow={height}
-        onKeyDown={(event) => {
-          if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-            event.preventDefault();
-            onHeight(height + (event.key === 'ArrowUp' ? 40 : -40));
-          }
-        }}
-        onPointerDown={(event) => {
-          event.currentTarget.setPointerCapture(event.pointerId);
-          event.currentTarget.dataset.startY = String(event.clientY);
-          event.currentTarget.dataset.startHeight = String(height);
-        }}
-        onPointerMove={(event) => {
-          if (event.currentTarget.hasPointerCapture(event.pointerId))
-            onHeight(
-              Number(event.currentTarget.dataset.startHeight) +
-                Number(event.currentTarget.dataset.startY) -
-                event.clientY,
-            );
-        }}
-        onPointerUp={(event) => event.currentTarget.releasePointerCapture(event.pointerId)}
-      />
+      {!maximized && (
+        <PanelResizer
+          className="run-resize"
+          label="调整运行面板高度"
+          direction="vertical"
+          value={height}
+          min={180}
+          max={maxHeight}
+          step={20}
+          reverse
+          onPreview={(value) => panel.current?.style.setProperty('height', `${value}px`)}
+          onChange={onHeight}
+          onReset={() => onHeight(DEFAULT_LAYOUT.run)}
+        />
+      )}
       <div className="run-dock-heading">
         <div className="heading-title">
           <Terminal size={16} />

@@ -11,7 +11,6 @@ import {
   Select,
   Tabs,
   TextArea,
-  TextField,
 } from '@heroui/react';
 import {
   ArrowDownToLine,
@@ -25,9 +24,6 @@ import {
   FlaskConical,
   Layers3,
   Plus,
-  RotateCw,
-  SlidersHorizontal,
-  Sparkles,
   Upload,
   X,
 } from 'lucide-react';
@@ -52,6 +48,7 @@ import type { Draft, Entity, Field, JsonValue, Path } from '../types';
 import { FieldDialog } from './field-dialog';
 import { JsonEditor } from './json-editor';
 import { SchemaEditor } from './schema-editor';
+import { ResizableSplit } from './resizable-split';
 
 import type { DocumentData } from '../workspace';
 import type { Preset } from '../presets';
@@ -60,8 +57,6 @@ interface Props {
   theme: 'dark' | 'light';
   entities: Entity[];
   extensions: string[];
-  connection: 'connecting' | 'online' | 'offline';
-  connect: () => Promise<void>;
   onChange: (update: (data: DocumentData) => DocumentData) => void;
   onRun: (direction: 'encode' | 'decode', submitted: DocumentData) => Promise<void>;
   onPreset: (preset: Preset) => void;
@@ -72,8 +67,6 @@ export function DocumentEditor({
   theme,
   entities,
   extensions,
-  connection,
-  connect,
   onChange,
   onRun,
   onPreset,
@@ -176,52 +169,6 @@ export function DocumentEditor({
   const CurrentIcon = mode === 'entity' ? Braces : mode === 'field' ? FlaskConical : Layers3;
   return (
     <>
-      <section className="config-bar" aria-label="编译配置与服务状态">
-        <div className="config-title">
-          <SlidersHorizontal size={15} />
-          编译配置
-        </div>
-        <TextField
-          aria-label="目标协议版本"
-          value={draft.version}
-          onChange={(value) => update({ version: value })}
-        >
-          <Input placeholder="目标协议版本 · 默认" />
-        </TextField>
-        {mode !== 'entity' && (
-          <span className="schema-version">
-            SCHEMA <b>v{draft.schema.schemaVersion}</b>
-          </span>
-        )}
-        <div className="connection-bar">
-          <div
-            className={`connection-status ${connection}`}
-            role="status"
-            title={
-              connection === 'offline'
-                ? '启动独立 Java 调试应用后重新连接；离线仍可编辑结构。'
-                : '编解码请求由调试服务执行'
-            }
-          >
-            <span />
-            {connection === 'online'
-              ? '服务已连接'
-              : connection === 'connecting'
-                ? '正在连接'
-                : '服务未连接'}
-          </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            isIconOnly
-            isDisabled={connection === 'connecting'}
-            aria-label="重新连接服务"
-            onPress={() => void connect()}
-          >
-            <RotateCw size={14} />
-          </Button>
-        </div>
-      </section>
       {error && (
         <Alert status="danger" className="error-banner dismissible" role="alert">
           <Alert.Content>
@@ -238,8 +185,15 @@ export function DocumentEditor({
           </Button>
         </Alert>
       )}
-      <div className="editor-grid">
-        <section className="panel structure-panel">
+      <ResizableSplit
+        name="editor"
+        label="调整结构与输入宽度"
+        minSize={340}
+        className="editor-grid"
+      >
+        <section
+          className={`panel structure-panel ${schemaTab === 'json' && mode !== 'entity' ? 'structure-json' : ''}`}
+        >
           <div className="panel-heading">
             <div className="heading-title">
               <span className="section-icon violet">
@@ -373,6 +327,7 @@ export function DocumentEditor({
             <>
               <div className="structure-toolbar">
                 <Tabs
+                  variant="secondary"
                   selectedKey={schemaTab}
                   onSelectionChange={(key) => switchSchemaTab(String(key))}
                 >
@@ -428,7 +383,7 @@ export function DocumentEditor({
                     schema
                     theme={theme}
                     label="结构定义 JSON"
-                    height="480px"
+                    height="var(--studio-schema-height, 480px)"
                   />
                   <div className="json-footer">
                     <span>Ctrl + Space 补全属性与引用</span>
@@ -500,7 +455,13 @@ export function DocumentEditor({
             </>
           )}
         </section>
-        <div className="execution-column">
+        <ResizableSplit
+          name="input"
+          label="调整编码与解码高度"
+          direction="vertical"
+          minSize={160}
+          className="execution-column"
+        >
           <section className="panel values-panel">
             <div className="panel-heading">
               <div className="heading-title">
@@ -516,11 +477,12 @@ export function DocumentEditor({
               onChange={(value) => update({ values: value })}
               theme={theme}
               label="编码值 JSON"
-              height="260px"
+              height="var(--studio-values-height, 260px)"
             />
             <div className="execution-footer">
               <span>按字段标识传值</span>
               <Button
+                size="sm"
                 className="encode-button"
                 isDisabled={!!pending}
                 isPending={pending === 'encode'}
@@ -552,6 +514,7 @@ export function DocumentEditor({
             <div className="execution-footer">
               <span>{draft.hex.replace(/\s/g, '').length / 2} 字节 · 原始报文</span>
               <Button
+                size="sm"
                 className="decode-button"
                 variant="secondary"
                 isDisabled={!!pending}
@@ -563,16 +526,8 @@ export function DocumentEditor({
               </Button>
             </div>
           </section>
-          <div className="workflow-hint">
-            <Sparkles size={15} />
-            <p>
-              编辑字段与值 → 编码 → 用同一结构解码
-              <br />
-              <span>编码结果自动写入 HEX 输入框。</span>
-            </p>
-          </div>
-        </div>
-      </div>
+        </ResizableSplit>
+      </ResizableSplit>
       <Input
         hidden
         className="schema-file-input"

@@ -303,6 +303,20 @@ export function descendants(entries: WorkspaceEntry[], id: string): Set<string> 
   return found;
 }
 
+export function canMoveEntry(
+  entries: WorkspaceEntry[],
+  id: string,
+  parentId: string | null,
+): boolean {
+  const entry = entries.find((item) => item.id === id);
+  if (!entry || entry.parentId === parentId) return false;
+  if (parentId === null) return true;
+  return (
+    entries.some((item) => item.id === parentId && item.kind === 'folder') &&
+    !descendants(entries, id).has(parentId)
+  );
+}
+
 export function downloadJson(name: string, data: unknown): void {
   const url = URL.createObjectURL(new Blob([pretty(data)], { type: 'application/json' }));
   const link = document.createElement('a');

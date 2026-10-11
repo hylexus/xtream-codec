@@ -12,6 +12,7 @@ import {
 import type { CodecResult, TraceNode } from '../types';
 import { pretty } from '../model';
 import { JsonEditor } from './json-editor';
+import { ResizableSplit } from './resizable-split';
 
 interface Props {
   result: CodecResult | null;
@@ -267,7 +268,7 @@ export function TraceViewer({ result, theme, onReuse, onNotice }: Props) {
           ))}
         </div>
       )}
-      <Tabs className="result-tabs" defaultSelectedKey="trace">
+      <Tabs className="result-tabs" variant="secondary" defaultSelectedKey="trace">
         <Tabs.ListContainer>
           <Tabs.List aria-label="执行结果视图">
             <Tabs.Tab id="trace">
@@ -285,7 +286,7 @@ export function TraceViewer({ result, theme, onReuse, onNotice }: Props) {
           </Tabs.List>
         </Tabs.ListContainer>
         <Tabs.Panel id="trace">
-          <div className="trace-grid">
+          <ResizableSplit name="trace" label="调整 HEX 与字段跟踪宽度" className="trace-grid">
             <div className="hex-pane">
               <div className="pane-caption">
                 <span>HEX DUMP</span>
@@ -452,7 +453,7 @@ export function TraceViewer({ result, theme, onReuse, onNotice }: Props) {
                 </div>
               )}
             </div>
-          </div>
+          </ResizableSplit>
         </Tabs.Panel>
         <Tabs.Panel id="values">
           <JsonEditor

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type DragEvent } from 'react';
 import { Button } from '@heroui/react';
 import {
   ArrowDown,
@@ -11,7 +11,7 @@ import {
   Settings2,
   Trash2,
 } from 'lucide-react';
-import { fieldColor, getAt, isAutomatic, pathKey } from '../model';
+import { fieldColor, fieldDropIndex, getAt, isAutomatic, pathKey } from '../model';
 import type { Field, JsonValue, Path, Schema, Values } from '../types';
 import { ValueEditor } from './value-editor';
 
@@ -29,6 +29,18 @@ interface Props {
 export function SchemaEditor(props: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [dragged, setDragged] = useState<Path | null>(null);
+  const [dropTarget, setDropTarget] = useState<{
+    key: string;
+    position: 'before' | 'after';
+  } | null>(null);
+  const clearDrag = () => {
+    setDragged(null);
+    setDropTarget(null);
+  };
+  const dropPosition = (event: DragEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return event.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+  };
   const toggle = (path: Path) =>
     setCollapsed((old) => {
       const next = new Set(old),
@@ -48,36 +60,52 @@ export function SchemaEditor(props: Props) {
     const hasChildren =
       !!field.fields || !!field.item || !!field.variants || !!field.defaultVariant;
     const open = !collapsed.has(pathKey(path));
+    const position = dropTarget?.key === pathKey(path) ? dropTarget.position : undefined;
     return (
       <div
-        className={`field-card color-${color}`}
+        className={`field-card color-${color}${dragged && pathKey(dragged) === pathKey(path) ? ' field-dragging' : ''}`}
         key={pathKey(path)}
+        data-drop-position={position}
         onDragOver={(event) => {
-          if (dragged && pathKey(dragged.slice(0, -1)) === pathKey(path.slice(0, -1)))
-            event.preventDefault();
-        }}
-        onDrop={(event) => {
+          if (!dragged) return;
+          const position = dropPosition(event);
+          if (fieldDropIndex(dragged, path, position) === null) return;
           event.preventDefault();
           event.stopPropagation();
-          if (
-            dragged &&
-            typeof path.at(-1) === 'number' &&
-            pathKey(dragged.slice(0, -1)) === pathKey(path.slice(0, -1))
-          )
-            props.onMove(dragged, Number(path.at(-1)));
-          setDragged(null);
+          event.dataTransfer.dropEffect = 'move';
+          const key = pathKey(path);
+          setDropTarget((old) =>
+            old?.key === key && old.position === position ? old : { key, position },
+          );
+        }}
+        onDrop={(event) => {
+          if (!dragged) return;
+          const index = fieldDropIndex(dragged, path, dropPosition(event));
+          if (index === null) return;
+          event.preventDefault();
+          event.stopPropagation();
+          clearDrag();
+          props.onMove(dragged, index);
         }}
       >
+        {position && (
+          <div className="field-drop-indicator" aria-hidden="true">
+            <span>插入到{position === 'before' ? '上方' : '下方'}</span>
+          </div>
+        )}
         <div className="field-line">
           {index !== undefined && (
             <span
               className="drag-handle"
               draggable
               onDragStart={(event) => {
+                event.stopPropagation();
                 setDragged(path);
-                event.dataTransfer.setData('text/plain', pathKey(path));
+                setDropTarget(null);
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('application/x-xtream-studio-field', pathKey(path));
               }}
-              onDragEnd={() => setDragged(null)}
+              onDragEnd={clearDrag}
               title="拖拽调整同级顺序"
             >
               <Button
@@ -251,7 +279,26 @@ export function SchemaEditor(props: Props) {
     );
   };
   return (
-    <div className="schema-tree">
+    <div
+      className="schema-tree"
+      onDragOver={(event) => {
+        if (!dragged) return;
+        event.dataTransfer.dropEffect = 'none';
+        setDropTarget(null);
+      }}
+      onDragLeave={(event) => {
+        if (
+          !(event.relatedTarget instanceof Node) ||
+          !event.currentTarget.contains(event.relatedTarget)
+        )
+          setDropTarget(null);
+      }}
+      onDrop={(event) => {
+        if (!dragged) return;
+        event.preventDefault();
+        clearDrag();
+      }}
+    >
       {props.schema.fields.map((field, index) =>
         render(field, ['fields', index], [field.id], index, props.schema.fields.length),
       )}

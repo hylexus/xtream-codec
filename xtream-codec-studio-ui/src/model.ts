@@ -172,6 +172,25 @@ export function moveField(schema: Schema, path: Path, targetIndex: number): Sche
   return setAt(schema, parent, copy);
 }
 
+export function fieldDropIndex(
+  source: Path,
+  target: Path,
+  position: 'before' | 'after',
+): number | null {
+  const sourceIndex = source.at(-1),
+    targetIndex = target.at(-1);
+  if (
+    typeof sourceIndex !== 'number' ||
+    typeof targetIndex !== 'number' ||
+    pathKey(source.slice(0, -1)) !== pathKey(target.slice(0, -1))
+  )
+    return null;
+  // 落点是原列表的插入间隙；先移除源字段时，位于源字段之后的间隙会左移一位。
+  const gap = targetIndex + (position === 'after' ? 1 : 0);
+  const index = gap - (sourceIndex < gap ? 1 : 0);
+  return index === sourceIndex ? null : index;
+}
+
 // 结构定义的数组元素只出现一次，实际值可能有多个；重命名和删除需更新每个元素。
 function valuePaths(schema: Schema, values: Values, target: Path): Path[] {
   const found: Path[] = [];

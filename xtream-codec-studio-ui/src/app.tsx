@@ -1,5 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Button, Dropdown, Input, Label, Link, Toast, Tooltip, toast } from '@heroui/react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import {
+  Alert,
+  Button,
+  Dropdown,
+  Input,
+  Label,
+  Link,
+  TextField,
+  Toast,
+  Tooltip,
+  toast,
+} from '@heroui/react';
 import {
   Binary,
   Braces,
@@ -19,6 +30,7 @@ import {
   Plus,
   RotateCw,
   Save,
+  SlidersHorizontal,
   Sun,
   Terminal,
   Upload,
@@ -31,6 +43,7 @@ import type { Preset } from './presets';
 import type { Entity, Mode } from './types';
 import {
   acceptSave,
+  canMoveEntry,
   completeRun,
   descendants,
   downloadJson,
@@ -59,10 +72,19 @@ import { RunPanel } from './components/run-panel';
 import { ThemeColorPicker } from './components/theme-color-picker';
 import { TabContextMenu } from './components/tab-context-menu';
 import type { TabAction, TabContext } from './components/tab-context-menu';
+import { DEFAULT_LAYOUT, useLayout, useViewportSize } from './layout';
+import { PanelResizer } from './components/panel-resizer';
 
 const MODE_ICONS = { dynamic: Layers3, entity: Braces, field: FlaskConical };
 
 export function App() {
+  const shell = useRef<HTMLDivElement>(null);
+  const { layout, setSize } = useLayout();
+  const viewport = useViewportSize();
+  const sidebarMax = Math.max(184, Math.min(420, viewport.width * 0.3));
+  const sidebarWidth = Math.min(layout.sidebar, sidebarMax);
+  // 保留顶部工具栏及输入面板的操作空间；查看完整结果可使用最大化。
+  const runMax = Math.max(180, viewport.height - 480);
   const [session, setSession] = useState<Session>({
     formatVersion: 1,
     tabs: [],
@@ -99,9 +121,9 @@ export function App() {
   const [tabDrop, setTabDrop] = useState<{ id: string; after: boolean } | null>(null);
   const [saving, setSaving] = useState<Set<string>>(new Set());
   const savingIds = useRef(new Set<string>());
+  const [movingEntry, setMovingEntry] = useState(false);
   const [pending, setPending] = useState<Set<string>>(new Set());
   const [runOpen, setRunOpen] = useState(false);
-  const [runHeight, setRunHeight] = useState(360);
   const [runMaximized, setRunMaximized] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const [importPending, setImportPending] = useState(false);
@@ -331,6 +353,41 @@ export function App() {
         await refresh();
       },
     });
+  const updateEntry = async (entry: WorkspaceEntry, name: string, parentId: string | null) => {
+    const full = await workspaceApi.get(entry.id);
+    const updated = await workspaceApi.update({
+      ...full,
+      revision: entry.revision,
+      name,
+      parentId,
+    });
+    changeSession((old) => ({
+      ...old,
+      tabs: old.tabs.map((tab) =>
+        tab.entryId === entry.id
+          ? {
+              ...tab,
+              name: updated.name,
+              parentId: updated.parentId,
+              // 只推进与移动前版本一致的标签，旧草稿仍需通过保存冲突检查。
+              revision: tab.revision === entry.revision ? updated.revision : tab.revision,
+            }
+          : tab,
+      ),
+    }));
+    await refresh();
+  };
+  const moveEntry = async (entry: WorkspaceEntry, parentId: string | null) => {
+    if (movingEntry || !canMoveEntry(workspace.entries, entry.id, parentId)) return;
+    if (!workspaceOnline) throw new Error('工作区未连接，请连接后移动');
+    setMovingEntry(true);
+    try {
+      await updateEntry(entry, entry.name, parentId);
+      notify('已移动到目标目录');
+    } finally {
+      setMovingEntry(false);
+    }
+  };
   const treeAction = (entry: WorkspaceEntry, kind: string) => {
     if (kind === 'new') {
       createDocument(entry.id);
@@ -368,29 +425,8 @@ export function App() {
       name: entry.name,
       parentId: entry.parentId,
       ...(kind === 'move' ? { folders: folders(descendants(workspace.entries, entry.id)) } : {}),
-      submit: async (name, parentId) => {
-        const full = await workspaceApi.get(entry.id);
-        const updated = await workspaceApi.update({
-          ...full,
-          revision: entry.revision,
-          name,
-          parentId: kind === 'move' ? parentId : entry.parentId,
-        });
-        changeSession((old) => ({
-          ...old,
-          tabs: old.tabs.map((tab) =>
-            tab.entryId === entry.id
-              ? {
-                  ...tab,
-                  name: updated.name,
-                  parentId: updated.parentId,
-                  revision: tab.revision === entry.revision ? updated.revision : tab.revision,
-                }
-              : tab,
-          ),
-        }));
-        await refresh();
-      },
+      submit: (name, parentId) =>
+        updateEntry(entry, name, kind === 'move' ? parentId : entry.parentId),
     });
   };
   const renameTab = (tab: DocumentTab) => {
@@ -551,7 +587,13 @@ export function App() {
   };
   return (
     <div
+      ref={shell}
       className={`workbench-shell studio-editor-shell ${session.sidebarCollapsed ? 'sidebar-collapsed' : ''}`}
+      style={
+        {
+          '--sidebar-width': session.sidebarCollapsed ? '72px' : `${sidebarWidth}px`,
+        } as CSSProperties
+      }
     >
       <aside className="sidebar" id="workbench-sidebar" aria-label="工作区导航">
         <div className="sidebar-header">
@@ -637,6 +679,8 @@ export function App() {
               activeId={active?.entryId || null}
               onOpen={(entry) => safely(() => openEntry(entry))}
               onAction={treeAction}
+              onMove={(entry, parentId) => safely(() => moveEntry(entry, parentId))}
+              isDisabled={!workspaceOnline || movingEntry || saving.size > 0}
             />
             {!workspaceOnline && (
               <p className="workspace-empty">工作区未连接，当前编辑保留在本地草稿。</p>
@@ -668,6 +712,19 @@ export function App() {
           <span>XTREAM CODEC</span>
           <span>0.11</span>
         </div>
+        {!session.sidebarCollapsed && (
+          <PanelResizer
+            className="sidebar-resizer"
+            label="调整侧边栏宽度"
+            direction="horizontal"
+            value={sidebarWidth}
+            min={184}
+            max={sidebarMax}
+            onPreview={(value) => shell.current?.style.setProperty('--sidebar-width', `${value}px`)}
+            onChange={(value) => setSize('sidebar', value)}
+            onReset={() => setSize('sidebar', DEFAULT_LAYOUT.sidebar)}
+          />
+        )}
       </aside>
       <div className="workspace studio-workspace">
         <header className="topbar">
@@ -837,79 +894,138 @@ export function App() {
           </Button>
         </div>
         {active && (
-          <div className="document-commandbar">
-            <div className="heading-title">
-              <span className="muted">{MODE_TITLES[active.data.mode]}</span>
-              <strong>{active.name}</strong>
-              {active.entryId && (
-                <span className="document-saved">服务器 · v{active.revision}</span>
-              )}
-            </div>
-            <div className="actions">
-              <Button
-                variant="secondary"
-                size="sm"
-                isDisabled={!ready || saving.has(active.id)}
-                onPress={() => requestSave(active.id)}
-              >
-                <Save size={14} />
-                保存
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onPress={() => {
-                  setRunOpen((open) => !open);
-                  setRunMaximized(false);
-                }}
-              >
-                <Terminal size={14} />
-                运行面板
-              </Button>
-              <Dropdown>
-                <Dropdown.Trigger
-                  className="button button--sm button--ghost"
-                  aria-label="文档和工作区操作"
+          <section className="document-toolbar" aria-label="文档工具栏">
+            <div className="document-commandbar">
+              <div className="heading-title document-info">
+                <span className="document-mode">{MODE_TITLES[active.data.mode]}</span>
+                <strong title={active.name}>{active.name}</strong>
+                {active.entryId && (
+                  <span className="document-saved">服务器 · v{active.revision}</span>
+                )}
+              </div>
+              <div className="document-config" role="group" aria-label="编译配置">
+                <TextField
+                  className="protocol-version-field"
+                  value={active.data.draft.version}
+                  onChange={(version) =>
+                    changeTab(active.id, (tab) => ({
+                      ...tab,
+                      data: { ...tab.data, draft: { ...tab.data.draft, version } },
+                    }))
+                  }
                 >
-                  <MoreHorizontal size={17} />
-                </Dropdown.Trigger>
-                <Dropdown.Popover>
-                  <Dropdown.Menu
-                    aria-label="文档操作"
-                    onAction={(key) => {
-                      if (key === 'rename') renameTab(active);
-                      else if (key === 'duplicate') duplicate(active);
-                      else if (key === 'export-document') exportDocument(active);
-                      else if (key === 'export-workspace')
-                        safely(async () =>
-                          downloadJson('codec-studio-workspace.json', await workspaceApi.export()),
-                        );
-                      else if (key === 'import') fileInput.current?.click();
-                    }}
+                  <Label>
+                    <SlidersHorizontal size={14} />
+                    协议版本
+                  </Label>
+                  <Input placeholder="默认" />
+                </TextField>
+                {active.data.mode !== 'entity' && (
+                  <span className="schema-version">
+                    SCHEMA <b>v{active.data.draft.schema.schemaVersion}</b>
+                  </span>
+                )}
+              </div>
+              <div className="connection-bar">
+                <div
+                  className={`connection-status ${connection}`}
+                  role="status"
+                  title={
+                    connection === 'offline'
+                      ? '启动独立 Java 调试应用后重新连接；离线仍可编辑结构。'
+                      : '编解码请求由调试服务执行'
+                  }
+                >
+                  <span />
+                  {connection === 'online'
+                    ? '服务已连接'
+                    : connection === 'connecting'
+                      ? '正在连接'
+                      : '服务未连接'}
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  isIconOnly
+                  isDisabled={connection === 'connecting'}
+                  aria-label="重新连接服务"
+                  onPress={() => void connect()}
+                >
+                  <RotateCw size={14} />
+                </Button>
+              </div>
+              <div className="actions document-actions">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  isDisabled={!ready || saving.has(active.id)}
+                  onPress={() => requestSave(active.id)}
+                >
+                  <Save size={14} />
+                  保存
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="run-panel-button"
+                  aria-label="运行面板"
+                  aria-pressed={runOpen}
+                  onPress={() => {
+                    setRunOpen((open) => !open);
+                    setRunMaximized(false);
+                  }}
+                >
+                  <Terminal size={14} />
+                  <span className="run-panel-label">运行面板</span>
+                </Button>
+                <Dropdown>
+                  <Dropdown.Trigger
+                    className="button button--sm button--ghost"
+                    aria-label="文档和工作区操作"
                   >
-                    <Dropdown.Item id="rename">
-                      <Label>重命名</Label>
-                    </Dropdown.Item>
-                    <Dropdown.Item id="duplicate">
-                      <Label>复制为新标签</Label>
-                    </Dropdown.Item>
-                    <Dropdown.Item id="export-document">
-                      <Download size={14} />
-                      <Label>导出完整文档</Label>
-                    </Dropdown.Item>
-                    <Dropdown.Item id="export-workspace">
-                      <Download size={14} />
-                      <Label>导出服务器工作区</Label>
-                    </Dropdown.Item>
-                    <Dropdown.Item id="import" isDisabled={importPending}>
-                      <Upload size={14} />
-                      <Label>导入文档 / 工作区</Label>
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown.Popover>
-              </Dropdown>
+                    <MoreHorizontal size={17} />
+                  </Dropdown.Trigger>
+                  <Dropdown.Popover>
+                    <Dropdown.Menu
+                      aria-label="文档操作"
+                      onAction={(key) => {
+                        if (key === 'rename') renameTab(active);
+                        else if (key === 'duplicate') duplicate(active);
+                        else if (key === 'export-document') exportDocument(active);
+                        else if (key === 'export-workspace')
+                          safely(async () =>
+                            downloadJson(
+                              'codec-studio-workspace.json',
+                              await workspaceApi.export(),
+                            ),
+                          );
+                        else if (key === 'import') fileInput.current?.click();
+                      }}
+                    >
+                      <Dropdown.Item id="rename">
+                        <Label>重命名</Label>
+                      </Dropdown.Item>
+                      <Dropdown.Item id="duplicate">
+                        <Label>复制为新标签</Label>
+                      </Dropdown.Item>
+                      <Dropdown.Item id="export-document">
+                        <Download size={14} />
+                        <Label>导出完整文档</Label>
+                      </Dropdown.Item>
+                      <Dropdown.Item id="export-workspace">
+                        <Download size={14} />
+                        <Label>导出服务器工作区</Label>
+                      </Dropdown.Item>
+                      <Dropdown.Item id="import" isDisabled={importPending}>
+                        <Upload size={14} />
+                        <Label>导入文档 / 工作区</Label>
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown.Popover>
+                </Dropdown>
+              </div>
             </div>
-          </div>
+          </section>
         )}
         {error && (
           <Alert status="danger" className="error-banner dismissible workspace-error">
@@ -977,8 +1093,6 @@ export function App() {
                   theme={theme}
                   entities={entities}
                   extensions={extensions}
-                  connection={connection}
-                  connect={connect}
                   onChange={(update) =>
                     changeTab(tab.id, (old) => ({ ...old, data: update(old.data) }))
                   }
@@ -994,12 +1108,11 @@ export function App() {
             tabs={session.tabs}
             activeId={session.activeId}
             theme={theme}
-            height={runHeight}
+            height={Math.min(layout.run, runMax)}
+            maxHeight={runMax}
             maximized={runMaximized}
             pending={pending.has(session.activeId)}
-            onHeight={(height) =>
-              setRunHeight(Math.max(180, Math.min(window.innerHeight - 180, height)))
-            }
+            onHeight={(height) => setSize('run', height)}
             onMaximize={() => setRunMaximized((max) => !max)}
             onClose={() => {
               setRunOpen(false);

@@ -5,6 +5,7 @@ import {
   createField,
   defaultValue,
   duplicateField,
+  fieldDropIndex,
   getAt,
   moveField,
   normalizeHex,
@@ -58,6 +59,80 @@ test('重排与复制结构不修改原对象，复制值保持独立', () => {
   const changed = setAt(duplicated.values, ['b_copy', 'child'], 99);
   assert.equal(changed.b.child, 17);
   assert.equal(values.b.child, 17);
+});
+
+test('字段拖放的上下落点与最终顺序一致，相邻原位置不产生修改', () => {
+  const schema = {
+    schemaVersion: 1,
+    fields: ['a', 'b', 'c', 'd'].map((id) => ({ id, type: 'u8' })),
+  };
+  for (const [source, target, position, expected] of [
+    [0, 2, 'before', ['b', 'a', 'c', 'd']],
+    [0, 2, 'after', ['b', 'c', 'a', 'd']],
+    [3, 1, 'before', ['a', 'd', 'b', 'c']],
+    [3, 1, 'after', ['a', 'b', 'd', 'c']],
+    [0, 3, 'after', ['b', 'c', 'd', 'a']],
+    [3, 0, 'before', ['d', 'a', 'b', 'c']],
+  ]) {
+    const path = ['fields', source];
+    const index = fieldDropIndex(path, ['fields', target], position);
+    assert.notEqual(index, null);
+    assert.deepEqual(
+      moveField(schema, path, index).fields.map((field) => field.id),
+      expected,
+    );
+  }
+  for (const [source, target, position] of [
+    [1, 1, 'before'],
+    [1, 1, 'after'],
+    [1, 2, 'before'],
+    [2, 1, 'after'],
+  ])
+    assert.equal(fieldDropIndex(['fields', source], ['fields', target], position), null);
+  assert.deepEqual(
+    schema.fields.map((field) => field.id),
+    ['a', 'b', 'c', 'd'],
+  );
+});
+
+test('嵌套字段只在自己的同级列表中排序，不能拖到容器或分支上', () => {
+  const schema = {
+    schemaVersion: 1,
+    fields: [
+      { id: 'count', type: 'u8' },
+      {
+        id: 'items',
+        type: 'array',
+        item: {
+          id: 'item',
+          type: 'struct',
+          fields: [
+            { id: 'code', type: 'u8' },
+            { id: 'value', type: 'u16' },
+          ],
+        },
+      },
+    ],
+  };
+  const source = ['fields', 1, 'item', 'fields', 0];
+  const index = fieldDropIndex(source, ['fields', 1, 'item', 'fields', 1], 'after');
+  const moved = moveField(schema, source, index);
+  assert.deepEqual(
+    moved.fields[1].item.fields.map((field) => field.id),
+    ['value', 'code'],
+  );
+  assert.deepEqual(
+    schema.fields[1].item.fields.map((field) => field.id),
+    ['code', 'value'],
+  );
+  for (const target of [
+    ['fields', 0],
+    ['fields', 1, 'item'],
+    ['fields', 1, 'fields', 1],
+    ['fields', 1, 'variants', '1'],
+    ['fields', 1, 'variants', '1', 'fields', 1],
+  ])
+    assert.equal(fieldDropIndex(source, target, 'before'), null);
 });
 
 test('数组元素中的子字段重命名、复制、删除及新增同步每个元素', () => {

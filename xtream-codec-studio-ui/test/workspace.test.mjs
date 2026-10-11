@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   acceptSave,
+  canMoveEntry,
   completeRun,
   descendants,
   fingerprint,
@@ -234,4 +235,23 @@ test('输入变化标记按方向比较，目录后代集合用于移动和递�
     { id: 'd', parentId: null },
   ];
   assert.deepEqual([...descendants(entries, 'a')], ['a', 'b', 'c']);
+});
+
+test('文件树移动只接受新的目录归属，拒绝自身、后代及非目录目标', () => {
+  const entries = [
+    { id: 'a', parentId: null, kind: 'folder' },
+    { id: 'b', parentId: 'a', kind: 'folder' },
+    { id: 'c', parentId: 'b', kind: 'folder' },
+    { id: 'file', parentId: 'a', kind: 'document' },
+    { id: 'other', parentId: null, kind: 'folder' },
+  ];
+  assert.equal(canMoveEntry(entries, 'file', 'b'), true);
+  assert.equal(canMoveEntry(entries, 'a', 'other'), true);
+  assert.equal(canMoveEntry(entries, 'b', null), true);
+  for (const target of ['a', 'b', 'c', 'file', 'missing', null]) {
+    assert.equal(canMoveEntry(entries, 'a', target), false, `根目录 a 的无效落点 ${target}`);
+  }
+  assert.equal(canMoveEntry(entries, 'file', 'a'), false);
+  assert.equal(canMoveEntry(entries, 'file', 'file'), false);
+  assert.equal(canMoveEntry(entries, 'missing', 'other'), false);
 });
