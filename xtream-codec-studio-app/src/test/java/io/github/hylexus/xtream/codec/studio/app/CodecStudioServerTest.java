@@ -24,6 +24,8 @@ import io.github.hylexus.xtream.codec.core.debugger.CodecDebuggerService;
 import io.github.hylexus.xtream.codec.core.debugger.DebugEntityCatalog;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -36,8 +38,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 独立 HTTP 路由与页面资源的集成测试。
- * 服务绑定临时本机端口，检查静态页面、版本化 API、请求上限和实体目录限制。
+ * 不依赖前端构建产物的独立 HTTP 路由与编解码 API 集成测试。
+ * 服务绑定临时本机端口，检查版本化 API、请求上限和实体目录限制。
  *
  * @author Codex (AI)
  * @since 0.11.0
@@ -47,31 +49,13 @@ class CodecStudioServerTest {
     private final HttpClient client = HttpClient.newHttpClient();
 
     @Test
-    void shouldServeVersionedApiAndProtocolAgnosticPage() throws Exception {
+    void shouldServeVersionedCodecApi() throws Exception {
         final CodecDebuggerService service = new CodecDebuggerService(
                 new DebugEntityCatalog(Map.of("sample", SampleMessage.class)));
         try (CodecStudioServer server = new CodecStudioServer(new InetSocketAddress("127.0.0.1", 0), service, 4096)) {
             server.start();
             final String base = "http://127.0.0.1:" + server.port();
-            final var page = get(base + "/");
-            assertEquals(200, page.statusCode());
-            assertTrue(page.body().contains("二进制编解码工作台"));
-            // 根据 HTML 中的引用检查 Vite 哈希资源，避免测试绑定某次构建的文件名。
-            final var scriptMatcher = java.util.regex.Pattern.compile("src=\"(/assets/[^\"]+\\.js)\"").matcher(page.body());
-            assertTrue(scriptMatcher.find());
-            final var script = get(base + scriptMatcher.group(1));
-            assertEquals(200, script.statusCode());
-            assertTrue(script.headers().firstValue("Content-Type").orElseThrow().startsWith("text/javascript"));
-            final var styleMatcher = java.util.regex.Pattern.compile("href=\"(/assets/[^\"]+\\.css)\"").matcher(page.body());
-            assertTrue(styleMatcher.find());
-            final var style = get(base + styleMatcher.group(1));
-            assertEquals(200, style.statusCode());
-            assertTrue(style.headers().firstValue("Content-Type").orElseThrow().startsWith("text/css"));
             assertEquals(404, get(base + "/assets/missing.js").statusCode());
-            final var jsonSchema = get(base + "/dynamic-codec-schema.json");
-            assertEquals(200, jsonSchema.statusCode());
-            assertTrue(jsonSchema.headers().firstValue("Content-Type").orElseThrow().startsWith("application/schema+json"));
-            assertTrue(mapper.readTree(jsonSchema.body()).path("$defs").path("field").path("properties").has("generated"));
             assertEquals(1, mapper.readTree(get(base + "/api/v1/entities").body()).size());
             final var template = get(base + "/api/v1/entities/sample/template");
             assertEquals(200, template.statusCode());
@@ -155,6 +139,28 @@ class CodecStudioServerTest {
             assertEquals(422, response.statusCode());
             assertEquals("$.result", mapper.readTree(response.body()).get("error").get("fieldPath").asText());
             assertEquals(404, post(base + "/api/v1/expression-engines", "{}").statusCode());
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "GET, /api/v1/missing, 404",
+            "GET, /api/v1/codec, 404",
+            "POST, /api/v1/entities, 404",
+            "PUT, /api/v1/codec, 404",
+            "POST, /api/v1/workspace, 404",
+            "POST, /, 405",
+            "PUT, /, 405",
+            "DELETE, /assets/missing.js, 405"
+    })
+    void shouldPreserveFallbackStatusForMethodAndPath(String method, String path, int status) throws Exception {
+        try (var server = new CodecStudioServer(new InetSocketAddress("127.0.0.1", 0),
+                new CodecDebuggerService(new DebugEntityCatalog(Map.of())), 4096)) {
+            server.start();
+            final var response = client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + server.port() + path))
+                    .method(method, HttpRequest.BodyPublishers.noBody()).build(), HttpResponse.BodyHandlers.ofString());
+            assertEquals(status, response.statusCode());
+            assertEquals(status == 404 ? "接口不存在" : "不支持的请求方法", mapper.readTree(response.body()).path("error").asText());
         }
     }
 

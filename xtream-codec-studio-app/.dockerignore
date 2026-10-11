@@ -1,0 +1,6 @@
+**
+!build/
+!build/libs/
+!build/libs/*-all.jar
+!docker/
+!docker/Dockerfile

@@ -1,8 +1,10 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.github.hylexus.xtream.codec.gradle.plugins.XtreamCodecFrontendBuildPlugin
 import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
 
 plugins {
     application
+    id("com.gradleup.shadow")
     id("xtream-codec-frontend-build-plugin")
 }
 
@@ -10,10 +12,61 @@ dependencies {
     implementation(project(":xtream-codec-core"))
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.xerial:sqlite-jdbc:3.53.4.0")
+    runtimeOnly("ch.qos.logback:logback-classic")
 }
 
 application {
     mainClass.set("io.github.hylexus.xtream.codec.studio.app.CodecStudioApplication")
+}
+
+shadow {
+    addShadowJarToAssembleLifecycle.set(false)
+}
+
+tasks.assemble {
+    // Shadow 分发归档也会通过 assemble 间接触发 fat JAR，发布时手动调用对应任务。
+    setDependsOn(taskDependencies.getDependencies(this).filterNot {
+        it.name in setOf("shadowDistTar", "shadowDistZip")
+    })
+}
+
+val executableJar = tasks.named<ShadowJar>("shadowJar") {
+    archiveClassifier.set("all")
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+    }
+    mergeServiceFiles()
+    filesMatching(listOf("META-INF/services/**", "META-INF/*.kotlin_module")) {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+    from(tasks.jar.map { zipTree(it.archiveFile.get().asFile) }) {
+        include("META-INF/LICENSE.txt", "META-INF/NOTICE.txt")
+    }
+    doFirst {
+        val ui = layout.buildDirectory.dir("resources/main/ui").get().asFile
+        check(ui.resolve("index.html").isFile && ui.resolve("dynamic-codec-schema.json").isFile) {
+            "发布 JAR 缺少 UI 资源，请使用 -Pxtream.frontend.build.xtream-codec-studio-ui.enabled=true 构建"
+        }
+        check(ui.resolve("assets").walkTopDown().any { it.isFile && it.extension == "js" }) {
+            "发布 JAR 缺少 UI 脚本，请重新构建前端"
+        }
+    }
+}
+
+tasks.test {
+    exclude("**/CodecStudioFatJarTest.class")
+}
+
+tasks.register<Test>("fatJarTest") {
+    description = "验证发布 JAR 的启动、资源、日志与工作区重启"
+    group = "verification"
+    dependsOn(executableJar)
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    include("**/CodecStudioFatJarTest.class")
+    inputs.file(executableJar.flatMap { it.archiveFile })
+    systemProperty("xtream.studio.test.jar", executableJar.get().archiveFile.get().asFile.absolutePath)
 }
 
 xtreamCodecFrontendBuild {

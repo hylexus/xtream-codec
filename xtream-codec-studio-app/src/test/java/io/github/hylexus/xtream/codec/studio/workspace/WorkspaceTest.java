@@ -23,6 +23,7 @@ import io.github.hylexus.xtream.codec.studio.app.CodecStudioServer;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
@@ -249,6 +250,32 @@ public class WorkspaceTest {
             final Entry entry = mapper.readValue(call(server, "GET", "/entries/" + id, null).body(), Entry.class);
             assertEquals(2, entry.revision());
             assertEquals(document(), entry.document());
+            final long workspaceRevision = mapper.readTree(call(server, "GET", "", null).body()).get("revision").asLong();
+            assertEquals(200, call(server, "DELETE", "/entries/" + id,
+                    Map.of("expectedRevision", entry.revision(), "workspaceRevision", workspaceRevision)).statusCode());
+            assertEquals(404, call(server, "GET", "/entries/" + id, null).statusCode());
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "POST, '', 404",
+            "POST, /export, 404",
+            "GET, /import, 404",
+            "GET, /entries, 404",
+            "GET, /missing, 404",
+            "POST, /entries/missing, 405",
+            "PATCH, /entries/missing, 405",
+            "POST, /entries/, 405"
+    })
+    void httpRoutingPreservesFallbackStatus(String method, String suffix, int status) throws Exception {
+        try (var service = new WorkspaceService(open("file"));
+                var server = new CodecStudioServer(new InetSocketAddress("127.0.0.1", 0),
+                        new CodecDebuggerService(new DebugEntityCatalog(Map.of())), 1024, service)) {
+            server.start();
+            final var response = call(server, method, suffix, null);
+            assertEquals(status, response.statusCode());
+            assertEquals(status == 404 ? "接口不存在" : "不支持的请求方法", mapper.readTree(response.body()).path("error").asText());
         }
     }
 

@@ -25,6 +25,8 @@ import io.github.hylexus.xtream.codec.studio.workspace.WorkspaceData;
 import io.github.hylexus.xtream.codec.studio.workspace.WorkspaceException;
 import io.github.hylexus.xtream.codec.studio.workspace.WorkspaceService;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,11 +45,13 @@ import java.util.concurrent.Executors;
  * @since 0.11.0
  */
 public final class CodecStudioServer implements AutoCloseable {
+    private static final Logger log = LoggerFactory.getLogger(CodecStudioServer.class);
     private final HttpServer server;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     private final CodecDebuggerService service;
     private final ObjectMapper mapper = new ObjectMapper();
     private final int maxRequestBytes;
+    private final int shutdownGraceSeconds;
     private final @Nullable WorkspaceService workspace;
 
     public CodecStudioServer(InetSocketAddress address, CodecDebuggerService service, int maxRequestBytes) throws IOException {
@@ -56,11 +60,25 @@ public final class CodecStudioServer implements AutoCloseable {
 
     public CodecStudioServer(InetSocketAddress address, CodecDebuggerService service, int maxRequestBytes,
                              @Nullable WorkspaceService workspace) throws IOException {
+        this(address, service, maxRequestBytes, workspace, 0);
+    }
+
+    /**
+     * 创建可配置 HTTP 停机等待时间的服务，工作区生命周期由调用方管理。
+     *
+     * @since 0.11.0
+     */
+    public CodecStudioServer(InetSocketAddress address, CodecDebuggerService service, int maxRequestBytes,
+                             @Nullable WorkspaceService workspace, int shutdownGraceSeconds) throws IOException {
         if (maxRequestBytes < 1) {
             throw new IllegalArgumentException("请求大小上限必须为正数");
         }
+        if (shutdownGraceSeconds < 0) {
+            throw new IllegalArgumentException("HTTP 停机等待秒数不能为负数");
+        }
         this.service = service;
         this.maxRequestBytes = maxRequestBytes;
+        this.shutdownGraceSeconds = shutdownGraceSeconds;
         this.workspace = workspace;
         this.server = HttpServer.create(address, 0);
         server.setExecutor(executor);
@@ -77,7 +95,7 @@ public final class CodecStudioServer implements AutoCloseable {
 
     @Override
     public void close() {
-        server.stop(0);
+        server.stop(shutdownGraceSeconds);
         executor.close();
     }
 
@@ -88,36 +106,42 @@ public final class CodecStudioServer implements AutoCloseable {
                 final String path = exchange.getRequestURI().getPath();
                 if (workspace != null && path.startsWith("/api/v1/workspace")) {
                     workspace(exchange, path, workspace);
-                } else if ("GET".equals(exchange.getRequestMethod()) && "/api/v1/entities".equals(path)) {
-                    json(exchange, 200, service.entities());
-                } else if ("GET".equals(exchange.getRequestMethod()) && "/api/v1/extensions".equals(path)) {
-                    json(exchange, 200, service.extensions());
-                } else if ("GET".equals(exchange.getRequestMethod()) && path.startsWith("/api/v1/entities/")
-                        && path.endsWith("/template")) {
-                    final String id = URLDecoder.decode(path.substring("/api/v1/entities/".length(),
-                            path.length() - "/template".length()), StandardCharsets.UTF_8);
-                    json(exchange, 200, service.entityTemplate(id));
-                } else if ("POST".equals(exchange.getRequestMethod()) && "/api/v1/codec".equals(path)) {
-                    // 最多读取上限加一字节，既可识别超限也不会无界读取请求体。
-                    final byte[] body = exchange.getRequestBody().readNBytes(maxRequestBytes + 1);
-                    if (body.length > maxRequestBytes) {
-                        json(exchange, 413, Map.of("error", "请求体超过资源上限"));
-                    } else {
-                        final var response = service.execute(mapper.readValue(body, DebugCodecRequest.class));
-                        json(exchange, response.success() ? 200 : 422, response);
+                    return;
+                }
+                switch (exchange.getRequestMethod()) {
+                    case "GET" -> {
+                        switch (path) {
+                            case "/api/v1/entities" -> json(exchange, 200, service.entities());
+                            case "/api/v1/extensions" -> json(exchange, 200, service.extensions());
+                            case String value when value.startsWith("/api/v1/entities/") && value.endsWith("/template") -> {
+                                final String id = URLDecoder.decode(value.substring("/api/v1/entities/".length(), value.length() - "/template".length()), StandardCharsets.UTF_8);
+                                json(exchange, 200, service.entityTemplate(id));
+                            }
+                            case String value when value.startsWith("/api/") -> json(exchange, 404, Map.of("error", "接口不存在"));
+                            default -> resource(exchange, path);
+                        }
                     }
-                } else if (path.startsWith("/api/")) {
-                    json(exchange, 404, Map.of("error", "接口不存在"));
-                } else if ("GET".equals(exchange.getRequestMethod())) {
-                    resource(exchange, path);
-                } else {
-                    json(exchange, 405, Map.of("error", "不支持的请求方法"));
+                    case String method when "POST".equals(method) && "/api/v1/codec".equals(path) -> {
+                        // 最多读取上限加一字节，既可识别超限也不会无界读取请求体。
+                        final byte[] body = exchange.getRequestBody().readNBytes(maxRequestBytes + 1);
+                        if (body.length > maxRequestBytes) {
+                            json(exchange, 413, Map.of("error", "请求体超过资源上限"));
+                        } else {
+                            final var response = service.execute(mapper.readValue(body, DebugCodecRequest.class));
+                            json(exchange, response.success() ? 200 : 422, response);
+                        }
+                    }
+                    default -> {
+                        final boolean api = path.startsWith("/api/");
+                        json(exchange, api ? 404 : 405, Map.of("error", api ? "接口不存在" : "不支持的请求方法"));
+                    }
                 }
             } catch (WorkspaceException exception) {
                 json(exchange, exception.status(), Map.of("error", exception.getMessage()));
             } catch (IllegalArgumentException | com.fasterxml.jackson.core.JsonProcessingException exception) {
                 json(exchange, 400, Map.of("error", exception.getMessage() == null ? "请求无效" : exception.getMessage()));
             } catch (IOException exception) {
+                log.error("HTTP 请求处理失败: {} {}", exchange.getRequestMethod(), exchange.getRequestURI().getPath(), exception);
                 json(exchange, 500, Map.of("error", "工作区读取或写入失败，请检查服务器存储"));
             }
         }
@@ -127,32 +151,50 @@ public final class CodecStudioServer implements AutoCloseable {
     }
 
     private void workspace(HttpExchange exchange, String path, WorkspaceService workspaceService) throws IOException {
-        final String method = exchange.getRequestMethod();
-        if ("GET".equals(method) && "/api/v1/workspace".equals(path)) {
-            final var snapshot = workspaceService.read();
-            // 树只加载元数据，打开文档时再获取输入和运行快照。
-            json(exchange, 200, new WorkspaceData.Snapshot(snapshot.revision(), snapshot.entries().stream()
-                    .map(entry -> new WorkspaceData.Entry(entry.id(), entry.parentId(), entry.kind(), entry.name(),
-                            entry.revision(), entry.updatedAt(), null)).toList()));
-        } else if ("GET".equals(method) && "/api/v1/workspace/export".equals(path)) {
-            json(exchange, 200, workspaceService.export());
-        } else if ("POST".equals(method) && "/api/v1/workspace/import".equals(path)) {
-            json(exchange, 201, workspaceService.importBackup(body(exchange, WorkspaceData.Backup.class)));
-        } else if ("POST".equals(method) && "/api/v1/workspace/entries".equals(path)) {
-            json(exchange, 201, workspaceService.create(body(exchange, WorkspaceData.Edit.class)));
-        } else if (path.startsWith("/api/v1/workspace/entries/")) {
-            final String id = path.substring("/api/v1/workspace/entries/".length());
-            switch (method) {
-                case "GET" -> json(exchange, 200, workspaceService.get(id));
-                case "PUT" -> json(exchange, 200, workspaceService.update(id, body(exchange, WorkspaceData.Edit.class)));
-                case "DELETE" -> {
-                    final var request = body(exchange, DeleteRequest.class);
-                    json(exchange, 200, workspaceService.delete(id, request.expectedRevision(), request.workspaceRevision()));
+        final boolean entryPath = path.startsWith("/api/v1/workspace/entries/");
+        switch (exchange.getRequestMethod()) {
+            case "GET" -> {
+                switch (path) {
+                    case "/api/v1/workspace" -> {
+                        final var snapshot = workspaceService.read();
+                        // 树只加载元数据，打开文档时再获取输入和运行快照。
+                        json(exchange, 200, new WorkspaceData.Snapshot(snapshot.revision(), snapshot.entries().stream()
+                                .map(entry -> new WorkspaceData.Entry(entry.id(), entry.parentId(), entry.kind(), entry.name(),
+                                        entry.revision(), entry.updatedAt(), null)).toList()));
+                    }
+                    case "/api/v1/workspace/export" -> json(exchange, 200, workspaceService.export());
+                    case String value when value.startsWith("/api/v1/workspace/entries/") -> {
+                        final String id = value.substring("/api/v1/workspace/entries/".length());
+                        json(exchange, 200, workspaceService.get(id));
+                    }
+                    default -> json(exchange, 404, Map.of("error", "接口不存在"));
                 }
-                default -> json(exchange, 405, Map.of("error", "不支持的请求方法"));
             }
-        } else {
-            json(exchange, 404, Map.of("error", "接口不存在"));
+            case "POST" -> {
+                switch (path) {
+                    case "/api/v1/workspace/import" -> json(exchange, 201, workspaceService.importBackup(body(exchange, WorkspaceData.Backup.class)));
+                    case "/api/v1/workspace/entries" -> json(exchange, 201, workspaceService.create(body(exchange, WorkspaceData.Edit.class)));
+                    default -> json(exchange, entryPath ? 405 : 404, Map.of("error", entryPath ? "不支持的请求方法" : "接口不存在"));
+                }
+            }
+            case "PUT" -> {
+                if (!entryPath) {
+                    json(exchange, 404, Map.of("error", "接口不存在"));
+                    return;
+                }
+                final String id = path.substring("/api/v1/workspace/entries/".length());
+                json(exchange, 200, workspaceService.update(id, body(exchange, WorkspaceData.Edit.class)));
+            }
+            case "DELETE" -> {
+                if (!entryPath) {
+                    json(exchange, 404, Map.of("error", "接口不存在"));
+                    return;
+                }
+                final String id = path.substring("/api/v1/workspace/entries/".length());
+                final var request = body(exchange, DeleteRequest.class);
+                json(exchange, 200, workspaceService.delete(id, request.expectedRevision(), request.workspaceRevision()));
+            }
+            default -> json(exchange, entryPath ? 405 : 404, Map.of("error", entryPath ? "不支持的请求方法" : "接口不存在"));
         }
     }
 
