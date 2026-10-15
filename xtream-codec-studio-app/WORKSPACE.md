@@ -28,7 +28,7 @@ XTREAM_STUDIO_STORAGE=sqlite XTREAM_STUDIO_DATA_DIR=/var/lib/xtream-studio \
 
 发布时使用 `:xtream-codec-studio-app:shadowJar` 生成可通过 `java -jar` 启动的单文件应用；也可继续运行 `:xtream-codec-studio-app:installDist`，启动 `build/install/xtream-codec-studio-app/bin/xtream-codec-studio-app`。发布构建须显式开启前端构建开关，运行只需要 Java 21。构建和 Docker 命令见 [README.md](./README.md)。
 
-Docker 镜像默认使用 `/data` 作为数据目录，以 UID/GID `10001:10001` 运行；挂载命名卷保存工作区，绑定宿主目录时保证该用户具有写权限。监听地址、端口、日志和 HTTP 停机等待配置与直接运行共用，镜像将监听地址默认设置为 `0.0.0.0`。
+Docker 镜像默认使用 `/data` 作为数据目录，继承基础镜像默认用户，不额外创建或切换用户；挂载命名卷保存工作区，绑定宿主目录时保证实际容器用户具有写权限。监听地址、端口、日志和 HTTP 停机等待配置与直接运行共用，镜像将监听地址默认设置为 `0.0.0.0`。
 
 文件介质以 `records/{UUID}.{revision}.json` 保存独立条目，通过原子替换 `manifest.json` 发布完整快照；更新失败时旧 manifest 仍有效。启动后确认有效记录再清理孤立记录。进程持有数据目录锁，一个目录只允许一个应用实例。SQLite 在事务中同时提交整体版本和条目。初始化失败明确终止启动，不回退成空工作区。
 

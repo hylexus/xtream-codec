@@ -41,6 +41,24 @@ const response = {
   },
 };
 
+test('HTTP 环境缺少 randomUUID 时仍能初始化、迁移和新建草稿', (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(crypto, 'randomUUID');
+  Object.defineProperty(crypto, 'randomUUID', { configurable: true, value: undefined });
+  t.after(() => {
+    if (descriptor) Object.defineProperty(crypto, 'randomUUID', descriptor);
+    else delete crypto.randomUUID;
+  });
+  const initial = migrateLegacy(null);
+  const migrated = migrateLegacy(JSON.stringify({ drafts: initialDrafts() }));
+  const tabs = [...initial.tabs, ...migrated.tabs, newTab()];
+  assert.equal(tabs.length, 5);
+  assert.equal(new Set(tabs.map((tab) => tab.id)).size, tabs.length);
+  for (const tab of tabs) {
+    assert.match(tab.id, /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/);
+  }
+  assert.deepEqual(restoreSession(initial), initial);
+});
+
 test('标签和复制的文档值独立，切换时保留未完成 JSON', () => {
   const first = newTab();
   const second = newTab();

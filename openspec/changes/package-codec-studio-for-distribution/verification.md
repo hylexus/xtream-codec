@@ -86,3 +86,21 @@ JAVA_HOME="$(mise where java)" ./gradlew :xtream-codec-studio-app:fatJarTest \
   --tests '*CodecStudioFatJarTest.publishedJarShouldServeResourcesAndPersistDocumentsAcrossRestart' \
   -Pxtream.frontend.build.xtream-codec-studio-ui.enabled=true --console=plain
 ```
+
+## 手动多架构镜像构建脚本验证
+
+日期：2026-10-15。新增可执行的 `xtream-codec-studio-app/docker/build-image.sh`，沿用 Dashboard 的 buildx 双架构及阿里云双标签推送流程，显式构建 Studio UI、常规检查和 shadowJar，保留现有 DaoCloud 基础镜像；README 已记录运行命令和构建环境。
+
+- `sh -n`、`bash --posix -n` 及 `git diff --check` 通过。
+- 将脚本复制到带空格的隔离临时仓库，以 Gradle 和 Docker 命令替身运行 10 组检查：从仓库外、仓库根目录及 docker 目录启动，分别读取正式版及预发布版本；确认 Gradle 工作目录、UI/Checkstyle 开关、模块任务、双架构、双标签、明确的 JAR_FILE、Dockerfile、构建上下文、推送参数及 attestations 环境变量全部正确。
+- CRLF 属性文件正确读取；Gradle 以状态 23 失败时不调用 Docker，Docker 以状态 29 失败时保留失败状态；缺少 projectVersion 时在任何构建之前报错退出。
+- 使用脚本相同参数执行 Gradle 离线 dry-run 成功，任务图包含 UI 构建及复制、常规测试、Checkstyle、许可证检查和 shadowJar；没有实际执行 fat JAR 打包、Docker 构建或镜像推送。
+- OpenSpec strict 验证通过，变更任务为 11/11 完成。验证只调用隔离替身和 Gradle dry-run，没有访问镜像仓库或改变日常构建生命周期。
+
+## 继承基础镜像默认用户验证
+
+日期：2026-10-15。按用户要求移除 Dockerfile 的 groupadd、useradd、chown 与 USER 指令，仅创建 `/app`、`/data` 目录，继承基础镜像默认用户。README、WORKSPACE 与当前发布规范同步更新；前文 UID 10001 的实测记录描述的是修改前的镜像。
+
+- 只读检查本地 `m.daocloud.io/docker.io/library/eclipse-temurin:21-jre` 的 `Config.User`，结果为空字符串，默认运行用户为 root。
+- `docker build --check --pull=false -f xtream-codec-studio-app/docker/Dockerfile xtream-codec-studio-app` 通过，没有警告；没有实际生成或推送镜像。
+- 确认 `/app`、`/data`、环境变量、端口和 exec 形式 JVM 入口保留；构建脚本 Shell 语法检查、`git diff --check` 与 OpenSpec strict 验证通过，变更任务为 12/12 完成。

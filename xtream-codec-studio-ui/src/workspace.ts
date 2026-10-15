@@ -1,5 +1,6 @@
 import { parseSchema, pretty } from './model';
 import { initialDrafts } from './presets';
+import { randomUuid } from './uuid';
 import type { CodecResult, Draft, Mode } from './types';
 
 export interface DocumentData {
@@ -53,7 +54,7 @@ export function newTab(
   draft = initialDrafts()[mode],
 ): DocumentTab {
   return {
-    id: crypto.randomUUID(),
+    id: randomUuid(),
     pinned: false,
     entryId: null,
     parentId: null,

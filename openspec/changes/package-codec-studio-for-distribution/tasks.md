@@ -10,10 +10,12 @@
 ## 3. 交付与验证
 
 - [x] 3.1 添加按需手动运行的真实 java -jar 集成测试，覆盖页面、实体扫描、编解码、文件与 SQLite 重启和日志配置。
-- [x] 3.2 提供普通用户 Dockerfile 与构建上下文过滤，更新 JAR、配置、Docker 和数据卷运行文档。
+- [x] 3.2 提供 Dockerfile 与构建上下文过滤，更新 JAR、配置、Docker 和数据卷运行文档。
 - [x] 3.3 执行模块测试、前端构建、fat JAR 集成验证、样式和 OpenSpec 校验；有 Docker daemon 时验证镜像，否则明确记录容器验证限制。
 - [x] 3.4 将 fat JAR、Shadow 分发和 fatJarTest 从日常构建生命周期移出，保留手动发布任务，更新文档并验证提交检查任务图及普通构建。
 - [x] 3.5 将真实 UI 资源验收归入手动 fatJarTest，普通 HTTP 测试只验证后端合同，确认没有 UI 产物时常规构建和测试仍可通过。
+- [x] 3.6 参考 Dashboard 提供手动镜像构建脚本，显式构建 UI、执行常规检查并生成 fat JAR，从 projectVersion 读取版本，使用 buildx 构建并推送双架构及双标签镜像；更新使用文档，以隔离替身验证路径、参数和失败中止，不实际推送镜像。
+- [x] 3.7 按用户要求移除 Dockerfile 的用户创建、归属修改及 USER 指令，继承基础镜像默认用户，保留目录与 JVM 入口并同步部署文档；验证 Dockerfile 配置及 OpenSpec。
 
 ## 4. HTTP 路由重构
 

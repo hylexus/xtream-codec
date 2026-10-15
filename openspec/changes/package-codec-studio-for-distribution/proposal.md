@@ -7,7 +7,7 @@ Studio 当前仅提供 Gradle application 分发，尚不能直接交付单文�
 - 保留 JDK HTTP 服务，引入 Shadow 构建包含 UI 和运行依赖的可执行 fat JAR。
 - 将监听地址、端口和停机等待时间纳入系统属性与环境变量配置，保留已有位置参数兼容性与工作区存储配置。
 - 在应用中使用 SLF4J 与 Logback，默认输出控制台，日志级别支持系统属性与环境变量。
-- 提供使用相同 fat JAR 的 Dockerfile，设置容器监听地址、数据目录和普通用户，直接启动 JVM。
+- 提供使用相同 fat JAR 的 Dockerfile，设置容器监听地址和数据目录，使用基础镜像默认用户直接启动 JVM。
 - 补充配置测试、可执行 JAR 集成验证和发布运行文档。
 
 ## Capabilities

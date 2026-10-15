@@ -54,12 +54,22 @@ fat JAR 打包、Shadow 分发及发布 JAR 集成验证 SHALL 通过显式任�
 
 ### Requirement: 容器交付与持久化
 
-系统 SHALL 提供使用相同发布 JAR 的 Docker 构建文件，容器默认 SHALL 监听 `0.0.0.0:8765`、使用 `/data` 保存工作区、以普通用户直接启动 JVM，并允许覆盖部署配置与 JVM 参数。
+系统 SHALL 提供使用相同发布 JAR 的 Docker 构建文件，容器默认 SHALL 监听 `0.0.0.0:8765`、使用 `/data` 保存工作区、继承基础镜像默认用户直接启动 JVM，并允许覆盖部署配置与 JVM 参数。
+
+#### Scenario: 使用基础镜像默认用户
+
+- **WHEN** 用户构建并运行 Studio 容器且未指定运行用户
+- **THEN** Dockerfile SHALL 不创建或切换用户，容器 SHALL 继承基础镜像默认用户，并保留 `/app`、`/data` 目录及直接启动 JVM 的入口
 
 #### Scenario: 映射端口并重启容器
 
 - **WHEN** 用户映射容器端口并挂载数据卷，保存工作区后停止并重新创建容器
 - **THEN** 用户 SHALL 能通过映射端口访问页面，并从数据卷读取之前提交的工作区
+
+#### Scenario: 手动构建并推送多架构镜像
+
+- **WHEN** 用户从任意当前目录执行 Studio 的 `docker/build-image.sh`
+- **THEN** 脚本 SHALL 定位仓库根目录，显式构建 UI、执行模块常规检查并生成 fat JAR，从根目录 `projectVersion` 读取版本，通过 buildx 构建 `linux/amd64,linux/arm64` 并向 `registry.cn-hangzhou.aliyuncs.com/xtream-codec/xtream-codec-studio-app` 推送 `latest` 和版本标签；JAR 文件 SHALL 与版本匹配，构建失败 SHALL 中止后续步骤，日常构建 SHALL 不触发该脚本
 
 ### Requirement: 停机生命周期
 

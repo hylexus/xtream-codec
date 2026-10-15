@@ -76,7 +76,24 @@ java -Dxtream.studio.port=9000 -Dxtream.studio.log-level=WARN \
 
 ## Docker
 
-先按上面的命令构建 fat JAR，再从仓库根目录构建镜像。构建上下文为 Studio 模块，`.dockerignore` 仅保留发布 JAR 与 Dockerfile：
+### 多架构镜像构建与推送
+
+在仓库根目录手动执行脚本：
+
+```bash
+JAVA_HOME="$(mise where java)" ./xtream-codec-studio-app/docker/build-image.sh
+```
+
+脚本与 Dashboard 的镜像构建流程一致：显式开启 Studio UI 构建和 Checkstyle，调用 Studio 模块的 `clean`、`check`、`shadowJar` 任务，再使用 Docker buildx 构建 `linux/amd64` 和 `linux/arm64` 镜像并推送到阿里云仓库。版本从根目录 `gradle.properties` 的 `projectVersion` 读取，同时推送以下两个标签：
+
+- `registry.cn-hangzhou.aliyuncs.com/xtream-codec/xtream-codec-studio-app:latest`
+- `registry.cn-hangzhou.aliyuncs.com/xtream-codec/xtream-codec-studio-app:<projectVersion>`
+
+执行前需准备 JDK 21、Node.js 22.12+、pnpm，以及支持双架构构建的 Docker buildx builder，并通过 `docker login registry.cn-hangzhou.aliyuncs.com` 登录有推送权限的账号。脚本按自身位置解析目录，可从任意当前目录调用；任一步失败即停止。该脚本仅供手动执行，日常构建与提交前检查不会调用它。
+
+### 本地构建与运行
+
+先按上面的命令构建 fat JAR，再从仓库根目录构建本地镜像。构建上下文为 Studio 模块，`.dockerignore` 仅保留发布 JAR 与 Dockerfile：
 
 ```bash
 docker build -f xtream-codec-studio-app/docker/Dockerfile \
@@ -91,7 +108,7 @@ docker run --name xtream-codec-studio \
   xtream-codec-studio:0.11.0
 ```
 
-基础镜像使用 `m.daocloud.io/docker.io/library/eclipse-temurin:21-jre`，以 UID/GID `10001:10001` 直接启动 JVM，接收容器停止信号。镜像默认设置 `XTREAM_STUDIO_HOST=0.0.0.0`、`XTREAM_STUDIO_PORT=8765` 和 `XTREAM_STUDIO_DATA_DIR=/data`，其余默认值与直接运行相同；可用 `-e` 覆盖。改变容器端口时也需同步修改 `-p` 的容器端口。命名卷保留已保存的工作区；若改为绑定宿主机目录，该目录须允许 UID/GID `10001:10001` 写入。
+基础镜像使用 `m.daocloud.io/docker.io/library/eclipse-temurin:21-jre`，继承基础镜像默认用户，不额外创建或切换用户，直接启动 JVM 并接收容器停止信号。镜像默认设置 `XTREAM_STUDIO_HOST=0.0.0.0`、`XTREAM_STUDIO_PORT=8765` 和 `XTREAM_STUDIO_DATA_DIR=/data`，其余默认值与直接运行相同；可用 `-e` 覆盖。改变容器端口时也需同步修改 `-p` 的容器端口。命名卷保留已保存的工作区；若改为绑定宿主机目录，该目录须允许实际容器用户写入。
 
 ```bash
 docker logs -f xtream-codec-studio

@@ -46,6 +46,8 @@ Non-Goals：账号与多人协同、完整执行历史、Dashboard 页面、运�
 
 28. HEX 点击继续复用 nodeIdsByByteOffset 的节点选择和祖先展开逻辑，每次显式选择递增定位请求。在 DOM 更新后的 layout effect 中比较选中行与 trace-tree 可视区的纵向边界，扣除固定表头高度，仅对超出边界的行使用原生 scrollTo 平滑调整树的纵向位置；已可见时保持位置。每次定位先停止尚未完成的滚动，再以当前选择为目标；系统偏好减少动态效果时立即定位。重复点击相同字节仍触发定位，树的横向位置、HEX 与页面滚动不变；从 Trace 或关联字段按钮选择节点共用此行为，手动滚动、折叠、主题或文档切换不额外触发定位。
 
+29. 浏览器标签 ID 统一由 randomUuid 生成，优先使用原生 crypto.randomUUID；远程 HTTP 等缺少该方法的环境通过 crypto.getRandomValues 生成带正确版本与变体位的 UUID v4，保持现有 ID 格式。新建、复制、旧草稿迁移及打开服务器文档共用此入口，不修改已有标签 ID 或持久化格式。
+
 ## Risks / Trade-offs
 
 - 大型 Trace 增加草稿与存储体积 → 只保存最近一次、请求与工作区大小限制，IndexedDB 使用异步写入。

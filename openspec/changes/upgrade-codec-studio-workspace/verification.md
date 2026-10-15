@@ -338,3 +338,13 @@ Trace 树使用固定表头和共享列宽，只有名称列按层级缩进，�
 在滚动开始约 70ms 后点击另一个已可见节点，旧动画停止，最终选择和可视节点均以最后一次点击为准。模拟 `prefers-reduced-motion: reduce` 后，首个动画帧已到达最终位置，后续采样不再移动。900×900 窗口中，Trace 从 0 平滑滚至 756，横向位置始终保持 138；宽窄窗口下 HEX、页面滚动均保持原位，页面无横向溢出。浏览器控制台错误与 JavaScript 异常为 0。
 
 前端 44 项测试、TypeScript、补全脚本语法检查及 Vite 生产构建通过；变更文件 Prettier、git diff 空白检查和 OpenSpec strict 验证通过，任务为 46/46 完成。此次未构建完整项目或 Studio fatJar，保留现有前后端进程。
+
+## 远程 HTTP 的 UUID 兼容修复验收
+
+日期：2026-10-15。首次草稿迁移通过 newTab 直接调用 crypto.randomUUID，远程 HTTP 页面缺少该方法时导致整个草稿恢复失败；打开服务器文档也有相同调用。新增共享 randomUuid，优先使用原生方法，否则以 crypto.getRandomValues 生成带 UUID v4 版本与变体位的随机 ID，两处调用统一替换，已有 ID 及草稿格式不变。
+
+先禁用 randomUUID 编写草稿初始化、迁移和新建回归测试，修复前复现相同 TypeError，修复后通过。另两项测试确认原生方法优先且保留调用接收者，以及全零/全一随机字节下的 UUID 格式、版本和变体位。全部 47 项前端测试、TypeScript、补全脚本语法检查、Vite 生产构建和变更文件 Prettier 检查通过。
+
+使用生产前端产物、独立临时 SQLite 后端及隔离 Chrome，通过本机域名映射访问 `http://studio-http.test:5174/`。实测 isSecureContext 为 false、crypto.randomUUID 为 undefined、crypto.getRandomValues 为 function；首次访问创建默认标签，草稿显示“本地草稿已备份”，页面无错误。实际点击新建自由组合、复制为新标签、保存到临时 SQLite、关闭已保存标签并从目录重新打开均成功；重新打开保留服务器文档 ID 且分配新的 UUID v4 标签 ID，三个标签 ID 均合法且互不相同。刷新页面后标签 ID、顺序及活动标签保持，控制台错误与 JavaScript 异常均为 0。
+
+git diff 空白检查和 OpenSpec strict 验证通过，任务为 47/47 完成。此次未构建 fat JAR 或推送镜像；验收仅操作临时后端数据和隔离浏览器草稿，现有 8765、5173 开发服务保留。

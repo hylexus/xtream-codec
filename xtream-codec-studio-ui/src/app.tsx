@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { codecApi, workspaceApi } from './api';
 import { pretty } from './model';
+import { randomUuid } from './uuid';
 import { draftFromPreset, PRESETS } from './presets';
 import type { Preset } from './presets';
 import type { Entity, Mode } from './types';
@@ -331,7 +332,7 @@ export function App() {
       const existing = old.tabs.find((tab) => tab.entryId === entry.id);
       if (existing) return { ...old, activeId: existing.id };
       const tab = {
-        id: crypto.randomUUID(),
+        id: randomUuid(),
         entryId: loaded.id,
         parentId: loaded.parentId,
         name: loaded.name,

@@ -289,3 +289,8 @@
 
 - **WHEN** 页面刷新，或首次升级时存在旧浏览器草稿
 - **THEN** 系统 SHALL 恢复工作区，或为旧草稿创建独立文档；存储不可用时 SHALL 明确提示并允许内存编辑
+
+#### Scenario: 远程 HTTP 访问与标签 ID
+
+- **WHEN** 用户通过服务器 IP 或域名的 HTTP 地址访问页面，浏览器未提供 crypto.randomUUID
+- **THEN** 系统 SHALL 使用可用的 crypto.getRandomValues 生成 UUID v4 标签 ID，首次草稿恢复、新建、复制及打开服务器文档 SHALL 正常工作；已有草稿和 ID SHALL 保持兼容，原生 randomUUID 可用时 SHALL 优先使用原生方法

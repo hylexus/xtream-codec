@@ -15,10 +15,7 @@
 FROM m.daocloud.io/docker.io/library/eclipse-temurin:21-jre
 LABEL authors="hylexus"
 
-RUN groupadd --gid 10001 studio \
-    && useradd --uid 10001 --gid studio --no-create-home studio \
-    && mkdir -p /app /data \
-    && chown studio:studio /data
+RUN mkdir -p /app /data
 
 WORKDIR /app
 ARG JAR_FILE=build/libs/*-all.jar
@@ -28,6 +25,5 @@ ENV XTREAM_STUDIO_HOST=0.0.0.0 \
     XTREAM_STUDIO_PORT=8765 \
     XTREAM_STUDIO_DATA_DIR=/data
 
-USER 10001:10001
 EXPOSE 8765
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
