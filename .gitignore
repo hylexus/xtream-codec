@@ -57,6 +57,7 @@ logs/
 *.drawio.bkp
 
 node_modules/
+.pnpm-store/
 
 /debug/**/.idea/
 /xtream-codec-studio-app/src/main/resources/ui/

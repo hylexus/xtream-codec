@@ -10,7 +10,6 @@ import {
   SearchField,
   Select,
   Tabs,
-  TextArea,
 } from '@heroui/react';
 import {
   ArrowDownToLine,
@@ -46,7 +45,7 @@ import {
 import { PRESETS } from '../presets';
 import type { Draft, Entity, Field, JsonValue, Path } from '../types';
 import { FieldDialog } from './field-dialog';
-import { JsonEditor } from './json-editor';
+import { CodeEditor } from './code-editor';
 import { SchemaEditor } from './schema-editor';
 import { ResizableSplit } from './resizable-split';
 
@@ -377,7 +376,7 @@ export function DocumentEditor({
               </div>
               {schemaTab === 'json' ? (
                 <div className="schema-json-panel">
-                  <JsonEditor
+                  <CodeEditor
                     value={schemaText}
                     onChange={setSchemaText}
                     schema
@@ -472,7 +471,7 @@ export function DocumentEditor({
               </div>
               <span className="quiet-label">JSON INPUT</span>
             </div>
-            <JsonEditor
+            <CodeEditor
               value={draft.values}
               onChange={(value) => update({ values: value })}
               theme={theme}
@@ -503,12 +502,13 @@ export function DocumentEditor({
               </div>
               <span className="quiet-label">HEX INPUT</span>
             </div>
-            <TextArea
-              className="hex-input"
+            <CodeEditor
+              language="hex"
               value={draft.hex}
-              onChange={(event) => update({ hex: event.target.value })}
-              aria-label="解码 HEX"
-              spellCheck={false}
+              onChange={(hex) => update({ hex })}
+              theme={theme}
+              label="解码 HEX"
+              height="100%"
               placeholder="输入原始 HEX，允许空白与换行"
             />
             <div className="execution-footer">

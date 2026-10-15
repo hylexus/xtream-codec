@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.core.dynamic.engine;
 
+import io.github.hylexus.xtream.codec.core.dynamic.schema.DynamicLengthUnit;
 import io.github.hylexus.xtream.codec.core.tracker.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -106,15 +107,51 @@ final class DynamicRuntime {
         if (tracker == null) {
             return null;
         }
+        if (kind == CodecTraceNodeKind.FIELD) {
+            kind = switch (node.operation()) {
+                case StructOp ignored -> CodecTraceNodeKind.NESTED_FIELD;
+                case ArrayOp ignored -> CodecTraceNodeKind.COLLECTION;
+                case EntriesOp ignored -> CodecTraceNodeKind.MAP;
+                default -> kind;
+            };
+        }
         final var result = new CodecTraceNode(kind, name, parent)
                 .setBitRange(start, null).setByteRange((int) (start / 8), null)
+                .putAttribute("dataType", node.dataType())
                 .putAttribute("displayName", node.name()).putAttribute("bitOrder", lsb(node.operation()) ? "lsb0" : "msb0");
         Objects.requireNonNull(parent).addChild(result);
         parent = result;
         return result;
     }
 
-    void end(Node node, @Nullable CodecTraceNode trace, long start, @Nullable Object value, boolean success) {
+    /**
+     * 条目及其线上头部没有独立布局节点，只在跟踪模式下创建合成节点。
+     */
+    @Nullable CodecTraceNode beginEntryPart(CodecTraceNodeKind kind, String name, String dataType, long start) {
+        if (tracker == null) {
+            return null;
+        }
+        final var result = new CodecTraceNode(kind, name, parent)
+                .setBitRange(start, null).setByteRange((int) (start / 8), null)
+                .putAttribute("dataType", dataType).putAttribute("bitOrder", "msb0");
+        Objects.requireNonNull(parent).addChild(result);
+        parent = result;
+        return result;
+    }
+
+    void endEntryPart(@Nullable CodecTraceNode trace, long start, @Nullable Object value, boolean success) {
+        if (trace != null) {
+            trace.setBitRange(start, cursor.position())
+                    .setByteRange((int) (start / 8), (int) ((cursor.position() + 7) / 8))
+                    .setStatus(success ? CodecTraceStatus.SUCCESS : CodecTraceStatus.ERROR);
+            if (success) {
+                trace.setValue(json(value));
+            }
+        }
+    }
+
+    void end(Node node, @Nullable CodecTraceNode trace, @Nullable CodecTraceNode traceParent,
+             long start, @Nullable Object value, boolean success) {
         if (trace == null) {
             return;
         }
@@ -141,16 +178,71 @@ final class DynamicRuntime {
         if (success) {
             trace.setValue(json(value));
         }
+        recordLengthPrefix(node, trace, traceParent, start, success);
         frame.recordTrace(node.address(), start, cursor.position(), trace);
+    }
+
+    /**
+     * 跟踪结束后读取最终前缀，兼容直接写入与容器回填，并保留完整字段和内容两个范围。
+     */
+    private void recordLengthPrefix(Node node, CodecTraceNode trace, @Nullable CodecTraceNode traceParent,
+                                    long start, boolean success) {
+        final Length length = switch (node.operation()) {
+            case BytesOp bytes -> bytes.length();
+            case StructOp structure -> structure.length();
+            case ArrayOp array -> array.length();
+            case EntriesOp entries -> entries.length();
+            default -> null;
+        };
+
+        if (length == null || !(length.source() instanceof Prefix(int bits)) || cursor.position() < start + bits) {
+            return;
+        }
+
+        final long contentStart = start + bits;
+        trace.putAttribute("contentBitStart", contentStart).putAttribute("contentBitEnd", cursor.position());
+        final CodecTraceNode owner = Objects.requireNonNull(traceParent);
+        final CodecTraceNode prefix = new CodecTraceNode(CodecTraceNodeKind.LENGTH_FIELD, "prependLengthField(" + trace.getName() + ")", owner)
+                .setBitRange(start, contentStart)
+                .setByteRange((int) (start / 8), (int) (contentStart / 8))
+                .setProcessorType("u" + bits)
+                .putAttribute("dataType", "u" + bits)
+                .putAttribute("displayName", trace.getName() + " 前置长度")
+                .putAttribute("fieldPath", Objects.requireNonNull(trace.getPath()))
+                .putAttribute("unit", length.unit().value())
+                .putAttribute("bitOrder", "msb0");
+
+        // 解码和直接写入的前缀已经有确定值；编码容器失败时预留位段尚未完成回填。
+        final boolean completed = success
+                || cursor instanceof DynamicBitReader
+                || node.operation() instanceof BytesOp
+                || length.unit() == DynamicLengthUnit.ITEM;
+
+        prefix.setStatus(completed ? CodecTraceStatus.SUCCESS : CodecTraceStatus.ERROR);
+
+        if (completed) {
+            final int index = cursor.start + (int) (start / 8);
+            final long value = switch (bits) {
+                case 8 -> buffer.getUnsignedByte(index);
+                case 16 -> buffer.getUnsignedShort(index);
+                case 32 -> buffer.getUnsignedInt(index);
+                default -> throw new IllegalStateException("不支持的长度前缀位宽: " + bits);
+            };
+            prefix.setValue(value);
+        }
+
+        // 前缀与内容字段属于同一层级，按线上顺序放在对应字段之前。
+        final var siblings = owner.getChildren();
+        siblings.add(siblings.indexOf(trace), prefix);
     }
 
     void failure(@Nullable CodecTraceNode trace, DynamicCodecException error) {
         if (tracker == null || tracker.getTrace().getDiagnostics().stream().anyMatch(diagnostic -> "ERROR".equals(diagnostic.level()))) {
             return;
         }
-        final var target = trace == null ? tracker.getTrace().getRoot() : trace;
+        final CodecTraceNode target = trace == null ? tracker.getTrace().getRoot() : trace;
         target.setStatus(CodecTraceStatus.ERROR);
-        final var diagnostic = new CodecTraceDiagnostic("ERROR", Objects.requireNonNull(error.getMessage()), target.getId(),
+        final CodecTraceDiagnostic diagnostic = new CodecTraceDiagnostic("ERROR", Objects.requireNonNull(error.getMessage()), target.getId(),
                 (int) (error.bitOffset() / 8), error.getClass().getName(), error.bitOffset());
         target.addDiagnostic(diagnostic);
         tracker.getTrace().addDiagnostic(diagnostic);

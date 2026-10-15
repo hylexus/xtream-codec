@@ -323,7 +323,7 @@ final class DynamicLayoutCompiler {
         final ValueExpression condition = this.condition(field);
 
         return new Node(
-                id, name,
+                id, name, definition.type(),
                 field.path(),
                 address,
                 retained.contains(field.path()),

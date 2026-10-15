@@ -154,7 +154,7 @@ final class DynamicReadExecution {
             runtime.failure(trace, error);
             throw error;
         } finally {
-            runtime.end(node, trace, start, value == DynamicFrame.MISSING ? null : value, success);
+            runtime.end(node, trace, previousParent, start, value == DynamicFrame.MISSING ? null : value, success);
             runtime.parent = previousParent;
             runtime.frame = previousFrame;
         }
@@ -321,34 +321,7 @@ final class DynamicReadExecution {
         try {
             for (int index = 0; count >= 0 ? index < count : reader.position() < runtime.boundary; index++) {
                 runtime.item(node);
-                final long key = reader.readLong(entries.keyBits(), false, false, runtime.boundary, node.path());
-                final Node variant = entries.variants().get(Long.toString(key));
-                if (entries.pair() && variant == null) {
-                    throw runtime.error(node, "pair 的未知键没有可确定的值边界");
-                }
-                final long lengthUnits = entries.pair() ? -1
-                        : reader.readLong(entries.lengthBits(), false, false, runtime.boundary, node.path());
-                final long entryParent = runtime.boundary;
-                if (lengthUnits >= 0) {
-                    reader.checkBoundary(Math.multiplyExact(lengthUnits, 8), runtime.boundary, node.path());
-                    runtime.boundary = reader.position() + lengthUnits * 8;
-                }
-                try {
-                    final Object value = variant == null
-                            ? HexFormat.of().formatHex(reader.readBytes(Math.toIntExact(lengthUnits), runtime.boundary, node.path()))
-                            : read(variant, depth + 1, CodecTraceNodeKind.MAP_ENTRY, "[" + key + "]");
-                    if (!entries.pair() && reader.position() != runtime.boundary) {
-                        throw runtime.error(node, "条目值未恰好消费声明长度");
-                    }
-                    final Map<String, Object> entry = new LinkedHashMap<>();
-                    entry.put("key", key);
-                    if (value != DynamicFrame.MISSING) {
-                        entry.put(variant == null ? "rawHex" : "value", DynamicRuntime.json(value));
-                    }
-                    result.add(Collections.unmodifiableMap(entry));
-                } finally {
-                    runtime.boundary = entryParent;
-                }
+                result.add(readEntry(node, entries, depth, index));
             }
             if (count < 0) {
                 exact(length, node);
@@ -356,6 +329,86 @@ final class DynamicReadExecution {
             return Collections.unmodifiableList(result);
         } finally {
             runtime.boundary = parent;
+        }
+    }
+
+    private Map<String, Object> readEntry(Node node, EntriesOp entries, int depth, int index) {
+        final long start = reader.position();
+        final long boundary = runtime.boundary;
+        final CodecTraceNode parent = runtime.parent;
+        final CodecTraceNode trace = runtime.beginEntryPart(CodecTraceNodeKind.MAP_ENTRY, "[" + index + "]", "entry", start);
+        Map<String, Object> result = null;
+        boolean success = false;
+        try {
+            final String keyName = "tlv".equals(node.dataType()) ? "Tag" : "Key";
+            final long key = readEntryNumber(node, keyName, entries.keyBits(), CodecTraceNodeKind.FIELD);
+            if (trace != null) {
+                trace.putAttribute("entryIndex", index).putAttribute("key", key).putAttribute("displayName", keyName + " = " + key);
+            }
+            final Node variant = entries.variants().get(Long.toString(key));
+            if (entries.pair() && variant == null) {
+                throw runtime.error(node, "pair 的未知键没有可确定的值边界");
+            }
+            final long lengthUnits = entries.pair() ? -1
+                    : readEntryNumber(node, "Length", entries.lengthBits(), CodecTraceNodeKind.LENGTH_FIELD);
+            if (lengthUnits >= 0) {
+                reader.checkBoundary(Math.multiplyExact(lengthUnits, 8), runtime.boundary, node.path());
+                runtime.boundary = reader.position() + lengthUnits * 8;
+            }
+            final Object value;
+            if (variant == null) {
+                final long contentStart = reader.position();
+                final CodecTraceNode raw = runtime.beginEntryPart(CodecTraceNodeKind.FIELD, "Value", "hex", contentStart);
+                String hex = null;
+                try {
+                    hex = HexFormat.of().formatHex(reader.readBytes(Math.toIntExact(lengthUnits), runtime.boundary, node.path()));
+                    value = hex;
+                } finally {
+                    runtime.endEntryPart(raw, contentStart, hex, hex != null);
+                    runtime.parent = trace;
+                }
+            } else {
+                value = read(variant, depth + 1, CodecTraceNodeKind.FIELD, "Value");
+            }
+            if (!entries.pair() && reader.position() != runtime.boundary) {
+                throw runtime.error(node, "条目值未恰好消费声明长度");
+            }
+            result = new LinkedHashMap<>();
+            result.put("key", key);
+            if (value != DynamicFrame.MISSING) {
+                result.put(variant == null ? "rawHex" : "value", DynamicRuntime.json(value));
+            }
+            success = true;
+            return Collections.unmodifiableMap(result);
+        } catch (RuntimeException exception) {
+            final var error = runtime.wrap(node, exception);
+            runtime.failure(trace, error);
+            throw error;
+        } finally {
+            runtime.endEntryPart(trace, start, result, success);
+            runtime.parent = parent;
+            runtime.boundary = boundary;
+        }
+    }
+
+    private long readEntryNumber(Node node, String name, int bits, CodecTraceNodeKind kind) {
+        final long start = reader.position();
+        final CodecTraceNode parent = runtime.parent;
+        final CodecTraceNode trace = runtime.beginEntryPart(kind, name, "u" + bits, start);
+        Long value = null;
+        try {
+            value = reader.readLong(bits, false, false, runtime.boundary, node.path());
+            if (trace != null && kind == CodecTraceNodeKind.LENGTH_FIELD) {
+                trace.putAttribute("unit", "byte");
+            }
+            return value;
+        } catch (RuntimeException exception) {
+            final var error = runtime.wrap(node, exception);
+            runtime.failure(trace, error);
+            throw error;
+        } finally {
+            runtime.endEntryPart(trace, start, value, value != null);
+            runtime.parent = parent;
         }
     }
 

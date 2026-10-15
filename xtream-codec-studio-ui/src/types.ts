@@ -56,11 +56,13 @@ export interface TraceNode {
   name: string;
   path?: string;
   kind: string;
+  javaType?: string | null;
   status: string;
   byteStart?: number | null;
   byteEnd?: number | null;
   bitStart?: number | null;
   bitEnd?: number | null;
+  value?: JsonValue;
   valueSummary?: string | null;
   hex?: string | null;
   children: TraceNode[];

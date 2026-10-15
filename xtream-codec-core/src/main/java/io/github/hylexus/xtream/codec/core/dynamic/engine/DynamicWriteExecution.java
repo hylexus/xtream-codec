@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.core.dynamic.engine;
 import io.github.hylexus.xtream.codec.core.dynamic.schema.DynamicLengthUnit;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTraceNode;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTraceNodeKind;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTraceStatus;
 import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.Nullable;
@@ -219,7 +220,7 @@ final class DynamicWriteExecution {
             runtime.failure(trace, error);
             throw error;
         } finally {
-            runtime.end(node, trace, start, value == DynamicFrame.MISSING ? null : value, success);
+            runtime.end(node, trace, previousParent, start, value == DynamicFrame.MISSING ? null : value, success);
             runtime.parent = previousParent;
             runtime.frame = previousFrame;
         }
@@ -469,56 +470,15 @@ final class DynamicWriteExecution {
         final long start = writer.position();
         final List<Object> result = needed ? new ArrayList<>(items.size()) : null;
         try {
+            int index = 0;
             for (final Object item : items) {
                 runtime.item(node);
                 if (!(item instanceof Map<?, ?> input)) {
                     throw runtime.error(node, "条目必须为对象");
                 }
-                final long key = DynamicNumbers.requireInteger(input.get("key"), node.path(), writer.position()).longValueExact();
-                // 无符号 keyBits 位的键要求 0 <= key < 2^keyBits。
-                if (key < 0 || key >= (1L << entries.keyBits())) {
-                    throw runtime.error(node, "条目键超出位宽");
-                }
-                writer.writeLong(key, entries.keyBits(), false, false, runtime.boundary, node.path());
-                final Node variant = entries.variants().get(Long.toString(key));
-                if (entries.pair() && variant == null) {
-                    throw runtime.error(node, "pair 的未知键没有可确定的值边界");
-                }
-                final long lengthAt = writer.position();
-                if (!entries.pair()) {
-                    writer.writeLong(0, entries.lengthBits(), false, false, runtime.boundary, node.path());
-                }
-                final long contentStart = writer.position();
-                final Object content;
-                if (variant == null) {
-                    if (!(input.get("rawHex") instanceof String hex)) {
-                        throw runtime.error(node, "未知条目需要 rawHex 字符串");
-                    }
-                    // 条目长度是无符号字节数，前缀可表示的最大值为 2^lengthBits - 1。
-                    final long maximum = Math.min((runtime.boundary - writer.position()) / 8, (1L << entries.lengthBits()) - 1);
-                    if (hex.length() / 2L > maximum) {
-                        throw runtime.error(node, "条目原始值超过边界或资源上限");
-                    }
-                    writer.writeBytes(HexFormat.of().parseHex(hex), runtime.boundary, node.path());
-                    content = needed ? hex.toLowerCase(Locale.ROOT) : null;
-                } else {
-                    content = write(variant, input.get("value"), depth + 1, CodecTraceNodeKind.MAP_ENTRY, "[" + key + "]", needed);
-                }
-                if (!entries.pair()) {
-                    final long bits = writer.position() - contentStart;
-                    // 字节数必须小于 2^lengthBits，即能完整放入无符号长度前缀。
-                    if (bits % 8 != 0 || bits / 8 >= (1L << entries.lengthBits())) {
-                        throw runtime.error(node, "条目值长度超出完整字节或前缀范围");
-                    }
-                    writer.patchInteger(lengthAt, BigInteger.valueOf(bits / 8), entries.lengthBits(), false, false, node.path());
-                }
+                final Map<String, Object> entry = writeEntry(node, entries, input, depth, index++, needed);
                 if (result != null) {
-                    final Map<String, Object> entry = new LinkedHashMap<>();
-                    entry.put("key", key);
-                    if (content != DynamicFrame.MISSING) {
-                        entry.put(variant == null ? "rawHex" : "value", DynamicRuntime.json(content));
-                    }
-                    result.add(Collections.unmodifiableMap(entry));
+                    result.add(entry);
                 }
             }
             if (counted && count != items.size()) {
@@ -530,6 +490,108 @@ final class DynamicWriteExecution {
             return result == null ? null : Collections.unmodifiableList(result);
         } finally {
             runtime.boundary = parent;
+        }
+    }
+
+    private @Nullable Map<String, Object> writeEntry(Node node, EntriesOp entries, Map<?, ?> input, int depth, int index, boolean needed) {
+        final long start = writer.position();
+        final CodecTraceNode parent = runtime.parent;
+        final CodecTraceNode trace = runtime.beginEntryPart(CodecTraceNodeKind.MAP_ENTRY, "[" + index + "]", "entry", start);
+        Map<String, Object> result = null;
+        boolean success = false;
+        try {
+            final long key = DynamicNumbers.requireInteger(input.get("key"), node.path(), writer.position()).longValueExact();
+            // 无符号 keyBits 位的键要求 0 <= key < 2^keyBits。
+            if (key < 0 || key >= (1L << entries.keyBits())) {
+                throw runtime.error(node, "条目键超出位宽");
+            }
+            final String keyName = "tlv".equals(node.dataType()) ? "Tag" : "Key";
+            if (trace != null) {
+                trace.putAttribute("entryIndex", index).putAttribute("key", key).putAttribute("displayName", keyName + " = " + key);
+            }
+            writeEntryNumber(node, keyName, key, entries.keyBits(), CodecTraceNodeKind.FIELD, true);
+            final Node variant = entries.variants().get(Long.toString(key));
+            if (entries.pair() && variant == null) {
+                throw runtime.error(node, "pair 的未知键没有可确定的值边界");
+            }
+            final long lengthAt = writer.position();
+            final CodecTraceNode lengthTrace = entries.pair() ? null
+                    : writeEntryNumber(node, "Length", 0, entries.lengthBits(), CodecTraceNodeKind.LENGTH_FIELD, false);
+            final long contentStart = writer.position();
+            final Object content;
+            if (variant == null) {
+                final CodecTraceNode raw = runtime.beginEntryPart(CodecTraceNodeKind.FIELD, "Value", "hex", contentStart);
+                String hex = null;
+                boolean completed = false;
+                try {
+                    if (!(input.get("rawHex") instanceof String text)) {
+                        throw runtime.error(node, "未知条目需要 rawHex 字符串");
+                    }
+                    // 条目长度是无符号字节数，前缀可表示的最大值为 2^lengthBits - 1。
+                    final long maximum = Math.min((runtime.boundary - writer.position()) / 8, (1L << entries.lengthBits()) - 1);
+                    if (text.length() / 2L > maximum) {
+                        throw runtime.error(node, "条目原始值超过边界或资源上限");
+                    }
+                    writer.writeBytes(HexFormat.of().parseHex(text), runtime.boundary, node.path());
+                    hex = needed ? text.toLowerCase(Locale.ROOT) : null;
+                    content = hex;
+                    completed = true;
+                } finally {
+                    runtime.endEntryPart(raw, contentStart, hex, completed);
+                    runtime.parent = trace;
+                }
+            } else {
+                content = write(variant, input.get("value"), depth + 1, CodecTraceNodeKind.FIELD, "Value", needed);
+            }
+            if (!entries.pair()) {
+                final long bits = writer.position() - contentStart;
+                // 字节数必须小于 2^lengthBits，即能完整放入无符号长度前缀。
+                if (bits % 8 != 0 || bits / 8 >= (1L << entries.lengthBits())) {
+                    throw runtime.error(node, "条目值长度超出完整字节或前缀范围");
+                }
+                writer.patchInteger(lengthAt, BigInteger.valueOf(bits / 8), entries.lengthBits(), false, false, node.path());
+                if (lengthTrace != null) {
+                    lengthTrace.setValue(bits / 8).setStatus(CodecTraceStatus.SUCCESS);
+                }
+            }
+            if (needed) {
+                result = new LinkedHashMap<>();
+                result.put("key", key);
+                if (content != DynamicFrame.MISSING) {
+                    result.put(variant == null ? "rawHex" : "value", DynamicRuntime.json(content));
+                }
+            }
+            success = true;
+            return result == null ? null : Collections.unmodifiableMap(result);
+        } catch (RuntimeException exception) {
+            final var error = runtime.wrap(node, exception);
+            runtime.failure(trace, error);
+            throw error;
+        } finally {
+            runtime.endEntryPart(trace, start, result, success);
+            runtime.parent = parent;
+        }
+    }
+
+    private @Nullable CodecTraceNode writeEntryNumber(Node node, String name, long value, int bits, CodecTraceNodeKind kind, boolean completed) {
+        final long start = writer.position();
+        final CodecTraceNode parent = runtime.parent;
+        final CodecTraceNode trace = runtime.beginEntryPart(kind, name, "u" + bits, start);
+        boolean success = false;
+        try {
+            writer.writeLong(value, bits, false, false, runtime.boundary, node.path());
+            if (trace != null && kind == CodecTraceNodeKind.LENGTH_FIELD) {
+                trace.putAttribute("unit", "byte");
+            }
+            success = completed;
+            return trace;
+        } catch (RuntimeException exception) {
+            final var error = runtime.wrap(node, exception);
+            runtime.failure(trace, error);
+            throw error;
+        } finally {
+            runtime.endEntryPart(trace, start, success ? value : null, success);
+            runtime.parent = parent;
         }
     }
 

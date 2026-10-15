@@ -13,9 +13,9 @@ import {
   useFilter,
 } from '@heroui/react';
 import { Check, SlidersHorizontal } from 'lucide-react';
-import { createField, FIELD_TYPES, parseJson, pretty } from '../model';
+import { createField, FIELD_TYPES, lengthPrefixSize, parseJson, pretty } from '../model';
 import type { Field } from '../types';
-import { JsonEditor } from './json-editor';
+import { CodeEditor } from './code-editor';
 
 interface Props {
   field: Field;
@@ -144,6 +144,7 @@ export function FieldDialog({ field, theme, extensions, onSave, onClose, isNew }
     : ['fixed', 'ref', 'prefixBits', 'remaining'].find(
         (key) => length && length[key as keyof typeof length] !== undefined,
       ) || '';
+  const prefixExample = length?.prefixBits === 1 ? 1 : 3;
   const setLength = (newKind: string, value?: string) => {
     if (!newKind) {
       change('length', undefined);
@@ -242,7 +243,7 @@ export function FieldDialog({ field, theme, extensions, onSave, onClose, isNew }
               </div>
               {tab === 'json' ? (
                 <>
-                  <JsonEditor
+                  <CodeEditor
                     value={jsonText}
                     onChange={setJsonText}
                     theme={theme}
@@ -403,15 +404,21 @@ export function FieldDialog({ field, theme, extensions, onSave, onClose, isNew }
                     ]}
                   />
                   <FieldSelect
-                    label="长度单位"
+                    label={kind === 'prefixBits' ? '前缀值表示' : '长度单位'}
                     value={length?.unit || 'byte'}
                     onChange={(value) =>
                       change('length', { ...(length || { fixed: 1 }), unit: value })
                     }
                     options={[
-                      { id: 'byte', label: '字节 · byte' },
-                      { id: 'bit', label: '位 · bit' },
-                      { id: 'item', label: '元素 · item' },
+                      {
+                        id: 'byte',
+                        label: kind === 'prefixBits' ? '内容字节数 · byte' : '字节 · byte',
+                      },
+                      { id: 'bit', label: kind === 'prefixBits' ? '内容位数 · bit' : '位 · bit' },
+                      {
+                        id: 'item',
+                        label: kind === 'prefixBits' ? '元素数量 · item' : '元素 · item',
+                      },
                     ]}
                   />
                   {kind && !['remaining', 'expression'].includes(kind) && (
@@ -424,17 +431,25 @@ export function FieldDialog({ field, theme, extensions, onSave, onClose, isNew }
                         {kind === 'ref'
                           ? '引用字段标识'
                           : kind === 'prefixBits'
-                            ? '前置长度字段的位宽'
+                            ? '长度前缀占用位数（bit）'
                             : '固定长度值'}
                       </Label>
                       <Input />
                     </TextField>
                   )}
+                  {kind === 'prefixBits' && length?.prefixBits !== undefined && (
+                    <p className="muted wide length-prefix-help">
+                      前缀占 {lengthPrefixSize(length.prefixBits)}；值为 {prefixExample} 时，
+                      {length?.unit === 'item'
+                        ? `后续有 ${prefixExample} 个元素。`
+                        : `后续内容占 ${prefixExample} ${length?.unit === 'bit' ? '位' : '字节'}。`}
+                    </p>
+                  )}
                   <div className="form-subtitle">
                     高级属性 <span>条件、生成规则、派生表达式、填充与扩展</span>
                   </div>
                   <div className="wide">
-                    <JsonEditor
+                    <CodeEditor
                       value={extra}
                       onChange={setExtra}
                       theme={theme}

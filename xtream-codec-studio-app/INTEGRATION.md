@@ -68,6 +68,12 @@ var service = new CodecDebuggerService(
 
 `DebugCodecResponse` 始终包含 `success`、`hex`、`consumedBits`、`consumedBytes`、`remainingHex`、`trace` 和 `checksums`；成功时还有字段映射 `values`，失败时有 `error.message`、可用的 `fieldPath` 和 `bitOffset`。失败 Trace 保留已完成字段。动态校验和不匹配默认仍返回成功响应、核对结果及 Trace 警告，便于查看损坏的报文。HTTP 适配器可把成功映射为 200、业务失败映射为 422。
 
+动态 Trace 通过 `attributes.dataType` 返回实际执行字段的声明类型（如 `u8`、`u16`、`bcd`、`struct`），合成的整数头部和长度前缀使用对应的 `uN`。实体 Trace 继续通过 `javaType` 返回 Java 类型；旧结果可能没有类型元数据，消费方可回退到 `kind`。
+
+TLV/map/pair 的业务值仍是保留顺序与重复键的条目数组。Trace 为每个条目增加覆盖整个头部和内容的 `MAP_ENTRY` 节点，以零起始条目序号构造路径（如 `body.extraItems[0]`），`attributes.entryIndex` 为序号、`attributes.key` 为实际键，`displayName` 注明 Tag/Key 值。子节点为 `Tag`（TLV）或 `Key`（map/pair）、`Length`（pair 除外）及 `Value`，各自提供独立范围和类型；Length 为 `LENGTH_FIELD`，其单位为 byte，编码时返回回填后的实际长度。已知 Value 使用分支声明类型并保留嵌套结构，未知 Value 为 hex。重复键不会合并，节点也不会按 Tag 大小排序；既有运行快照需重新执行才能获得完整节点。
+
+动态字段使用 `length.prefixBits` 时，字段节点的 `bitStart` / `bitEnd` 和 `byteStart` / `byteEnd` 仍表示包含前缀的完整范围。`attributes.contentBitStart` / `contentBitEnd` 表示不含前缀的实际内容范围；独立的 `LENGTH_FIELD` 节点与对应字段具有相同 `parentId`，插入对应字段之前，命名为 `prependLengthField(字段名)`。前缀具有自己的范围、HEX、长度值、`processorType`（`u8` / `u16` / `u32`）和 `attributes.unit`（`bit` / `byte` / `item`），通过 `attributes.fieldPath` 关联对应字段，`attributes.displayName` 为“字段名 前置长度”。例如 `payload.items[0].desc` 的前缀路径为 `payload.items[0].prependLengthField(desc)`；`03 73 73 73` 的字段范围是 `[0, 4)` 字节，前缀是 `[0, 1)`、值为 3，内容范围是 `[8, 32)` bit。所有偏移均相对于本次编解码起点。内容为空时两个内容偏移相等；已读取前缀后的内容解码失败保留长度值，编码容器回填未完成时前缀标为 `ERROR` 且不返回成功值。旧结果没有这些属性时仍可按原字段范围展示，重新执行后获得细分信息。
+
 `CodecDebuggerServiceTest` 演示无需启动 HTTP 服务的实体与动态调用。调试服务本身不管理调用方的 HTTP 连接。
 
 

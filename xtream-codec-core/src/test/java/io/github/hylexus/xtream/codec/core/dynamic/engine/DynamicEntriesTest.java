@@ -20,6 +20,10 @@ import io.github.hylexus.xtream.codec.core.dynamic.schema.DynamicCondition;
 import io.github.hylexus.xtream.codec.core.dynamic.schema.DynamicField;
 import io.github.hylexus.xtream.codec.core.dynamic.schema.DynamicLength;
 import io.github.hylexus.xtream.codec.core.dynamic.schema.DynamicSchema;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTraceNodeKind;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTraceStatus;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTraceView;
+import io.github.hylexus.xtream.codec.core.tracker.CodecTracker;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -41,6 +45,161 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.11.0
  */
 class DynamicEntriesTest {
+    @ParameterizedTest
+    @ValueSource(strings = {"tlv", "map", "pair"})
+    void shouldTraceOrderedEntriesWithSeparateHeadersAndNestedValues(String type) {
+        final DynamicPlan plan = DynamicCompiler.compile(DynamicSchema.of(
+                DynamicField.field("items", type).length(DynamicLength.fixed(3, "item"))
+                        .options("pair".equals(type) ? Map.of("keyBits", 16) : Map.of("keyBits", 16, "lengthBits", 16))
+                        .variants(Map.of(
+                                "1", DynamicField.field("number", "u16").name("数值").build(),
+                                "2", DynamicField.field("text", "struct").name("文本").fields(
+                                        DynamicField.field("desc", "string").length(DynamicLength.prefix(8, "byte")).build()
+                                ).build())).build()));
+        final DynamicValues values = DynamicValues.of(Map.of("items", List.of(
+                Map.of("key", 2, "value", Map.of("desc", "A")),
+                Map.of("key", 1, "value", 0x1234),
+                Map.of("key", 2, "value", Map.of("desc", "B")))));
+        final ByteBuf production = Unpooled.buffer();
+        final ByteBuf tracked = Unpooled.buffer().writeByte(0x7e);
+        try {
+            final CodecTracker encoder = new CodecTracker();
+            plan.encode(values, production);
+            plan.encode(values, tracked, encoder);
+            final String expected = "pair".equals(type) ? "000201410001123400020142"
+                    : "000200020141000100021234000200020142";
+            assertEquals(expected, ByteBufUtil.hexDump(production));
+            assertEquals(expected, ByteBufUtil.hexDump(tracked, 1, tracked.readableBytes() - 1));
+            tracked.readerIndex(1);
+            final CodecTracker decoder = new CodecTracker();
+            assertEquals(plan.decode(production), plan.decode(tracked, decoder));
+            final int entryBytes = "pair".equals(type) ? 4 : 6;
+            final String keyName = "tlv".equals(type) ? "Tag" : "Key";
+            for (final var view : List.of(encoder.toTraceView(), decoder.toTraceView())) {
+                final var items = view.root().children().getFirst().children();
+                assertEquals(List.of("items[0]", "items[1]", "items[2]"), items.stream().map(CodecTraceView.Node::path).toList());
+                assertEquals(List.of(2L, 1L, 2L), items.stream().map(entry -> entry.attributes().get("key")).toList());
+                for (int index = 0; index < items.size(); index++) {
+                    final var entry = items.get(index);
+                    assertEquals(CodecTraceNodeKind.MAP_ENTRY, entry.kind());
+                    assertEquals(index, entry.attributes().get("entryIndex"));
+                    assertEquals("pair".equals(type) ? 2 : 3, entry.children().size());
+                    final long start = (long) index * entryBytes * 8;
+                    assertEquals(start, entry.bitStart());
+                    assertEquals(start + entryBytes * 8, entry.bitEnd());
+                    assertEntryPart(entry.children().getFirst(), keyName, "u16", start, start + 16);
+                    assertEquals(index == 1 ? 1L : 2L, entry.children().getFirst().value());
+                    if (!"pair".equals(type)) {
+                        final var length = entry.children().get(1);
+                        assertEntryPart(length, "Length", "u16", start + 16, start + 32);
+                        assertEquals(CodecTraceNodeKind.LENGTH_FIELD, length.kind());
+                        assertEquals(2L, length.value());
+                        assertEquals("byte", length.attributes().get("unit"));
+                        assertEquals("0002", length.hex());
+                    }
+                    final var value = entry.children().getLast();
+                    assertEntryPart(value, "Value", index == 1 ? "u16" : "struct",
+                            start + (entryBytes - 2) * 8, start + entryBytes * 8);
+                    assertEquals(index == 1 ? "数值" : "文本", value.attributes().get("displayName"));
+                    if (index != 1) {
+                        assertEquals(List.of(CodecTraceNodeKind.LENGTH_FIELD, CodecTraceNodeKind.FIELD),
+                                value.children().stream().map(CodecTraceView.Node::kind).toList());
+                        assertEquals("items[" + index + "].Value.desc", value.children().getLast().path());
+                    }
+                }
+            }
+        } finally {
+            production.release();
+            tracked.release();
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {8, 16, 32})
+    void shouldTraceUnknownAndEmptyTlvValuesWithConfiguredWidths(int width) {
+        final DynamicPlan plan = DynamicCompiler.compile(DynamicSchema.of(
+                DynamicField.field("items", "tlv").length(DynamicLength.prefix(8, "item"))
+                        .options(Map.of("keyBits", width, "lengthBits", width)).variants(Map.of()).build()));
+        final ByteBuf buffer = Unpooled.buffer();
+        try {
+            final CodecTracker encoder = new CodecTracker();
+            plan.encode(DynamicValues.of(Map.of("items", List.of(
+                    Map.of("key", 99, "rawHex", "AABB"), Map.of("key", 1, "rawHex", "")))), buffer, encoder);
+            final CodecTracker decoder = new CodecTracker();
+            final var decoded = plan.decode(buffer, decoder).values().fields();
+            assertEquals(List.of(Map.of("key", 99L, "rawHex", "aabb"), Map.of("key", 1L, "rawHex", "")), decoded.get("items"));
+            for (final var view : List.of(encoder.toTraceView(), decoder.toTraceView())) {
+                final var items = view.root().children().getLast().children();
+                final var first = items.getFirst();
+                assertEntryPart(first.children().get(0), "Tag", "u" + width, 8, 8 + width);
+                assertEntryPart(first.children().get(1), "Length", "u" + width, 8 + width, 8 + 2L * width);
+                assertEntryPart(first.children().get(2), "Value", "hex", 8 + 2L * width, 24 + 2L * width);
+                assertEquals("aabb", first.children().getLast().value());
+                assertEquals(2L, first.children().get(1).value());
+                final var empty = items.getLast().children().getLast();
+                assertEquals(empty.bitStart(), empty.bitEnd());
+                assertEquals("", empty.value());
+                assertEquals(0L, items.getLast().children().get(1).value());
+            }
+        } finally {
+            buffer.release();
+        }
+    }
+
+    @Test
+    void shouldKeepCompletedEntryHeadersOnReadAndWriteFailures() {
+        final DynamicPlan plan = DynamicCompiler.compile(DynamicSchema.of(
+                DynamicField.field("items", "tlv").length(DynamicLength.fixed(1, "item"))
+                        .variants(Map.of("1", DynamicField.field("number", "u16").build())).build()));
+        for (final String hex : List.of("", "01", "0103ff")) {
+            final ByteBuf input = Unpooled.wrappedBuffer(java.util.HexFormat.of().parseHex(hex));
+            try {
+                final CodecTracker decoder = new CodecTracker();
+                assertThrows(DynamicCodecException.class, () -> plan.decode(input, decoder));
+                assertEquals(0, input.readerIndex());
+                final var entry = decoder.toTraceView().root().children().getFirst().children().getFirst();
+                assertEquals(CodecTraceStatus.ERROR, entry.status());
+                assertEquals("items[0]", entry.path());
+                final var tag = entry.children().getFirst();
+                assertEquals(hex.isEmpty() ? CodecTraceStatus.ERROR : CodecTraceStatus.SUCCESS, tag.status());
+                if (!hex.isEmpty()) {
+                    assertEquals(1L, tag.value());
+                    final var length = entry.children().get(1);
+                    assertEquals(hex.length() > 2 ? CodecTraceStatus.SUCCESS : CodecTraceStatus.ERROR, length.status());
+                    assertEquals(hex.length() > 2 ? 3L : null, length.value());
+                }
+                assertEquals(1, decoder.toTraceView().diagnostics().size());
+            } finally {
+                input.release();
+            }
+        }
+        final ByteBuf output = Unpooled.buffer();
+        try {
+            final CodecTracker encoder = new CodecTracker();
+            assertThrows(DynamicCodecException.class, () -> plan.encode(
+                    DynamicValues.of(Map.of("items", List.of(Map.of("key", 1, "value", "invalid")))), output, encoder));
+            final var entry = encoder.toTraceView().root().children().getFirst().children().getFirst();
+            assertEquals(CodecTraceStatus.SUCCESS, entry.children().get(0).status());
+            assertEquals(CodecTraceStatus.ERROR, entry.children().get(1).status());
+            assertNull(entry.children().get(1).value());
+            assertEquals(CodecTraceStatus.ERROR, entry.children().get(2).status());
+            assertEquals(CodecTraceStatus.ERROR, entry.status());
+            assertEquals("0100", ByteBufUtil.hexDump(output));
+        } finally {
+            output.release();
+        }
+    }
+
+    private static void assertEntryPart(CodecTraceView.Node part, String name, String type, long start, long end) {
+        assertEquals(name, part.name());
+        assertEquals(type, part.attributes().get("dataType"));
+        assertEquals(start, part.bitStart());
+        assertEquals(end, part.bitEnd());
+        assertEquals((int) (start / 8), part.byteStart());
+        assertEquals((int) ((end + 7) / 8), part.byteEnd());
+        assertEquals(CodecTraceStatus.SUCCESS, part.status());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"tlv", "map", "pair"})
     void shouldIsolateConditionalValuesInRepeatedEntryVariants(String type) {

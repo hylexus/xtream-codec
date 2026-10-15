@@ -107,6 +107,16 @@ export function fieldColor(type: string): string {
   return 'green';
 }
 
+export const LENGTH_UNIT_NAMES: Record<string, string> = {
+  byte: '字节',
+  bit: '位',
+  item: '元素',
+};
+
+export function lengthPrefixSize(bits: number): string {
+  return `${bits} 位${bits % 8 === 0 ? `（${bits / 8} 字节）` : ''}`;
+}
+
 export function createField(type = 'u8', id = 'field'): Field {
   const field: Field = { id, type };
   if (type === 'struct') field.fields = [];

@@ -11,7 +11,15 @@ import {
   Settings2,
   Trash2,
 } from 'lucide-react';
-import { fieldColor, fieldDropIndex, getAt, isAutomatic, pathKey } from '../model';
+import {
+  fieldColor,
+  fieldDropIndex,
+  getAt,
+  isAutomatic,
+  LENGTH_UNIT_NAMES,
+  lengthPrefixSize,
+  pathKey,
+} from '../model';
 import type { Field, JsonValue, Path, Schema, Values } from '../types';
 import { ValueEditor } from './value-editor';
 
@@ -200,18 +208,25 @@ export function SchemaEditor(props: Props) {
           </div>
         </div>
         <div className="field-meta">
-          {field.length && (
-            <span>
-              长度 ·{' '}
-              {field.length.ref ??
-                field.length.fixed ??
-                (field.length.expression
-                  ? '表达式'
-                  : field.length.remaining
-                    ? 'remaining'
-                    : `${field.length.prefixBits} bit 前缀`)}{' '}
-              {field.length.unit}
-            </span>
+          {field.length?.prefixBits !== undefined ? (
+            <>
+              <span>前缀占 {lengthPrefixSize(field.length.prefixBits)}</span>
+              <span>值表示{LENGTH_UNIT_NAMES[field.length.unit] || field.length.unit}数</span>
+            </>
+          ) : (
+            field.length && (
+              <span>
+                长度 ·{' '}
+                {field.length.ref ??
+                  field.length.fixed ??
+                  (field.length.expression
+                    ? '表达式'
+                    : field.length.remaining
+                      ? 'remaining'
+                      : '')}{' '}
+                {field.length.unit}
+              </span>
+            )
           )}
           {field.computedLengthOf && <span>回填 · {field.computedLengthOf}</span>}
           {field.versions && <span>版本 · {field.versions.join(' / ')}</span>}

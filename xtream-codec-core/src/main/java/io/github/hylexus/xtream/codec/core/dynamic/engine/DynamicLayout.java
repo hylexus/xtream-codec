@@ -61,6 +61,7 @@ record DynamicLayout(List<Node> nodes, int[] scopeSizes) {
      *
      * @param id        业务值对象中的字段键；集合元素和分支也保留定义中的标识
      * @param name      跟踪展示名称，未声明名称时使用字段标识
+     * @param dataType  字段声明类型，用于返回实际执行节点的跟踪类型
      * @param path      编译后完整字段路径，用于错误定位
      * @param address   当前节点的值槽位地址
      * @param retained  后续引用或回填是否需要保留该值；编码时据此决定是否计算规范化值
@@ -74,6 +75,7 @@ record DynamicLayout(List<Node> nodes, int[] scopeSizes) {
     record Node(
             String id,
             String name,
+            String dataType,
             String path,
             Address address,
             boolean retained,

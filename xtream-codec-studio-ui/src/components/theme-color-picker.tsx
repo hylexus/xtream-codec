@@ -3,8 +3,8 @@ import { Button, ColorSwatchPicker, Popover } from '@heroui/react';
 import { Palette } from 'lucide-react';
 
 const COLORS = [
-  { id: 'violet', name: '紫罗兰', hex: '#8052e4' },
-  { id: 'blue', name: '湛蓝', hex: '#2563eb' },
+  { id: 'violet', name: '紫罗兰', hex: '#7c3aed' },
+  { id: 'blue', name: '湛蓝', hex: '#006fee' },
   { id: 'cyan', name: '青色', hex: '#087f92' },
   { id: 'green', name: '翡翠绿', hex: '#047857' },
   { id: 'yellow', name: '金黄', hex: '#a16207' },
@@ -17,8 +17,7 @@ const COLORS = [
 export function ThemeColorPicker() {
   const [color, setColor] = useState(
     () =>
-      COLORS.find((item) => item.id === document.documentElement.dataset.themeColor)?.id ||
-      COLORS[0].id,
+      COLORS.find((item) => item.id === document.documentElement.dataset.themeColor)?.id || 'blue',
   );
   const selectedColor = COLORS.find((item) => item.id === color) || COLORS[0];
   useEffect(() => {

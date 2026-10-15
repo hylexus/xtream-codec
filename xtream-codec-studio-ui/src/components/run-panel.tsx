@@ -1,6 +1,6 @@
-import { Button } from '@heroui/react';
+import { Button, Tooltip } from '@heroui/react';
 import { useRef } from 'react';
-import { ChevronDown, Maximize2, Minimize2, Terminal, X } from 'lucide-react';
+import { Maximize2, Minimize2, Minus, Terminal, X } from 'lucide-react';
 import { TraceViewer } from './trace-viewer';
 import { isStale } from '../workspace';
 import type { DocumentTab } from '../workspace';
@@ -59,6 +59,53 @@ export function RunPanel({
         />
       )}
       <div className="run-dock-heading">
+        <div className="run-window-controls" role="group" aria-label="运行面板控制">
+          <Tooltip>
+            <Button
+              className="run-window-button run-window-close"
+              size="sm"
+              variant="ghost"
+              isIconOnly
+              aria-label="关闭运行面板"
+              onPress={onClose}
+            >
+              <span className="run-window-dot">
+                <X size={10} strokeWidth={2.5} />
+              </span>
+            </Button>
+            <Tooltip.Content>关闭运行面板</Tooltip.Content>
+          </Tooltip>
+          <Tooltip>
+            <Button
+              className="run-window-button run-window-collapse"
+              size="sm"
+              variant="ghost"
+              isIconOnly
+              aria-label="折叠运行面板"
+              onPress={onClose}
+            >
+              <span className="run-window-dot">
+                <Minus size={10} strokeWidth={2.5} />
+              </span>
+            </Button>
+            <Tooltip.Content>折叠运行面板</Tooltip.Content>
+          </Tooltip>
+          <Tooltip>
+            <Button
+              className="run-window-button run-window-maximize"
+              size="sm"
+              variant="ghost"
+              isIconOnly
+              aria-label={maximized ? '还原运行面板' : '最大化运行面板'}
+              onPress={onMaximize}
+            >
+              <span className="run-window-dot">
+                {maximized ? <Minimize2 size={9} /> : <Maximize2 size={9} />}
+              </span>
+            </Button>
+            <Tooltip.Content>{maximized ? '还原运行面板' : '最大化运行面板'}</Tooltip.Content>
+          </Tooltip>
+        </div>
         <div className="heading-title">
           <Terminal size={16} />
           <strong>运行</strong>
@@ -67,23 +114,6 @@ export function RunPanel({
           {active?.data.run && isStale(active.data) && (
             <span className="run-stale">输入已变化 · 结果来自上次运行</span>
           )}
-        </div>
-        <div className="actions">
-          <Button
-            size="sm"
-            variant="ghost"
-            isIconOnly
-            aria-label={maximized ? '还原运行面板' : '最大化运行面板'}
-            onPress={onMaximize}
-          >
-            {maximized ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-          </Button>
-          <Button size="sm" variant="ghost" isIconOnly aria-label="折叠运行面板" onPress={onClose}>
-            <ChevronDown size={16} />
-          </Button>
-          <Button size="sm" variant="ghost" isIconOnly aria-label="关闭运行面板" onPress={onClose}>
-            <X size={15} />
-          </Button>
         </div>
       </div>
       <div className="run-dock-content">
