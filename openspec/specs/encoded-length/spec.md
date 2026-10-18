@@ -8,12 +8,15 @@
 
 The system SHALL support an `@EncodedLength` annotation on unsigned integer length fields to declare the field's encoded value as the cumulative byte length of a range of subsequent encoded fields.
 
-- `@EncodedLength` MUST have `from()` attribute (String, default `""`) specifying the inclusive start field name
-- `@EncodedLength` MUST have `until()` attribute (String, default `""`) specifying the exclusive end field name
-- When `from` is empty, the range SHALL start from the field immediately after the `@EncodedLength` field in encoding order
-- When `until` is empty, the range SHALL extend to the last field in encoding order (inclusive)
-- The `@EncodedLength` field MUST also carry an unsigned integer wire-format annotation equivalent to u8, u16, or u32
-- The `@EncodedLength` annotation SHALL have `@Retention(RetentionPolicy.RUNTIME)` and `@Target(ElementType.FIELD)`
+#### Scenario: Annotation declaration and defaults
+
+- **WHEN** the system reads the `@EncodedLength` annotation declaration and its field usage
+- **THEN** `@EncodedLength` MUST have `from()` attribute (String, default `""`) specifying the inclusive start field name
+- **THEN** `@EncodedLength` MUST have `until()` attribute (String, default `""`) specifying the exclusive end field name
+- **THEN** when `from` is empty, the range SHALL start from the field immediately after the `@EncodedLength` field in encoding order
+- **THEN** when `until` is empty, the range SHALL extend to the last field in encoding order (inclusive)
+- **THEN** the `@EncodedLength` field MUST also carry an unsigned integer wire-format annotation equivalent to u8, u16, or u32
+- **THEN** the `@EncodedLength` annotation SHALL have `@Retention(RetentionPolicy.RUNTIME)` and `@Target(ElementType.FIELD)`
 
 #### Scenario: @EncodedLength with explicit from and until
 
@@ -40,13 +43,16 @@ The system SHALL support an `@EncodedLength` annotation on unsigned integer leng
 
 The system SHALL validate `@EncodedLength` field references at metadata registration time.
 
-- SHALL reject `from` field name that does not exist in the entity's field list
-- SHALL reject `until` field name that does not exist in the entity's field list
-- SHALL reject `from == until`
-- SHALL reject multiple `@EncodedLength` annotations on the same entity
-- SHALL reject `from` field appearing after `until` field in encoding order
-- SHALL reject `from` or `until` appearing before or at the `@EncodedLength` field in encoding order
-- SHALL reject an `@EncodedLength` field whose own wire format is not u8, u16, or u32
+#### Scenario: Invalid field metadata
+
+- **WHEN** an entity's `@EncodedLength` metadata is registered
+- **THEN** the system SHALL reject `from` field name that does not exist in the entity's field list
+- **THEN** the system SHALL reject `until` field name that does not exist in the entity's field list
+- **THEN** the system SHALL reject `from == until`
+- **THEN** the system SHALL reject multiple `@EncodedLength` annotations on the same entity
+- **THEN** the system SHALL reject `from` field appearing after `until` field in encoding order
+- **THEN** the system SHALL reject `from` or `until` appearing before or at the `@EncodedLength` field in encoding order
+- **THEN** the system SHALL reject an `@EncodedLength` field whose own wire format is not u8, u16, or u32
 
 #### Scenario: Invalid from field name
 
@@ -77,11 +83,14 @@ The system SHALL validate `@EncodedLength` field references at metadata registra
 
 The encoder SHALL compute and backfill the range length during entity encoding.
 
-- SHALL write a placeholder value (0) for the `@EncodedLength` field during initial encoding pass
-- SHALL record the range start at the writer index immediately before encoding the `from` field, or immediately after the placeholder field when `from` is empty
-- SHALL, before encoding the `until` field (or after the last field if `until` is empty), compute `rangeEnd - rangeStart` as the range length
-- SHALL overwrite the placeholder bytes at the recorded writer index with the computed length
-- SHALL use the wire format specified by the field's unsigned integer annotation for the backfill (e.g., `setByte` for u8, `setShort` for u16, `setInt` for u32)
+#### Scenario: Backfill sequence
+
+- **WHEN** an entity with an `@EncodedLength` field is encoded
+- **THEN** the encoder SHALL write a placeholder value (0) for the `@EncodedLength` field during initial encoding pass
+- **THEN** the encoder SHALL record the range start at the writer index immediately before encoding the `from` field, or immediately after the placeholder field when `from` is empty
+- **THEN** the encoder SHALL, before encoding the `until` field (or after the last field if `until` is empty), compute `rangeEnd - rangeStart` as the range length
+- **THEN** the encoder SHALL overwrite the placeholder bytes at the recorded writer index with the computed length
+- **THEN** the encoder SHALL use the wire format specified by the field's unsigned integer annotation for the backfill (e.g., `setByte` for u8, `setShort` for u16, `setInt` for u32)
 
 #### Scenario: Placeholder backfill with u16
 

@@ -24,7 +24,7 @@
 
 - `dynamic-binary-codec`: 完善生产执行、节点组合、错误和资源边界，允许显式启用的引擎表达式。
 
-该能力尚位于前序变更 `add-dynamic-binary-codec-and-debugger/specs/dynamic-binary-codec/spec.md`，未同步至主规格。本变更复用该能力名称，不建立平行规格；实现以该文件为基线，归档时必须先同步前序变更，再应用本变更 delta。本轮不自动归档或改写前序变更。
+该能力尚位于前序变更 `add-dynamic-binary-codec-and-debugger/specs/dynamic-binary-codec/spec.md`，未同步至主规格。本变更复用该能力名称，不建立平行规格；实现以该文件为基线，归档时必须先同步前序变更，再应用本变更 delta。本轮不自动归档或改写前序变更。增量中的 MODIFIED 块完整描述同名需求的变更，其他前序需求保持有效。
 
 ## Impact
 

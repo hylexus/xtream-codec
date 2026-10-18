@@ -1,7 +1,5 @@
 # Spec Delta
 
-此 delta 基于尚未归档的 `add-dynamic-binary-codec-and-debugger` 中同名规格；归档前先同步该前序规格。以下 MODIFIED 块完整替换同名需求，其他前序需求保持有效。
-
 ## MODIFIED Requirements
 
 ### Requirement: 条件、派生值与扩展

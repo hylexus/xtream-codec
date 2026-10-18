@@ -41,6 +41,11 @@ Module 的 `build.gradle.kts` 依赖：
 
 `MyDemoHandler` SHALL 包含以下 6 个 Handler 方法：
 
+#### Scenario: Handler 方法签名
+
+- **WHEN** 查看 `MyDemoHandler` 的消息处理方法
+- **THEN** Handler 方法 SHALL 与下表的消息类型、方法名及参数一致
+
 | msgType | 方法名 | 参数 | 说明 |
 |---------|--------|------|------|
 | 0x10 | handleHeartbeat | 无参 | 演示最简用法 |

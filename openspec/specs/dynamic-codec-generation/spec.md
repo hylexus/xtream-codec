@@ -1,0 +1,41 @@
+# dynamic-codec-generation Specification
+
+## Purpose
+
+为动态二进制 DSL 提供线上标量的自动生成能力，使协议常量、集合元素数、表达式结果及实际字节区间的校验和由同一编译布局生成，并保持调用方负责业务值约束的职责边界。
+
+## Requirements
+
+### Requirement: 编码字段生成
+系统 SHALL 支持互斥的 constant、countOf、expression 和 checksum 生成配置，保留现有定义和 Java 构造入口。生成配置 SHALL 与 computedLengthOf 互斥。
+
+#### Scenario: 固定值和表达式生成
+- **WHEN** 字段配置固定值或引用先前字段的表达式
+- **THEN** 编码使用生成值，解码返回线上实际值，不增加通用业务断言
+
+#### Scenario: 集合计数
+- **WHEN** 无符号整数通过 countOf 引用同级集合
+- **THEN** 编码写入提供的集合元素数，并支持后续集合以该字段控制长度
+
+#### Scenario: 表达式引擎复用
+- **WHEN** 生成表达式显式指定已启用的 XtreamExpressionEngine
+- **THEN** 编译绑定可见字段并沿用现有隔离与数值规则
+
+### Requirement: 字节区间校验和
+系统 SHALL 支持 xor8、sum8、crc32 和 crc32c，基于完整字节对齐的同级字段区间计算。区间 SHALL 排除校验和字段，并支持前置回填与后置直接写入。核对结果 SHALL 随解码结果返回，严格拒绝 SHALL 由调用方在单次解码时显式选择。
+
+#### Scenario: 编码和解码
+- **WHEN** 字段声明有效的校验和区间
+- **THEN** 编码根据最终线上字节生成校验和，默认解码返回完整字段及包含路径、算法、实际值、计算值和匹配状态的核对结果；校验不匹配仍提交已消费位置
+
+#### Scenario: 严格模式
+- **WHEN** 调用方显式使用严格解码选项且校验值不匹配
+- **THEN** 解码抛出校验字段异常且不推进 readerIndex，同一编译计划仍可用于默认模式
+
+#### Scenario: 调试损坏报文
+- **WHEN** 默认解码发现校验不匹配且启用了跟踪
+- **THEN** 返回完整字段、核对结果及跟踪警告，后续结构错误仍正常报告失败
+
+#### Scenario: 无效区间
+- **WHEN** 区间包含校验和自身或实际没有字节对齐
+- **THEN** 编译或执行报告明确的字段路径错误
