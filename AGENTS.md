@@ -6,7 +6,7 @@
 - **JDK**: 21, managed by `mise.toml` as `temurin-21`
 - **Node.js**: 22, required by `docs/package.json`
 - **pnpm**: 9.12.1 or newer for the docs module
-- **Gradle**: 9.8.0 through `./gradlew`
+- **Gradle**: 9.8.1 through `./gradlew`
 - **Build scripts**: Kotlin DSL
 - **OpenSpec schema**: `spec-driven`, configured in `openspec/config.yaml`
 
