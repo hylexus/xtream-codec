@@ -583,10 +583,10 @@ h1 {
   min-height: 0;
 }
 .split-horizontal {
-  grid-template-columns: minmax(0, var(--split-first)) 6px minmax(0, var(--split-second));
+  grid-template-columns: minmax(0, var(--split-first)) 8px minmax(0, var(--split-second));
 }
 .split-vertical {
-  grid-template-rows: minmax(0, var(--split-first)) 6px minmax(0, var(--split-second));
+  grid-template-rows: minmax(0, var(--split-first)) 8px minmax(0, var(--split-second));
 }
 .panel-resizer {
   position: relative;
@@ -608,6 +608,7 @@ h1 {
   margin: auto;
   border-radius: 2px;
   background: var(--studio-border);
+  opacity: 0;
 }
 .panel-resizer[aria-orientation='vertical']::after {
   width: 2px;
@@ -622,6 +623,7 @@ h1 {
 }
 .panel-resizer:is(:hover, :focus-visible, [data-resizing])::after {
   background: var(--studio-accent);
+  opacity: 1;
 }
 /* 指针已由分隔线捕获，覆盖层只统一光标，避免遍历工作区所有后代修改样式。 */
 body[data-panel-resizing]::after {
@@ -1089,21 +1091,23 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
   color: var(--studio-text);
   box-shadow: none;
 }
-.execution-footer {
-  padding: 14px 17px;
-  border-top: 1px solid var(--studio-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+.input-panel-heading .heading-title h2,
+.input-panel-heading .section-icon,
+.input-panel-heading .button {
+  flex-shrink: 0;
 }
-.execution-footer > span {
+.input-panel-heading .button {
+  box-shadow: none;
+}
+.input-panel-meta {
   color: var(--studio-muted);
   font-size: var(--studio-font-caption);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .encode-button {
   background: var(--accent);
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 16%, transparent);
   color: #fff;
 }
 .decode-button {
@@ -1274,6 +1278,7 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 }
 .result-tabs > .tabs__list-container {
   flex-shrink: 0;
+  border-bottom: 1px solid var(--studio-section-border);
 }
 .result-tabs .tabs__tab {
   height: 30px;
@@ -1294,6 +1299,12 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 .result-tabs .tabs__panel > .code-editor > div {
   height: 100%;
   min-height: 0;
+}
+.result-tabs .tabs__panel > .code-editor {
+  border: 1px solid var(--studio-section-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--studio-input);
 }
 .result-notices {
   max-height: min(30%, 120px);
@@ -2686,7 +2697,7 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
   flex-direction: column;
   overflow: hidden;
   overscroll-behavior: contain;
-  padding: 6px;
+  padding: 8px;
 }
 .document-host[hidden],
 .run-dock-wrapper[hidden],
@@ -2831,23 +2842,8 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
   flex-direction: column;
 }
 .document-host .panel-heading,
-.document-host .execution-footer,
 .document-host .structure-toolbar,
 .document-host .json-footer {
-  flex-shrink: 0;
-}
-.document-host .execution-footer {
-  min-height: 42px;
-  padding: 5px 12px;
-  gap: 8px;
-  border-top: 1px solid var(--studio-divider);
-}
-.document-host .execution-footer > span {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.document-host .execution-footer .button {
   flex-shrink: 0;
 }
 .values-panel > .code-editor,
@@ -2898,7 +2894,7 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
     overflow: visible;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
   .editor-grid > .panel-resizer,
   .execution-column > .panel-resizer {
@@ -2915,7 +2911,7 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
     overflow: visible;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
   .values-panel > .code-editor {
     flex: none;
@@ -2933,11 +2929,11 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 .run-dock-wrapper {
   flex-shrink: 0;
   min-height: 0;
-  padding: 0 6px 6px;
+  padding: 0 8px 8px;
 }
 .run-dock-wrapper:has(.maximized) {
   flex: 1;
-  padding-top: 6px;
+  padding-top: 8px;
 }
 .run-dock {
   display: flex;
@@ -2953,8 +2949,8 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 }
 .run-resize {
   position: absolute;
-  inset: -7px 8px auto;
-  height: 6px;
+  inset: -9px 8px auto;
+  height: 8px;
   z-index: 5;
 }
 .run-dock-heading {
@@ -3079,7 +3075,7 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 @container run-content (max-height: 240px) {
   /* 高度不足以容纳上下两栏时，恢复左右分栏，保留各自的滚动区域。 */
   .trace-grid {
-    grid-template-columns: minmax(0, var(--split-first)) 6px minmax(0, var(--split-second));
+    grid-template-columns: minmax(0, var(--split-first)) 8px minmax(0, var(--split-second));
     grid-template-rows: minmax(0, 1fr);
     gap: 0;
   }

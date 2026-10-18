@@ -2,7 +2,17 @@ import { normalizeHex, parseJson, parseSchema, parseValues, pretty } from './mod
 import type { CodecResult, Draft, Entity, Mode } from './types';
 import type { DocumentData, WorkspaceEntry, WorkspaceIndex } from './workspace';
 
-const API_BASE = (import.meta.env.VITE_CODEC_API_BASE || '/api/v1').replace(/\/$/, '');
+const API_BASE = (import.meta.env?.VITE_CODEC_API_BASE || '/api/v1').replace(/\/$/, '');
+
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
 
 async function request<T>(
   path: string,
@@ -21,7 +31,10 @@ async function request<T>(
   };
   // 422 响应包含已经完成的 Trace，必须保留为执行结果供用户检查。
   if (!response.ok && !(response.status === 422 && typeof data.success === 'boolean')) {
-    throw new Error(typeof data.error === 'string' ? data.error : `请求失败 (${response.status})`);
+    throw new ApiError(
+      response.status,
+      typeof data.error === 'string' ? data.error : `请求失败 (${response.status})`,
+    );
   }
   return data;
 }

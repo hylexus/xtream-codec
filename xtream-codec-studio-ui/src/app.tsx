@@ -36,7 +36,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { codecApi, workspaceApi } from './api';
+import { ApiError, codecApi, workspaceApi } from './api';
 import { pretty } from './model';
 import { randomUuid } from './uuid';
 import { draftFromPreset, PRESETS } from './presets';
@@ -44,6 +44,7 @@ import type { Preset } from './presets';
 import type { Entity, Mode } from './types';
 import {
   acceptSave,
+  acceptServer,
   canMoveEntry,
   completeRun,
   descendants,
@@ -68,6 +69,8 @@ import { loadSession, saveSession } from './draft-store';
 import { DocumentEditor } from './components/document-editor';
 import { WorkspaceDialog } from './components/workspace-dialog';
 import type { DialogAction } from './components/workspace-dialog';
+import { SaveConflictDialog } from './components/save-conflict-dialog';
+import type { SaveConflictAction } from './components/save-conflict-dialog';
 import { WorkspaceTree } from './components/workspace-tree';
 import { RunPanel } from './components/run-panel';
 import { ThemeColorPicker } from './components/theme-color-picker';
@@ -116,12 +119,15 @@ export function App() {
   );
   const [error, setError] = useState('');
   const [action, setAction] = useState<DialogAction | null>(null);
+  const [conflict, setConflict] = useState<SaveConflictAction | null>(null);
   const [tabContext, setTabContext] = useState<TabContext | null>(null);
   const [closeQueue, setCloseQueue] = useState<string[]>([]);
   const draggingTab = useRef<string | null>(null);
   const [tabDrop, setTabDrop] = useState<{ id: string; after: boolean } | null>(null);
   const [saving, setSaving] = useState<Set<string>>(new Set());
   const savingIds = useRef(new Set<string>());
+  const conflictQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const runGenerations = useRef(new Map<string, number>());
   const [movingEntry, setMovingEntry] = useState(false);
   const [pending, setPending] = useState<Set<string>>(new Set());
   const [runOpen, setRunOpen] = useState(false);
@@ -131,7 +137,7 @@ export function App() {
   const active = session.tabs.find((tab) => tab.id === session.activeId) || session.tabs[0];
   const report = (cause: unknown) =>
     setError(cause instanceof Error ? cause.message : String(cause));
-  const safely = (work: () => Promise<void>) => {
+  const safely = (work: () => Promise<unknown>) => {
     void work().catch(report);
   };
   const notify = (message: string) => {
@@ -238,6 +244,65 @@ export function App() {
     tab.parentId = parentId;
     append(tab);
   };
+  const resolveSaveConflict = (id: string, entryId: string, server: WorkspaceEntry) => {
+    const resolution = conflictQueue.current.then(
+      () =>
+        new Promise<boolean>((finish) => {
+          const target = () => {
+            const tab = current.current.tabs.find((item) => item.id === id);
+            if (!tab || tab.entryId !== entryId)
+              throw new Error('冲突报文已关闭或变化，请重新保存');
+            return tab;
+          };
+          const show = (server: WorkspaceEntry) => {
+            target();
+            setConflict({
+              tabId: id,
+              server,
+              cancel: () => {
+                setConflict(null);
+                setCloseQueue([]);
+                finish(false);
+              },
+              resolve: async (source) => {
+                try {
+                  target();
+                  if (source === 'server') {
+                    const entry = await workspaceApi.get(entryId);
+                    const adopted = acceptServer(target(), entry);
+                    runGenerations.current.set(id, (runGenerations.current.get(id) || 0) + 1);
+                    changeTab(id, () => adopted);
+                    notify('已使用服务器版本');
+                  } else {
+                    const submitted = structuredClone(target().data);
+                    const entry = await workspaceApi.update({ ...server, document: submitted });
+                    target();
+                    changeTab(id, (tab) => acceptSave(tab, entry, submitted));
+                    notify('本地版本已保存到服务器');
+                  }
+                  await refresh().catch(report);
+                  setConflict(null);
+                  finish(true);
+                } catch (cause) {
+                  setCloseQueue([]);
+                  if (source === 'local' && cause instanceof ApiError && cause.status === 409) {
+                    const latest = await workspaceApi.get(entryId);
+                    if (latest.revision !== server.revision) {
+                      show(latest);
+                      throw new Error('服务器再次发生变化，已加载最新版本，请重新选择');
+                    }
+                  }
+                  throw cause;
+                }
+              },
+            });
+          };
+          show(server);
+        }),
+    );
+    conflictQueue.current = resolution.catch(() => {});
+    return resolution;
+  };
   const saveDocument = async (id: string, name?: string, parentId?: string | null) => {
     const tab = current.current.tabs.find((item) => item.id === id);
     if (!tab) throw new Error('文档已关闭');
@@ -247,25 +312,34 @@ export function App() {
     savingIds.current.add(id);
     setSaving(new Set(savingIds.current));
     try {
-      const entry = tab.entryId
-        ? await workspaceApi.update({
-            id: tab.entryId,
-            parentId: parentId === undefined ? tab.parentId : parentId,
-            kind: 'document',
-            name: name || tab.name,
-            revision: tab.revision,
-            updatedAt: 0,
-            document: submitted,
-          })
-        : await workspaceApi.create(
-            parentId === undefined ? tab.parentId : parentId,
-            'document',
-            name || tab.name,
-            submitted,
-          );
+      let entry: WorkspaceEntry;
+      try {
+        entry = tab.entryId
+          ? await workspaceApi.update({
+              id: tab.entryId,
+              parentId: parentId === undefined ? tab.parentId : parentId,
+              kind: 'document',
+              name: name || tab.name,
+              revision: tab.revision,
+              updatedAt: 0,
+              document: submitted,
+            })
+          : await workspaceApi.create(
+              parentId === undefined ? tab.parentId : parentId,
+              'document',
+              name || tab.name,
+              submitted,
+            );
+      } catch (cause) {
+        if (!tab.entryId || !(cause instanceof ApiError) || cause.status !== 409) throw cause;
+        const server = await workspaceApi.get(tab.entryId);
+        if (server.revision === tab.revision) throw cause;
+        return await resolveSaveConflict(id, tab.entryId, server);
+      }
       changeTab(id, (latest) => acceptSave(latest, entry, submitted));
       notify('文档已保存到服务器');
       await refresh().catch(report);
+      return true;
     } finally {
       savingIds.current.delete(id);
       setSaving(new Set(savingIds.current));
@@ -286,6 +360,7 @@ export function App() {
       });
   };
   const removeTab = (id: string) => {
+    runGenerations.current.delete(id);
     changeSession((old) => removeDocumentTab(old, id));
     if (!current.current.tabs.length) {
       setRunOpen(false);
@@ -306,19 +381,26 @@ export function App() {
       confirm: '保存并关闭',
       discard: () => removeTab(id),
       submit: async (name, parentId) => {
-        await saveDocument(id, name || undefined, tab.entryId ? undefined : parentId);
-        const latest = current.current.tabs.find((item) => item.id === id);
-        if (latest && isDirty(latest)) throw new Error('保存期间又有新编辑，请再次保存或取消关闭');
-        removeTab(id);
+        try {
+          if (!(await saveDocument(id, name || undefined, tab.entryId ? undefined : parentId)))
+            return false;
+          const latest = current.current.tabs.find((item) => item.id === id);
+          if (latest && isDirty(latest))
+            throw new Error('保存期间又有新编辑，请再次保存或取消关闭');
+          removeTab(id);
+        } catch (cause) {
+          setCloseQueue([]);
+          throw cause;
+        }
       },
     });
   };
   // 逐个处理关闭请求，等待当前确认框完成；取消或保存失败时不继续关闭。
   useEffect(() => {
-    if (action || !closeQueue.length) return;
+    if (action || conflict || !closeQueue.length) return;
     setCloseQueue(closeQueue.slice(1));
     closeTab(closeQueue[0]);
-  }, [action, closeQueue]);
+  }, [action, conflict, closeQueue]);
   const openEntry = async (entry: WorkspaceEntry) => {
     const opened = current.current.tabs.find((tab) => tab.entryId === entry.id);
     if (opened) {
@@ -521,11 +603,14 @@ export function App() {
     }
   };
   const run = async (id: string, direction: 'encode' | 'decode', submitted: DocumentData) => {
+    const generation = runGenerations.current.get(id) || 0;
     setRunOpen(true);
     setPending((old) => new Set(old).add(id));
     try {
       const result = await codecApi.execute(submitted.mode, direction, submitted.draft);
-      changeTab(id, (tab) => completeRun(tab, submitted, direction, result));
+      if ((runGenerations.current.get(id) || 0) === generation) {
+        changeTab(id, (tab) => completeRun(tab, submitted, direction, result));
+      }
       setConnection('online');
     } finally {
       setPending((old) => {
@@ -539,7 +624,7 @@ export function App() {
     const keydown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
-        if (ready && !action) requestSave(current.current.activeId);
+        if (ready && !action && !conflict) requestSave(current.current.activeId);
       }
     };
     const beforeUnload = (event: BeforeUnloadEvent) => {
@@ -555,7 +640,7 @@ export function App() {
       window.removeEventListener('keydown', keydown, true);
       window.removeEventListener('beforeunload', beforeUnload);
     };
-  }, [ready, action, workspace]);
+  }, [ready, action, conflict, workspace]);
 
   const importFile = async (file: File) => {
     if (file.size > 20 * 1024 * 1024) throw new Error('导入文件超过 20 MiB');
@@ -1193,12 +1278,14 @@ export function App() {
       {action && (
         <WorkspaceDialog
           action={action}
+          isOpen={!conflict}
           onClose={(completed) => {
             setAction(null);
             if (!completed) setCloseQueue([]);
           }}
         />
       )}
+      {conflict && <SaveConflictDialog key={conflict.tabId} action={conflict} />}
       <Toast.Provider
         className="studio-toasts"
         placement="bottom"

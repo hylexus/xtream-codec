@@ -189,6 +189,14 @@ export function acceptSave(
   };
 }
 
+// 采用服务器内容时保留编辑器标签身份，完整更新文档与保存基线。
+export function acceptServer(tab: DocumentTab, entry: WorkspaceEntry): DocumentTab {
+  if (tab.entryId !== entry.id || entry.kind !== 'document')
+    throw new Error('冲突报文已变化，请重新保存');
+  const data = parseDocument(entry.document);
+  return { ...acceptSave(tab, entry, data), data };
+}
+
 export function parseDocument(value: unknown): DocumentData {
   const data = value as DocumentData;
   if (

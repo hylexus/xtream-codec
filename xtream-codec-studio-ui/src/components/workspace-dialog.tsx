@@ -11,15 +11,17 @@ export interface DialogAction {
   confirm?: string;
   danger?: boolean;
   discard?: () => void;
-  submit: (name: string, parentId: string | null) => Promise<void>;
+  submit: (name: string, parentId: string | null) => Promise<void | boolean>;
 }
 
 export function WorkspaceDialog({
   action,
   onClose,
+  isOpen = true,
 }: {
   action: DialogAction;
   onClose: (completed?: boolean) => void;
+  isOpen?: boolean;
 }) {
   const [name, setName] = useState(action.name || '');
   const [parentId, setParentId] = useState(action.parentId || 'root');
@@ -29,14 +31,15 @@ export function WorkspaceDialog({
     setPending(true);
     setError('');
     try {
-      await action.submit(name.trim(), parentId === 'root' ? null : parentId);
-      onClose(true);
+      const completed = await action.submit(name.trim(), parentId === 'root' ? null : parentId);
+      onClose(completed !== false);
     } catch (cause) {
       setError((cause as Error).message);
     } finally {
       setPending(false);
     }
   };
+  if (!isOpen) return null;
   return (
     <Modal
       isOpen

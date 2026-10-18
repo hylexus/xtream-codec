@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   acceptSave,
+  acceptServer,
   canMoveEntry,
   completeRun,
   descendants,
@@ -202,6 +203,34 @@ test('保存期间继续编辑不丢失，确认基线保留未保存状态', ()
     ),
     false,
   );
+});
+
+test('采用服务器版本完整替换文档，保留编辑器标签身份且不串到其他报文', () => {
+  const local = newTab('dynamic', 'old');
+  local.entryId = 'server';
+  local.pinned = true;
+  local.data.draft.hex = 'local';
+  const remote = newTab('field').data;
+  const entry = {
+    id: 'server',
+    kind: 'document',
+    parentId: 'moved',
+    name: 'renamed',
+    revision: 3,
+    document: remote,
+  };
+  const adopted = acceptServer(local, entry);
+  assert.equal(adopted.id, local.id);
+  assert.equal(adopted.pinned, true);
+  assert.equal(adopted.revision, 3);
+  assert.equal(adopted.parentId, 'moved');
+  assert.equal(adopted.name, 'renamed');
+  assert.deepEqual(adopted.data, remote);
+  assert.notEqual(adopted.data, remote);
+  assert.equal(isDirty(adopted), false);
+  assert.equal(local.data.draft.hex, 'local');
+  assert.throws(() => acceptServer(newTab(), entry), /冲突报文已变化/);
+  assert.throws(() => acceptServer(local, { ...entry, document: null }), /无效的 Studio 文档/);
 });
 
 test('切换结构编辑方式属于视图操作，不产生未保存标记', () => {

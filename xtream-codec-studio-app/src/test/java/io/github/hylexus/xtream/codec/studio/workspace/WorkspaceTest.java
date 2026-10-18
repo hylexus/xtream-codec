@@ -258,6 +258,37 @@ public class WorkspaceTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"file", "sqlite"})
+    void httpConflictResolutionStillComparesTheConfirmedVersion(String type) throws Exception {
+        try (var service = new WorkspaceService(open(type));
+                var server = new CodecStudioServer(new InetSocketAddress("127.0.0.1", 0), new CodecDebuggerService(new DebugEntityCatalog(Map.of())), 1024, service)) {
+            server.start();
+            final Entry original = service.create(new Edit(null, "document", "original", 0, document()));
+            final String path = "/entries/" + original.id();
+            final var localDraft = new java.util.HashMap<>(document().draft());
+            localDraft.put("hex", "01 02");
+            final var local = new Document(1, "dynamic", localDraft, "{", "json", null);
+            final Entry changed = service.update(original.id(), new Edit(null, "document", "renamed", 1, document()));
+            assertEquals(409, call(server, "PUT", path, new Edit(null, "document", "original", 1, local)).statusCode());
+            final Entry confirmed = mapper.readValue(call(server, "GET", path, null).body(), Entry.class);
+            assertEquals(changed, confirmed);
+            final Entry third = service.update(original.id(), new Edit(null, "document", "third", confirmed.revision(), document()));
+            assertEquals(409, call(server, "PUT", path, new Edit(null, "document", confirmed.name(), confirmed.revision(), local)).statusCode());
+            assertEquals(third, service.get(original.id()));
+            final var accepted = call(server, "PUT", path, new Edit(third.parentId(), "document", third.name(), third.revision(), local));
+            assertEquals(200, accepted.statusCode());
+            final Entry saved = mapper.readValue(accepted.body(), Entry.class);
+            assertEquals(third.revision() + 1, saved.revision());
+            assertEquals(third.name(), saved.name());
+            assertEquals(local, saved.document());
+            service.delete(saved.id(), saved.revision(), service.read().revision());
+            assertEquals(404, call(server, "GET", path, null).statusCode());
+            assertEquals(404, call(server, "PUT", path, new Edit(saved.parentId(), "document", saved.name(), saved.revision(), local)).statusCode());
+            assertTrue(service.read().entries().isEmpty());
+        }
+    }
+
+    @ParameterizedTest
     @CsvSource({
             "POST, '', 404",
             "POST, /export, 404",

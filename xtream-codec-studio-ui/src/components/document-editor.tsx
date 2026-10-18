@@ -462,24 +462,16 @@ export function DocumentEditor({
           className="execution-column"
         >
           <section className="panel values-panel">
-            <div className="panel-heading">
+            <div className="panel-heading input-panel-heading">
               <div className="heading-title">
                 <span className="section-icon green">
                   <Braces size={17} />
                 </span>
                 <h2>编码值</h2>
+                <span className="input-panel-meta" title="按字段标识传值">
+                  按字段标识传值
+                </span>
               </div>
-              <span className="quiet-label">JSON INPUT</span>
-            </div>
-            <CodeEditor
-              value={draft.values}
-              onChange={(value) => update({ values: value })}
-              theme={theme}
-              label="编码值 JSON"
-              height="var(--studio-values-height, 260px)"
-            />
-            <div className="execution-footer">
-              <span>按字段标识传值</span>
               <Button
                 size="sm"
                 className="encode-button"
@@ -491,28 +483,25 @@ export function DocumentEditor({
                 编码为 HEX
               </Button>
             </div>
+            <CodeEditor
+              value={draft.values}
+              onChange={(value) => update({ values: value })}
+              theme={theme}
+              label="编码值 JSON"
+              height="var(--studio-values-height, 260px)"
+            />
           </section>
           <section className="panel hex-input-panel">
-            <div className="panel-heading">
+            <div className="panel-heading input-panel-heading">
               <div className="heading-title">
                 <span className="section-icon amber">
                   <Binary size={17} />
                 </span>
                 <h2>解码字节</h2>
+                <span className="input-panel-meta" title="原始报文">
+                  {draft.hex.replace(/\s/g, '').length / 2} 字节
+                </span>
               </div>
-              <span className="quiet-label">HEX INPUT</span>
-            </div>
-            <CodeEditor
-              language="hex"
-              value={draft.hex}
-              onChange={(hex) => update({ hex })}
-              theme={theme}
-              label="解码 HEX"
-              height="100%"
-              placeholder="输入原始 HEX，允许空白与换行"
-            />
-            <div className="execution-footer">
-              <span>{draft.hex.replace(/\s/g, '').length / 2} 字节 · 原始报文</span>
               <Button
                 size="sm"
                 className="decode-button"
@@ -525,6 +514,15 @@ export function DocumentEditor({
                 解码为字段值
               </Button>
             </div>
+            <CodeEditor
+              language="hex"
+              value={draft.hex}
+              onChange={(hex) => update({ hex })}
+              theme={theme}
+              label="解码 HEX"
+              height="100%"
+              placeholder="输入原始 HEX，允许空白与换行"
+            />
           </section>
         </ResizableSplit>
       </ResizableSplit>

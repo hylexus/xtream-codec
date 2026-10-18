@@ -28,7 +28,7 @@ export function ResizableSplit({
     observer.observe(container.current!);
     return () => observer.disconnect();
   }, [direction]);
-  const available = Math.max(1, size - 6);
+  const available = Math.max(1, size - 8);
   const min = Math.max(name === 'input' ? 15 : 20, Math.min(50, (minSize / available) * 100));
   const ratio = Math.max(min, Math.min(100 - min, layout[name]));
   return (
