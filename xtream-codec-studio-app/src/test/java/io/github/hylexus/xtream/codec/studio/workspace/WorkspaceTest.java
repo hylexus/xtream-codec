@@ -34,6 +34,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.DriverManager;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -205,6 +206,54 @@ public class WorkspaceTest {
             final Entry copiedFolder = service.get(copy.parentId());
             assertEquals("808", copiedFolder.name());
             assertNotNull(copiedFolder.parentId());
+            assertNotNull(copy.createdAt());
+            assertTrue(copy.createdAt() >= doc.createdAt());
+            assertEquals(copy.createdAt(), copy.updatedAt());
+            assertEquals(copy.createdAt(), copiedFolder.createdAt());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"file", "sqlite"})
+    void legacyTimestampsRemainUnknownUntilNewEntriesAreImported(String type) throws Exception {
+        final String id = UUID.randomUUID().toString();
+        try (var store = open(type)) {
+            store.commit(0, List.of(new Entry(id, null, "document", "legacy", 1, 42, document())));
+        }
+        final String legacy = mapper.writeValueAsString(Map.of("id", id, "kind", "document", "name", "legacy",
+                "revision", 1, "updatedAt", 42, "document", document()));
+        // 实际写入缺少 createdAt 的旧 JSON，覆盖两种介质的升级读取。
+        if ("file".equals(type)) {
+            Files.writeString(directory.resolve("records").resolve(id + ".1.json"), legacy);
+        } else {
+            try (var connection = DriverManager.getConnection("jdbc:sqlite:" + directory.resolve("workspace.db"));
+                    var update = connection.prepareStatement("UPDATE workspace_entries SET content=? WHERE id=?")) {
+                update.setString(1, legacy);
+                update.setString(2, id);
+                assertEquals(1, update.executeUpdate());
+            }
+        }
+        Entry saved;
+        try (var service = new WorkspaceService(open(type))) {
+            assertNull(service.get(id).createdAt());
+            assertEquals(42, service.get(id).updatedAt());
+            final Entry folder = service.create(new Edit(null, "folder", "target", 0, null));
+            saved = service.update(id, new Edit(folder.id(), "document", "renamed", 1, document()));
+            assertNull(saved.createdAt());
+            assertTrue(saved.updatedAt() > 42);
+            assertEquals(saved, service.export().entries().stream().filter(entry -> entry.id().equals(id)).findFirst().orElseThrow());
+            final Backup oldBackup = mapper.readValue("{\"format\":\"studio-workspace\",\"formatVersion\":1,\"entries\":[" + legacy + "]}", Backup.class);
+            final long importStarted = System.currentTimeMillis();
+            final Snapshot imported = service.importBackup(oldBackup);
+            final Entry copy = imported.entries().stream().filter(entry -> entry.kind().equals("document") && !entry.id().equals(id)).findFirst().orElseThrow();
+            assertNotNull(copy.createdAt());
+            assertTrue(copy.createdAt() >= importStarted);
+            assertEquals(copy.createdAt(), copy.updatedAt());
+            assertEquals(document(), copy.document());
+            assertNull(service.get(id).createdAt());
+        }
+        try (var service = new WorkspaceService(open(type))) {
+            assertEquals(saved, service.get(id));
         }
     }
 
@@ -229,19 +278,35 @@ public class WorkspaceTest {
     @ValueSource(strings = {"file", "sqlite"})
     void httpSaveIndexConflictBackupAndRestart(String type) throws Exception {
         String id;
+        long createdAt;
+        long updatedAt;
         try (var service = new WorkspaceService(open(type));
                 var server = new CodecStudioServer(new InetSocketAddress("127.0.0.1", 0), new CodecDebuggerService(new DebugEntityCatalog(Map.of())), 1024, service)) {
             server.start();
             final var created = call(server, "POST", "/entries", new Edit(null, "document", "0200", 0, document()));
             assertEquals(201, created.statusCode());
-            id = mapper.readTree(created.body()).get("id").asText();
+            final Entry original = mapper.readValue(created.body(), Entry.class);
+            id = original.id();
+            assertNotNull(original.createdAt());
+            createdAt = original.createdAt();
+            assertTrue(createdAt > 0);
+            assertEquals(createdAt, original.updatedAt());
             final var index = mapper.readTree(call(server, "GET", "", null).body());
             assertTrue(index.get("entries").get(0).get("document").isNull());
-            assertEquals(200, call(server, "PUT", "/entries/" + id, new Edit(null, "document", "0200", 1, document())).statusCode());
+            assertEquals(createdAt, index.get("entries").get(0).get("createdAt").asLong());
+            assertEquals(createdAt, index.get("entries").get(0).get("updatedAt").asLong());
+            final var saved = call(server, "PUT", "/entries/" + id, new Edit(null, "document", "0200", 1, document()));
+            assertEquals(200, saved.statusCode());
+            final Entry updated = mapper.readValue(saved.body(), Entry.class);
+            assertEquals(original.createdAt(), updated.createdAt());
+            assertTrue(updated.updatedAt() >= createdAt);
+            updatedAt = updated.updatedAt();
             assertEquals(409, call(server, "PUT", "/entries/" + id, new Edit(null, "document", "0200", 1, document())).statusCode());
+            assertEquals(updated, service.get(id));
             assertEquals(400, call(server, "POST", "/import", Map.of("format", "studio-workspace", "formatVersion", 2, "entries", List.of())).statusCode());
             assertEquals(1, mapper.readTree(call(server, "GET", "", null).body()).get("entries").size());
             final Backup backup = mapper.readValue(call(server, "GET", "/export", null).body(), Backup.class);
+            assertEquals(updated, backup.entries().getFirst());
             assertEquals(201, call(server, "POST", "/import", backup).statusCode());
         }
         try (var service = new WorkspaceService(open(type));
@@ -249,6 +314,8 @@ public class WorkspaceTest {
             server.start();
             final Entry entry = mapper.readValue(call(server, "GET", "/entries/" + id, null).body(), Entry.class);
             assertEquals(2, entry.revision());
+            assertEquals(createdAt, entry.createdAt());
+            assertEquals(updatedAt, entry.updatedAt());
             assertEquals(document(), entry.document());
             final long workspaceRevision = mapper.readTree(call(server, "GET", "", null).body()).get("revision").asLong();
             assertEquals(200, call(server, "DELETE", "/entries/" + id,

@@ -6,6 +6,7 @@ import {
   Input,
   Label,
   Link,
+  Modal,
   TextField,
   Toast,
   Tooltip,
@@ -17,6 +18,7 @@ import {
   Check,
   ChevronRight,
   CircleHelp,
+  Clock3,
   Download,
   FileCode2,
   FlaskConical,
@@ -50,6 +52,7 @@ import {
   descendants,
   downloadJson,
   fingerprint,
+  formatEntryTime,
   isDirty,
   moveTab,
   MODE_TITLES,
@@ -134,7 +137,9 @@ export function App() {
   const [runMaximized, setRunMaximized] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const [importPending, setImportPending] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const active = session.tabs.find((tab) => tab.id === session.activeId) || session.tabs[0];
+  const activeEntry = workspace.entries.find((entry) => entry.id === active?.entryId);
   const report = (cause: unknown) =>
     setError(cause instanceof Error ? cause.message : String(cause));
   const safely = (work: () => Promise<unknown>) => {
@@ -624,7 +629,7 @@ export function App() {
     const keydown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
-        if (ready && !action && !conflict) requestSave(current.current.activeId);
+        if (ready && !action && !conflict && !infoOpen) requestSave(current.current.activeId);
       }
     };
     const beforeUnload = (event: BeforeUnloadEvent) => {
@@ -640,7 +645,7 @@ export function App() {
       window.removeEventListener('keydown', keydown, true);
       window.removeEventListener('beforeunload', beforeUnload);
     };
-  }, [ready, action, conflict, workspace]);
+  }, [ready, action, conflict, infoOpen, workspace]);
 
   const importFile = async (file: File) => {
     if (file.size > 20 * 1024 * 1024) throw new Error('导入文件超过 20 MiB');
@@ -726,7 +731,19 @@ export function App() {
             })}
           </nav>
           <div className="workspace-tree-heading">
-            <span>我的报文</span>
+            <span className="workspace-tree-title">
+              我的报文
+              <span
+                className={`workspace-tree-status ${workspaceOnline ? '' : 'offline'}`}
+                role="status"
+                aria-label={
+                  workspaceOnline ? `${workspace.entries.length} 个工作区条目` : '工作区离线'
+                }
+                title={workspaceOnline ? `${workspace.entries.length} 个工作区条目` : '工作区离线'}
+              >
+                {workspaceOnline ? workspace.entries.length : '离线'}
+              </span>
+            </span>
             <div className="actions">
               <Button
                 size="sm"
@@ -1041,15 +1058,17 @@ export function App() {
                 </Button>
               </div>
               <div className="actions document-actions">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  isDisabled={!ready || saving.has(active.id)}
-                  onPress={() => requestSave(active.id)}
-                >
-                  <Save size={14} />
-                  保存
-                </Button>
+                <span className="inline-flex" title="保存（Ctrl / ⌘ + S）">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    isDisabled={!ready || saving.has(active.id)}
+                    onPress={() => requestSave(active.id)}
+                  >
+                    <Save size={14} />
+                    保存
+                  </Button>
+                </span>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -1075,7 +1094,8 @@ export function App() {
                     <Dropdown.Menu
                       aria-label="文档操作"
                       onAction={(key) => {
-                        if (key === 'rename') renameTab(active);
+                        if (key === 'info') setInfoOpen(true);
+                        else if (key === 'rename') renameTab(active);
                         else if (key === 'duplicate') duplicate(active);
                         else if (key === 'export-document') exportDocument(active);
                         else if (key === 'export-workspace')
@@ -1088,6 +1108,10 @@ export function App() {
                         else if (key === 'import') fileInput.current?.click();
                       }}
                     >
+                      <Dropdown.Item id="info">
+                        <Clock3 size={14} />
+                        <Label>报文信息</Label>
+                      </Dropdown.Item>
                       <Dropdown.Item id="rename">
                         <Label>重命名</Label>
                       </Dropdown.Item>
@@ -1216,16 +1240,6 @@ export function App() {
             }
           />
         </div>
-        <footer className="studio-statusbar">
-          <span>
-            {active ? (active.entryId ? '已关联服务器文档' : '未保存报文') : '没有打开的报文'}
-            {active && isDirty(active) ? ' · 有未保存更改' : ''}
-          </span>
-          <span>
-            {workspaceOnline ? `${workspace.entries.length} 个工作区条目` : '工作区离线'} · Ctrl / ⌘
-            + S 保存
-          </span>
-        </footer>
       </div>
       <Input
         hidden
@@ -1284,6 +1298,41 @@ export function App() {
             if (!completed) setCloseQueue([]);
           }}
         />
+      )}
+      {active && infoOpen && (
+        <Modal key={active.id} isOpen onOpenChange={setInfoOpen}>
+          <Modal.Backdrop variant="blur">
+            <Modal.Container size="sm">
+              <Modal.Dialog className="workspace-dialog" aria-label="报文时间信息">
+                <Modal.CloseTrigger />
+                <Modal.Header>
+                  <Modal.Heading>报文信息</Modal.Heading>
+                </Modal.Header>
+                <Modal.Body>
+                  <dl className="grid gap-2 text-sm">
+                    {(
+                      [
+                        ['创建时间', activeEntry?.createdAt],
+                        ['最后更新时间', activeEntry?.updatedAt],
+                      ] as const
+                    ).map(([label, value]) => (
+                      <div key={label}>
+                        <dt className="muted">{label}</dt>
+                        <dd>
+                          {!active.entryId
+                            ? '尚未保存'
+                            : activeEntry
+                              ? formatEntryTime(value)
+                              : '服务器时间不可用'}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </Modal.Body>
+              </Modal.Dialog>
+            </Modal.Container>
+          </Modal.Backdrop>
+        </Modal>
       )}
       {conflict && <SaveConflictDialog key={conflict.tabId} action={conflict} />}
       <Toast.Provider

@@ -98,7 +98,12 @@ public final class WorkspaceData {
     }
 
     public record Entry(String id, @Nullable String parentId, String kind, String name,
-                        long revision, long updatedAt, @Nullable Document document) {
+                        long revision, @Nullable Long createdAt, long updatedAt, @Nullable Document document) {
+        // 兼容原有宿主与存储实现；旧条目没有可靠的创建时间。
+        public Entry(String id, @Nullable String parentId, String kind, String name,
+                     long revision, long updatedAt, @Nullable Document document) {
+            this(id, parentId, kind, name, revision, null, updatedAt, document);
+        }
     }
 
     public record Snapshot(long revision, List<Entry> entries) {

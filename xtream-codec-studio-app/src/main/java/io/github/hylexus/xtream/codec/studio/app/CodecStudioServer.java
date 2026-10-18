@@ -160,7 +160,7 @@ public final class CodecStudioServer implements AutoCloseable {
                         // 树只加载元数据，打开文档时再获取输入和运行快照。
                         json(exchange, 200, new WorkspaceData.Snapshot(snapshot.revision(), snapshot.entries().stream()
                                 .map(entry -> new WorkspaceData.Entry(entry.id(), entry.parentId(), entry.kind(), entry.name(),
-                                        entry.revision(), entry.updatedAt(), null)).toList()));
+                                        entry.revision(), entry.createdAt(), entry.updatedAt(), null)).toList()));
                     }
                     case "/api/v1/workspace/export" -> json(exchange, 200, workspaceService.export());
                     case String value when value.startsWith("/api/v1/workspace/entries/") -> {

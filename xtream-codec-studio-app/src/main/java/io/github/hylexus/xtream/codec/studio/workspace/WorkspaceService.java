@@ -51,8 +51,9 @@ public final class WorkspaceService implements AutoCloseable {
 
     public synchronized Entry create(Edit edit) throws IOException {
         final Snapshot before = read();
+        final long now = System.currentTimeMillis();
         final Entry entry = new Entry(UUID.randomUUID().toString(), edit.parentId(), edit.kind(),
-                edit.name(), 1, System.currentTimeMillis(), edit.document());
+                edit.name(), 1, now, now, edit.document());
         final var entries = new ArrayList<>(before.entries());
         entries.add(entry);
         validate(entries);
@@ -68,7 +69,7 @@ public final class WorkspaceService implements AutoCloseable {
             throw new IllegalArgumentException("不能改变目录或文档类型");
         }
         final Entry entry = new Entry(id, edit.parentId(), edit.kind(), edit.name(), old.revision() + 1,
-                System.currentTimeMillis(), edit.document());
+                old.createdAt(), System.currentTimeMillis(), edit.document());
         final List<Entry> entries = before.entries().stream().map(item -> item.id().equals(id) ? entry : item).toList();
         validate(entries);
         store.commit(before.revision(), entries);
@@ -108,12 +109,12 @@ public final class WorkspaceService implements AutoCloseable {
         final var entries = new ArrayList<>(before.entries());
         final String folderId = UUID.randomUUID().toString();
         final long now = System.currentTimeMillis();
-        entries.add(new Entry(folderId, null, "folder", "导入-" + folderId.substring(0, 8), 1, now, null));
+        entries.add(new Entry(folderId, null, "folder", "导入-" + folderId.substring(0, 8), 1, now, now, null));
         final var ids = new HashMap<String, String>();
         backup.entries().forEach(entry -> ids.put(entry.id(), UUID.randomUUID().toString()));
         for (final Entry entry : backup.entries()) {
             entries.add(new Entry(ids.get(entry.id()), entry.parentId() == null ? folderId : ids.get(entry.parentId()),
-                    entry.kind(), entry.name(), 1, now, entry.document()));
+                    entry.kind(), entry.name(), 1, now, now, entry.document()));
         }
         validate(entries);
         return store.commit(before.revision(), entries);

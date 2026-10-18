@@ -2253,6 +2253,8 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 
 /* 编辑器壳固定占据窗口，文档和运行面板分别滚动。 */
 .studio-editor-shell {
+  --studio-topbar-height: 54px;
+  --studio-tabbar-height: 43px;
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
@@ -2265,7 +2267,7 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 }
 .studio-workspace .topbar {
   flex-shrink: 0;
-  height: 54px;
+  height: var(--studio-topbar-height);
   padding: 0 22px;
 }
 .breadcrumbs,
@@ -2289,7 +2291,11 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
 }
 .studio-editor-shell .sidebar-header {
   position: relative;
-  padding: 22px 14px;
+  display: flex;
+  align-items: center;
+  height: calc(var(--studio-topbar-height) + var(--studio-tabbar-height));
+  padding: 0 14px;
+  border-bottom-color: var(--studio-border);
 }
 .sidebar-mobile-close {
   display: none;
@@ -2339,6 +2345,19 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
   justify-content: space-between;
   color: var(--studio-muted);
   font-size: 12px;
+}
+.workspace-tree-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.workspace-tree-status {
+  color: var(--studio-subtle);
+  font-size: 11px;
+}
+.workspace-tree-status.offline {
+  color: var(--studio-amber);
 }
 .workspace-tree-heading .actions {
   gap: 0;
@@ -2444,7 +2463,7 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  min-height: 42px;
+  height: var(--studio-tabbar-height);
   border-bottom: 1px solid var(--studio-border);
   background: var(--studio-sidebar);
   padding-right: 8px;
@@ -3113,17 +3132,6 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
     line-height: 16px;
   }
 }
-.studio-statusbar {
-  flex-shrink: 0;
-  height: 26px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 16px;
-  border-top: 1px solid var(--studio-divider);
-  color: var(--studio-muted);
-  font-size: 11px;
-}
 .workspace-dialog {
   padding: 24px;
 }
@@ -3163,9 +3171,6 @@ body[data-panel-resizing] :is(.sidebar, .workspace) {
     padding-right: 12px;
   }
   .sidebar-resizer {
-    display: none;
-  }
-  .studio-statusbar > span:last-child {
     display: none;
   }
   .run-dock-content {

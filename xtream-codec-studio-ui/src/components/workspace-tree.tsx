@@ -9,7 +9,7 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import type { WorkspaceEntry } from '../workspace';
-import { canMoveEntry } from '../workspace';
+import { canMoveEntry, formatEntryTime } from '../workspace';
 
 const ENTRY_DRAG_TYPE = 'application/x-xtream-studio-entry';
 
@@ -129,7 +129,11 @@ export function WorkspaceTree({
                   <span className="tree-indent" />
                 )}
                 <Icon size={15} />
-                <span title={entry.name}>{entry.name}</span>
+                <span
+                  title={`${entry.name}\n创建时间：${formatEntryTime(entry.createdAt)}\n最后更新时间：${formatEntryTime(entry.updatedAt)}`}
+                >
+                  {entry.name}
+                </span>
               </Button>
               <Dropdown>
                 <Dropdown.Trigger

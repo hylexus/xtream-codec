@@ -32,6 +32,7 @@ export interface WorkspaceEntry {
   kind: 'folder' | 'document';
   name: string;
   revision: number;
+  createdAt?: number | null;
   updatedAt: number;
   document: DocumentData | null;
 }
@@ -47,6 +48,12 @@ export interface Session {
 }
 
 export const MODE_TITLES = { dynamic: '自由组合', entity: '实体类调试', field: '单字段试验' };
+
+export function formatEntryTime(value: number | null | undefined): string {
+  return value && Number.isFinite(value) && !Number.isNaN(new Date(value).getTime())
+    ? new Date(value).toLocaleString()
+    : '未记录';
+}
 
 export function newTab(
   mode: Mode = 'dynamic',
