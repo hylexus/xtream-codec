@@ -51,7 +51,14 @@ export const zhSidebar = sidebar({
                 },
                 {
                     text: "动态编解码", icon: "code", collapsible: false,
-                    children: ['/guide/core/dynamic/README.md']
+                    children: [
+                        '/guide/core/dynamic/README.md',
+                        '/guide/core/dynamic/studio.md',
+                        '/guide/core/dynamic/quick-start.md',
+                        '/guide/core/dynamic/dsl-reference.md',
+                        '/guide/core/dynamic/examples.md',
+                        '/guide/core/dynamic/troubleshooting.md',
+                    ]
                 },
                 {
                     text: "示例", icon: "server", collapsible: false,

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "payloadLength", "type": "u16", "computedLengthOf": "payload" },
+    {
+      "id": "payload", "type": "struct",
+      "length": { "ref": "payloadLength", "unit": "byte" },
+      "fields": [
+        { "id": "count", "type": "u8", "generated": { "countOf": "records" } },
+        {
+          "id": "records", "type": "array",
+          "length": { "ref": "count", "unit": "item" },
+          "item": {
+            "id": "record", "type": "struct",
+            "length": { "prefixBits": 16, "unit": "byte" },
+            "fields": [
+              { "id": "code", "type": "u8" },
+              { "id": "text", "type": "string", "length": { "remaining": true, "unit": "byte" } }
+            ]
+          }
+        }
+      ]
+    },
+    { "id": "tail", "type": "u8", "generated": { "constant": 126 } }
+  ]
+}

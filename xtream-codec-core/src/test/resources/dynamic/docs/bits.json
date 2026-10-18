@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "source", "type": "u8" },
+    { "id": "low", "type": "derived", "ref": "source", "options": { "bitOffset": 0, "bitWidth": 5 } },
+    { "id": "high", "type": "derived", "ref": "source", "options": { "bitOffset": 5, "bitWidth": 3 } },
+    { "id": "sequence", "type": "bits", "bits": 3 },
+    { "id": "align", "type": "align", "alignTo": 8, "fillBit": 0 }
+  ]
+}

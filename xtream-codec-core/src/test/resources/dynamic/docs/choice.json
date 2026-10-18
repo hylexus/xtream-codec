@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "flags", "type": "u8" },
+    { "id": "kind", "type": "u8" },
+    { "id": "extra", "type": "u16", "when": { "ref": "flags", "op": "bitSet", "value": "4" } },
+    {
+      "id": "body", "type": "choice", "ref": "kind",
+      "variants": {
+        "1": {
+          "id": "temperature", "type": "struct",
+          "fields": [{ "id": "temperature", "type": "i16" }]
+        },
+        "2": { "id": "text", "type": "string", "length": { "prefixBits": 8, "unit": "byte" } }
+      },
+      "defaultVariant": { "id": "raw", "type": "hex", "length": { "fixed": 2, "unit": "byte" } }
+    }
+  ]
+}

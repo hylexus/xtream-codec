@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "sequence", "type": "u16", "endian": "little" },
+    {
+      "id": "name", "type": "string", "charset": "GBK",
+      "length": { "fixed": 6, "unit": "byte" },
+      "options": { "padByte": 0, "padSide": "right", "stripPadding": true }
+    },
+    { "id": "terminal", "type": "bcd", "length": { "fixed": 3, "unit": "byte" } },
+    { "id": "raw", "type": "hex", "length": { "prefixBits": 8, "unit": "byte" } }
+  ]
+}

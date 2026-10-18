@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "start", "type": "u8", "generated": { "constant": 126 } },
+    { "id": "count", "type": "u8", "generated": { "countOf": "items" } },
+    { "id": "length", "type": "u16", "computedLengthOf": "items" },
+    {
+      "id": "items", "type": "array",
+      "length": { "ref": "count", "unit": "item" },
+      "item": { "id": "item", "type": "u8" }
+    },
+    { "id": "checksum", "type": "u8", "generated": { "checksum": { "algorithm": "xor8", "range": "count..items" } } },
+    { "id": "end", "type": "u8", "generated": { "constant": 126 } }
+  ]
+}

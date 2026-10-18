@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    { "id": "count", "type": "u8", "generated": { "countOf": "items" } },
+    { "id": "count", "type": "u16", "versions": [2019], "generated": { "countOf": "items" } },
+    {
+      "id": "items", "type": "array",
+      "length": { "ref": "count", "unit": "item" },
+      "item": { "id": "item", "type": "u16" }
+    }
+  ]
+}

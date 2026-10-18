@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    {
+      "id": "extras", "type": "tlv",
+      "length": { "prefixBits": 8, "unit": "item" },
+      "options": { "keyBits": 8, "lengthBits": 8 },
+      "variants": {
+        "1": { "id": "number", "type": "u16" },
+        "2": {
+          "id": "text", "type": "struct",
+          "fields": [{ "id": "note", "type": "string", "length": { "remaining": true, "unit": "byte" } }]
+        }
+      }
+    }
+  ]
+}

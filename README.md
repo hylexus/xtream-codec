@@ -123,38 +123,6 @@
         - [https://sample-videos.com/index.php#sample-flv-video](https://sample-videos.com/index.php#sample-flv-video)
         - ...
 
-## JT/T 808 QuickStart
-
-```shell
-# 支持 amd64 和 arm64 两种架构
-docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/jt-808-server-quick-start-with-dashboard:latest
-```
-
-启动后访问: [http://localhost:8888/dashboard-ui/](http://localhost:8888/dashboard-ui/)
-
-| 首页                                                                                               | 编解码调试                                                                                     |
-|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| ![jt-808-docker-quickstart.png](docs/src/.vuepress/public/img/readme/jt-808-docker-quickstart.png) | ![jt-808-dashboard-debug.png](docs/src/.vuepress/public/img/readme/jt-808-dashboard-debug.png) |
-
-## Roadmap / 版本路线图
-
-通过 [GitHub Milestones](https://github.com/hylexus/xtream-codec/milestones) 管理未来的版本计划
-
-> 欢迎在 Issue 中讨论设计，或认领 `help wanted` 任务参与开发
-
-## Compatibility / 兼容性
-
-参考 : [https://start.spring.io/actuator/info](https://start.spring.io/actuator/info)
-
-> 非 spring 项目可以不用理会这个兼容性
->
-> 但依然建议使用 [spring-boot-dependencies](https://central.sonatype.com/artifact/org.springframework.boot/spring-boot-dependencies) 这个 `BOM` 来管理 N 多依赖的兼容性问题
-
-| xtream-version | spring-boot-dependencies | spring-cloud-dependencies |
-|----------------|--------------------------|---------------------------|
-| **0.1.x**      | **3.5.6 +**              | **2025.0.0**              |
-| **0.0.x**      | **3.2.x +**              | **2023.0.3**              |
-
 ## Modules / 项目模块
 
 ```shell
@@ -185,6 +153,82 @@ docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/
 ├── xtream-codec-studio-ui                              ## Studio 前端（React + HeroUI 3 + Vite）
 └── xtream-codec-server-reactive                        ## 异步非阻塞的 TCP/UDP 服务端实现
 ```
+
+## Codec Studio / 报文工作区
+
+独立的报文编辑器与编解码工作区，支持可视化配置字段、编辑动态 DSL、编码和解码、HEX 与字段跟踪联动，以及多文档保存。运行单文件 JAR 只需 Java 21，也支持 Docker 部署。
+
+> **Studio 与具体协议无关，Dashboard 是 JT/T 808 协议专用。** Studio 是通用报文编辑与编解码调试工具，可用于自定义二进制协议，无需启动 JT/T 808 服务端或连接真实终端；Dashboard 集成在 JT/T 808 服务端中，用于查看 808 服务状态、在线会话和进行 808 协议联调。
+>
+> 下方 Studio 的 JT/T 808 0200 截图用于演示通用 DSL 的配置，Studio 也可编辑和调试其他协议的报文。接入 808 终端并使用 Dashboard 的启动方式见下方 [JT/T 808 QuickStart](#jtt-808-quickstart)。
+
+使用方式见 [Studio 启动与部署](docs/src/guide/core/dynamic/studio.md)，报文配置见 [从协议表写出第一份 DSL](docs/src/guide/core/dynamic/quick-start.md)。
+
+```shell
+# 支持 amd64 和 arm64 两种架构
+docker run -it --rm \
+  -p 127.0.0.1:8765:8765 \
+  -v xtream-codec-studio-data:/data \
+  registry.cn-hangzhou.aliyuncs.com/xtream-codec/xtream-codec-studio-app:latest
+```
+
+启动后访问：[http://127.0.0.1:8765](http://127.0.0.1:8765)。服务器中已保存的报文存放在命名卷 `xtream-codec-studio-data`，退出并删除容器后仍会保留。
+
+下面展示两个内置样例，点击图片可查看原图。
+
+### 位字段与嵌套集合
+
+| 可视化结构与编码值                                                                                                                                                                                         | DSL JSON                                                                                                                                                                                            |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![Studio 基础报文：可视化编辑位字段、嵌套结构和编码值](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-01.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-01.png) | [![Studio 基础报文：DSL JSON 定义与独立的编码值](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-02.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-02.png) |
+
+| HEX 与字段跟踪                                                                                                                                                                                         | 完整响应                                                                                                                                                                                         |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![Studio 基础报文：HEX 字节与嵌套数组字段联动定位](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-03.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-03.png) | [![Studio 基础报文：完整 JSON 响应与运行快照](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-04.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-demo-01-04.png) |
+
+### JT/T 808 0200 位置汇报
+
+| 多版本结构与业务值                                                                                                                                                                                               | 协议 DSL JSON                                                                                                                                                                                                    |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![Studio JT/T 808 0200：2019 版可视化结构与位置汇报编码值](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-01.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-01.png) | [![Studio JT/T 808 0200：包含固定值和多版本字段的 DSL JSON](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-02.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-02.png) |
+
+| 运行结果与校验                                                                                                                                                                                                   | 位段与 TLV 明细                                                                                                                                                                                                     |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![Studio JT/T 808 0200：校验结果、位置字段和 HEX 联动定位](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-03.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-03.png) | [![Studio JT/T 808 0200：消息体长度位段、TLV 附加信息和校验码](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-04.png)](docs/src/.vuepress/public/img/readme/xtream-codec-studio-808-0200-04.png) |
+
+## JT/T 808 QuickStart
+
+以下镜像会同时启动 **JT/T 808 服务端和 Dashboard 管理界面**，用于终端接入与服务端联调。
+
+```shell
+# 支持 amd64 和 arm64 两种架构
+docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/jt-808-server-quick-start-with-dashboard:latest
+```
+
+启动后访问: [http://localhost:8888/dashboard-ui/](http://localhost:8888/dashboard-ui/)
+
+| 首页                                                                                               | 编解码调试                                                                                     |
+|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| ![jt-808-docker-quickstart.png](docs/src/.vuepress/public/img/readme/jt-808-docker-quickstart.png) | ![jt-808-dashboard-debug.png](docs/src/.vuepress/public/img/readme/jt-808-dashboard-debug.png) |
+
+## Roadmap / 版本路线图
+
+通过 [GitHub Milestones](https://github.com/hylexus/xtream-codec/milestones) 管理未来的版本计划
+
+> 欢迎在 Issue 中讨论设计，或认领 `help wanted` 任务参与开发
+
+## Compatibility / 兼容性
+
+参考 : [https://start.spring.io/actuator/info](https://start.spring.io/actuator/info)
+
+> 非 spring 项目可以不用理会这个兼容性
+>
+> 但依然建议使用 [spring-boot-dependencies](https://central.sonatype.com/artifact/org.springframework.boot/spring-boot-dependencies) 这个 `BOM` 来管理 N 多依赖的兼容性问题
+
+| xtream-version | spring-boot-dependencies | spring-cloud-dependencies |
+|----------------|--------------------------|---------------------------|
+| **0.1.x**      | **3.5.6 +**              | **2025.0.0**              |
+| **0.0.x**      | **3.2.x +**              | **2023.0.3**              |
 
 ## Docs / 文档
 
