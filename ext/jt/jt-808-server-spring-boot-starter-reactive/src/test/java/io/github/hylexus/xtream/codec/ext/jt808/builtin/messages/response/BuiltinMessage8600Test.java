@@ -78,6 +78,7 @@ class BuiltinMessage8600Test extends BaseCodecTest {
         final String hex = "86000038013912344323000001020000006f400301d907f2073d336c0000029a241026183956241026203956006f0a000000de000201d907f2073d336c0000029a006f0a0b";
         final BuiltinMessage8600 entity = decodeAsEntity(BuiltinMessage8600.class, hex);
         assertEquals(1, entity.getType());
+        assertEquals(2, entity.getAreaCount());
         assertEquals(2, entity.getAreaList().size());
         final BuiltinMessage8600.CircularArea first = entity.getAreaList().getFirst();
         assertEquals(111L, first.getAreaId());
@@ -102,4 +103,31 @@ class BuiltinMessage8600Test extends BaseCodecTest {
         assertEquals(111, second.getTopSpeed());
         assertEquals((short) 10, second.getDurationOfOverSpeed());
     }
+
+    @Test
+    void testWithoutOptionalFields() {
+        final BuiltinMessage8600.CircularArea source = new BuiltinMessage8600.CircularArea()
+                .setAreaId(111).setAreaProps(0)
+                .setLatitude(31000562).setLongitude(121451372).setRadius(666)
+                .setStartTime(startTime).setEndTime(endTime).setTopSpeed(111).setDurationOfOverSpeed((short) 10);
+        final BuiltinMessage8600 entity = new BuiltinMessage8600().setType((short) 1)
+                .setAreaCount((short) 1).setAreaList(List.of(source));
+        final String hex = "7e86000014013912344323000001010000006f000001d907f2073d336c0000029a537e";
+        assertEquals(hex, encode(entity, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
+        final BuiltinMessage8600 decoded = decodeAsEntity(BuiltinMessage8600.class, hex);
+        assertEquals(1, decoded.getType());
+        assertEquals(1, decoded.getAreaCount());
+        assertEquals(1, decoded.getAreaList().size());
+        final BuiltinMessage8600.CircularArea area = decoded.getAreaList().getFirst();
+        assertEquals(111, area.getAreaId());
+        assertEquals(0, area.getAreaProps());
+        assertEquals(31000562, area.getLatitude());
+        assertEquals(121451372, area.getLongitude());
+        assertEquals(666, area.getRadius());
+        assertNull(area.getStartTime());
+        assertNull(area.getEndTime());
+        assertEquals(0, area.getTopSpeed());
+        assertEquals(0, area.getDurationOfOverSpeed());
+    }
+
 }

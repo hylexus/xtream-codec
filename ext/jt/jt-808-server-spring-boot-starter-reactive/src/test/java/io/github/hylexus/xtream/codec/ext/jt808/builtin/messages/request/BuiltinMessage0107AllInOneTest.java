@@ -27,17 +27,15 @@ class BuiltinMessage0107AllInOneTest extends BaseCodecTest {
 
     @Test
     void testV2013() {
-        final BuiltinMessage0107AllInOne sourceEntity = createEntityV2011();
+        final BuiltinMessage0107AllInOne sourceEntity = createEntityV2013();
         final String hex = this.encode(sourceEntity, Jt808ProtocolVersion.VERSION_2013, terminalId2013);
-
-        final BuiltinMessage0107AllInOne decodedEntity1 = this.decodeAsEntity(BuiltinMessage0107AllInOne.class, hex);
-        doCompareV2011(sourceEntity, decodedEntity1);
-
-        final BuiltinMessage0107AllInOne decodedEntity2 = this.decodeAsEntity(BuiltinMessage0107AllInOne.class, hex);
-        doCompareV2011(sourceEntity, decodedEntity2);
+        final String expectedHex = "7e01070042013912344323000000013132333435747970653031323334353637383930313233343569643132333435678905432167890543210a6877762d3132333435360a6677762d363534333231207e";
+        assertEquals(expectedHex, hex);
+        final BuiltinMessage0107AllInOne decoded = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2013, BuiltinMessage0107AllInOne.class, expectedHex);
+        doCompareV2013(sourceEntity, decoded);
     }
 
-    private void doCompareV2011(BuiltinMessage0107AllInOne sourceEntity, BuiltinMessage0107AllInOne decodedEntity) {
+    private void doCompareV2013(BuiltinMessage0107AllInOne sourceEntity, BuiltinMessage0107AllInOne decodedEntity) {
         assertEquals(sourceEntity.getType(), decodedEntity.getType());
         assertEquals(sourceEntity.getManufacturerId(), decodedEntity.getManufacturerId());
         assertEquals(sourceEntity.getTerminalType(), decodedEntity.getTerminalType());
@@ -53,12 +51,10 @@ class BuiltinMessage0107AllInOneTest extends BaseCodecTest {
     void testV2019() {
         final BuiltinMessage0107AllInOne sourceEntity = createEntityV2019();
         final String hex = this.encode(sourceEntity, Jt808ProtocolVersion.VERSION_2019, terminalId2019);
-
-        final BuiltinMessage0107AllInOne decodedEntity1 = this.decodeAsEntity(BuiltinMessage0107AllInOne.class, hex);
-        doCompareV2019(sourceEntity, decodedEntity1);
-
-        final BuiltinMessage0107AllInOne decodedEntity2 = this.decodeAsEntity(BuiltinMessage0107AllInOne.class, hex);
-        doCompareV2019(sourceEntity, decodedEntity2);
+        final String expectedHex = "7e010740650100000000013912344329000000013132333435747970653031323334353637383930313233343536373839303132333435696431323334353637383930313233343536373839303132333435363738678905432167890543210a6877762d3132333435360a6677762d3635343332310102777e";
+        assertEquals(expectedHex, hex);
+        final BuiltinMessage0107AllInOne decoded = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2019, BuiltinMessage0107AllInOne.class, expectedHex);
+        doCompareV2019(sourceEntity, decoded);
     }
 
     private void doCompareV2019(BuiltinMessage0107AllInOne sourceEntity, BuiltinMessage0107AllInOne decodedEntity) {
@@ -73,7 +69,7 @@ class BuiltinMessage0107AllInOneTest extends BaseCodecTest {
         assertEquals(sourceEntity.getCommunicationModelProperty(), decodedEntity.getCommunicationModelProperty());
     }
 
-    private BuiltinMessage0107AllInOne createEntityV2011() {
+    private BuiltinMessage0107AllInOne createEntityV2013() {
         return new BuiltinMessage0107AllInOne()
                 .setType((short) 1)
                 .setManufacturerId("12345")

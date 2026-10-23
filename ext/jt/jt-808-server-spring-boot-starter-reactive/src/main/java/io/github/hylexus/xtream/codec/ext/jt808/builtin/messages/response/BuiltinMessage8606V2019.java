@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,7 +60,7 @@ public class BuiltinMessage8606V2019 {
      */
     // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
     @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
-    private LocalDateTime startTime;
+    private @Nullable LocalDateTime startTime;
 
     /**
      * 结束时间 BCD[6]
@@ -68,7 +69,7 @@ public class BuiltinMessage8606V2019 {
      */
     // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
     @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
-    private LocalDateTime endTime;
+    private @Nullable LocalDateTime endTime;
 
     @SuppressWarnings("unused")
     public boolean hasTimeProperty() {
@@ -87,7 +88,7 @@ public class BuiltinMessage8606V2019 {
     @Preset.JtStyle.Word
     private int count;
 
-    @Preset.JtStyle.List
+    @Preset.JtStyle.List(iterationTimesExpressions = @Expression(spel = "getCount()", mvel = "self.getCount()", aviator = "self.count"))
     private List<Item> itemList;
 
     public long getRouteId() {
@@ -108,20 +109,20 @@ public class BuiltinMessage8606V2019 {
         return this;
     }
 
-    public LocalDateTime getStartTime() {
+    public @Nullable LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public BuiltinMessage8606V2019 setStartTime(LocalDateTime startTime) {
+    public BuiltinMessage8606V2019 setStartTime(@Nullable LocalDateTime startTime) {
         this.startTime = startTime;
         return this;
     }
 
-    public LocalDateTime getEndTime() {
+    public @Nullable LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public BuiltinMessage8606V2019 setEndTime(LocalDateTime endTime) {
+    public BuiltinMessage8606V2019 setEndTime(@Nullable LocalDateTime endTime) {
         this.endTime = endTime;
         return this;
     }
@@ -204,7 +205,7 @@ public class BuiltinMessage8606V2019 {
          */
         // @Preset.JtStyle.Word(condition = "hasThresholdProperty()")
         @Preset.JtStyle.Word(conditions = @Expression(spel = "hasThresholdProperty()", mvel = "self.hasThresholdProperty()", aviator = "self.hasThresholdProperty"))
-        private Integer longDriveThreshold;
+        private @Nullable Integer longDriveThreshold;
 
         /**
          * 路段行驶不足阈值
@@ -212,7 +213,7 @@ public class BuiltinMessage8606V2019 {
          */
         // @Preset.JtStyle.Word(condition = "hasThresholdProperty()")
         @Preset.JtStyle.Word(conditions = @Expression(spel = "hasThresholdProperty()", mvel = "self.hasThresholdProperty()", aviator = "self.hasThresholdProperty"))
-        private Integer shortDriveThreshold;
+        private @Nullable Integer shortDriveThreshold;
 
         @SuppressWarnings("unused")
         public boolean hasThresholdProperty() {
@@ -232,7 +233,7 @@ public class BuiltinMessage8606V2019 {
          */
         // @Preset.JtStyle.Word(condition = "hasSpeedLimitProperty()")
         @Preset.JtStyle.Word(conditions = @Expression(spel = "hasSpeedLimitProperty()", mvel = "self.hasSpeedLimitProperty()", aviator = "self.hasSpeedLimitProperty"))
-        private Integer maxSpeedLimit;
+        private @Nullable Integer maxSpeedLimit;
 
         /**
          * 路段超速持续时间
@@ -241,7 +242,7 @@ public class BuiltinMessage8606V2019 {
          */
         // @Preset.JtStyle.Byte(condition = "hasSpeedLimitProperty()")
         @Preset.JtStyle.Byte(conditions = @Expression(spel = "hasSpeedLimitProperty()", mvel = "self.hasSpeedLimitProperty()", aviator = "self.hasSpeedLimitProperty"))
-        private Short speedingDuration;
+        private @Nullable Short speedingDuration;
 
         @SuppressWarnings("unused")
         public boolean hasSpeedLimitProperty() {
@@ -263,7 +264,7 @@ public class BuiltinMessage8606V2019 {
         /**
          * 路线名称
          */
-        @Preset.JtStyle.Str
+        @Preset.JtStyle.Str(lengthExpressions = @Expression(spel = "getAreaNameLength()", mvel = "self.getAreaNameLength()", aviator = "self.areaNameLength"))
         private String areaName;
 
         public long getId() {
@@ -320,38 +321,38 @@ public class BuiltinMessage8606V2019 {
             return this;
         }
 
-        public Integer getLongDriveThreshold() {
+        public @Nullable Integer getLongDriveThreshold() {
             return longDriveThreshold;
         }
 
-        public Item setLongDriveThreshold(Integer longDriveThreshold) {
+        public Item setLongDriveThreshold(@Nullable Integer longDriveThreshold) {
             this.longDriveThreshold = longDriveThreshold;
             return this;
         }
 
-        public Integer getShortDriveThreshold() {
+        public @Nullable Integer getShortDriveThreshold() {
             return shortDriveThreshold;
         }
 
-        public Item setShortDriveThreshold(Integer shortDriveThreshold) {
+        public Item setShortDriveThreshold(@Nullable Integer shortDriveThreshold) {
             this.shortDriveThreshold = shortDriveThreshold;
             return this;
         }
 
-        public Integer getMaxSpeedLimit() {
+        public @Nullable Integer getMaxSpeedLimit() {
             return maxSpeedLimit;
         }
 
-        public Item setMaxSpeedLimit(Integer maxSpeedLimit) {
+        public Item setMaxSpeedLimit(@Nullable Integer maxSpeedLimit) {
             this.maxSpeedLimit = maxSpeedLimit;
             return this;
         }
 
-        public Short getSpeedingDuration() {
+        public @Nullable Short getSpeedingDuration() {
             return speedingDuration;
         }
 
-        public Item setSpeedingDuration(Short speedingDuration) {
+        public Item setSpeedingDuration(@Nullable Short speedingDuration) {
             this.speedingDuration = speedingDuration;
             return this;
         }

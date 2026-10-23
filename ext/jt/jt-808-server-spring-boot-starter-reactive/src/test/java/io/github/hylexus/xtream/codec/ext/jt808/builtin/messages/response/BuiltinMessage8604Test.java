@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BuiltinMessage8604Test extends BaseCodecTest {
 
@@ -80,4 +81,30 @@ class BuiltinMessage8604Test extends BaseCodecTest {
         assertEquals(31000564L, entity.getPointList().get(2).getLatitude());
         assertEquals(121451374L, entity.getPointList().get(2).getLongitude());
     }
+
+    @Test
+    void testWithoutOptionalFields() {
+        final BuiltinMessage8604 entity = new BuiltinMessage8604().setAreaId(111).setAreaProps(0)
+                .setStartTime(startTime).setEndTime(endTime).setTopSpeed(111).setDurationOfOverSpeed((short) 10)
+                .setPointCount(2).setPointList(List.of(
+                        new BuiltinMessage8604.Point(31000562L, 121451372L),
+                        new BuiltinMessage8604.Point(31000563L, 121451373L)
+                ));
+        final String hex = "7e8604001801391234432300000000006f0000000201d907f2073d336c01d907f3073d336d897e";
+        assertEquals(hex, encode(entity, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
+        final BuiltinMessage8604 decoded = decodeAsEntity(BuiltinMessage8604.class, hex);
+        assertEquals(111, decoded.getAreaId());
+        assertEquals(0, decoded.getAreaProps());
+        assertNull(decoded.getStartTime());
+        assertNull(decoded.getEndTime());
+        assertEquals(0, decoded.getTopSpeed());
+        assertEquals(0, decoded.getDurationOfOverSpeed());
+        assertEquals(2, decoded.getPointCount());
+        assertEquals(2, decoded.getPointList().size());
+        assertEquals(31000562L, decoded.getPointList().getFirst().getLatitude());
+        assertEquals(121451372L, decoded.getPointList().getFirst().getLongitude());
+        assertEquals(31000563L, decoded.getPointList().getLast().getLatitude());
+        assertEquals(121451373L, decoded.getPointList().getLast().getLongitude());
+    }
+
 }

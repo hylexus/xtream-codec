@@ -45,4 +45,18 @@ class BuiltinMessage8800Test extends BaseCodecTest {
         assertEquals(4, entity.getRetransmittedPackageIdList().length);
         assertArrayEquals(new byte[]{1, 2, 3, 4}, entity.getRetransmittedPackageIdList());
     }
+
+    @Test
+    void testNoRetransmissionRequired() {
+        final BuiltinMessage8800 entity = new BuiltinMessage8800()
+                .setMultimediaId(11).setRetransmittedPackageCount((short) 0)
+                .setRetransmittedPackageIdList(new byte[0]);
+        final String hex = "7e88004005010000000001391234432900000000000b00b37e";
+        assertEquals(hex, encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019));
+        final BuiltinMessage8800 decoded = decodeAsEntity(BuiltinMessage8800.class, hex);
+        assertEquals(11, decoded.getMultimediaId());
+        assertEquals(0, decoded.getRetransmittedPackageCount());
+        assertNull(decoded.getRetransmittedPackageIdList());
+    }
+
 }

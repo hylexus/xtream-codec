@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -146,7 +147,7 @@ public class BuiltinMessage8600V2019 {
          */
         // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
         @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
-        private LocalDateTime startTime;
+        private @Nullable LocalDateTime startTime;
 
         /**
          * 结束时间 BCD[6]
@@ -155,7 +156,7 @@ public class BuiltinMessage8600V2019 {
          */
         // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
         @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
-        private LocalDateTime endTime;
+        private @Nullable LocalDateTime endTime;
 
         @SuppressWarnings("unused")
         public boolean hasTimeProperty() {
@@ -267,20 +268,20 @@ public class BuiltinMessage8600V2019 {
             return this;
         }
 
-        public LocalDateTime getStartTime() {
+        public @Nullable LocalDateTime getStartTime() {
             return startTime;
         }
 
-        public CircularArea setStartTime(LocalDateTime startTime) {
+        public CircularArea setStartTime(@Nullable LocalDateTime startTime) {
             this.startTime = startTime;
             return this;
         }
 
-        public LocalDateTime getEndTime() {
+        public @Nullable LocalDateTime getEndTime() {
             return endTime;
         }
 
-        public CircularArea setEndTime(LocalDateTime endTime) {
+        public CircularArea setEndTime(@Nullable LocalDateTime endTime) {
             this.endTime = endTime;
             return this;
         }

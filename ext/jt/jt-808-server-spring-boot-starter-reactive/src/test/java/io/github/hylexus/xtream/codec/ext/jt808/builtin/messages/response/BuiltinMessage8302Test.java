@@ -54,6 +54,8 @@ class BuiltinMessage8302Test extends BaseCodecTest {
         assertEquals(1, entity.getIdentifier());
         assertEquals("你是谁?", entity.getQuestion());
         assertEquals(2, entity.getCandidateAnswerList().size());
+        assertEquals(1, entity.getCandidateAnswerList().getFirst().getAnswerId());
+        assertEquals(2, entity.getCandidateAnswerList().getLast().getAnswerId());
         assertEquals("张三", entity.getCandidateAnswerList().getFirst().getAnswer());
         assertEquals("李四", entity.getCandidateAnswerList().getLast().getAnswer());
     }

@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.sample8105.codec.Message8105CodecSample;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.sample8105.types.CommandValue;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -49,7 +50,7 @@ public class BuiltinMessage8105 {
             // 这里是一个自定义的编解码器
             fieldCodec = Message8105CodecSample.class
     )
-    private List<CommandValue<?>> commandValue;
+    private @Nullable List<CommandValue<?>> commandValue;
 
     @SuppressWarnings("lombok")
     public short getCommandWord() {
@@ -61,11 +62,11 @@ public class BuiltinMessage8105 {
         return this;
     }
 
-    public List<CommandValue<?>> getCommandValue() {
+    public @Nullable List<CommandValue<?>> getCommandValue() {
         return commandValue;
     }
 
-    public BuiltinMessage8105 setCommandValue(List<CommandValue<?>> commandValue) {
+    public BuiltinMessage8105 setCommandValue(@Nullable List<CommandValue<?>> commandValue) {
         this.commandValue = commandValue;
         return this;
     }

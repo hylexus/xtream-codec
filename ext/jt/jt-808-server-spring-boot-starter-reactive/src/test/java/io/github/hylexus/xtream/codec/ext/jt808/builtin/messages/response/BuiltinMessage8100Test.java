@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BuiltinMessage8100Test extends BaseCodecTest {
 
@@ -42,6 +43,19 @@ class BuiltinMessage8100Test extends BaseCodecTest {
         assertEquals(111, entity.getClientFlowId());
         assertEquals(0, entity.getResult());
         assertEquals("ok..ok..ok", entity.getAuthCode());
+    }
+
+
+    @Test
+    void testFailedRegistrationOmitsAuthCode() {
+        final BuiltinMessage8100 entity = new BuiltinMessage8100()
+                .setClientFlowId(111).setResult((short) 2).setAuthCode("不应发送");
+        final String hex = "7e8100400301000000000139123443290000006f02da7e";
+        assertEquals(hex, encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019));
+        final BuiltinMessage8100 decoded = decodeAsEntity(BuiltinMessage8100.class, hex);
+        assertEquals(111, decoded.getClientFlowId());
+        assertEquals(2, decoded.getResult());
+        assertNull(decoded.getAuthCode());
     }
 
 }

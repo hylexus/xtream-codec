@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.codec.BuiltinLocationMessageExtraItemFieldCodec;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -69,7 +70,7 @@ public class BuiltinMessage0200Sample2 {
 
     // 长度：消息体长度减去前面的 28 字节
     @Preset.JtStyle.Object(desc = "附加项", fieldCodec = BuiltinLocationMessageExtraItemFieldCodec.class)
-    private Map<Short, Object> extraItems;
+    private @Nullable Map<Short, Object> extraItems;
 
     public long getAlarmFlag() {
         return alarmFlag;
@@ -143,11 +144,11 @@ public class BuiltinMessage0200Sample2 {
         return this;
     }
 
-    public Map<Short, Object> getExtraItems() {
+    public @Nullable Map<Short, Object> getExtraItems() {
         return extraItems;
     }
 
-    public BuiltinMessage0200Sample2 setExtraItems(Map<Short, Object> extraItems) {
+    public BuiltinMessage0200Sample2 setExtraItems(@Nullable Map<Short, Object> extraItems) {
         this.extraItems = extraItems;
         return this;
     }

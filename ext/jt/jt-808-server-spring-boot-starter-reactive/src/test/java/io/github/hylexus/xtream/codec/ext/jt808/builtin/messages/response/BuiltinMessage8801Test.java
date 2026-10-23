@@ -47,6 +47,7 @@ class BuiltinMessage8801Test extends BaseCodecTest {
         final BuiltinMessage8801 entity = decodeAsEntity(BuiltinMessage8801.class, hex);
         assertEquals(22, entity.getChanelId());
         assertEquals(0, entity.getCommand());
+        assertEquals(0, entity.getDuration());
         assertEquals(1, entity.getSaveFlag());
         assertEquals(0xff, entity.getResolution());
         assertEquals(3, entity.getQuality());

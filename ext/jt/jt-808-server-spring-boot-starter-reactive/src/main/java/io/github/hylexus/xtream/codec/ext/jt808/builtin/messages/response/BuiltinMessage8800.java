@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.jackson.XtreamCodecDebugJsonSerializer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.StringJoiner;
@@ -51,7 +52,7 @@ public class BuiltinMessage8800 {
     // @Preset.JtStyle.Bytes(lengthExpression = "2 * getRetransmittedPackageCount()", desc = "重传包 ID 列表")
     @Preset.JtStyle.Bytes(lengthExpressions = @Expression(spel = "2 * getRetransmittedPackageCount()", mvel = "2 * self.getRetransmittedPackageCount()", aviator = "2 * self.retransmittedPackageCount"), desc = "重传包 ID 列表")
     @JsonSerialize(using = XtreamCodecDebugJsonSerializer.class)
-    private byte[] retransmittedPackageIdList;
+    private byte @Nullable [] retransmittedPackageIdList;
 
     @SuppressWarnings("lombok")
     public short getRetransmittedPackageCount() {
@@ -72,11 +73,11 @@ public class BuiltinMessage8800 {
         return this;
     }
 
-    public byte[] getRetransmittedPackageIdList() {
+    public byte @Nullable [] getRetransmittedPackageIdList() {
         return retransmittedPackageIdList;
     }
 
-    public BuiltinMessage8800 setRetransmittedPackageIdList(byte[] retransmittedPackageIdList) {
+    public BuiltinMessage8800 setRetransmittedPackageIdList(byte @Nullable [] retransmittedPackageIdList) {
         this.retransmittedPackageIdList = retransmittedPackageIdList;
         return this;
     }

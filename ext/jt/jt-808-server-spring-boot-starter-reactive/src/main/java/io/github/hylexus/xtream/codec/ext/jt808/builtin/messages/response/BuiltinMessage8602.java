@@ -21,6 +21,7 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -140,7 +141,7 @@ public class BuiltinMessage8602 {
         @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"), desc = "起始时间 BCD[6]")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime startTime;
+        private @Nullable LocalDateTime startTime;
 
         /**
          * 结束时间 BCD[6]
@@ -151,7 +152,7 @@ public class BuiltinMessage8602 {
         @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"), desc = "结束时间 BCD[6]")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime endTime;
+        private @Nullable LocalDateTime endTime;
 
         public boolean hasTimeProperty() {
             return Numbers.getBitAt(this.areaProps, 0) == 1;
@@ -245,20 +246,20 @@ public class BuiltinMessage8602 {
             return this;
         }
 
-        public LocalDateTime getStartTime() {
+        public @Nullable LocalDateTime getStartTime() {
             return startTime;
         }
 
-        public RectangularArea setStartTime(LocalDateTime startTime) {
+        public RectangularArea setStartTime(@Nullable LocalDateTime startTime) {
             this.startTime = startTime;
             return this;
         }
 
-        public LocalDateTime getEndTime() {
+        public @Nullable LocalDateTime getEndTime() {
             return endTime;
         }
 
-        public RectangularArea setEndTime(LocalDateTime endTime) {
+        public RectangularArea setEndTime(@Nullable LocalDateTime endTime) {
             this.endTime = endTime;
             return this;
         }

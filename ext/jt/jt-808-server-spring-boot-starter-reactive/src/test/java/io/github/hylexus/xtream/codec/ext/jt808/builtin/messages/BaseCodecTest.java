@@ -135,6 +135,29 @@ public class BaseCodecTest {
         }
     }
 
+    protected String encodeBody(Object instance) {
+        final ByteBuf buffer = allocator.buffer();
+        try {
+            entityCodec.encode(instance, buffer);
+            return FormatUtils.toHexString(buffer);
+        } finally {
+            buffer.release();
+            assertEquals(0, buffer.refCnt());
+        }
+    }
+
+    protected <T> T decodeBody(Class<T> entityClass, String hex) {
+        final ByteBuf buffer = XtreamBytes.byteBufFromHexString(allocator, hex);
+        try {
+            final T entity = entityCodec.decode(entityClass, buffer);
+            assertEquals(0, buffer.readableBytes());
+            return entity;
+        } finally {
+            buffer.release();
+            assertEquals(0, buffer.refCnt());
+        }
+    }
+
     protected <T> T decodeAsEntity(Class<T> entityClass, String hex) {
         return decodeAsEntity(null, entityClass, hex);
     }

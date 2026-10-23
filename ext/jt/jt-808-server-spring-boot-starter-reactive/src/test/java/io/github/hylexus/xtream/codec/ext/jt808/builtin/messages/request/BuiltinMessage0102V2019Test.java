@@ -51,6 +51,7 @@ class BuiltinMessage0102V2019Test extends BaseCodecTest {
         final String authCode = "这是鉴权码111";
         assertEquals(authCode, entity.getAuthenticationCode());
         assertEquals("111111111111111", entity.getImei());
+        assertEquals("1.2.3010" + "\0".repeat(12), entity.getSoftwareVersion());
         assertEquals("1.2.3010", entity.getFormatedSoftwareVersion());
     }
 }

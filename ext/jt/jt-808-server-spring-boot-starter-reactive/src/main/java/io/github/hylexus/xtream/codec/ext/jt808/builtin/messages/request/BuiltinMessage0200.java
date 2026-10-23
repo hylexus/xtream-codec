@@ -124,13 +124,13 @@ public class BuiltinMessage0200 {
     ///
     /// alarmFlag 的 bit 位 → EnumSet<AlarmFlag>，编码时通过 write() 回写 alarmFlag
     @DerivedField(source = "alarmFlag", using = AlarmFlagTransformer.class, reverseSource = true)
-    private transient Set<AlarmFlag> alarmFlags;
+    private transient @Nullable Set<AlarmFlag> alarmFlags;
 
     /// 「可选」示例2: 自定义 Transformer + reverseSource=false（只读衍生，不参与编码回写）
     ///
     /// alarmFlag → 人类可读的报警描述字符串，仅解码时计算，不影响编码
     @DerivedField(source = "alarmFlag", using = AlarmDescriptionTransformer.class, reverseSource = false)
-    private transient String alarmDescription;
+    private transient @Nullable String alarmDescription;
 
     /// 「可选」示例3: EnumSetBitTransformer + reverseSource=true（回环编解码）
     ///
@@ -138,7 +138,7 @@ public class BuiltinMessage0200 {
     ///
     /// 编码时通过 write() 按位 OR 回写 status，不同 bitOffset 互不干扰
     @DerivedField(source = "status", using = StatusBitTransformer.class, reverseSource = true)
-    private transient Set<StatusBit> statusFlags;
+    private transient @Nullable Set<StatusBit> statusFlags;
 
     @Preset.JtStyle.Dword(desc = "纬度")
     private long latitude;
@@ -253,7 +253,7 @@ public class BuiltinMessage0200 {
                     )
             )
     )
-    private Map<Short, Object> extraItems;
+    private @Nullable Map<Short, Object> extraItems;
 
     public long getAlarmFlag() {
         return alarmFlag;
@@ -354,11 +354,11 @@ public class BuiltinMessage0200 {
         return this;
     }
 
-    public Map<Short, Object> getExtraItems() {
+    public @Nullable Map<Short, Object> getExtraItems() {
         return extraItems;
     }
 
-    public BuiltinMessage0200 setExtraItems(Map<Short, Object> extraItems) {
+    public BuiltinMessage0200 setExtraItems(@Nullable Map<Short, Object> extraItems) {
         this.extraItems = extraItems;
         return this;
     }

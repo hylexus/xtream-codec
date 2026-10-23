@@ -37,9 +37,14 @@ class BuiltinMessage0003Test extends BaseCodecTest {
     void testDecode() {
         final String hex = "000340000100000000013912344329000036";
         final Jt808Request jt808Request = decodeAsRequest(hex);
-        final BuiltinMessage0003 entity = decodeAsEntity(BuiltinMessage0003.class, hex);
-        assertNotNull(entity);
-        assertEquals(0x0003, jt808Request.header().messageId());
+        try {
+            final BuiltinMessage0003 entity = decodeAsEntity(BuiltinMessage0003.class, hex);
+            assertNotNull(entity);
+            assertEquals(0x0003, jt808Request.header().messageId());
+        } finally {
+            jt808Request.release();
+            assertEquals(0, jt808Request.payload().refCnt());
+        }
     }
 
 }

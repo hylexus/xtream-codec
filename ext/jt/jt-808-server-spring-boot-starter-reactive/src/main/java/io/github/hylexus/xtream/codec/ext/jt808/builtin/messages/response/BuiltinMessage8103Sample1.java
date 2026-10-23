@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.ByteArrayContainer;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
@@ -66,7 +67,7 @@ public class BuiltinMessage8103Sample1 {
         @Preset.JtStyle.Byte
         private short parameterLength;
 
-        @Preset.JtStyle.Bytes
+        @Preset.JtStyle.Bytes(lengthExpressions = @Expression(spel = "getParameterLength()", mvel = "self.getParameterLength()", aviator = "self.parameterLength"))
         private ByteArrayContainer parameterValue;
 
         public ParameterItem() {

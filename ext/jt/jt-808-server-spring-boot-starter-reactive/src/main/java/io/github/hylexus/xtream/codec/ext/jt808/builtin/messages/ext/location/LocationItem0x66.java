@@ -16,7 +16,9 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location;
 
+import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.StringJoiner;
  * 苏标-表-4-18 胎压监测系统报警信息数据格式
  *
  * @author hylexus
+ * @author Codex (AI)
  */
 public class LocationItem0x66 {
 
@@ -75,8 +78,11 @@ public class LocationItem0x66 {
     private short eventItemCount;
 
     // 报警/事件信息列表
-    @Preset.JtStyle.List(condition = "getEventItemCount() > 0")
-    private List<EventItem> eventItemList;
+    @Preset.JtStyle.List(
+            condition = "getEventItemCount() > 0",
+            iterationTimesExpressions = @Expression(spel = "getEventItemCount()", mvel = "self.getEventItemCount()", aviator = "self.eventItemCount")
+    )
+    private @Nullable List<EventItem> eventItemList;
 
     public long getAlarmId() {
         return alarmId;
@@ -168,11 +174,11 @@ public class LocationItem0x66 {
         return this;
     }
 
-    public List<EventItem> getEventItemList() {
+    public @Nullable List<EventItem> getEventItemList() {
         return eventItemList;
     }
 
-    public LocationItem0x66 setEventItemList(List<EventItem> eventItemList) {
+    public LocationItem0x66 setEventItemList(@Nullable List<EventItem> eventItemList) {
         this.eventItemList = eventItemList;
         return this;
     }

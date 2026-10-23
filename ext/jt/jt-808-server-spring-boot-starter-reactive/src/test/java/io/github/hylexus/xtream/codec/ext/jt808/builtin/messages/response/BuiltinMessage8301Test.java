@@ -46,6 +46,9 @@ class BuiltinMessage8301Test extends BaseCodecTest {
         final BuiltinMessage8301 entity = decodeAsEntity(BuiltinMessage8301.class, hex);
         assertEquals(1, entity.getEventType());
         assertEquals(2, entity.getEventCount());
+        assertEquals(2, entity.getEventItemList().size());
+        assertEquals(1, entity.getEventItemList().getFirst().getEventId());
+        assertEquals(2, entity.getEventItemList().getLast().getEventId());
         assertEquals("haha", entity.getEventItemList().getFirst().getEventContent());
         assertEquals("heihei", entity.getEventItemList().getLast().getEventContent());
     }

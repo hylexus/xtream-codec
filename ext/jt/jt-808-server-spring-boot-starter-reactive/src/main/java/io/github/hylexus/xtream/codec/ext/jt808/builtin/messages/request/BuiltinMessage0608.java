@@ -54,7 +54,7 @@ public class BuiltinMessage0608 {
     private long count;
 
     @Preset.JtStyle.List(fieldCodec = BuiltinMessage0608.Message0608FieldCodec.class)
-    private List<Object> dataList;
+    private @Nullable List<Object> dataList;
 
     public short getType() {
         return type;
@@ -74,11 +74,11 @@ public class BuiltinMessage0608 {
         return this;
     }
 
-    public List<Object> getDataList() {
+    public @Nullable List<Object> getDataList() {
         return dataList;
     }
 
-    public BuiltinMessage0608 setDataList(List<Object> dataList) {
+    public BuiltinMessage0608 setDataList(@Nullable List<Object> dataList) {
         this.dataList = dataList;
         return this;
     }

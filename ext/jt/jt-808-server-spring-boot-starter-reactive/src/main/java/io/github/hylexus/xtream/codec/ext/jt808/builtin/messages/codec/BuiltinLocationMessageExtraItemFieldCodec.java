@@ -46,7 +46,7 @@ public class BuiltinLocationMessageExtraItemFieldCodec
         this.registerValueFieldCodec((short) 0x06, I16FieldCodecs.SHORT_INSTANCE);
         this.registerValueFieldCodec((short) 0x25, U32FieldCodecs.LONG_INSTANCE);
         this.registerValueFieldCodec((short) 0x2a, U16FieldCodecs.INTEGER_INSTANCE);
-        this.registerValueFieldCodec((short) 0x2b, U16FieldCodecs.INTEGER_INSTANCE);
+        this.registerValueFieldCodec((short) 0x2b, I32FieldCodecs.INTEGER_INSTANCE);
         this.registerValueFieldCodec((short) 0x30, U8FieldCodecs.SHORT_INSTANCE);
         this.registerValueFieldCodec((short) 0x31, U8FieldCodecs.SHORT_INSTANCE);
 

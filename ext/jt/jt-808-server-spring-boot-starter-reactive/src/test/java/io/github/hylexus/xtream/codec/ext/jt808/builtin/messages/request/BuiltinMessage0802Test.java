@@ -78,6 +78,7 @@ class BuiltinMessage0802Test extends BaseCodecTest {
         final BuiltinMessage0802 entity = decodeAsEntity(BuiltinMessage0802.class, hex);
         assertEquals(111, entity.getFlowId());
         assertEquals(2, entity.getMultimediaDataItemCount());
+        assertEquals(2, entity.getItemList().size());
 
         final BuiltinMessage0802.Item first = entity.getItemList().getFirst();
         assertEquals(1, first.getMultimediaId());
@@ -110,5 +111,6 @@ class BuiltinMessage0802Test extends BaseCodecTest {
         assertEquals(777, location2.getAltitude());
         assertEquals(67, location2.getSpeed());
         assertEquals(90, location2.getDirection());
+        assertEquals(time, location2.getTime());
     }
 }

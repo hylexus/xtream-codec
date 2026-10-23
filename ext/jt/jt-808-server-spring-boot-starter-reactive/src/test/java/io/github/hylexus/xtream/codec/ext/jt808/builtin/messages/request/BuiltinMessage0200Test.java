@@ -56,6 +56,7 @@ class BuiltinMessage0200Test extends BaseCodecTest {
             assertEquals(expected.getTime(), actual.getTime());
             final Map<Short, Object> expectedExtraItems = expected.getExtraItems();
             final Map<Short, Object> actualExtraItems = actual.getExtraItems();
+            assertEquals(expectedExtraItems.keySet(), actualExtraItems.keySet());
             assertEquals(expectedExtraItems.get((short) 0x01), actualExtraItems.get((short) 0x01));
             assertEquals(expectedExtraItems.get((short) 0x02), actualExtraItems.get((short) 0x02));
             assertEquals(expectedExtraItems.get((short) 0x03), actualExtraItems.get((short) 0x03));
@@ -71,6 +72,7 @@ class BuiltinMessage0200Test extends BaseCodecTest {
                 assertEquals(expectedExtraItems.get((short) 0x11), actualExtraItems.get((short) 0x11));
             }
             assertEquals(expectedExtraItems.get((short) 0x12), actualExtraItems.get((short) 0x12));
+            assertEquals(expectedExtraItems.get((short) 0x13), actualExtraItems.get((short) 0x13));
             assertEquals(expectedExtraItems.get((short) 0x25), actualExtraItems.get((short) 0x25));
             assertEquals(expectedExtraItems.get((short) 0x2A), actualExtraItems.get((short) 0x2A));
             assertEquals(expectedExtraItems.get((short) 0x2B), actualExtraItems.get((short) 0x2B));
@@ -147,6 +149,36 @@ class BuiltinMessage0200Test extends BaseCodecTest {
             // bits 8~9 为 0b00，对应 CARGO_EMPTY（空车）
             assertEquals(Set.of(StatusBit.ACC_ON, StatusBit.GPS_LOCKED, StatusBit.CARGO_EMPTY), actual.getStatusFlags());
         }, true);
+    }
+
+    @Test
+    void testLocationTypeZeroOmitsLocationId() {
+        final BuiltinMessage0200 entity = new BuiltinMessage0200()
+                .setAlarmFlag(0)
+                .setStatus(0)
+                .setLatitude(31000562)
+                .setLongitude(121451372)
+                .setAltitude(666)
+                .setSpeed(78)
+                .setDirection(0)
+                .setTime(time)
+                .setExtraItems(Map.of((short) 0x11, new BuiltinMessage0200.Item0x11((short) 0, 123L)));
+        final String expectedHex = "7e0200401f01000000000139123443290000000000000000000001d907f2073d336c029a004e0000141021195109110100c27e";
+        assertEquals(expectedHex, encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019));
+
+        final BuiltinMessage0200 actual = decodeAsEntity(BuiltinMessage0200.class, expectedHex);
+        assertEquals(0, actual.getAlarmFlag());
+        assertEquals(0, actual.getStatus());
+        assertEquals(31000562, actual.getLatitude());
+        assertEquals(121451372, actual.getLongitude());
+        assertEquals(666, actual.getAltitude());
+        assertEquals(78, actual.getSpeed());
+        assertEquals(0, actual.getDirection());
+        assertEquals(time, actual.getTime());
+        assertEquals(Set.of((short) 0x11), actual.getExtraItems().keySet());
+        final BuiltinMessage0200.Item0x11 item = (BuiltinMessage0200.Item0x11) actual.getExtraItems().get((short) 0x11);
+        assertEquals(0, item.locationType());
+        assertNull(item.locationId());
     }
 
     private static void compareItem64(Map<Short, Object> expectedExtraItems, Map<Short, Object> actualExtraItems) {

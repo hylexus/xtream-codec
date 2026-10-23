@@ -24,15 +24,16 @@ import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriber;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import io.netty.buffer.ByteBuf;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MixedEntity02Test extends BaseCodecTest {
 
@@ -43,16 +44,16 @@ class MixedEntity02Test extends BaseCodecTest {
         final List<Object> dataList = new ArrayList<>();
         dataList.add(u32("报警标志", 111L));
         dataList.add(u32("状态", 222L));
+        final Map<DataField.U8, DataField> values = new LinkedHashMap<>();
+        // 里程，DWORD，1/10km，对应车上里程表读数
+        values.put(u8((short) 0x01), u32(123L));
+        // 油量，WORD，1/10L，对应车上油量表读数
+        values.put(u8((short) 0x02), u16(88));
+        values.put(u8((short) 0xe1), gbkString("测试"));
         final DataField.Dict<DataField.U8> extraItems = dict(
                 DataField.U8.class,
                 LengthFieldType.u8,
-                Map.of(
-                        // 里程，DWORD，1/10km，对应车上里程表读数
-                        u8((short) 0x01), u32(123L),
-                        // 油量，WORD，1/10L，对应车上油量表读数
-                        u8((short) 0x02), u16(88),
-                        u8((short) 0xe1), gbkString("测试")
-                )
+                values
         );
         final MixedEntity02 mixedEntity02 = new MixedEntity02()
                 .setLatitude(31)
@@ -66,15 +67,23 @@ class MixedEntity02Test extends BaseCodecTest {
         dataList.add(mixedEntity02);
 
         final ByteBuf encodeBuffer = responseEncoder.encode(dataList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
-        System.out.println(FormatUtils.toHexString(encodeBuffer));
-        Assertions.assertEquals(1, encodeBuffer.refCnt());
-        encodeBuffer.release();
+        try {
+            assertEquals("7e0200003201391234432300000000006f000000de0000001f0000007903e80050000125111515431901040000007b02020058e104b2e2cad401040000007bbe7e",
+                    FormatUtils.toHexString(encodeBuffer));
+        } finally {
+            encodeBuffer.release();
+            assertEquals(0, encodeBuffer.refCnt());
+        }
 
         final ByteBuf buffer = allocator.buffer();
-        final CodecTracker tracker = new CodecTracker();
-        entityCodec.encode(dataList, buffer, tracker);
-        tracker.visit();
-        Assertions.assertEquals(1, buffer.refCnt());
-        buffer.release();
+        try {
+            final CodecTracker tracker = new CodecTracker();
+            entityCodec.encode(dataList, buffer, tracker);
+            assertEquals("0000006f000000de0000001f0000007903e80050000125111515431901040000007b02020058e104b2e2cad401040000007b",
+                    FormatUtils.toHexString(buffer));
+        } finally {
+            buffer.release();
+            assertEquals(0, buffer.refCnt());
+        }
     }
 }

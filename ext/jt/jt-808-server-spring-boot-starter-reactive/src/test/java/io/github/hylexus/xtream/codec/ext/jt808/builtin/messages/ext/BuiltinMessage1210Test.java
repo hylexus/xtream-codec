@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author hylexus
@@ -52,6 +53,8 @@ class BuiltinMessage1210Test extends BaseCodecTest {
         final BuiltinMessage1210.AttachmentItem attachmentItem = entity.getAttachmentItemList().getFirst();
         assertEquals("00_64_6401_0_lrveywwdibs9pe6onrbz6hvb2sfvp91b.jpg", attachmentItem.getFileName());
         assertEquals(16364, attachmentItem.getFileSize());
+        assertEquals(0, attachmentItem.getFileType());
+        assertNull(attachmentItem.getGroup());
     }
 
     @Test
@@ -76,6 +79,7 @@ class BuiltinMessage1210Test extends BaseCodecTest {
                         )
                 );
 
+        entity.getAttachmentItemList().getFirst().setFileType((short) 8).setGroup(entity);
         final String hex = encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019, 0x1210);
         assertEquals("7e1210406f0100000000013912344329000031323334353637313233343536372409252055320101006c72766579777764696273397065366f6e72627a36687662327366767039316200013130305f36345f363430315f305f6c72766579777764696273397065366f6e72627a3668766232736676703931622e6a706700003fec967e", hex);
     }

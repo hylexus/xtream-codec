@@ -20,6 +20,8 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBitOperator;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -85,6 +87,7 @@ class BuiltinMessage8606Test extends BaseCodecTest {
         assertEquals(startTime, entity.getStartTime());
         assertEquals(endTime, entity.getEndTime());
         assertEquals(2, entity.getItemList().size());
+        assertEquals(2, entity.getCount());
 
         final BuiltinMessage8606.Item first = entity.getItemList().get(0);
         assertEquals(111, first.getId());
@@ -111,4 +114,39 @@ class BuiltinMessage8606Test extends BaseCodecTest {
         assertNull(second.getSpeedingDuration());
 
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1, 7e8606001e01391234432300000000029a000000010000006f0000045701d907f2073d336c1401270f0457637e",
+            "2, 7e8606001d01391234432300000000029a000000010000006f0000045701d907f2073d336c1402006f0a7d017e"
+    })
+    void testIndependentRoadSectionProperties(short props, String hex) {
+        final BuiltinMessage8606 entity = new BuiltinMessage8606().setRouteId(666).setRouteProps(0)
+                .setStartTime(startTime).setEndTime(endTime).setCount(1).setItemList(List.of(
+                        new BuiltinMessage8606.Item().setId(111).setRouteId(1111)
+                                .setLatitude(31000562).setLongitude(121451372).setRouteWidth((short) 20)
+                                .setRouteProps(props).setLongDriveThreshold(9999).setShortDriveThreshold(1111)
+                                .setMaxSpeedLimit(111).setSpeedingDuration((short) 10)
+                ));
+        assertEquals(hex, encode(entity, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
+        final BuiltinMessage8606 decoded = decodeAsEntity(BuiltinMessage8606.class, hex);
+        assertEquals(666, decoded.getRouteId());
+        assertEquals(0, decoded.getRouteProps());
+        assertNull(decoded.getStartTime());
+        assertNull(decoded.getEndTime());
+        assertEquals(1, decoded.getCount());
+        assertEquals(1, decoded.getItemList().size());
+        final BuiltinMessage8606.Item item = decoded.getItemList().getFirst();
+        assertEquals(111, item.getId());
+        assertEquals(1111, item.getRouteId());
+        assertEquals(31000562, item.getLatitude());
+        assertEquals(121451372, item.getLongitude());
+        assertEquals(20, item.getRouteWidth());
+        assertEquals(props, item.getRouteProps());
+        assertEquals(props == 1 ? 9999 : null, item.getLongDriveThreshold());
+        assertEquals(props == 1 ? 1111 : null, item.getShortDriveThreshold());
+        assertEquals(props == 2 ? 111 : null, item.getMaxSpeedLimit());
+        assertEquals(props == 2 ? (short) 10 : null, item.getSpeedingDuration());
+    }
+
 }

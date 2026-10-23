@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext.location.AlarmIdentifier;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -155,7 +156,7 @@ public class BuiltinMessage1210 {
         // 这个属性不在报文里  由外部赋值
         private short fileType;
         // 这个属性不在报文里  由外部赋值
-        private BuiltinMessage1210 group;
+        private @Nullable BuiltinMessage1210 group;
 
         public String getFileName() {
             return fileName;
@@ -184,11 +185,11 @@ public class BuiltinMessage1210 {
             return this;
         }
 
-        public BuiltinMessage1210 getGroup() {
+        public @Nullable BuiltinMessage1210 getGroup() {
             return group;
         }
 
-        public AttachmentItem setGroup(BuiltinMessage1210 group) {
+        public AttachmentItem setGroup(@Nullable BuiltinMessage1210 group) {
             this.group = group;
             return this;
         }

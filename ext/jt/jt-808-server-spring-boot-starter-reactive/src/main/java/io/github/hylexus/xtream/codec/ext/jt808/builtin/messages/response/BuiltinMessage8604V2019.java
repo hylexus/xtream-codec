@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.utils.Numbers;
 import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,7 +65,7 @@ public class BuiltinMessage8604V2019 {
      */
     // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
     @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
-    private LocalDateTime startTime;
+    private @Nullable LocalDateTime startTime;
 
     /**
      * 结束时间 BCD[6]
@@ -73,7 +74,7 @@ public class BuiltinMessage8604V2019 {
      */
     // @Preset.JtStyle.BcdDateTime(condition = "hasTimeProperty()")
     @Preset.JtStyle.BcdDateTime(conditions = @Expression(spel = "hasTimeProperty()", mvel = "self.hasTimeProperty()", aviator = "self.hasTimeProperty"))
-    private LocalDateTime endTime;
+    private @Nullable LocalDateTime endTime;
 
     public boolean hasTimeProperty() {
         return Numbers.getBitAt(this.areaProps, 0) == 1;
@@ -122,7 +123,7 @@ public class BuiltinMessage8604V2019 {
     /**
      * 顶点项
      */
-    @Preset.JtStyle.List
+    @Preset.JtStyle.List(iterationTimesExpressions = @Expression(spel = "getPointCount()", mvel = "self.getPointCount()", aviator = "self.pointCount"))
     private List<Point> pointList;
 
     /**
@@ -141,7 +142,7 @@ public class BuiltinMessage8604V2019 {
     /**
      * 区域名称
      */
-    @Preset.JtStyle.Str
+    @Preset.JtStyle.Str(lengthExpressions = @Expression(spel = "getAreaNameLength()", mvel = "self.getAreaNameLength()", aviator = "self.areaNameLength"))
     private String areaName;
 
     public long getAreaId() {
@@ -162,20 +163,20 @@ public class BuiltinMessage8604V2019 {
         return this;
     }
 
-    public LocalDateTime getStartTime() {
+    public @Nullable LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public BuiltinMessage8604V2019 setStartTime(LocalDateTime startTime) {
+    public BuiltinMessage8604V2019 setStartTime(@Nullable LocalDateTime startTime) {
         this.startTime = startTime;
         return this;
     }
 
-    public LocalDateTime getEndTime() {
+    public @Nullable LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public BuiltinMessage8604V2019 setEndTime(LocalDateTime endTime) {
+    public BuiltinMessage8604V2019 setEndTime(@Nullable LocalDateTime endTime) {
         this.endTime = endTime;
         return this;
     }

@@ -46,24 +46,42 @@ class BuiltinMessage0104SampleTLVTest extends BaseCodecTest {
                 .setParameterCount((short) parameterItems.size())
                 .setParameterItems(parameterItems);
 
-        codec(
-                Jt808ProtocolVersion.VERSION_2019, terminalId2019,
-                instance,
-                (expected, actual, hexString) -> {
-                    assertEquals(expected.getFlowId(), actual.getFlowId());
-                    assertEquals(expected.getParameterCount(), actual.getParameterCount());
-                    final List<TLV> expectedParameterItems = expected.getParameterItems();
-                    final List<TLV> actualParameterItems = actual.getParameterItems();
-                    assertEquals(expectedParameterItems.size(), actualParameterItems.size());
-                    assertEquals(((DataField.U32) (expectedParameterItems.get(0).value())).value(), actualParameterItems.get(0).value());
-                    assertEquals(((DataField.GbkString) (expectedParameterItems.get(1).value())).value(), actualParameterItems.get(1).value());
-                    assertEquals(((DataField.GbkString) (expectedParameterItems.get(2).value())).value(), actualParameterItems.get(2).value());
-                    assertEquals(((DataField.GbkString) (expectedParameterItems.get(3).value())).value(), actualParameterItems.get(3).value());
-                    assertEquals(((DataField.U16) (expectedParameterItems.get(4).value())).value(), actualParameterItems.get(4).value());
-                    assertEquals(((DataField.U16) (expectedParameterItems.get(5).value())).value(), actualParameterItems.get(5).value());
-                    assertEquals(((DataField.U8) (expectedParameterItems.get(6).value())).value(), actualParameterItems.get(6).value());
-                },
-                true
-        );
+        final String expectedHex = "7e0104405001000000000139123443290000007b07000000010400000001000000400b3133393030303031313131000000400b3133393030303032323232000000400b31333930303030333333330000008102003e00000082020067000000840101b67e";
+        assertEquals(expectedHex, encode(instance, Jt808ProtocolVersion.VERSION_2019, terminalId2019));
+
+        final BuiltinMessage0104SampleTLV actual = decodeAsEntity(BuiltinMessage0104SampleTLV.class, expectedHex);
+        assertEquals(123, actual.getFlowId());
+        assertEquals(7, actual.getParameterCount());
+        final List<TLV> actualParameterItems = actual.getParameterItems();
+        assertEquals(parameterItems.size(), actualParameterItems.size());
+        final List<Integer> expectedLengths = List.of(4, 11, 11, 11, 2, 2, 1);
+        for (int i = 0; i < parameterItems.size(); i++) {
+            final TLV expectedItem = parameterItems.get(i);
+            final TLV actualItem = actualParameterItems.get(i);
+            assertEquals(expectedItem.tag().value(), actualItem.tag().value());
+            assertEquals(LengthFieldType.u8, actualItem.length().type());
+            assertEquals(expectedLengths.get(i), actualItem.length().value());
+            assertEquals(((DataField) expectedItem.value()).value(), actualItem.value());
+        }
+    }
+
+    @Test
+    void testUnknownParameter() {
+        final BuiltinMessage0104SampleTLV instance = new BuiltinMessage0104SampleTLV()
+                .setFlowId(123)
+                .setParameterCount((short) 1)
+                .setParameterItems(List.of(new TLV(u32(0xf0000001L), LengthFieldType.u8, hexString("01027e7d"))));
+        final String expectedHex = "7e0104400c01000000000139123443290000007b01f00000010401027d027d01b37e";
+        assertEquals(expectedHex, encode(instance, Jt808ProtocolVersion.VERSION_2019, terminalId2019));
+
+        final BuiltinMessage0104SampleTLV actual = decodeAsEntity(BuiltinMessage0104SampleTLV.class, expectedHex);
+        assertEquals(123, actual.getFlowId());
+        assertEquals(1, actual.getParameterCount());
+        assertEquals(1, actual.getParameterItems().size());
+        final TLV item = actual.getParameterItems().getFirst();
+        assertEquals(0xf0000001L, item.tag().value());
+        assertEquals(LengthFieldType.u8, item.length().type());
+        assertEquals(4, item.length().value());
+        assertEquals("01027e7d", item.value());
     }
 }

@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MixedEntity03Test extends BaseCodecTest {
     private final LocalDateTime time = LocalDateTime.of(2025, 11, 15, 15, 43, 19);
@@ -63,6 +64,6 @@ class MixedEntity03Test extends BaseCodecTest {
                         TLV.of(u8((short) 0x31), LengthFieldType.u8, u8((short) 31))
                 ));
         final String hex = this.encode(sourceEntity, Jt808ProtocolVersion.VERSION_2013, terminalId2013);
-        System.out.println(hex);
+        assertEquals("7e02000069013912344323000000000001000000020000001f0000007903e80050000125111515431901040000000b02020016030200210402002c050501020304050602004211050b0000001612060b000000162113070000000b0016212504000000252a02002a2b040000002b30011e31011f0101fa7e", hex);
     }
 }

@@ -18,6 +18,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -42,7 +43,7 @@ public class BuiltinMessage8100 {
 
     // 3. byte[3,x) STRING 鉴权码(只有在成功后才有该字段)
     @Preset.JtStyle.Str(condition = "result == 0", desc = "鉴权码")
-    private String authCode;
+    private @Nullable String authCode;
 
     public int getClientFlowId() {
         return clientFlowId;
@@ -62,11 +63,11 @@ public class BuiltinMessage8100 {
         return this;
     }
 
-    public String getAuthCode() {
+    public @Nullable String getAuthCode() {
         return authCode;
     }
 
-    public BuiltinMessage8100 setAuthCode(String authCode) {
+    public BuiltinMessage8100 setAuthCode(@Nullable String authCode) {
         this.authCode = authCode;
         return this;
     }

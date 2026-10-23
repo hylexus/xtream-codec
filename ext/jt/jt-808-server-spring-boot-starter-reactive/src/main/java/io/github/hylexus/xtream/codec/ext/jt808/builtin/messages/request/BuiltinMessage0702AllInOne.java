@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.core.annotation.Padding;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -41,7 +42,7 @@ public class BuiltinMessage0702AllInOne {
      * <li>0x02：从业资格证IC卡拔出（驾驶员下班）</li>
      */
     @Preset.JtStyle.Byte(version = {2013, 2019}, desc = "状态(2013 || 2019)")
-    private Short status;
+    private @Nullable Short status;
 
     /**
      * 插卡/拔卡时间，YY-MM-DD-hh-mm-ss；
@@ -51,7 +52,7 @@ public class BuiltinMessage0702AllInOne {
     @Preset.JtStyle.BcdDateTime(version = {2013, 2019}, desc = "插卡/拔卡时间(2013 || 2019)")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime time;
+    private @Nullable LocalDateTime time;
 
 
     /**
@@ -65,7 +66,7 @@ public class BuiltinMessage0702AllInOne {
      * 以下字段在IC 卡读取结果等于0x00时才有效。
      */
     @Preset.JtStyle.Byte(version = {2013, 2019}, desc = "IC卡读取结果(2013 || 2019)")
-    private Short icCardReadResult;
+    private @Nullable Short icCardReadResult;
 
     /**
      * 驾驶员姓名
@@ -76,7 +77,7 @@ public class BuiltinMessage0702AllInOne {
 
     @Preset.JtStyle.Str(order = 10, version = 2011, length = 20, desc = "驾驶员身份证编码(2011)")
     @Preset.JtStyle.Str(order = 50, version = 2019, length = 20, desc = "驾驶员身份证编码(2019)")
-    private String driverIdCardNo;
+    private @Nullable String driverIdCardNo;
 
     @Preset.JtStyle.Str(order = 20, version = 2011, length = 40, desc = "从业资格证编码")
     @Preset.JtStyle.Str(order = 20, version = {2013, 2019}, length = 20, paddingRight = @Padding(minEncodedLength = 20), desc = "从业资格证编码")
@@ -89,31 +90,31 @@ public class BuiltinMessage0702AllInOne {
     @Preset.JtStyle.BcdDateTime(order = 40, version = {2013, 2019}, length = 4, pattern = "yyyyMMdd", desc = "到期时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate certificateExpiresDate;
+    private @Nullable LocalDate certificateExpiresDate;
 
-    public Short getStatus() {
+    public @Nullable Short getStatus() {
         return status;
     }
 
-    public BuiltinMessage0702AllInOne setStatus(Short status) {
+    public BuiltinMessage0702AllInOne setStatus(@Nullable Short status) {
         this.status = status;
         return this;
     }
 
-    public LocalDateTime getTime() {
+    public @Nullable LocalDateTime getTime() {
         return time;
     }
 
-    public BuiltinMessage0702AllInOne setTime(LocalDateTime time) {
+    public BuiltinMessage0702AllInOne setTime(@Nullable LocalDateTime time) {
         this.time = time;
         return this;
     }
 
-    public Short getIcCardReadResult() {
+    public @Nullable Short getIcCardReadResult() {
         return icCardReadResult;
     }
 
-    public BuiltinMessage0702AllInOne setIcCardReadResult(Short icCardReadResult) {
+    public BuiltinMessage0702AllInOne setIcCardReadResult(@Nullable Short icCardReadResult) {
         this.icCardReadResult = icCardReadResult;
         return this;
     }
@@ -127,11 +128,11 @@ public class BuiltinMessage0702AllInOne {
         return this;
     }
 
-    public String getDriverIdCardNo() {
+    public @Nullable String getDriverIdCardNo() {
         return driverIdCardNo;
     }
 
-    public BuiltinMessage0702AllInOne setDriverIdCardNo(String driverIdCardNo) {
+    public BuiltinMessage0702AllInOne setDriverIdCardNo(@Nullable String driverIdCardNo) {
         this.driverIdCardNo = driverIdCardNo;
         return this;
     }
@@ -154,11 +155,11 @@ public class BuiltinMessage0702AllInOne {
         return this;
     }
 
-    public LocalDate getCertificateExpiresDate() {
+    public @Nullable LocalDate getCertificateExpiresDate() {
         return certificateExpiresDate;
     }
 
-    public BuiltinMessage0702AllInOne setCertificateExpiresDate(LocalDate certificateExpiresDate) {
+    public BuiltinMessage0702AllInOne setCertificateExpiresDate(@Nullable LocalDate certificateExpiresDate) {
         this.certificateExpiresDate = certificateExpiresDate;
         return this;
     }

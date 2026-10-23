@@ -53,6 +53,11 @@ class BuiltinMessage0104Test extends BaseCodecTest {
         assertEquals(666, entity.getFlowId());
         assertEquals(7, entity.getParameterCount());
         final List<BuiltinMessage0104.ParameterItem> parameterItems = entity.getParameterItems();
+        assertEquals(7, parameterItems.size());
+        assertEquals(List.of(0x0001L, 0x0040L, 0x0040L, 0x0040L, 0x0081L, 0x0082L, 0x0084L),
+                parameterItems.stream().map(BuiltinMessage0104.ParameterItem::getParameterId).toList());
+        assertEquals(List.of(4, 11, 11, 11, 2, 2, 1),
+                parameterItems.stream().map(item -> item.getParameterValue().length()).toList());
         assertEquals(111, parameterItems.getFirst().getParameterValue().asU32());
         assertEquals("13900001111", parameterItems.get(1).getParameterValue().asStringGbk());
         assertEquals("13900002222", parameterItems.get(2).getParameterValue().asStringGbk());

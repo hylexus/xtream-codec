@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -33,13 +34,13 @@ public class BuiltinMessage0102AllInOne {
      */
     @Preset.JtStyle.Str(version = {2011, 2013}, desc = "鉴权码(2011 || 2013)")
     @Preset.JtStyle.Str(version = 2019, prependLengthFieldType = PrependLengthFieldType.u8, desc = "鉴权码(2019)")
-    private String authenticationCode;
+    private @Nullable String authenticationCode;
 
     /**
      * byte[n+1,n+1+15)     BYTE[]  IMEI
      */
     @Preset.JtStyle.Str(version = 2019, length = 15, desc = "IMEI[15](2019)")
-    private String imei;
+    private @Nullable String imei;
 
     /**
      * byte[n+16,n+16+20)   BYTE[20]    软件版本号
@@ -47,38 +48,39 @@ public class BuiltinMessage0102AllInOne {
      * 位数不足时后补 `0x00`
      */
     @Preset.JtStyle.Str(version = 2019, length = 20, desc = "软件版本号[20](2019)")
-    private String softwareVersion;
+    private @Nullable String softwareVersion;
 
     /**
-     * @return 去掉可能存在的后补 `0x00` 的字符串
+     * @return 去掉可能存在的后补 `0x00` 的字符串；当前协议版本无软件版本号时返回 null
      */
-    public String getFormatedSoftwareVersion() {
-        return XtreamBytes.trimTailing(this.getSoftwareVersion(), (byte) 0x00);
+    public @Nullable String getFormatedSoftwareVersion() {
+        final String version = this.getSoftwareVersion();
+        return version == null ? null : XtreamBytes.trimTailing(version, (byte) 0x00);
     }
 
-    public String getAuthenticationCode() {
+    public @Nullable String getAuthenticationCode() {
         return authenticationCode;
     }
 
-    public BuiltinMessage0102AllInOne setAuthenticationCode(String authenticationCode) {
+    public BuiltinMessage0102AllInOne setAuthenticationCode(@Nullable String authenticationCode) {
         this.authenticationCode = authenticationCode;
         return this;
     }
 
-    public String getImei() {
+    public @Nullable String getImei() {
         return imei;
     }
 
-    public BuiltinMessage0102AllInOne setImei(String imei) {
+    public BuiltinMessage0102AllInOne setImei(@Nullable String imei) {
         this.imei = imei;
         return this;
     }
 
-    public String getSoftwareVersion() {
+    public @Nullable String getSoftwareVersion() {
         return softwareVersion;
     }
 
-    public BuiltinMessage0102AllInOne setSoftwareVersion(String softwareVersion) {
+    public BuiltinMessage0102AllInOne setSoftwareVersion(@Nullable String softwareVersion) {
         this.softwareVersion = softwareVersion;
         return this;
     }

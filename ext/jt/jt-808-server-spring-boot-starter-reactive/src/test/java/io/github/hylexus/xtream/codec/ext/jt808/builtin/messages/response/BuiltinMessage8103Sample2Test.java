@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response;
 
+import io.github.hylexus.xtream.codec.core.type.wrapper.BytesDataWrapper;
 import io.github.hylexus.xtream.codec.core.type.wrapper.StringWrapperGbk;
 import io.github.hylexus.xtream.codec.core.type.wrapper.U16Wrapper;
 import io.github.hylexus.xtream.codec.core.type.wrapper.U32Wrapper;
@@ -25,8 +26,10 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HexFormat;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BuiltinMessage8103Sample2Test extends BaseCodecTest {
@@ -54,6 +57,47 @@ class BuiltinMessage8103Sample2Test extends BaseCodecTest {
 
         final String hex = encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019, 0x8103);
         assertEquals("7e8103404e010000000001391234432900000700000001040000006f000000400b3133393030303031313131000000400b3133393030303032323232000000400b31333930303030333333330000008102003e000000820200670000008401013a7e", hex);
+    }
+
+    @Test
+    void testDecode() {
+        final BuiltinMessage8103Sample2 entity = decodeAsEntity(BuiltinMessage8103Sample2.class,
+                "8103404e010000000001391234432900000700000001040000006f000000400b3133393030303031313131000000400b3133393030303032323232000000400b31333930303030333333330000008102003e000000820200670000008401013a");
+        assertEquals(7, entity.getParameterCount());
+        assertEquals(7, entity.getParameterItemList().size());
+        final long[] ids = {0x0001, 0x0040, 0x0040, 0x0040, 0x0081, 0x0082, 0x0084};
+        final int[] lengths = {4, 11, 11, 11, 2, 2, 1};
+        final String[] values = {"0000006f", "3133393030303031313131", "3133393030303032323232",
+                "3133393030303033333333", "003e", "0067", "01"};
+        for (int i = 0; i < ids.length; i++) {
+            final BuiltinMessage8103Sample2.ParameterItem item = entity.getParameterItemList().get(i);
+            assertEquals(ids[i], item.getParameterId());
+            assertEquals(lengths[i], item.getParameterLength());
+            assertEquals(lengths[i], item.getParameterValue().length());
+            assertEquals(values[i], HexFormat.of().formatHex(item.getParameterValue().asBytes()));
+        }
+    }
+
+    @Test
+    void testGbkAndEscapedParameterValues() {
+        final BuiltinMessage8103Sample2 entity = new BuiltinMessage8103Sample2().setParameterCount((short) 2)
+                .setParameterItemList(List.of(
+                        new BuiltinMessage8103Sample2.ParameterItem(0xf0000001L, new BytesDataWrapper(new byte[]{0x7d, 0x7e})),
+                        new BuiltinMessage8103Sample2.ParameterItem(0x0040, new StringWrapperGbk("区域"))
+                ));
+        final String hex = "7e810340110100000000013912344329000002f0000001027d017d020000004004c7f8d3f20e7e";
+        assertEquals(hex, encode(entity, Jt808ProtocolVersion.VERSION_2019, terminalId2019));
+        final BuiltinMessage8103Sample2 decoded = decodeAsEntity(BuiltinMessage8103Sample2.class, hex);
+        assertEquals(2, decoded.getParameterCount());
+        assertEquals(2, decoded.getParameterItemList().size());
+        final BuiltinMessage8103Sample2.ParameterItem first = decoded.getParameterItemList().getFirst();
+        assertEquals(0xf0000001L, first.getParameterId());
+        assertEquals(2, first.getParameterLength());
+        assertArrayEquals(new byte[]{0x7d, 0x7e}, first.getParameterValue().asBytes());
+        final BuiltinMessage8103Sample2.ParameterItem second = decoded.getParameterItemList().getLast();
+        assertEquals(0x0040, second.getParameterId());
+        assertEquals(4, second.getParameterLength());
+        assertEquals("c7f8d3f2", HexFormat.of().formatHex(second.getParameterValue().asBytes()));
     }
 
 }

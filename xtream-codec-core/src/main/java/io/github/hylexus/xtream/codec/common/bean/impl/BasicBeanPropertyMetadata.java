@@ -72,9 +72,9 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
         this.isRecordClass = type.isRecord();
         this.propertyGetter = getter;
         this.propertySetter = setter;
+        this.xtreamField = xtreamField;
         this.order = initOrder();
         this.filedValueType = XtreamTypes.detectFieldDataType(field);
-        this.xtreamField = xtreamField;
         // this.xtreamField = findAnnotation(XtreamField.class).orElseThrow();
         this.fieldLengthExtractor = detectFieldLengthExtractor(this.xtreamField);
         this.fieldConditionEvaluator = detectFieldConditionalEvaluator(this.xtreamField);
@@ -180,7 +180,7 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
     }
 
     protected int initOrder() {
-        return this.findAnnotation(XtreamField.class).map(XtreamField::order).orElse(XtreamField.DEFAULT_ORDER);
+        return this.xtreamField.order();
     }
 
     @Override

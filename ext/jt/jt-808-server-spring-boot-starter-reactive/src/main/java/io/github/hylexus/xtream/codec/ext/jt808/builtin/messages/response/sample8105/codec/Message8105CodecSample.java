@@ -32,6 +32,7 @@ import java.util.List;
  * The current class is derived from and modified based on <a href="https://github.com/SmallChi/JT808/blob/e79d18c3b465f5c450a1d6ba0edc6d9d51c7b13b/src/JT808.Protocol/MessageBody/JT808_0x8105.cs#L69">JT808_0x8105.cs#L69</a>.
  *
  * @author hylexus
+ * @author Codex (AI)
  * @see <a href="https://github.com/SmallChi/JT808/blob/e79d18c3b465f5c450a1d6ba0edc6d9d51c7b13b/src/JT808.Protocol/MessageBody/JT808_0x8105.cs#L69">https://github.com/SmallChi/JT808/blob/e79d18c3b465f5c450a1d6ba0edc6d9d51c7b13b/src/JT808.Protocol/MessageBody/JT808_0x8105.cs#L69</a>
  */
 public class Message8105CodecSample implements FieldCodec<List<CommandValue<Object>>> {
@@ -46,10 +47,15 @@ public class Message8105CodecSample implements FieldCodec<List<CommandValue<Obje
         // 范围: [0,12]
         CommandValue.checkOffset(sortedValue.getFirst().offset());
         CommandValue.checkOffset(sortedValue.getLast().offset());
+        for (int i = 1; i < sortedValue.size(); i++) {
+            if (sortedValue.get(i - 1).offset() == sortedValue.get(i).offset()) {
+                throw new IllegalArgumentException("Duplicate offset: " + sortedValue.get(i).offset());
+            }
+        }
         int offset = 0;
         for (final CommandValue<Object> commandValue : sortedValue) {
             // 不连续的 offset ==> 填充 ";"
-            while (offset != commandValue.offset()) {
+            while (offset < commandValue.offset()) {
                 AbstractCommandValue.writeSeparator(output);
                 offset++;
             }
@@ -65,30 +71,36 @@ public class Message8105CodecSample implements FieldCodec<List<CommandValue<Obje
 
     @Override
     public @Nullable List<CommandValue<Object>> deserialize(BeanPropertyMetadata propertyMetadata, FieldCodec.DeserializeContext context, ByteBuf input, int length) {
-        if (input.readableBytes() <= 0) {
+        final ByteBuf slice = length < 0 ? input : input.readSlice(length);
+        if (!slice.isReadable()) {
             return null;
         }
-        final int to = input.writerIndex();
-        int from = input.readerIndex();
         int offset = 0;
         final List<CommandValue<Object>> result = new ArrayList<>();
-        while (from <= to) {
-            // 查找下一个分隔符
-            final int indexOf = input.indexOf(from, to, (byte) ';');
-            if (indexOf < 0) {
-                break;
-            }
+        while (slice.isReadable()) {
+            CommandValue.checkOffset(offset);
             // 第一个就是分隔符 ==> 空值
-            if (indexOf == 0) {
+            if (slice.getByte(slice.readerIndex()) == ';') {
                 result.add(new EmptyCommandValue<>(offset));
-                from++;
+                slice.skipBytes(1);
             } else {
-                // 切片
-                final ByteBuf slice = input.slice(from, indexOf - from);
+                // 数值字段按固定宽度读取，避免把数值中的 0x3b 当成分隔符
+                final int valueLength = switch (offset) {
+                    // BYTE
+                    case 0 -> 1;
+                    // WORD
+                    case 5, 6, 12 -> 2;
+                    default -> slice.indexOf(slice.readerIndex(), slice.writerIndex(), (byte) ';') - slice.readerIndex();
+                };
+                if (valueLength < 0
+                        || slice.readableBytes() <= valueLength
+                        || slice.getByte(slice.readerIndex() + valueLength) != ';') {
+                    throw new IllegalArgumentException("Missing separator at offset: " + offset);
+                }
                 // 通过偏移量创建对应的命令值实例
-                @SuppressWarnings("unchecked") final CommandValue<Object> commandValue1 = (CommandValue<Object>) createCommandValueInstance(offset, slice);
-                result.add(commandValue1);
-                from += (indexOf - from) + 1;
+                @SuppressWarnings("unchecked") final CommandValue<Object> commandValue = (CommandValue<Object>) createCommandValueInstance(offset, slice.readSlice(valueLength));
+                result.add(commandValue);
+                slice.skipBytes(1);
             }
             offset++;
         }

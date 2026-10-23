@@ -160,7 +160,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
                 case I16 i16 -> output.writeShort(i16.value());
                 case U16 u16 -> output.writeShort(u16.value());
                 case I32 i32 -> output.writeInt(i32.value());
-                case U32 u32 -> output.writeInt(Math.toIntExact(u32.value()));
+                case U32 u32 -> output.writeInt(u32.value().intValue());
                 case I64 i64 -> output.writeLong(i64.value());
                 case GbkString gbkString -> XtreamBytes.writeCharSequence(output, gbkString.value(), XtreamConstants.CHARSET_GBK, gbkString.paddingConfig());
                 case Gb2312String gb2312String -> XtreamBytes.writeCharSequence(output, gb2312String.value(), XtreamConstants.CHARSET_GB_2312, gb2312String.paddingConfig());

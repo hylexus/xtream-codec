@@ -16,6 +16,7 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.ext;
 
+import io.github.hylexus.xtream.codec.core.annotation.Padding;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 
 /**
@@ -28,7 +29,7 @@ import io.github.hylexus.xtream.codec.core.type.Preset;
 public class BuiltinMessage30316364 {
 
     // BYTE[50]  文件名称
-    @Preset.JtStyle.Bytes(length = 50)
+    @Preset.JtStyle.Str(length = 50, paddingRight = @Padding(minEncodedLength = 50, paddingElement = 0))
     private String fileName;
 
     // DWORD 数据偏移量

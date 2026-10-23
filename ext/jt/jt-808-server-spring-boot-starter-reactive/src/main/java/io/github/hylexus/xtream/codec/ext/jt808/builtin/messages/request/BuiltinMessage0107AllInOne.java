@@ -19,6 +19,7 @@ package io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.request;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -66,10 +67,10 @@ public class BuiltinMessage0107AllInOne {
     private String firmwareVersion;
 
     @Preset.JtStyle.Byte(version = 2019, desc = "GNSS 模块属性(2019)")
-    private Short gnssModelProperty;
+    private @Nullable Short gnssModelProperty;
 
     @Preset.JtStyle.Byte(version = 2019, desc = "通信模块属性(2019)")
-    private Short communicationModelProperty;
+    private @Nullable Short communicationModelProperty;
 
     public int getType() {
         return type;
@@ -134,20 +135,20 @@ public class BuiltinMessage0107AllInOne {
         return this;
     }
 
-    public Short getGnssModelProperty() {
+    public @Nullable Short getGnssModelProperty() {
         return gnssModelProperty;
     }
 
-    public BuiltinMessage0107AllInOne setGnssModelProperty(Short gnssModelProperty) {
+    public BuiltinMessage0107AllInOne setGnssModelProperty(@Nullable Short gnssModelProperty) {
         this.gnssModelProperty = gnssModelProperty;
         return this;
     }
 
-    public Short getCommunicationModelProperty() {
+    public @Nullable Short getCommunicationModelProperty() {
         return communicationModelProperty;
     }
 
-    public BuiltinMessage0107AllInOne setCommunicationModelProperty(Short communicationModelProperty) {
+    public BuiltinMessage0107AllInOne setCommunicationModelProperty(@Nullable Short communicationModelProperty) {
         this.communicationModelProperty = communicationModelProperty;
         return this;
     }

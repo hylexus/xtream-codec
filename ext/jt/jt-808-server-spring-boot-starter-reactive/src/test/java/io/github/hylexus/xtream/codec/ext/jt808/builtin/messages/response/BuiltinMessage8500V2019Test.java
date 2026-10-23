@@ -43,6 +43,7 @@ class BuiltinMessage8500V2019Test extends BaseCodecTest {
         final String hex = "85004005010000000001391234432900000001000101b4";
         final BuiltinMessage8500V2019 entity = decodeAsEntity(BuiltinMessage8500V2019.class, hex);
         assertEquals(1, entity.getParams().size());
+        assertEquals(1, entity.getParamCount());
         assertEquals((short) 1, entity.getParams().get(0x0001));
     }
 }

@@ -20,6 +20,7 @@ import io.github.hylexus.xtream.codec.core.annotation.Expression;
 import io.github.hylexus.xtream.codec.core.type.Preset;
 import io.github.hylexus.xtream.codec.core.type.wrapper.DwordWrapper;
 import io.github.hylexus.xtream.codec.ext.jt808.extensions.handler.Jt808ResponseBody;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -54,7 +55,7 @@ public class BuiltinMessage0805 {
      */
     // @Preset.JtStyle.List(condition = "success()", desc = "多媒体 ID 列表")
     @Preset.JtStyle.List(conditions = @Expression(spel = "success()", mvel = "self.success()", aviator = "self.success"), desc = "多媒体 ID 列表")
-    private List<DwordWrapper> multimediaIdList;
+    private @Nullable List<DwordWrapper> multimediaIdList;
 
     public boolean success() {
         return result == 0;
@@ -92,11 +93,11 @@ public class BuiltinMessage0805 {
         return this;
     }
 
-    public List<DwordWrapper> getMultimediaIdList() {
+    public @Nullable List<DwordWrapper> getMultimediaIdList() {
         return multimediaIdList;
     }
 
-    public BuiltinMessage0805 setMultimediaIdList(List<DwordWrapper> multimediaIdList) {
+    public BuiltinMessage0805 setMultimediaIdList(@Nullable List<DwordWrapper> multimediaIdList) {
         this.multimediaIdList = multimediaIdList;
         return this;
     }

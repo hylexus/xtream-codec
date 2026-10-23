@@ -28,17 +28,40 @@ import io.github.hylexus.xtream.codec.core.type.PaddingConfig;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DataFieldTest extends BaseEntityCodecTest {
 
     final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+    @ParameterizedTest
+    @CsvSource({
+            "0, 00000000",
+            "2147483647, 7fffffff",
+            "2147483648, 80000000",
+            "4026531841, f0000001",
+            "4294967295, ffffffff"
+    })
+    void testEncodeUnsigned32BitDictKey(long value, String expectedHex) {
+        final ByteBuf buffer = allocator.buffer();
+        try {
+            u32(value).encode(buffer);
+            assertEquals(4, buffer.readableBytes());
+            assertEquals(expectedHex, FormatUtils.toHexString(buffer));
+            assertEquals(value, buffer.readUnsignedInt());
+        } finally {
+            buffer.release();
+        }
+    }
 
     record CustomDataField1(
             String value, U16 haha,

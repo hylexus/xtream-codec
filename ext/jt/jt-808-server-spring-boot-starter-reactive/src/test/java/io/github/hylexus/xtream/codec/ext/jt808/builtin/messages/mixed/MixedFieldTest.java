@@ -24,7 +24,6 @@ import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.BaseCodecTest;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808MessageDescriber;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import io.netty.buffer.ByteBuf;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -34,6 +33,7 @@ import java.util.Map;
 
 import static io.github.hylexus.xtream.codec.core.type.simple.DataField.U8;
 import static io.github.hylexus.xtream.codec.core.type.simple.DataFields.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MixedFieldTest extends BaseCodecTest {
 
@@ -50,7 +50,7 @@ public class MixedFieldTest extends BaseCodecTest {
                 .setDirection(u16(7))
                 .setTime(now);
         final String hex = encode(mixedEntity01, Jt808ProtocolVersion.VERSION_2013, terminalId2013, 0x0200);
-        System.out.println(hex);
+        assertEquals("7e0200001c0139123443230000000000010000000200000003000000040005000600072511112220581f7e", hex);
     }
 
     @Test
@@ -78,17 +78,24 @@ public class MixedFieldTest extends BaseCodecTest {
         );
 
         final ByteBuf encode = responseEncoder.encode(dataFieldList, new Jt808MessageDescriber(0x0200, Jt808ProtocolVersion.VERSION_2013, terminalId2013));
-        System.out.println(FormatUtils.toHexString(encode));
-        encode.release();
-        Assertions.assertEquals(0, encode.refCnt());
+        try {
+            assertEquals("7e0200005501391234432300000000000b000000150000001f000000290033003d004725110822345601040000006f020200de0302014d0402115c050201020602029a1105010000029a120601000000de032a0200de2b04000000ea3001ff3101ff697e",
+                    FormatUtils.toHexString(encode));
+        } finally {
+            encode.release();
+            assertEquals(0, encode.refCnt());
+        }
 
         final ByteBuf buffer = this.allocator.buffer();
-        final CodecTracker tracker = new CodecTracker();
-        this.entityCodec.entityEncoder().encodeWithTracker(dataFieldList, buffer, tracker);
-        System.out.println(FormatUtils.toHexString(buffer));
-        tracker.visit();
-        buffer.release();
-        Assertions.assertEquals(0, buffer.refCnt());
+        try {
+            final CodecTracker tracker = new CodecTracker();
+            this.entityCodec.entityEncoder().encodeWithTracker(dataFieldList, buffer, tracker);
+            assertEquals("0000000b000000150000001f000000290033003d004725110822345601040000006f020200de0302014d0402115c050201020602029a1105010000029a120601000000de032a0200de2b04000000ea3001ff3101ff",
+                    FormatUtils.toHexString(buffer));
+        } finally {
+            buffer.release();
+            assertEquals(0, buffer.refCnt());
+        }
     }
 
     private static Map<U8, DataField> getExtraItems() {

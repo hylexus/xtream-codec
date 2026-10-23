@@ -28,49 +28,44 @@ class BuiltinMessage0102AllInOneTest extends BaseCodecTest {
     void testV2011() {
         final BuiltinMessage0102AllInOne sourceEntity = createEntityV2011();
         final String hex = this.encode(sourceEntity, Jt808ProtocolVersion.VERSION_2011, terminalId2011);
-
-        final BuiltinMessage0102AllInOne decodedEntity1 = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2011, BuiltinMessage0102AllInOne.class, hex);
-        doCompareV2011(sourceEntity, decodedEntity1);
-
-        final BuiltinMessage0102AllInOne decodedEntity2 = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2011, BuiltinMessage0102AllInOne.class, hex);
-        doCompareV2011(sourceEntity, decodedEntity2);
+        final String expectedHex = "7e0102000d013912344321000041757468436f64655632303131237e";
+        assertEquals(expectedHex, hex);
+        final BuiltinMessage0102AllInOne decoded = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2011, BuiltinMessage0102AllInOne.class, expectedHex);
+        doCompareV2011(sourceEntity, decoded);
     }
 
     private static void doCompareV2011(BuiltinMessage0102AllInOne sourceEntity, BuiltinMessage0102AllInOne decodedEntity) {
         assertEquals(sourceEntity.getAuthenticationCode(), decodedEntity.getAuthenticationCode());
         assertNull(decodedEntity.getImei());
         assertNull(decodedEntity.getSoftwareVersion());
-        assertThrows(NullPointerException.class, decodedEntity::getFormatedSoftwareVersion);
+        assertNull(decodedEntity.getFormatedSoftwareVersion());
     }
 
     @Test
     void testV2013() {
         final BuiltinMessage0102AllInOne sourceEntity = createEntityV2013();
         final String hex = this.encode(sourceEntity, Jt808ProtocolVersion.VERSION_2013, terminalId2013);
-
-        final BuiltinMessage0102AllInOne decodedEntity1 = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2013, BuiltinMessage0102AllInOne.class, hex);
-        doCompareV2013(sourceEntity, decodedEntity1);
-
-        final BuiltinMessage0102AllInOne decodedEntity2 = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2013, BuiltinMessage0102AllInOne.class, hex);
-        doCompareV2013(sourceEntity, decodedEntity2);
+        final String expectedHex = "7e0102000d013912344323000041757468436f64655632303133237e";
+        assertEquals(expectedHex, hex);
+        final BuiltinMessage0102AllInOne decoded = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2013, BuiltinMessage0102AllInOne.class, expectedHex);
+        doCompareV2013(sourceEntity, decoded);
     }
 
     private void doCompareV2013(BuiltinMessage0102AllInOne sourceEntity, BuiltinMessage0102AllInOne decodedEntity) {
         assertEquals(sourceEntity.getAuthenticationCode(), decodedEntity.getAuthenticationCode());
         assertNull(decodedEntity.getImei());
         assertNull(decodedEntity.getSoftwareVersion());
-        assertThrows(NullPointerException.class, decodedEntity::getFormatedSoftwareVersion);
+        assertNull(decodedEntity.getFormatedSoftwareVersion());
     }
 
     @Test
     void testV2019() {
         final BuiltinMessage0102AllInOne sourceEntity = createEntityV2019();
         final String hex = this.encode(sourceEntity, Jt808ProtocolVersion.VERSION_2019, terminalId2019);
-        final BuiltinMessage0102AllInOne decodedEntity1 = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2019, BuiltinMessage0102AllInOne.class, hex);
-        doCompareV2019(sourceEntity, decodedEntity1);
-
-        final BuiltinMessage0102AllInOne decodedEntity2 = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2019, BuiltinMessage0102AllInOne.class, hex);
-        doCompareV2019(sourceEntity, decodedEntity2);
+        final String expectedHex = "7e01024031010000000001391234432900000d41757468436f64655632303133696d6569303132333435363738393076303132333435363738393031323334353637382f7e";
+        assertEquals(expectedHex, hex);
+        final BuiltinMessage0102AllInOne decoded = this.decodeAsEntity(Jt808ProtocolVersion.VERSION_2019, BuiltinMessage0102AllInOne.class, expectedHex);
+        doCompareV2019(sourceEntity, decoded);
     }
 
     private void doCompareV2019(BuiltinMessage0102AllInOne sourceEntity, BuiltinMessage0102AllInOne decodedEntity) {
