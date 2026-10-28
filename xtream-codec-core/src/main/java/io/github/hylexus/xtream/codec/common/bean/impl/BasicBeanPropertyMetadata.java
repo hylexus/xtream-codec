@@ -262,22 +262,31 @@ public class BasicBeanPropertyMetadata implements BeanPropertyMetadata {
 
     @Override
     public @Nullable Object decodePropertyValue(FieldCodec.DeserializeContext context, ByteBuf input) {
-        int rb = input.readableBytes();
-        if (rb == 0) {
-            return null;
-        }
         final int length = this.fieldLengthExtractor.extractFieldLength(context, context.evaluationContext(), input);
-        if (rb >= length) {
-            return fieldCodec().deserialize(this, context, input, length);
-        } else {
-            return null;
-        }
+        this.checkReadableBytes(input, length);
+        return fieldCodec().deserialize(this, context, input, length);
     }
 
     @Override
     public @Nullable Object decodePropertyValueWithTracker(FieldCodec.DeserializeContext context, ByteBuf input) {
         final int length = this.fieldLengthExtractor.extractFieldLengthWithTracker(context, context.evaluationContext(), input);
+        try {
+            this.checkReadableBytes(input, length);
+        } catch (IndexOutOfBoundsException exception) {
+            final CodecTracker tracker = Objects.requireNonNull(context.codecTracker());
+            try (final CodecTracker.TraceScope scope = tracker.enterField(this, this.fieldCodec().getClass(), input.readerIndex())) {
+                scope.fail(exception, input.readerIndex());
+            }
+            throw exception;
+        }
         return fieldCodec().deserializeWithTracker(this, context, input, length);
+    }
+
+    private void checkReadableBytes(ByteBuf input, int length) {
+        final int readableBytes = input.readableBytes();
+        if (length > readableBytes) {
+            throw new IndexOutOfBoundsException("字段 [%s] 数据不足：需要 %d 字节，剩余 %d 字节".formatted(this.name, length, readableBytes));
+        }
     }
 
     @Override

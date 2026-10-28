@@ -168,7 +168,7 @@ class BuiltinMessage0608Test extends BaseCodecTest {
         final BuiltinMessage0608 decoded = decodeBody(BuiltinMessage0608.class, hex);
         assertEquals(type, decoded.getType());
         assertEquals(0, decoded.getCount());
-        assertNull(decoded.getDataList());
+        assertEquals(List.of(), decoded.getDataList());
     }
 
     @Test

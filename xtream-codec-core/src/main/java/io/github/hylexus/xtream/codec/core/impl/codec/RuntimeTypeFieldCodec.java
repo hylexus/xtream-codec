@@ -65,7 +65,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
                     ? input // all remaining
                     : input.readSlice(length);
             final BeanMetadata beanMetadata = entityDecoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
-            return entityDecoder.decode(beanMetadata, slice);
+            return entityDecoder.decode(context.version(), beanMetadata, slice);
         }
     }
 
@@ -95,10 +95,10 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
             try (final CodecTracker.TraceScope scope = codecTracker.enterNestedField(propertyMetadata, targetClass, this.getClass(), inputReaderIndexBeforeSlice)) {
                 final Object value;
                 if (length < 0) {
-                    value = entityDecoder.decodeWithTracker(beanMetadata, slice, codecTracker);
+                    value = entityDecoder.decodeWithTracker(context.version(), beanMetadata, slice, codecTracker);
                 } else {
                     try (final CodecTracker.CoordinateScope ignored = codecTracker.openCoordinateBase(inputReaderIndexBeforeSlice)) {
-                        value = entityDecoder.decodeWithTracker(beanMetadata, slice, codecTracker);
+                        value = entityDecoder.decodeWithTracker(context.version(), beanMetadata, slice, codecTracker);
                     }
                 }
                 scope.complete(value, slice, sliceStart, slice.readerIndex());
@@ -148,7 +148,7 @@ public class RuntimeTypeFieldCodec extends AbstractFieldCodec<Object> {
             final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
             try (final CodecTracker.TraceScope scope = codecTracker.enterNestedField(propertyMetadata, targetClass, this.getClass(), parentIndexBeforeWrite)) {
                 final BeanMetadata beanMetadata = entityEncoder.getBeanMetadataRegistry().getBeanMetadata(targetClass, context.version());
-                entityEncoder.encodeWithTracker(beanMetadata, value, output, codecTracker);
+                entityEncoder.encodeWithTracker(context.version(), beanMetadata, value, output, codecTracker);
                 scope.complete(value, output, output.writerIndex());
             }
         }

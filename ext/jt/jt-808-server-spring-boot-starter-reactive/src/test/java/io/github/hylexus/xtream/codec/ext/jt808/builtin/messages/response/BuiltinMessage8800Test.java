@@ -56,7 +56,7 @@ class BuiltinMessage8800Test extends BaseCodecTest {
         final BuiltinMessage8800 decoded = decodeAsEntity(BuiltinMessage8800.class, hex);
         assertEquals(11, decoded.getMultimediaId());
         assertEquals(0, decoded.getRetransmittedPackageCount());
-        assertNull(decoded.getRetransmittedPackageIdList());
+        assertArrayEquals(new byte[0], decoded.getRetransmittedPackageIdList());
     }
 
 }

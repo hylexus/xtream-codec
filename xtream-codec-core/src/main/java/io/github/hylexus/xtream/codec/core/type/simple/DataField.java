@@ -138,7 +138,7 @@ public sealed interface DataField extends FieldCodecRegistry.AtomicDataType {
                 case u32 -> new U32(null, input.readUnsignedInt(), null);
                 case i64 -> new I64(null, input.readLong(), null);
                 case str -> new GenericString(null, null, input.readCharSequence(sizeInBytes, Charset.forName(charset)).toString(), charset, null, null);
-                case str_gb_2312 -> new GbkString(null, null, input.readCharSequence(sizeInBytes, XtreamConstants.CHARSET_GB_2312).toString(), null, null);
+                case str_gb_2312 -> new Gb2312String(null, null, input.readCharSequence(sizeInBytes, XtreamConstants.CHARSET_GB_2312).toString(), null, null);
                 case str_gbk -> new GbkString(null, null, input.readCharSequence(sizeInBytes, XtreamConstants.CHARSET_GBK).toString(), null, null);
                 case str_utf8 -> new Utf8String(null, null, input.readCharSequence(sizeInBytes, XtreamConstants.CHARSET_UTF8).toString(), null, null);
             };
