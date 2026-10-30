@@ -173,6 +173,8 @@ public final class XtreamFieldUtils {
                 }
                 defaults.put(m.getName(), dv);
             }
+            // 属性读取、比较、哈希和展示统一使用代理实际生效的瞬态策略。
+            defaults.put("codecStrategy", XtreamField.CodecStrategy.TRANSIENT);
             this.defaultValues = Collections.unmodifiableMap(defaults);
         }
 
@@ -196,8 +198,6 @@ public final class XtreamFieldUtils {
                 case "hashCode" -> this.hashCodeImpl();
                 case "toString" -> this.toStringImpl();
                 case "annotationType" -> this.annotationType;
-                // 注意这里: 返回值代表不参与序列化 和 反序列化
-                case "codecStrategy" -> XtreamField.CodecStrategy.TRANSIENT;
                 // defaultValueForNulls
                 case METHOD_NAME_DEFAULT_VALUE_FOR_NULLS -> this.defaultValueForNulls();
                 // targetType
@@ -233,7 +233,8 @@ public final class XtreamFieldUtils {
             for (Map.Entry<String, Object> entry : defaultValues.entrySet()) {
                 final String name = entry.getKey();
                 final Object value = entry.getValue();
-                result += (127 * name.hashCode()) ^ Objects.hashCode(value);
+                final int valueHash = value instanceof int[] array ? Arrays.hashCode(array) : Objects.hashCode(value);
+                result += (127 * name.hashCode()) ^ valueHash;
             }
             return result;
         }

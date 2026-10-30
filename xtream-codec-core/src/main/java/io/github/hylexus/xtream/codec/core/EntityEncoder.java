@@ -117,13 +117,29 @@ public class EntityEncoder {
             }
             case Iterable<?> iterable -> {
                 final FieldCodec.SerializeContext context = new DefaultSerializeContext(this.bufferFactory, this, instance, version, this.beanMetadataRegistry, tracker);
-                for (Object object : iterable) {
-                    if (object instanceof DataField dataField) {
-                        this.dataFieldEncoder.encodeWithTracker(context, dataField, target);
-                    } else {
-                        final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(object.getClass(), version);
-                        this.encodeWithTracker(version, beanMetadata, object, target, tracker);
+                final int indexBeforeWrite = target.writerIndex();
+                final boolean rootInvocation = tracker.isNotTracing();
+                if (rootInvocation) {
+                    tracker.beginEncode(indexBeforeWrite, instance.getClass().getName());
+                }
+                try {
+                    for (Object object : iterable) {
+                        if (object instanceof DataField dataField) {
+                            this.dataFieldEncoder.encodeWithTracker(context, dataField, target);
+                        } else {
+                            final BeanMetadata beanMetadata = beanMetadataRegistry.getBeanMetadata(object.getClass(), version);
+                            this.encodeWithTracker(version, beanMetadata, object, target, tracker);
+                        }
                     }
+                    if (rootInvocation) {
+                        final String hexString = FormatUtils.toHexString(target, indexBeforeWrite, target.writerIndex() - indexBeforeWrite);
+                        tracker.finishTrace(hexString, target.writerIndex());
+                    }
+                } catch (RuntimeException | Error e) {
+                    if (rootInvocation) {
+                        tracker.recordFailure(e, target.writerIndex());
+                    }
+                    throw e;
                 }
             }
             default -> {

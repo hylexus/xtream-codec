@@ -23,6 +23,18 @@
 - 第八轮补充 Record 派生组件无匹配版本及基本类型计算失败的边界、动态字节字段的实际值与填充和字符错误边界，以及类级与字段级属性访问策略的优先级测试。
 - 修复第八轮测试发现且用户确认的 Record 派生组件无匹配版本时构造参数不足、基本类型派生值未赋值时拆箱空指针问题，保留回归用例。
 - 为反射构造与字段访问测试中刻意保留的构造器、参数及字段添加成员级 Error Prone 警告抑制，验证严格编译和原有测试通过。
+- 第九轮补充 EncodedLength 的容量临界值、溢出、非零写入位置与条件组合，以及公开入口 Iterable 批量编码的顺序、版本、空输入、中途失败和跟踪完整性测试。
+- 修复第九轮测试发现且用户确认的 Iterable 跟踪边界问题：整批统一记录根报文、方向和失败偏移，保留回归用例。
+- 第十轮补充动态编码的容器前缀容量、完整字节和固定长度边界、集合计数与条目非法输入，以及 Trace 临时缓冲区嵌套、异常恢复和 checkpoint 迁移范围测试。
+- 第十一轮补充 Trace 值的标量类型保留、非废弃包装类型转换、字节无符号展示、普通对象回退与摘要长度边界，并验证 Trace 视图的实际 JSON 表示。
+- 第十二轮补充调试 JSON 序列化器的数值、字符串、字节与容器输出，以及类扫描的注解模式、过滤、去重和包范围测试。
+- 第十三轮补充非废弃包装类型的二进制写入、转换、空值及修改后的状态和公开编解码入口测试，以及七种长度字段的数值边界、跟踪范围和截断输入测试。
+- 修复第十三轮测试发现且用户确认的 UTF8 包装类型注册错误，将 INSTANCE_STRING_UTF_8 的类型及初始化对象更正为 StringWrapperUtf8FieldCodec，保留默认注册器及普通／跟踪解码的回归用例。
+- 第十四轮补充动态字段 options 的嵌套快照、只读性、标量保真与非法对象拒绝，以及表达式定义的来源互斥、参数数量、引擎绑定、集合隔离和树深度／节点数边界测试。
+- 第十五轮补充瞬态字段注解代理的属性、相等性、哈希及集合使用约定，以及 XtreamMethodParameter 的缓存键区分、索引边界、泛型位置和组合注解读取测试。
+- 修复第十五轮测试发现且用户确认的瞬态注解代理属性不一致及数组哈希问题：内部统一使用生效的 TRANSIENT 策略，version 数组按内容计算哈希，保留与真实注解及哈希集合对照的回归用例。
+- 第十六轮通过 DataFields 的公开 JSON／对象和单字段／列表入口，补充类型别名、嵌套结构、名称及扩展属性、配置和精确编码字节的转换测试，以及非法类型、JSON、字典配置和键值的异常测试。
+- 修复第十六轮测试发现且用户确认的字典 JSON 解析丢失名称和扩展属性、缺失 value 报空指针及非对象 value 被静默转为空字典的问题；仅调整 DictJsonDeserializer，保留合法空对象并增加回归测试。
 
 ## Capabilities
 
@@ -36,4 +48,4 @@
 
 ## Impact
 
-变更涉及 `xtream-codec-core/src/test`、`XtreamByteReader.readString` 的一行修复、`RuntimeTypeFieldCodec` 的四处版本参数传递、`DataField.DictKey.deserialize` 的 GB2312 返回类型修复、`SimpleBeanMetadataRegistry` 的瞬态字段及 Record 组件占位分支、`EntityDecoder` 的 Record 基本类型派生值兜底和本变更记录，不新增正式构建依赖，不调整文档引用示例。
+变更涉及 `xtream-codec-core/src/test`、`XtreamByteReader.readString` 的一行修复、`RuntimeTypeFieldCodec` 的四处版本参数传递、`DataField.DictKey.deserialize` 的 GB2312 返回类型修复、`SimpleBeanMetadataRegistry` 的瞬态字段及 Record 组件占位分支、`EntityDecoder` 的 Record 基本类型派生值兜底、`EntityEncoder` 的 Iterable 跟踪边界、`DataWrapperFieldCodes` 的 UTF8 单例类型及初始化修复、`XtreamFieldUtils` 的瞬态注解代理属性及数组哈希修复、`DictJsonDeserializer` 的元数据保留及值结构校验和本变更记录，不新增正式构建依赖，不调整文档引用示例。
