@@ -29,12 +29,13 @@ import static org.assertj.core.api.Assertions.*;
  */
 class CodecTrackerBufferScopeTest {
 
-    @Test
-    void relocatesNestedTemporarySubtreesWithoutMovingLaterSiblings() {
+    @ParameterizedTest
+    @ValueSource(ints = {0, 2, 10})
+    void relocatesNestedTemporarySubtreesWithoutMovingLaterSiblings(int origin) {
         final CodecTracker tracker = new CodecTracker();
-        tracker.beginEncode(0, "Message");
-        field(tracker, "head", "07", 0, 1);
-        try (final CodecTracker.TraceScope body = tracker.enterScope(CodecTraceNodeKind.NESTED_FIELD, "body", null, null, null, 1)) {
+        tracker.beginEncode(origin, "Message");
+        field(tracker, "head", "07", origin, origin + 1);
+        try (final CodecTracker.TraceScope body = tracker.enterScope(CodecTraceNodeKind.NESTED_FIELD, "body", null, null, null, origin + 1)) {
             final CodecTracker.TraceCheckpoint outer = tracker.checkpoint();
             try (final CodecTracker.TemporaryBufferScope ignored = tracker.openTemporaryBuffer()) {
                 try (final CodecTracker.TraceScope value = tracker.enterScope(CodecTraceNodeKind.NESTED_FIELD, "value", null, null, null, 0)) {
@@ -54,12 +55,12 @@ class CodecTrackerBufferScopeTest {
                 }
             }
             outer.captureNewChildren();
-            field(tracker, "outerLength", "04", 1, 2);
-            outer.captureNewChildren().relocateNewChildren(2);
-            body.completeWithHex(null, "0401020203", 6);
+            field(tracker, "outerLength", "04", origin + 1, origin + 2);
+            outer.captureNewChildren().relocateNewChildren(origin + 2);
+            body.completeWithHex(null, "0401020203", origin + 6);
         }
-        field(tracker, "tail", "7e", 6, 7);
-        tracker.finishTrace("0704010202037e", 7);
+        field(tracker, "tail", "7e", origin + 6, origin + 7);
+        tracker.finishTrace("0704010202037e", origin + 7);
 
         final CodecTraceNode body = tracker.getTrace().getRoot().getChildren().get(1);
         assertRange(body, 1, 6);
@@ -79,16 +80,19 @@ class CodecTrackerBufferScopeTest {
         assertThat(tracker.isNotTracing()).isTrue();
     }
 
-    @Test
-    void restoresEachTemporaryCursorAfterNestedBuffersClose() {
+    @ParameterizedTest
+    @ValueSource(ints = {0, 10})
+    void restoresEachTemporaryCursorAfterNestedBuffersClose(int origin) {
         final CodecTraceRecorder recorder = new CodecTraceRecorder();
-        recorder.begin(CodecTraceDirection.ENCODE, 0, null);
+        recorder.begin(CodecTraceDirection.ENCODE, origin, null);
         final CodecTraceNode root = recorder.trace().getRoot();
-        recorder.updateLeaf(recorder.enterNode(root, CodecTraceNodeKind.FIELD, "head", 0), null, "0102", 0, 2);
+        recorder.updateLeaf(recorder.enterNode(root, CodecTraceNodeKind.FIELD, "head", origin), null, "0102", origin, origin + 2);
         final int outer = recorder.beginTemporaryBuffer();
         recorder.updateLeaf(recorder.enterNode(root, CodecTraceNodeKind.FIELD, "outer", 0), null, "aabbccdd", 0, 4);
+        assertRange(root.getChildren().getLast(), 0, 4);
         final int inner = recorder.beginTemporaryBuffer();
         recorder.updateLeaf(recorder.enterNode(root, CodecTraceNodeKind.FIELD, "inner", 0), null, "ab".repeat(9), 0, 9);
+        assertRange(root.getChildren().getLast(), 0, 9);
         recorder.endTemporaryBuffer(inner);
 
         // 无显式范围的叶节点从当前游标开始，用于观察每层临时缓冲区关闭后的恢复结果。
@@ -128,11 +132,12 @@ class CodecTrackerBufferScopeTest {
         assertThat(tracker.getTrace().getRoot().getChildren()).extracting("name").containsExactly("head", "body", "after");
         final CodecTraceNode body = tracker.getTrace().getRoot().getChildren().get(1);
         assertThat(body.getStatus()).isEqualTo(CodecTraceStatus.ERROR);
-        assertRange(body.getChildren().getFirst(), 8, 9);
+        // 内层临时缓冲区隔离外层坐标，只累加其自身的切片偏移。
+        assertRange(body.getChildren().getFirst(), 4, 5);
         assertRange(tracker.getTrace().getRoot().getChildren().get(2), 9, 10);
         tracker.recordFailure(failure, 20);
         assertThat(tracker.getTrace().getDiagnostics()).singleElement().satisfies(diagnostic -> {
-            assertThat(diagnostic.byteOffset()).isEqualTo(9);
+            assertThat(diagnostic.byteOffset()).isEqualTo(5);
             assertThat(diagnostic.nodeId()).isEqualTo(body.getChildren().getFirst().getId());
         });
         assertThat(tracker.getTrace().getRoot().getStatus()).isEqualTo(CodecTraceStatus.ERROR);

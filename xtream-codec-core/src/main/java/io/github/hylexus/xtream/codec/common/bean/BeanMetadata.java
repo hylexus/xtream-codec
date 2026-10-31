@@ -48,6 +48,8 @@ public class BeanMetadata {
     private final Map<String, BeanPropertyMetadata> reverseDerivedBySource;
     // 属性名 → 在 propertyMetadataList 中的下标（Record 构造器参数数组 定位用）
     private final Map<String, Integer> propertyIndex;
+    // Record 声明顺序中的每个构造参数对应的属性列表位置。
+    private final int[] recordArgumentIndexes;
     // 缓存是否有派生字段，避免 decode/encode 热路径中反复查询 Map.isEmpty()
     private final boolean hasDerivedFields;
     // 编码长度计划；为空时编码器走普通路径
@@ -74,6 +76,9 @@ public class BeanMetadata {
         this.derivedBySource = derivedBySource;
         this.reverseDerivedBySource = reverseDerivedBySource;
         this.propertyIndex = buildPropertyIndex(propertyMetadataList);
+        this.recordArgumentIndexes = rawType.isRecord()
+                ? Arrays.stream(rawType.getRecordComponents()).mapToInt(component -> propertyIndex(component.getName())).toArray()
+                : new int[0];
         this.hasDerivedFields = !derivedBySource.isEmpty();
         this.encodedLengthPlan = encodedLengthPlan;
     }
@@ -89,7 +94,16 @@ public class BeanMetadata {
     // todo: TypeParameterUnusedInFormals
     @SuppressWarnings("TypeParameterUnusedInFormals")
     public <T> T createNewRecordInstance(@Nullable Object[] filedValues) {
-        final Object newInstance = this.instantiator.newInstanceIgnoreException(filedValues);
+        final @Nullable Object[] constructorValues;
+        if (this.rawType.isRecord()) {
+            constructorValues = new Object[this.recordArgumentIndexes.length];
+            for (int i = 0; i < constructorValues.length; i++) {
+                constructorValues[i] = filedValues[this.recordArgumentIndexes[i]];
+            }
+        } else {
+            constructorValues = filedValues;
+        }
+        final Object newInstance = this.instantiator.newInstanceIgnoreException(constructorValues);
         // final Object newInstance = BeanUtils.createNewInstance(this.getConstructor(), filedValues);
         @SuppressWarnings("unchecked") final T casted = (T) newInstance;
         return casted;

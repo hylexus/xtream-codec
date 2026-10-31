@@ -27,21 +27,24 @@ import io.github.hylexus.xtream.codec.core.annotation.XtreamEntityCreator;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.beans.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 /**
  * @author hylexus
  * @author opencode (AI)
+ * @author Codex (AI)
  */
 public final class BeanUtils {
     public static final BasicPropertyDescriptor[] EMPTY_ARRAY = {};
 
-    private static final Map<Class<?>, XtreamSimpleBeanInfo> CACHE = new HashMap<>();
+    private static final Map<BeanInfoCacheKey, XtreamSimpleBeanInfo> CACHE = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(BeanUtils.class);
 
     public static class XtreamSimpleBeanInfo extends SimpleBeanInfo {
@@ -93,33 +96,34 @@ public final class BeanUtils {
     }
 
     public static XtreamSimpleBeanInfo getBeanInfo(Class<?> beanClass, XtreamCacheableClassPredicate cacheableClassPredicate, Predicate<AnnotatedElement> fieldPredicate) throws BeanIntrospectionException {
-
-        XtreamSimpleBeanInfo beanInfo;
-        if ((beanInfo = CACHE.get(beanClass)) != null) {
-            return beanInfo;
+        if (!cacheableClassPredicate.test(beanClass)) {
+            return createBeanInfo(beanClass, fieldPredicate);
         }
+        return CACHE.computeIfAbsent(
+                new BeanInfoCacheKey(beanClass, fieldPredicate),
+                key -> createBeanInfo(key.beanClass(), key.fieldPredicate())
+        );
+    }
 
+    private record BeanInfoCacheKey(Class<?> beanClass, Predicate<AnnotatedElement> fieldPredicate) {
+    }
+
+    private static XtreamSimpleBeanInfo createBeanInfo(Class<?> beanClass, Predicate<AnnotatedElement> fieldPredicate) {
         if (beanClass.isRecord()) {
-            beanInfo = createRecordTypeBeanInfo(beanClass);
+            return createRecordTypeBeanInfo(beanClass);
         } else {
             final BasicPropertyDescriptor[] propertyDescriptors = determineBasicProperties(beanClass, fieldPredicate);
-            beanInfo = new XtreamSimpleBeanInfo(beanClass, propertyDescriptors);
+            return new XtreamSimpleBeanInfo(beanClass, propertyDescriptors);
         }
-
-        if (cacheableClassPredicate.test(beanClass)) {
-            CACHE.put(beanClass, beanInfo);
-        }
-        return beanInfo;
     }
 
     private static XtreamSimpleBeanInfo createRecordTypeBeanInfo(Class<?> beanClass) {
         XtreamSimpleBeanInfo beanInfo;
-        final Field[] declaredFields = beanClass.getDeclaredFields();
-        final BasicPropertyDescriptor[] pdList = new BasicPropertyDescriptor[declaredFields.length];
         final RecordComponent[] recordComponents = beanClass.getRecordComponents();
+        final BasicPropertyDescriptor[] pdList = new BasicPropertyDescriptor[recordComponents.length];
         for (int i = 0; i < recordComponents.length; i++) {
             final RecordComponent recordComponent = recordComponents[i];
-            final Field field = declaredFields[i];
+            final Field field = Objects.requireNonNull(ReflectionUtils.findField(beanClass, recordComponent.getName()));
             final BasicPropertyDescriptor pd = BasicPropertyDescriptor.ofRecord(field, recordComponent);
             pdList[i] = pd;
         }
@@ -174,8 +178,17 @@ public final class BeanUtils {
             final BasicPropertyDescriptor pd = pdMap.get(propertyName);
             if (pd != null) {
                 if (setter) {
+                    final Class<?> fieldType = pd.getField().getType();
+                    final Class<?> parameterType = method.getParameterTypes()[0];
+                    if (!ClassUtils.isAssignable(parameterType, fieldType)) {
+                        return;
+                    }
                     final Method writeMethod = pd.getWriteMethod();
-                    if (writeMethod == null || writeMethod.getParameterTypes()[0].isAssignableFrom(method.getParameterTypes()[0])) {
+                    final Class<?> currentParameter = writeMethod == null ? null : writeMethod.getParameterTypes()[0];
+                    // 精确字段类型优先；参数类型相同时保留先扫描的子类实现。
+                    if (currentParameter == null || (currentParameter != fieldType
+                            && (parameterType == fieldType || (currentParameter != parameterType
+                            && ClassUtils.isAssignable(currentParameter, parameterType))))) {
                         pd.setWriteMethod(method);
                         method.setAccessible(true);
                     }

@@ -868,3 +868,529 @@ DataFieldJsonValidationTest 的 48 个用例全部通过：
 DataFields 的四个转换入口及 mixedListToJsonString 方法各自行覆盖率均为 100%；整类统计还包含本轮未作为目标的工厂方法。模块原始统计仍包含废弃及生成代码；本轮最小修复使生产代码统计增加 9 行、8 个分支。修改前后覆盖率 XML 保存在 `/private/tmp/xtream-core-round16.d2Hjqs/before.xml` 和 `after.xml`，最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。继续仅使用临时 JaCoCo 配置，未改动正式构建配置或文档引用源码。
 
 按 openspec-apply-change 工作流记录用户确认的两处修复并更新第十六轮范围、设计与任务。OpenSpec 严格验证、工作区及暂存区差异空白检查、两个新增 Java 文件的独立空白检查通过，保留既有工作区改动。
+
+## 第十七轮：Record 构造与嵌套路径组合
+
+新增 6 个测试类、80 个用例，全部通过。首批 30 个回归用例在修复前有 24 个失败、6 个对照用例通过；最小修复后全部转绿，已有 DerivedFieldFallbackTest 和 NestedAndSequenceMetadataTest 同时通过。测试没有调用废弃的项目 API。
+
+- RecordConstructionBoundaryTest：16 个用例覆盖同类型和异类型字段重排、版本切换顺序、静态常量、含静态常量的空 Record、派生字段构造位置和列表中的重排 Record。独立 HEX、完整对象、非零缓冲区起点及尾随字节共同验证构造参数顺序。
+- RecordCollectionDefaultsTest：4 个用例对照两个版本和两种模式，验证条件跳过、隐式瞬态 boolean、显式 null／空集合、派生值为 null、转换失败及派生组件版本不匹配；同时确认列表元素的空集合互不共享，尾字段及读取索引正确。
+- NestedEncodedLengthTest：10 个用例对照独立 POJO、嵌套 POJO、from／until 范围和外层前置长度，验证独立 HEX、解码结果及游标、源对象长度仍为 99、跟踪节点采用回填后的长度 2 和 HEX 02。
+- SimpleBeanMetadataRegistryTest：4 个用例验证类与版本缓存键、实际版本编码字节、禁用缓存、注册表之间的隔离、8 个线程同步首次请求两个版本，以及创建失败后的重试和发布行为；不依赖休眠或线程调度顺序。
+- DynamicExtensionFailureTest：8 个用例验证扩展编码／解码抛出的原始原因、字段路径和位偏移、部分输出及尾字段停止、解码失败不提交 readerIndex、引用计数，以及同一计划随后成功调用；同时验证扩展输出超过固定长度或资源上限。
+- DynamicIntegerBoundaryTest：38 个用例通过公开计划验证正负 JSON 安全整数阈值两侧的值与具体返回类型、整数 BigDecimal／BigInteger／十进制字符串、非整数 BigDecimal、非法字符串、Float／Double、非有限数值、布尔值和 null。非法输入检查字段路径、位偏移、部分输出及跟踪错误。
+
+生产修改仅涉及 3 个文件：BeanMetadata 缓存组件声明顺序到属性编码顺序的映射，在调用 Record 构造器前重排参数；BeanUtils 按 Record 组件数量与名称创建属性描述，排除静态字段；NestedBeanPropertyMetadata 将 Record 解码委托给已有 EntityDecoder，并仅在存在 EncodedLength 时委托 EntityEncoder 复用回填。删除被替代的 Record 解码逻辑，保留普通嵌套 POJO 的原有路径。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 20 秒，27 个任务中 14 个实际执行。核心模块 1974 个、无 Jackson 环境 3 个、core-debug 23 个，共 2000 个用例全部通过，失败、错误和跳过均为 0。生产、测试和 JMH 源码启用 Error Prone/NullAway 编译通过；Checkstyle 和许可证检查通过，没有新增编译警告。所有正式构建配置保持原状；临时脚本使用 JaCoCo 0.8.13，下载缺少的临时工具依赖后完成基线及最终报告。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8146/9555（85.25%） | 8235/9549（86.24%） |
+| 核心模块 | 分支 | 3521/4169（84.46%） | 3537/4169（84.84%） |
+| BeanMetadata | 行 | 38/55（69.09%） | 46/63（73.02%） |
+| SimpleBeanMetadataRegistry | 行 | 171/188（90.96%） | 178/188（94.68%） |
+
+模块统计仍包含废弃和生成代码；本轮新增测试只针对非废弃行为。删除重复的 Record 解码路径使总行数减少 6 行，NestedBeanPropertyMetadata 的覆盖分母随之变化，不直接以其前后比例评价效果。DynamicNumbers 的行覆盖率仍为 12/13，新增用例保护具体数值阈值与输入语义，不以覆盖行数替代行为断言。
+
+基线与最终 XML 分别保存于 `/private/tmp/xtream-core-round17.NUtqCK/before.xml`、`after.xml`；修复前的三份失败测试 XML 和运行日志保存在同一目录。最终 HTML 位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。没有修改文档引用的源码片段，无需重建文档站点。OpenSpec 严格验证及新增文件和已有差异的空白检查通过。
+
+## 第十八轮：长度边界与重复调用
+
+新增 4 个测试类、48 个用例，全部通过。修复前，NestedRecordLengthBoundaryTest 的 16 个用例因忽略长度而失败，BeanUtilsCacheTest 的 3 个用例因过滤器或禁用策略被已有缓存绕过而失败；对应失败 XML 已保留。集合的全部 20 个用例在生产修改前即通过，明确记录现有的最大次数语义。测试分别核对 POJO 编码器的变量初始化和嵌套字符串零长度返回 null 的既有行为，使用独立断言，不修改这些语义。
+
+- NestedRecordLengthBoundaryTest：18 个用例覆盖固定、表达式及前置长度下的剩余文本隔离、零长度区域、过短区域不能借用外层字节、未使用区域字节的消费、两层切片坐标，以及无界 Record 的既有消费行为。对照普通与跟踪模式，验证独立 HEX、外层尾字段、非零输入起点、读取索引、引用计数、失败节点和跟踪范围。
+- SequenceIterationBoundaryTest：20 个用例覆盖默认上限两侧的 1023／1024／1025 项、显式提高上限、有界输入消费整个区域、无界输入保留剩余字节、次数 0／1／3 与两字节区域的组合、零长度区域及零消费元素。默认上限仍为 1024；最大次数不解释为必须读取的严格数量。
+- BeanUtilsCacheTest：6 个用例验证类与过滤器缓存键、相同键复用、不同过滤器的完整及空结果、禁用缓存绕过已有结果且不替换或填充缓存、过滤失败后的完整重试，以及先进行自定义过滤后真实 EntityCodec 仍解码全部注解字段。各场景使用独立类型，避免静态缓存造成顺序依赖。
+- PojoReuseDecodingTest：4 个用例验证同一对象在条件满足、跳过、再次满足时的字段及派生值更新，和首次跳过保留调用方初始化。解码时被跳过字段的变量为空，对象属性保留；编码时变量重新从实例读取，因此编码输出可能再次包含依赖该变量的字段，测试分别约束两个方向的精确字节。每次使用独立 Tracker，核对节点、游标、对象身份、引用计数及编码不修改源值。
+
+本轮生产修改仅涉及 DelegateBeanMetadataFieldCodec 和 BeanUtils：前者在有界解码前创建非持有切片，并以坐标作用域完成嵌套跟踪；后者使用包含类和过滤器的缓存键、在禁用策略下绕过读写，并用 ConcurrentHashMap 发布结果。不同 Predicate 不做语义等价推断，不扩大原有字段反射扫描范围。保留上一轮尚未提交的生产及测试改动，没有修改废弃实现。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 12 个实际执行。核心模块完整测试 2022 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2048 个用例全部通过，失败、错误和跳过均为 0。本轮定向验证已启用 Error Prone/NullAway 重新编译生产及测试源码；最终检查复用这些编译产物，Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8235/9549（86.24%） | 8241/9553（86.27%） |
+| 核心模块 | 分支 | 3537/4169（84.84%） | 3542/4175（84.84%） |
+
+模块原始覆盖率仍包含废弃及生成代码，新增测试只针对非废弃行为。多数用例保护已覆盖路径中的长度、数量和重复调用组合，不能以新增行数替代这些行为断言。基线及最终报告保存在 `/private/tmp/xtream-core-round18.2AU76I/before.xml`、`after.xml`，失败回归 XML 和最终检查日志也在该目录。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 更新范围、设计、任务及验证记录。OpenSpec 严格验证、git diff --check 和全部新增 Java 文件的独立空白检查通过。未修改文档引用的源码片段，无需重建文档站点。
+
+## 第十九轮：属性方法选择与动态数值边界
+
+新增 3 个测试类、192 个参数化及普通用例，全部通过。修复前有 33 个失败：BeanUtilsSetterSelectionTest 的 13 个用例定位不兼容重载、精确类型优先及子类方法保留问题；DynamicDerivedBoundaryTest 的 20 个用例定位有符号源整数反向合成后未还原补码的问题。DynamicFloatBoundaryTest 的全部 124 个用例在生产修改前已通过，约束现有浮点语义。三组修复前 XML 和运行日志均已保留。
+
+- BeanUtilsSetterSelectionTest：24 个用例验证继承的精确 setter 不被 String 或装箱重载阻断、链式 with 方法、Number 与 Object 参数的兼容性和优先级、子类覆盖、仅有装箱写方法及无兼容方法时的字段回退。通过真实 EntityCodec 普通／跟踪解码和再次编码，核对 getter 值、精确字节、非零起点、尾随字节及引用计数。
+- DynamicDerivedBoundaryTest：44 个用例验证 i8、i16、i64 的符号位、完整位宽与部分位段在双字节序下的精确编码，检查大整数的 JSON 安全表示、未提供位保持零、重叠一致及冲突、负数和超宽位段。显式提供 128 作为 i8 源值仍被拒绝。普通／跟踪模式均检查字段路径、位偏移、失败前已写前缀和资源状态。
+- DynamicFloatBoundaryTest：124 个用例覆盖 f32／f64 在双字节序下的正负零、最小次正规数、最小正规数、正负最大有限值及 double 到 float 的舍入；拒绝 Java 输入和线上位模式中的 NaN、正负无穷，以及转为 f32 后溢出的有限 double、非数值和 null。编码失败只保留先前已写字节，解码失败不提交调用方 readerIndex；错误偏移定位到内部已读取的浮点字段末尾，并验证普通／跟踪模式下的诊断、字节和引用计数。
+
+生产修改仅涉及 BeanUtils 和 DynamicWriteExecution。setter 候选必须能接收字段类型（含装箱），精确类型优先，相同参数保留先扫描的子类实现；派生位段按无符号位模式合成后，仅对有符号源整数还原补码，未放宽显式源值范围校验。保留前两轮尚未提交的生产及测试改动，不修改废弃实现。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 10 个实际执行。核心模块完整测试 2214 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2240 个用例全部通过，失败、错误和跳过均为 0。定向验证启用 Error Prone/NullAway 编译了本轮生产和测试源码；全量检查复用这些编译产物，Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8241/9553（86.27%） | 8260/9561（86.39%） |
+| 核心模块 | 分支 | 3542/4175（84.84%） | 3581/4189（85.49%） |
+
+模块原始统计仍包含废弃及生成代码，新增测试仅针对非废弃行为。证据目录为 `/private/tmp/xtream-core-round19.jNVjS0`，其中 `before.xml`、`after.xml` 为完整覆盖率报告，`setter-before.xml`、`derived-before.xml`、`float-before.xml` 为修复前测试结果，`regression-before.log`、`targeted-after.log` 和 `full-check.log` 为对应运行日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮使用 openspec-apply-change 更新范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和全部新增 Java 文件的独立空白检查通过。未修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十轮：动态编译边界与回填值传递
+
+新增 3 个测试类、70 个用例，全部通过。DynamicDerivedCompilationBoundaryTest 在修复前有 8 个失败：四组超大偏移／宽度在 Java 与 JSON 两种入口下均因 int 加法溢出而绕过源整数范围校验。失败结果和日志已保存；生产修复仅将范围加法提升为 long，其余两组测试无需修改生产代码。
+
+- DynamicDerivedCompilationBoundaryTest：32 个用例覆盖超出 u64 末位、宽度超限、Integer.MAX_VALUE 及刚好溢出的偏移／宽度组合，验证 Java 定义与 JSON 导入均在编译期拒绝并定位到 `$.view`。合法用例验证 u64 末位与完整位宽、小端 msb0 的单字节及完整字节视图、小端 lsb0 和大端的跨字节视图；对照普通／跟踪模式核对精确 HEX、派生值、非零起点、读取索引和引用计数。
+- DynamicNestedBackfillTest：10 个用例验证嵌套结构的实际长度被后续容器复制表达式和生成字段读取，范围中的条件字段只按实际出现内容计数。三个数组元素分别回填 1、0、2 字节，各自的局部表达式、外层数组副本和 Tracker 均获得最终值。长度字段及内容同时跳过时，复制结果不重新加入被跳过的长度。输入中的错误长度保持原值，编码字节、解码对象、容器与长度节点值及范围均有独立断言。
+- DynamicVersionBoundaryTest：28 个用例验证数组元素被版本排除时，即使声明数量为零也在编译期拒绝；整个集合被排除时不会继续检查其元素。choice 的所有分支被排除后，无有效默认分支则在执行期失败，有有效默认分支则回退；匹配版本下保留已知分支。结构本身仍被选中而全部子字段被排除时保留空对象；空结构作为数组元素时遵守已有的游标推进要求。普通／跟踪模式分别检查精确字节、尾字段、失败路径、位偏移、部分输出、解码 readerIndex 不提交、诊断与引用计数。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 9 秒，27 个任务中 11 个实际执行。核心模块完整测试 2284 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2310 个用例全部通过，失败、错误和跳过均为 0。本轮各定向测试启用 Error Prone/NullAway 编译生产及测试源码；全量验证复用这些编译产物，Checkstyle 的 main／test／jmh 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8260/9561（86.39%） | 8266/9561（86.46%） |
+| 核心模块 | 分支 | 3581/4189（85.49%） | 3596/4189（85.84%） |
+
+模块原始统计仍包含废弃及生成代码，新增测试仅针对非废弃行为。证据目录为 `/private/tmp/xtream-core-round20.gZDgDM`，其中 `before.xml`、`after.xml` 为覆盖率报告，`range-before.xml`、`range-before.log` 保留溢出修复前的失败证据，`range-after.log`、`backfill.log`、`version.log` 为定向验证日志，`full-check.log` 为完整检查日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和全部新增 Java 文件的独立空白检查通过。保留已有未提交修改，没有修改废弃实现或文档引用的源码片段，无需重建文档站点。
+
+## 第二十一轮：缓冲区生命周期与动态失败状态
+
+新增 3 个测试类、141 个用例，全部通过。ByteBufContainerLifecycleTest 在修复前有 26 个失败：11 种工厂返回的 payload 身份和释放行为各失败一次，4 组非零 readerIndex 的数值视图也读取了错误位置。失败结果及日志已保存；生产修复仅让六个分配缓冲区的工厂入口统一持有同一个 ByteBuf，并让三个数值读取方法使用当前 readerIndex。
+
+- ByteBufContainerLifecycleTest：29 个用例覆盖字节数组、有符号／无符号整数、BCD、UTF8、UTF16BE 及 GBK 工厂的对象身份、修改后状态、写入消费和重复释放；验证数值视图及别名从当前读取起点取值且不消费输入、包装 retained slice 时不增加引用，以及 EntityCodec 普通／跟踪模式下的精确字节、借用切片、索引和释放行为。使用非废弃的 BytesFieldCodecs 显式配置字段编解码器。
+- DynamicBufferFormsTest：56 个用例对照 CRC32／CRC32C 和普通／跟踪模式，以标准字符串 123456789 的独立校验值验证堆、直接、跨组件复合、切片和只读输入；严格校验失败停在 body 末尾的第 120 位，不读取 tail，也不提交调用方 readerIndex。输出覆盖堆、直接、复合及可写切片，验证长度与校验和回填、扩容、精确 HEX、尾随字节、父子索引隔离、切片外保护字节及引用计数。
+- DynamicInvalidInputTest：56 个用例覆盖 bits 缺失、null、类型、长度和首／中／末位置非法字符，以及 countOf 目标缺失、null、标量、Map、数组和 Set。普通／跟踪模式分别检查字段路径、位偏移、部分输出、错误节点、诊断及尾字段停止；同一计划随后接受合法输入，校验两种位序的精确字节和集合计数生成值，不修改调用方提交的错误 count。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 10 个实际执行。核心模块完整测试 2425 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2451 个用例全部通过，失败、错误和跳过均为 0。本轮定向验证启用 Error Prone/NullAway 编译生产及测试源码，最终定向日志没有新增编译警告；全量验证复用这些编译产物，Checkstyle 的 main／test／jmh 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8266/9561（86.46%） | 8273/9564（86.50%） |
+| 核心模块 | 分支 | 3596/4189（85.84%） | 3601/4189（85.96%） |
+
+ByteBufContainer 的行覆盖率为 26/26，方法覆盖率为 22/22。模块原始统计仍包含废弃及生成代码，本轮没有为废弃代码补测试或修改其实现。证据目录为 `/private/tmp/xtream-core-round21.nYH9KR`：`before.xml`、`after.xml` 保存完整覆盖率，`container-before.xml` 和 `container-before.log` 保存修复前的 26 个失败，`container-after.log`、`buffer-forms.log`、`targeted.log` 和 `full-check.log` 保存定向及完整验证日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和 19 个未跟踪 Java 文件的独立空白检查通过。保留已有未提交修改，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十二轮：动态长度、描述输出和表达式编译失败
+
+新增 3 个测试类、76 个用例，全部通过。本轮仅增加测试及变更记录，没有修改生产代码，也没有涉及废弃入口。
+
+- DynamicLengthFailureTest：44 个用例对照普通／跟踪模式，验证引用和表达式得到 0、7、8、9、16 bit 时字节字段的行为，拒绝非完整字节的长度，并覆盖损坏的 bit 单位长度前缀。验证 fixed、ref、expression 和 prefix 四种 struct 长度来源在子字段未消费完整区域时失败，保留已经成功读取的子节点，不读取外层 tail。padding 分别使用 0 和 255，在首、中、末字节损坏时拒绝，同时保留合法编码与解码对照。检查精确 HEX、字段路径、位偏移、部分输出、诊断、readerIndex 不提交及引用计数。
+- BeanDescriptorTest：20 个用例通过真实实体、属性访问器及 SimpleBeanMetadataRegistry.beanDescriptors 检查描述内容和 ObjectMapper 的实际 JSON。覆盖五种访问策略下的方法／字段组合、Record 组件与只读 setter、两种版本和显式／默认顺序、固定／表达式／前置／剩余／自定义长度、恒真／恒假／表达式／自定义条件，以及 GBK、UTF-8、UTF-16BE 和自定义编解码器描述。检查有效访问实现分支、成员签名、空分支省略、isDefault／isBuiltIn 字段名、小写条件与长度枚举及缓存版本的导出排序。保留注册表对字符编解码器按字符集解析、字节数组长度为 -1 和瞬态 NullFieldCodec 描述的现有语义。
+- DynamicExpressionCompilationFailureTest：12 个用例分别把表达式用于派生值、条件和长度，覆盖顶层及嵌套字段的非法 SpEL 语法和宿主引擎 createExpression 抛异常。检查所属字段路径、用途、编译期 -1 偏移、引擎标识及完整因果链中的原始异常；确认编译不创建求值上下文。同一引擎在失败后仍可编译合法定义，普通／跟踪模式均验证精确字节、解码值、尾随输入、游标和引用计数，执行不会重复创建表达式。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 7 个实际执行。核心模块完整测试 2501 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2527 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码和输入未变化，Gradle 复用已通过结果。本轮定向验证启用 Error Prone/NullAway 重新编译测试源码，最终日志没有新增编译警告；全量验证复用生产及测试编译产物，Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8273/9564（86.50%） | 8338/9564（87.18%） |
+| 核心模块 | 分支 | 3601/4189（85.96%） | 3636/4189（86.80%） |
+
+BeanDescriptor 的行覆盖率为 145/147（98.64%），分支覆盖率为 31/33（93.94%）。模块原始统计仍包含废弃及生成代码，新增测试仅针对非废弃行为。证据目录为 `/private/tmp/xtream-core-round22.GCV2rg`：`before.xml`、`after.xml` 保存完整覆盖率，`length.log`、`descriptor.log`、`targeted.log` 保存已通过的定向验证，`full-check.log` 保存完整检查日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和 22 个未跟踪 Java 文件的独立空白检查通过。保留前轮全部未提交修改，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十三轮：回填容量、条目头部失败和 POJO 构造器
+
+新增 3 个测试类、69 个用例，全部通过。本轮仅增加测试及变更记录，没有修改生产代码，也没有涉及废弃入口。
+
+- DynamicBackfillBoundaryTest：28 个用例对照普通／跟踪模式，覆盖 u8 回填 byte 单位的 0、255、256，以及 bit 单位的 0、248、256；验证上限内的精确字节和解码结果、溢出时占位值不回填、已写内容保留、尾字段停止及同一计划后续成功调用。另以 3、7、9、255 bit 区间对照 byte 单位的拒绝行为与 bit 单位的合法编码，验证部分字节、对齐、错误路径和偏移、跟踪诊断、非零起点及缓冲区所有权。
+- DynamicEntryHeaderFailureTest：24 个用例覆盖 8／16／32 位 Tag 和 Length，分别在全局输出上限和父容器边界不足时失败。全局上限夹具使用无独立长度的 struct，避免有界容器的整体预检先行拒绝；父边界夹具使用引用长度。检查精确部分输出、Tag 成功状态、失败头部的空值和零长度范围、未执行 Value／tail、诊断所属节点和偏移。每个用例在失败后用同一计划、刚好足够的输出上限及父边界完成编码和解码，验证精确 HEX、尾随输入、索引及引用计数。
+- PojoConstructorSelectionTest：17 个用例通过隔离的注册表与真实 POJO 验证单一公开无参构造器、多个公开构造器的默认回退、私有注解构造器、本类注解优先、父类注解签名映射，以及缺少匹配签名时的回退。普通／跟踪模式各验证真实解码和重新编码、构造标记、字段内容、索引与元数据缓存。参数化注解构造器仅验证元数据选择及直接反射调用，不扩展解码参数注入能力；同时验证没有公开构造器时的明确错误，以及构造异常的原始原因和输入未消费。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 7 个实际执行。核心模块完整测试 2570 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2596 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码和输入未变化，Gradle 复用已通过结果。新增测试定向运行时启用 Error Prone 重新编译，无新增编译警告；生产编译及 NullAway 检查复用已有通过结果，测试源码按仓库既有配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8338/9564（87.18%） | 8357/9564（87.38%） |
+| 核心模块 | 分支 | 3636/4189（86.80%） | 3641/4189（86.92%） |
+
+模块原始覆盖率仍包含废弃及生成代码，新增测试仅针对非废弃行为。证据目录为 `/private/tmp/xtream-core-round23.QwqMko`：`before.xml`、`after.xml` 保存完整覆盖率，`backfill.log`、`header.log`、`constructor.log` 保存已通过的定向验证，`full-check.log` 保存完整检查日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和 25 个未跟踪 Java 文件的独立空白检查通过。保留前轮全部未提交修改，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十四轮：集合项数前缀和属性访问异常
+
+新增 2 个测试类、42 个用例，全部通过。本轮仅增加测试及变更记录，没有修改生产代码，也没有涉及废弃入口。
+
+- DynamicItemPrefixBoundaryTest：24 个用例对照普通／跟踪模式，验证 array、TLV、map、pair 使用 8 位 item 前缀时的 0、255、256 项。元素使用 u16 且数值随位置递增，以独立 HEX 区分项数和字节长度，检查空集合、重复键条目顺序、前缀值及位范围、尾字段和完整消费量。256 项在写入前缀及元素之前失败，仅保留 head；核对路径、偏移、无前缀／元素节点、错误诊断、非零缓冲区起点和引用计数，再用同一计划成功编解码两项及尾随字节。
+- PropertyAccessorFailureIntegrationTest：18 个用例通过真实实体字段级策略，分别触发反射、MethodHandle、Lambda getter、普通 setter 和链式 setter 的固定异常。检查因果链中的原始异常身份、访问顺序、已写输出或已消费输入、部分赋值及后续字段停止。跟踪模式验证 getter 失败前的已完成节点、setter 字节解码成功的字段节点，以及根节点错误诊断和相对偏移；不为实体解码增加回滚。解除故障后复用同一元数据和实例成功解码、重新编码，检查精确 HEX、完整字段及缓存身份。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 7 个实际执行。核心模块完整测试 2612 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2638 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码和输入未变化，Gradle 复用已通过结果。新增测试定向运行时启用 Error Prone 重新编译，无新增编译警告；生产编译及 NullAway 检查复用已有通过结果，测试源码按仓库既有配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8357/9564（87.38%） | 8364/9564（87.45%） |
+| 核心模块 | 分支 | 3641/4189（86.92%） | 3643/4189（86.97%） |
+
+模块原始覆盖率仍包含废弃及生成代码，新增测试仅针对非废弃行为。证据目录为 `/private/tmp/xtream-core-round24.Pn1Moz`：`before.xml`、`after.xml` 保存完整覆盖率，`item-prefix.log`、`accessor-failure.log` 保存已通过的定向验证，`full-check.log` 保存完整检查日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和 27 个未跟踪 Java 文件的独立空白检查通过。生产代码差异哈希与本轮开始时相同，保留前轮全部未提交修改，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十五轮：跳过字段与字符集收尾边界
+
+新增 2 个测试类、22 个用例，全部通过。本轮仅增加测试及变更记录，没有修改生产代码，也没有涉及废弃入口。
+
+- EncodedLengthSkippedFieldTest：6 个用例对照普通／跟踪模式，验证 from 指向派生字段、until 指向瞬态字段，反向组合，以及两个跳过字段之间没有实际字节的空范围。以真实 Record 检查回填值、范围之外的字段及 tail、独立 HEX、非零起点和引用计数；解码验证派生值正常计算、瞬态字段按 AS_NULL 取 null，编码不修改源对象的长度、派生值和瞬态值。Trace 中仅保留实际字段节点，长度字段范围和值与精确报文一致。
+- DynamicStatefulCharsetBoundaryTest：16 个用例使用 ISO-2022-JP 编码 1 个及 14 个「あ」，以独立的 JIS 字节和末尾 ESC ( B 验证收尾字节被保留。14 个字符在 encode 阶段占 31 字节，flush 需要补入 3 字节，从而触发 32 字节初始缓冲区的扩容。分别验证固定字段长度和输出资源限制恰好足够，以及只允许文本少一字节时在 flush 阶段失败；输出上限成功场景同时为 tail 留足空间。核对前置长度、失败路径和偏移、仅保留 head 的部分输出、错误诊断及引用计数，再以同一计划和上限编码 ASCII，验证异常后状态恢复。Trace 按现有语义区分含前缀的完整字段范围和 contentBitStart／contentBitEnd 内容范围。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 7 秒，27 个任务中 7 个实际执行。核心模块完整测试 2634 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2660 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码和输入未变化，Gradle 复用已通过结果。新增测试定向运行时启用 Error Prone 重新编译，无新增编译警告；生产编译及 NullAway 检查复用已有通过结果，测试源码按仓库既有配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8364/9564（87.45%） | 8369/9564（87.51%） |
+| 核心模块 | 分支 | 3643/4189（86.97%） | 3648/4189（87.09%） |
+
+覆盖率确认 EntityEncoder 长度回填循环中的派生和瞬态跳过分支均已执行，DynamicByteFormat 的 flush 溢出及扩容路径已执行。不为 JDK 字符集无法自然触发的 flush 错误返回构造替身。模块原始覆盖率仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round25.H0CvmQ`：`before.xml`、`after.xml` 保存完整覆盖率，`skipped-field.log`、`stateful-charset.log` 保存已通过的定向验证，`full-check.log` 保存完整检查日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和 29 个未跟踪 Java 文件的独立空白检查通过。生产代码差异哈希与本轮开始时相同，保留前轮全部未提交修改，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十六轮：实体表达式失败与调试服务资源边界
+
+新增 2 个测试类、40 个用例，全部通过。本轮仅增加测试及变更记录，没有修改生产代码，也没有涉及废弃入口。
+
+- EntityExpressionFailureTest：20 个用例对照普通／跟踪解码，分别使字节数组、嵌套实体、按长度读取的集合，以及有界和无界集合的迭代次数表达式返回 null 或抛出固定异常。检查错误消息或原始异常身份、已完成 head、保持原值的 body 和 tail、表达式求值次数、非零读取起点、原始报文和引用计数。有界集合先 readSlice 再求迭代次数，失败时保留已消费的内容；Trace 根节点范围仍只包含已完成 head，诊断偏移则反映真实消费位置。解除故障后复用同一实体和元数据，成功解码并重新编码，验证精确 HEX、尾随输入、字段范围和诊断清空。
+- CodecDebuggerResourceLimitTest：20 个用例分别验证实体／动态模式下输入和输出上限为 0、2、3 字节时处理 3 字节报文的响应，输入同时对照带空白 HEX。输入超限在解析及 Trace 开始前拒绝，返回空 HEX、零消费量和无字段节点的初始 Trace；刚好足够时返回完整字段值和 HEX。输出超限检查仅保留已完成 head、失败字段及其范围、错误节点诊断、消费量和错误定位；实体模式零容量异常无消息时回退到异常类名，动态模式保留字段路径及位偏移。每次请求后复用同一服务完成合法编解码，另验证输入输出均为零时可处理空消息；无字段实体通过宿主 ObjectMapper 允许空 Bean 映射。实体输出测试使用真实 ByteBuf 容量限制，不为不可达的后置输出检查构造替身。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 7 个实际执行。核心模块完整测试 2674 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2700 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码和输入未变化，Gradle 复用已通过结果。新增测试定向运行时启用 Error Prone 重新编译，无新增编译警告；生产编译及 NullAway 检查复用已有通过结果，测试源码按仓库既有配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8369/9564（87.51%） | 8372/9564（87.54%） |
+| 核心模块 | 分支 | 3648/4189（87.09%） | 3654/4189（87.23%） |
+
+覆盖率确认 CodecDebuggerService 的 execute、readHex 和 error 方法分支全部执行，新增覆盖输入超限拒绝和无异常消息的响应回退。模块原始覆盖率仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round26.zHHVdC`：`before.xml`、`after.xml` 保存完整覆盖率，`entity-expression.log`、`debugger-limit.log` 保存已通过的定向验证，`full-check.log` 保存完整检查日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、git diff --check 和 31 个未跟踪 Java 文件的独立空白检查通过。生产代码差异哈希与本轮开始时相同，保留前轮全部未提交修改，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十七轮：实体 Map 输出失败与定长字节短值
+
+新增 2 个测试类、32 个用例，并为已有临时缓冲区测试增加 3 个参数化用例，核心测试总数增加 35 个，全部通过。本轮还修复用户确认的临时跟踪坐标问题，没有涉及废弃入口。
+
+- MapOutputBoundaryTest：12 个用例对照普通／跟踪模式，分别在第一条和第二条条目的 Key、ValueLength 及 Value 复制阶段遇到输出容量不足。真实 ByteBuf 的 maxCapacity 每次仅留下不足一个完整字段的空间，检查精确部分 HEX、readerIndex、引用计数、值编码次数、后续条目及 tail 不执行。通过同一实体的 Map 元数据及可观察分配器，另行确认各失败阶段均释放临时缓冲区。容量足够时复用同一编解码器成功编码和解码，以从空 Map 及初始字段值开始的对象确认真实赋值，核对独立 HEX、条目和子节点范围及尾随字节。复制 Value 失败时，临时 Value 编码节点已成功，条目节点记录复制失败，不把未复制的字节当作实际输出。
+- DynamicShortByteValueTest：20 个用例覆盖 string、hex、bcd、bytes 列表及 byte[] 输入，分别提供空内容和短一字节的内容。普通／跟踪模式均拒绝未声明 padByte 的定长短值，检查 IllegalArgumentException 原因、字段路径、位偏移、仅保留 head 的输出、尾字段停止、节点范围和唯一诊断。随后复用同一计划及输出缓冲区，以恰好足够的值完成精确编码和解码，验证尾随输入、完整字段值及字节数组没有被修改。
+- CodecTrackerBufferScopeTest：原有嵌套迁移测试扩展为根起点 0、2、10，游标恢复测试扩展为根起点 0、10，共增加 3 个用例；验证临时缓冲区内部显式及隐式范围、嵌套迁移后的子树、外层后续节点及异常恢复。既有异常夹具同步采用隔离后的内层临时坐标，只累计其自身切片偏移。
+
+测试复现的缺陷及修复：
+
+- 报文起点非零时，临时 Value 的本地 0 起点仍被减去根报文起点，导致范围被压缩；迁移又直接使用绝对 writerIndex，造成位置额外包含前置字节。
+- 用户确认一并修复后，仅修改 CodecTraceRecorder：进入临时缓冲区时抵消根起点并隔离外层坐标，退出时恢复外层坐标；迁移目标统一转换为当前缓冲区的相对位置。未改变普通编码字节、容量异常或部分写入语义。
+- 初始失败日志和 XML 保存在证据目录；修复后的 Map 容量测试、嵌套临时缓冲区及既有 CodecTraceTest 定向回归通过。其他前轮生产代码差异哈希仍为 `f012c3c5e5f692e8a564b8eb9e01a2f543491862`。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+最终结果为 BUILD SUCCESSFUL，用时 7 秒，27 个任务中 7 个实际执行。核心模块完整测试 2709 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2735 个用例全部通过，失败、错误和跳过均为 0。core-debug 在本轮首次完整检查中实际执行，最终复用已通过结果。修改后的生产代码在定向验证时启用 Error Prone／NullAway 重新编译通过；新增测试同样启用 Error Prone 重新编译，无新增编译警告，测试源码按仓库配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8372/9564（87.54%） | 8377/9567（87.56%） |
+| 核心模块 | 分支 | 3654/4189（87.23%） | 3656/4189（87.28%） |
+
+覆盖率确认未声明 padByte 的短值拒绝分支已执行；行数分母增加 3 来自坐标修复的有效代码。模块原始覆盖率仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round27.gCCQBp`：`before.xml`、`after.xml` 保存完整覆盖率，`map-output-initial-failure.log` 和对应 XML 保存初始失败证据，`map-output.log`、`targeted.log` 保存定向验证，`full-check.log` 保存最终完整检查日志。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、已暂存和未暂存差异空白检查，以及 33 个新增 Java 文件（含已暂存文件）的独立空白检查通过。保留前轮和用户已有的全部未提交修改，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十八轮：实体条件与前置长度输出失败
+
+新增 2 个测试类、26 个用例，全部通过。本轮只新增非废弃行为测试及变更记录，生产代码差异与本轮开始时完全相同。
+
+- EntityConditionBoundaryTest：10 个用例对照普通／跟踪模式，验证 condition 返回 null 时跳过字段及其前置长度，POJO 保留原值，Record 的基本类型使用零值，引用类型使用 null，显式 AS_EMPTY 字符串使用空串。条件抛出固定异常时，检查原始根因、已完成的 head、未读写的 body／前置长度、未执行的 tail、精确部分 HEX、输入输出索引、引用计数和根节点诊断；恢复条件后复用同一份元数据完成编解码。另行验证编码值为 null 时不求值 condition，即使条件方法配置为抛异常也可以跳过字段。
+- PrependLengthOutputBoundaryTest：16 个用例覆盖 u8／u16 前置长度、byte[]／Byte[] 内容，以及占位和内容编码两个失败阶段。使用真实 maxCapacity 缓冲区，在非零报文起点检查精确部分 HEX、readerIndex／writerIndex、引用计数、源数组不变及 tail 不执行。byte[] 内容写入失败时没有内容字节，Byte[] 按元素写入失败时保留已写的一字节；长度占位仍为零，不回填部分长度。跟踪保留成功的 head、未完成的长度节点和实际失败位置，未回填节点不显示成功值。随后使用恰好足够的输出容量完成编码，再从独立输入解码，验证从不同初始字段值开始的真实赋值、完整回填、节点范围及尾随字节，并确认元数据身份不变。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 9 秒，27 个任务中 7 个实际执行。核心模块完整测试 2735 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2761 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码及输入未变化，Gradle 复用已通过结果。新增测试定向运行时启用 Error Prone 重新编译，无新增编译警告；生产编译及 NullAway 检查复用已有通过结果，测试源码按仓库既有配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8377/9567（87.56%） | 8377/9567（87.56%） |
+| 核心模块 | 分支 | 3656/4189（87.28%） | 3657/4189（87.30%） |
+
+覆盖率确认 FieldConditionEvaluator.ExpressionFieldConditionEvaluator.evaluate 的 4 个分支全部执行，补齐 null 结果的跳过分支。前置长度编码此前已有正常路径覆盖，本轮增加失败状态及恢复断言；模块原始覆盖率仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round28.xb4fbhpu`：`before.xml`、`after.xml` 保存完整覆盖率，`targeted.log` 和两个新增类的测试 XML 保存已通过的定向验证，`full-check.log` 保存完整检查日志，`production-before.diff` 用于确认本轮没有改变生产代码。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、已暂存和未暂存差异空白检查，以及新增 Java 文件的独立空白检查通过。保留前轮和用户已有的全部未提交修改及暂存状态，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第二十九轮：动态编译校验与条件边界
+
+新增 2 个测试类、46 个用例，全部通过。仅针对非废弃入口，生产代码差异与本轮开始时完全相同。
+
+- DynamicCompilerBoundaryTest：34 个用例对照 Java 构造和 JSON 导入。分别验证 63／64 层结构编译并使用足够的执行深度上限完成精确编解码，65 层在编译时拒绝并报告完整路径和 -1 偏移；长度、choice 及派生位段分别引用 string／float 时拒绝，并以 u8 来源完成合法编解码对照；countOf 分别指向不存在的目标、标量、自身和外层集合时拒绝，同时验证合法同级集合生成实际计数。合法用例使用独立输入 HEX，检查非零起点、准确结果、消费量、尾随字节和缓冲区所有权。
+- DynamicConditionBoundaryTest：12 个用例对照普通／跟踪编解码，覆盖 gt／gte／lt／lte 的等值及相邻值，以及 bitClear／bitSet 多位掩码全部、部分和未命中的情况。每个用例在相邻数组项中切换成立与不成立，所有项均显式提供不同的 value，确认跳过字段不进入结果或 Trace，且不会沿用前一项的状态。核对独立 HEX、后续 after 和 tail 的位置、输入消费及尾随字节、引用计数，并通过公开 Trace 视图检查各元素、条件字段和后续字段的精确范围与 HEX。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 7 秒，27 个任务中 7 个实际执行。核心模块完整测试 2781 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2807 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码及输入未变化，Gradle 复用已通过结果。新增测试定向运行时启用 Error Prone 重新编译，无新增编译警告；生产编译及 NullAway 检查复用已有通过结果，测试源码按仓库配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8377/9567（87.56%） | 8379/9567（87.58%） |
+| 核心模块 | 分支 | 3657/4189（87.30%） | 3664/4189（87.47%） |
+
+覆盖率确认编译结构深度超限和非整数引用拒绝路径已执行，countOf 目标判断的 6 个分支全部覆盖，gt／lt／bitClear 的成立与不成立分支全部覆盖。模块原始统计仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round29.1p81fhjh`：`before.xml`、`after.xml` 保存完整覆盖率，`targeted.log` 和两个新增类的测试 XML 保存已通过的定向验证，`full-check.log` 保存完整检查日志，`production-before.diff` 用于确认本轮没有改变生产代码。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、已暂存和未暂存差异空白检查，以及新增 Java 文件的独立空白检查通过。保留前轮和用户已有的全部未提交修改及暂存状态，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第三十轮：回填区间校验与字节字段提前拒绝
+
+新增 2 个测试类、58 个用例，全部通过。仅针对非废弃入口，生产代码差异与本轮开始时完全相同。
+
+- DynamicComputedLengthCompilationBoundaryTest：30 个用例对照 Java 构造和 JSON 导入。18 个非法定义用例覆盖不存在的单字段及起止端点、前序字段、自身、包含前序字段或自身的区间、倒序区间，以及嵌套结构引用外层端点；检查完整字段路径、-1 偏移和编译错误原因。12 个合法用例覆盖单字段、首尾相同及连续字段区间，对照普通／跟踪模式检查实际回填长度、独立 HEX、结果、节点范围、非零输入输出起点、尾随字节和缓冲区所有权。
+- DynamicByteEarlyFailureTest：28 个用例中，24 个覆盖 8／16／32 位字节长度前缀、父容器／全局输出上限、内置 hex／扩展及普通／跟踪模式。提供空内容，验证少一字节时连前缀也不能写入，已完成的 head／bound 保留，失败节点零消费，扩展 encode／decode 均未执行；随后在同一计划下将容量设为恰好足够，完成空内容编码和独立 HEX 解码，检查零长度前缀、内容空范围、消费量、尾随字节、引用计数和按需扩展调用次数。另 4 个用例分别验证必需扩展字段缺失或显式 null，检查缺值错误、字段路径和位偏移、输入值不变、扩展零调用、部分输出、tail 停止及 Trace；随后复用计划和输出缓冲区完成合法编码，并从独立报文解码。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 7 秒，27 个任务中 7 个实际执行。核心模块完整测试 2839 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2865 个用例全部通过，失败、错误和跳过均为 0。core-debug 源码及输入未变化，Gradle 复用已通过结果。新增测试定向运行时启用 Error Prone 重新编译，无新增编译警告；生产编译及 NullAway 检查复用已有通过结果，测试源码按仓库配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8379/9567（87.58%） | 8382/9567（87.61%） |
+| 核心模块 | 分支 | 3664/4189（87.47%） | 3668/4189（87.56%） |
+
+覆盖率确认 computedLengthOf 非法端点及顺序的拒绝路径、字节字段前缀容量不足的提前拒绝路径、必需扩展缺值的拒绝路径均已执行。模型构造已拒绝超过两个端点的区间语法，不为该防御分支绕过公开校验；模块原始统计仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round30.b_6tj47v`：`before.xml`、`after.xml` 保存完整覆盖率，`targeted.log` 和两个新增类的测试 XML 保存已通过的定向验证，`full-check.log` 保存完整检查日志，`production-before.diff` 用于确认本轮没有改变生产代码。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、已暂存和未暂存差异空白检查，以及新增 Java 文件的独立空白检查通过。保留前轮和用户已有的全部未提交修改及暂存状态，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第三十一轮：单值协议结构与编译配置校验
+
+新增 3 个测试类、59 个用例，全部通过。仅针对非废弃入口；本轮生产代码仅修改 HasVersions 的一行成员检查。
+
+- SinglePairAndTlvEncodingTest：26 个用例覆盖默认注册的单值 Pair／TLV 真实实体编码，分别使用 DataField、嵌套实体和 null 字段，对照普通／跟踪模式检查独立 HEX、非零输出起点、键／长度／值及嵌套节点的范围、后续字段、索引和引用计数。直接调用编解码器验证 null 早返回且不分配缓冲区；通过真实字段元数据、可观察分配器和受限 ByteBuf，验证 TLV 正常编码、Tag／Length／复制 Value 容量不足和 Value 编码异常时的部分输出、执行次数、长度状态及临时缓冲区释放。
+- MetadataVersionBoundaryTest：21 个用例通过公共 Key／ValueLength 元数据工厂验证 ALL_VERSION 在不同位置时均拒绝与具体版本混用，拒绝单配置及跨配置重复、重复默认配置和多版本重叠。合法未排序版本数组与独立默认配置验证精确版本优先、默认回退、实际键及长度读写、独立 HEX、非零读取起点、尾随字节和数组不变。修复前 4 个用例失败，输入分别为 `{1, ALL_VERSION}` 和 `{1, 2, ALL_VERSION}`，两个入口均未拒绝；用户确认修复后，将 Arrays.binarySearch 替换为 Arrays.stream(...).anyMatch(...)，不排序、不修改输入数组，全部回归通过。
+- DynamicExtensionCompilationBoundaryTest：12 个用例对照 Java 构造与 JSON 导入，分别验证 extensionId 缺失、显式 null、空串、纯空白和非字符串时在编译期拒绝，检查完整嵌套路径、-1 偏移及扩展零调用；配置 validate 抛异常时保留原始 cause。失败后使用同一注册表重新编译合法结构，完成编码及独立 HEX 解码，核对校验与编解码调用次数、消费量、尾随字节、索引和缓冲区所有权。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 9 秒，27 个任务中 11 个实际执行。核心模块完整测试 2898 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2924 个用例全部通过，失败、错误和跳过均为 0；三项测试任务均实际执行。定向运行时启用 Error Prone 重新编译生产代码，执行生产 NullAway 检查；最终全量检查复用该生产编译结果，重新编译测试源码且无新增编译警告，测试源码按仓库配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8382/9567（87.61%） | 8412/9567（87.93%） |
+| 核心模块 | 分支 | 3668/4189（87.56%） | 3684/4191（87.90%） |
+
+覆盖率确认单值 PairCodec／TLVCodec 的 serialize 和 serializeWithTracker 行及分支全部执行，ALL_VERSION 成员检查及混用拒绝路径全部覆盖。成员谓词产生两个分支，使模块分支总数由 4189 变为 4191；模块原始统计仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round31.nYixmMOq`：`before.xml`、`after.xml` 保存完整覆盖率；`version-initial.log` 和 `version-initial.xml` 保存修复前 4 个失败的证据；`targeted.log` 保存 59 个用例的定向验证，三个测试 XML 保存最终全量运行结果；`full-check.log` 保存完整检查日志；对照 `production-before.diff` 确认本轮仅增加上述 HasVersions 修复。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、已暂存和未暂存差异空白检查，以及新增 Java 文件的独立空白检查通过。保留前轮和用户已有的全部未提交修改及暂存状态，没有修改文档引用的源码片段，无需重建文档站点。
+
+## 第三十二轮：自定义 Map 与动态条件定义
+
+新增 3 个测试类、68 个用例，全部通过。仅针对非废弃入口；本轮生产代码仅调整 AbstractMapFieldCodec.deserializeWithTracker 的 HEX 起点，新增一行记录读取起点，替换一行节点完成调用。
+
+- CustomMapFieldCodecBoundaryTest：22 个用例通过真实实体及 AbstractMapFieldCodec 子类，验证按实体类和 CustomFieldCodec 类注册 Value、构造器注册表注入、两个版本的值宽度传递，以及有界／无界普通和跟踪编解码。使用独立 HEX，检查非零输入输出起点、键顺序、实体及自定义值、Map 和嵌套节点范围、尾字段、尾随字节、索引和引用计数。覆盖空 Map 的零消费范围与空 HEX、未知数值键在有界及无界输入中的失败消费、文本键错误表示，以及基础类型和没有 CustomFieldCodec 标记的类被拒绝且原注册仍保留。
+- DynamicConditionAndLengthDefinitionTest：42 个用例对照 Java 构造与 JSON 导入。14 个条件用例覆盖缺失／空白引用、缺少运算符／比较值，以及表达式分别与 ref、op、value 混用；12 个长度用例覆盖单位缺失、引用空白、来源缺失或冲突、表达式与固定来源冲突，以及 remaining 与 item 组合。检查 Java 拒绝原因和 JSON 包装异常的原始原因；16 个合法对照通过条件 eq／ne／表达式及固定／引用／前缀／剩余 byte／剩余 bit 长度，完成实际编码和独立 HEX 解码，验证字节、消费量、边界、尾随字节及缓冲区所有权。
+- DynamicBooleanLayoutBoundaryTest：4 个用例对照普通／跟踪模式，在相邻数组项中分别使用 OR(false, 布尔表达式) 和 NOT(布尔表达式)，覆盖 OR 右侧成功返回 false／true 及 NOT(false) 为 true。每项均显式提供不同的条件字段值，检查派生布尔值、条件字段执行／跳过、相邻项状态隔离、独立 HEX、零消费派生节点、实际字段及尾字段范围、尾随字节和引用计数。
+
+首次定向运行 68 个用例中 2 个失败，两个版本的无界 Map 跟踪解码都在 Map 节点 HEX 前额外包含了 `55aa7e`，而节点范围和普通解码正确。修复前全量运行也仅此 2 个失败。原因是完成 Map 节点时固定使用 HEX 起点 0：有界切片从 0 开始合法，无界输入则包含了缓冲区前缀和前置字段。用户确认一并修复后，在读取前保存 slice.readerIndex，并在完成节点时使用该起点；不改变解码结果、输入消费和节点范围。保留两个版本的失败回归，并增加空 Map 的空 HEX 断言，修复后定向及全量全部通过。
+
+最终验证命令：
+
+```bash
+JAVA_HOME="$(mise where java)" ./gradlew \
+  :xtream-codec-core:check :xtream-codec-core:jacocoTestReport \
+  :debug:xtream-codec-core-debug:test \
+  -I /private/tmp/xtream-core-round17.NUtqCK/coverage.init.gradle \
+  -P xtream.backend.build.errorprone.enabled=true \
+  -P xtream.backend.build.checkstyle.enabled=true \
+  -P xtream.backend.build.license-checker.enabled=true --console=plain
+```
+
+结果为 BUILD SUCCESSFUL，用时 8 秒，27 个任务中 10 个实际执行。核心模块完整测试 2966 个、无 Jackson 环境测试 3 个、core-debug 测试 23 个，共 2992 个用例全部通过，失败、错误和跳过均为 0，三项测试任务均实际执行。修复后的定向运行启用 Error Prone 重新编译生产及测试源码，执行生产 NullAway 检查，无新增编译警告；最终全量检查复用该编译结果，测试源码按仓库配置禁用 NullAway。Checkstyle 和许可证检查通过。
+
+| 范围 | 指标 | 修改前 | 修改后 |
+| --- | --- | ---: | ---: |
+| 核心模块 | 行 | 8412/9567（87.93%） | 8465/9568（88.47%） |
+| 核心模块 | 分支 | 3684/4191（87.90%） | 3711/4191（88.55%） |
+
+覆盖率确认 AbstractMapFieldCodec 的类注册、未知键拒绝及普通解码路径已执行，EntityFieldCodec 的四种编解码方法均已执行；动态条件及长度定义的本轮拒绝路径、OR 的合法右侧返回和 NOT 的两种结果已覆盖。生产修复新增一行，使模块行总数增加 1；模块原始统计仍包含废弃及生成代码，新增测试仅针对非废弃行为。
+
+证据目录为 `/private/tmp/xtream-core-round32.cFBJ4R3C`：`before.xml`、`after.xml` 保存完整覆盖率；`map-initial.log`、`map-initial.xml` 和 `full-initial.log` 保存修复前失败证据；`targeted.log` 和三个测试 XML 保存通过的定向验证；`static-check.log` 保存独立风格和许可证检查；`full-check.log` 保存最终完整检查日志；对照 `production-before.diff` 确认本轮仅增加上述 Map 跟踪 HEX 起点修复。最新 HTML 报告位于 `xtream-codec-core/build/reports/jacoco/test/html/index.html`。
+
+本轮按 openspec-apply-change 同步范围、设计、任务和验证记录。变更及全部 22 个主规格的严格验证、已暂存和未暂存差异空白检查，以及新增 Java 文件的独立空白检查通过。保留前轮和用户已有的全部未提交修改及暂存状态，没有修改文档引用的源码片段，无需重建文档站点。

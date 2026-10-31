@@ -123,6 +123,7 @@ public abstract class AbstractMapFieldCodec<
         try (final CodecTracker.TraceScope mapScope = codecTracker.enterMap(propertyMetadata, this.getClass(), inputReaderIndexBeforeSlice)) {
             int sequence = 0;
             try (final CodecTracker.CoordinateScope ignored = length >= 0 ? codecTracker.openCoordinateBase(inputReaderIndexBeforeSlice) : null) {
+                final int mapIndexBeforeRead = slice.readerIndex();
                 while (slice.isReadable()) {
                     final int indexBeforeRead = slice.readerIndex();
                     try (final CodecTracker.TraceScope entryScope = codecTracker.enterMapEntry(propertyMetadata.name(), sequence++, indexBeforeRead)) {
@@ -147,7 +148,7 @@ public abstract class AbstractMapFieldCodec<
                         result.put(key, value);
                     }
                 }
-                mapScope.complete(result, slice, 0, slice.readerIndex());
+                mapScope.complete(result, slice, mapIndexBeforeRead, slice.readerIndex());
             }
         }
         return result;

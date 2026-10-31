@@ -33,7 +33,7 @@ public record HasVersions<T>(int[] version, T source) {
                 .flatMap(it -> {
                     final int[] version = it.version();
                     if (version.length > 1) {
-                        if (Arrays.binarySearch(version, XtreamMapField.ALL_VERSION) >= 0) {
+                        if (Arrays.stream(version).anyMatch(v -> v == XtreamMapField.ALL_VERSION)) {
                             throw new IllegalArgumentException(
                                     "Cannot use `XtreamMapField.ALL_VERSION` with other versions\n"
                                     + "Components:\n\n" + it.source());

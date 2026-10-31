@@ -63,6 +63,8 @@ class CodecTraceRecorder {
     int beginTemporaryBuffer() {
         final int previousCursor = this.cursor;
         this.temporaryBufferCursorStack.push(previousCursor);
+        // 临时缓冲区从零开始，抵消根报文起点并隔离外层切片坐标。
+        this.coordinateBaseStack.push(this.rootStartAbsolute);
         this.cursor = 0;
         return previousCursor;
     }
@@ -72,6 +74,7 @@ class CodecTraceRecorder {
         if (expectedCursor != previousCursor) {
             throw new IllegalStateException("临时缓冲区游标恢复顺序不正确");
         }
+        this.coordinateBaseStack.pop();
         this.cursor = previousCursor;
     }
 
@@ -80,8 +83,9 @@ class CodecTraceRecorder {
         if (fromIndex < 0 || toIndex > children.size() || fromIndex > toIndex) {
             throw new IndexOutOfBoundsException("无效的 Trace 子节点范围");
         }
+        final int relativeTarget = this.toRelative(this.currentCoordinateBase(), targetStart);
         for (int i = fromIndex; i < toIndex; i++) {
-            shiftSubtree(children.get(i), targetStart);
+            shiftSubtree(children.get(i), relativeTarget);
         }
     }
 

@@ -30,7 +30,6 @@ import io.github.hylexus.xtream.codec.core.utils.XtreamFieldUtils;
 import io.netty.buffer.ByteBuf;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -106,36 +105,9 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
 
 
     private Object decodeRecordFields(FieldCodec.DeserializeContext newContext, ByteBuf slice, Object instance, boolean useTracker) {
-        final @Nullable Object[] fieldValues = new @Nullable Object[this.nestedBeanMetadata.getPropertyMetadataList().size()];
-        @SuppressWarnings("unchecked") final Map<String, @Nullable Object> map = (Map<String, Object>) instance;
-
-        for (final BeanPropertyMetadata pm : this.nestedBeanMetadata.getPropertyMetadataList()) {
-            if (pm.isDerived() || !pm.conditionEvaluator().evaluate(newContext)) {
-                newContext.evaluationContext().setVariable(pm.name(), null);
-                continue;
-            }
-            final Object value = useTracker
-                    ? pm.decodePropertyValueWithTracker(newContext, slice)
-                    : pm.decodePropertyValue(newContext, slice);
-            newContext.evaluationContext().setVariable(pm.name(), value);
-            map.put(pm.name(), value);
-            final int idx = nestedBeanMetadata.propertyIndex(pm.name());
-            if (idx >= 0) {
-                fieldValues[idx] = value;
-            }
-
-            if (this.nestedBeanMetadata.hasDerivedFields()) {
-                XtreamFieldUtils.applyDerivedFieldsInline(value, pm.name(), nestedBeanMetadata, (derived, derivedVal) -> {
-                    map.put(derived.name(), derivedVal);
-                    final int derivedIndex = nestedBeanMetadata.propertyIndex(derived.name());
-                    if (derivedIndex >= 0) {
-                        fieldValues[derivedIndex] = derivedVal;
-                    }
-                    newContext.evaluationContext().setVariable(derived.name(), derivedVal);
-                });
-            }
-        }
-        return nestedBeanMetadata.createNewRecordInstance(fieldValues);
+        return useTracker
+                ? newContext.entityDecoder().decodeWithTracker(newContext.version(), slice, this.nestedBeanMetadata, instance, Objects.requireNonNull(newContext.codecTracker()))
+                : newContext.entityDecoder().decode(newContext.version(), slice, this.nestedBeanMetadata, instance);
     }
 
     private Object decodePojoFields(FieldCodec.DeserializeContext newContext, ByteBuf slice, Object instance, boolean useTracker) {
@@ -163,6 +135,10 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
 
     @Override
     public void doEncode(FieldCodec.SerializeContext context, ByteBuf output, Object value) {
+        if (this.nestedBeanMetadata.hasEncodedLengthField()) {
+            context.entityEncoder().encode(context.version(), this.nestedBeanMetadata, value, output);
+            return;
+        }
         final DefaultSerializeContext newContext = new DefaultSerializeContext(context, value);
         for (final BeanPropertyMetadata pm : this.nestedBeanMetadata.getPropertyMetadataList()) {
             if (pm.isDerived() || !pm.conditionEvaluator().evaluate(newContext)) {
@@ -181,6 +157,11 @@ public class NestedBeanPropertyMetadata extends BasicBeanPropertyMetadata {
         final CodecTracker codecTracker = Objects.requireNonNull(context.codecTracker());
         final int indexBeforeWrite = output.writerIndex();
         try (final CodecTracker.TraceScope scope = codecTracker.enterNestedField(this, this.getClass(), indexBeforeWrite)) {
+            if (this.nestedBeanMetadata.hasEncodedLengthField()) {
+                context.entityEncoder().encodeWithTracker(context.version(), this.nestedBeanMetadata, value, output, codecTracker);
+                scope.complete(value, output.writerIndex());
+                return;
+            }
             for (final BeanPropertyMetadata pm : this.nestedBeanMetadata.getPropertyMetadataList()) {
                 if (pm.isDerived() || !pm.conditionEvaluator().evaluate(newContext)) {
                     newContext.evaluationContext().setVariable(pm.name(), null);
