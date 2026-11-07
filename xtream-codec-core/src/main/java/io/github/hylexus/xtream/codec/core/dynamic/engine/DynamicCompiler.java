@@ -299,7 +299,7 @@ public final class DynamicCompiler {
         final int width = dynamicField.options() != null && dynamicField.options().get("bitWidth") instanceof Number number
                 ? number.intValue() : -1;
         if (target == null || target.bitWidth() == null || offset < 0 || width < 1
-                || offset + width > target.bitWidth()) {
+                || (long) offset + width > target.bitWidth()) {
             throw error(path, "派生位段必须声明有效的 bitOffset 和 bitWidth，且位于源整数范围内");
         }
         if (target.definition().endian() == DynamicEndian.LITTLE

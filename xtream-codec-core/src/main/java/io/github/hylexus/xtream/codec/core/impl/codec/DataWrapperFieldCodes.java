@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
 public final class DataWrapperFieldCodes {
     public static final DataWrapperFieldCodec INSTANCE = new DataWrapperFieldCodec();
 
-    public static final DwordWrapperFieldCodec INSTANCE_STRING_UTF_8 = new DwordWrapperFieldCodec();
+    public static final StringWrapperUtf8FieldCodec INSTANCE_STRING_UTF_8 = new StringWrapperUtf8FieldCodec();
     public static final StringWrapperGbkFieldCodec INSTANCE_STRING_GBK = new StringWrapperGbkFieldCodec();
     public static final StringWrapperBcd8421FieldCodec INSTANCE_STRING_BCD_8421 = new StringWrapperBcd8421FieldCodec();
 

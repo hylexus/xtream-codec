@@ -103,7 +103,7 @@ public interface XtreamByteReader {
     }
 
     default String readString(int length, Charset charset) {
-        return (String) readable().readCharSequence(length, charset);
+        return readable().readCharSequence(length, charset).toString();
     }
 
     default XtreamByteReader readString(int length, Charset charset, Consumer<String> consumer) {

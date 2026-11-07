@@ -124,6 +124,7 @@ final class DynamicWriteExecution {
     /**
      * 源整数输入缺省时，将已提供的同级派生位段组合成源值。
      * 每个位段必须为其位宽内的非负整数，重叠位必须一致，未提供的位保持为零。
+     * 有符号源整数按声明位宽将合成的补码位模式还原为负值。
      *
      * @return 合成的整数；没有提供任何派生位段时为空
      */
@@ -152,6 +153,9 @@ final class DynamicWriteExecution {
             result = result.or(shifted);
             used = used.or(mask);
             found = true;
+        }
+        if (number.signed() && result.testBit(number.bits() - 1)) {
+            result = result.subtract(BigInteger.ONE.shiftLeft(number.bits()));
         }
         return found ? result : null;
     }

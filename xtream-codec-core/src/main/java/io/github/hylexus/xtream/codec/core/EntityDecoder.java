@@ -204,6 +204,13 @@ public class EntityDecoder {
                 });
             }
         }
+        // 派生转换失败、源值为空或返回空值时，基本类型构造参数使用对应的零值。
+        for (int i = 0; i < propertyMetadataList.size(); i++) {
+            final BeanPropertyMetadata propertyMetadata = propertyMetadataList.get(i);
+            if (propertyMetadata.isDerived() && filedValues[i] == null && propertyMetadata.rawClass().isPrimitive()) {
+                filedValues[i] = XtreamFieldUtils.createDefaultValueForNulls(XtreamField.Nulls.AS_NULL, propertyMetadata.rawClass());
+            }
+        }
         return beanMetadata.createNewRecordInstance(filedValues);
     }
 

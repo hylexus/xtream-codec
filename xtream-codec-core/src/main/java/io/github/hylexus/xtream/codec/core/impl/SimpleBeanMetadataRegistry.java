@@ -185,8 +185,9 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
                             pd.getName(), beanClass.getName());
                 }
                 final BeanPropertyMetadata basicPropertyMetadata = creator.apply(new PropertyInfo(xtreamEntityAnnotation, pd, xtreamFieldAnnotation, version));
-                // 用户自定义 FieldCodec
-                if (basicPropertyMetadata.fieldCodec() != FieldCodec.NullFieldCodec.INSTANCE) {
+                // 瞬态字段或自定义 FieldCodec 无需继续解析内部结构
+                if (xtreamFieldAnnotation.codecStrategy() == XtreamField.CodecStrategy.TRANSIENT
+                        || basicPropertyMetadata.fieldCodec() != FieldCodec.NullFieldCodec.INSTANCE) {
                     pdList.add(basicPropertyMetadata);
                 } else {
                     if (basicPropertyMetadata.dataType() == BeanPropertyMetadata.FiledDataType.basic) {
@@ -234,6 +235,10 @@ public class SimpleBeanMetadataRegistry implements BeanMetadataRegistry {
                         accessor.setter()
                 );
                 pdList.add(derivedMetadata);
+            } else if (isRecordClass && !allDerivedFields.isEmpty()) {
+                // 未匹配版本的派生组件仍需占据 Record 构造参数的位置。
+                final XtreamField transientField = XtreamFieldUtils.createTransientFieldProxy(field);
+                pdList.add(creator.apply(new PropertyInfo(xtreamEntityAnnotation, pd, transientField, version)));
             }
         }
 

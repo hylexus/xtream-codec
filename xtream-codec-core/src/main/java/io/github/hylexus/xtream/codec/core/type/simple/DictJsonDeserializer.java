@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hylexus.xtream.codec.core.annotation.PrependLengthFieldType;
 import io.github.hylexus.xtream.codec.core.annotation.ext.LengthFieldType;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -31,6 +32,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? extends DataField.DictKey>> {
+
+    private static final Set<String> FIELD_PROPERTIES = Set.of(
+            "type", "name", "prependLengthFieldType", "keyType", "valueLengthType", "value");
 
     private static final Map<String, Class<? extends DataField.DictKey>> NAME_TO_CLASS = Map.of(
             "i8", DataField.I8.class,
@@ -77,6 +81,9 @@ public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? exte
 
         // 3. 手动反序列化 value map
         final JsonNode valueNode = node.get("value");
+        if (valueNode == null || !valueNode.isObject()) {
+            throw new JsonParseException(p, "value must be a JSON object");
+        }
         final Map<DataField.DictKey, DataField> valueMap = new LinkedHashMap<>();
 
         final Set<Map.Entry<String, JsonNode>> properties = valueNode.properties();
@@ -92,22 +99,33 @@ public class DictJsonDeserializer extends JsonDeserializer<DataField.Dict<? exte
             valueMap.put(dictKey, fieldValue);
         }
 
-        // 4. 构造 Dict
+        // 4. 保留名称以及按现有格式展开的扩展属性
+        final String name = node.path("name").asText(null);
+        final Map<String, @Nullable Object> attributes = new LinkedHashMap<>();
+        for (Map.Entry<String, JsonNode> entry : node.properties()) {
+            if (!FIELD_PROPERTIES.contains(entry.getKey())) {
+                attributes.put(entry.getKey(), this.objectMapper.treeToValue(entry.getValue(), Object.class));
+            }
+        }
         return createDict(
+                name,
                 keyType,
                 valueLengthType,
                 valueMap,
-                prependLengthFieldType
+                prependLengthFieldType,
+                attributes
         );
 
     }
 
     private <K extends DataField.DictKey> DataField.Dict<K> createDict(
+            @Nullable String name,
             Class<K> keyType,
             LengthFieldType valueLengthType,
             Map<DataField.DictKey, DataField> rawValueMap,
-            PrependLengthFieldType prependLengthFieldType) {
+            PrependLengthFieldType prependLengthFieldType,
+            Map<String, @Nullable Object> attributes) {
         @SuppressWarnings("unchecked") final Map<K, DataField> typedMap = (Map<K, DataField>) rawValueMap;
-        return new DataField.Dict<>(null, prependLengthFieldType, keyType, valueLengthType, typedMap, null);
+        return new DataField.Dict<>(name, prependLengthFieldType, keyType, valueLengthType, typedMap, attributes);
     }
 }

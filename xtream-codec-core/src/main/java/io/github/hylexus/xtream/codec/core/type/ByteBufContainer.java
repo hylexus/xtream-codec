@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * @author hylexus
+ * @author Codex (AI)
  * @apiNote 注意 {@link #release()} 方法
  * @see #release()
  * @see ByteArrayContainerFieldCodec
@@ -40,11 +41,11 @@ public interface ByteBufContainer extends BytesContainer {
     }
 
     static ByteBufContainer ofBytes(byte[] bytes) {
-        return () -> FACTORY.buffer(bytes.length).writeBytes(bytes);
+        return ofBytes(FACTORY.buffer(bytes.length).writeBytes(bytes));
     }
 
     static ByteBufContainer ofI8(int value) {
-        return () -> FACTORY.buffer(1).writeByte(value);
+        return ofBytes(FACTORY.buffer(1).writeByte(value));
     }
 
     static ByteBufContainer ofU8(int value) {
@@ -52,7 +53,7 @@ public interface ByteBufContainer extends BytesContainer {
     }
 
     static ByteBufContainer ofI16(int value) {
-        return () -> FACTORY.buffer(2).writeShort(value);
+        return ofBytes(FACTORY.buffer(2).writeShort(value));
     }
 
     static ByteBufContainer ofU16(int value) {
@@ -60,7 +61,7 @@ public interface ByteBufContainer extends BytesContainer {
     }
 
     static ByteBufContainer ofI32(int value) {
-        return () -> FACTORY.buffer(4).writeInt(value);
+        return ofBytes(FACTORY.buffer(4).writeInt(value));
     }
 
     static ByteBufContainer ofU32(int value) {
@@ -68,11 +69,11 @@ public interface ByteBufContainer extends BytesContainer {
     }
 
     static ByteBufContainer ofBcd(String bcd) {
-        return () -> XtreamBytes.writeBcd(FACTORY.buffer(bcd.length()), bcd);
+        return ofBytes(XtreamBytes.writeBcd(FACTORY.buffer(bcd.length()), bcd));
     }
 
     static ByteBufContainer ofString(String string, Charset charset) {
-        return () -> FACTORY.buffer().writeBytes(string.getBytes(charset));
+        return ofBytes(FACTORY.buffer().writeBytes(string.getBytes(charset)));
     }
 
     static ByteBufContainer ofString(String string) {
@@ -107,17 +108,20 @@ public interface ByteBufContainer extends BytesContainer {
 
     @Override
     default byte asI8() {
-        return this.payload().getByte(0);
+        final ByteBuf payload = this.payload();
+        return payload.getByte(payload.readerIndex());
     }
 
     @Override
     default short asI16() {
-        return this.payload().getShort(0);
+        final ByteBuf payload = this.payload();
+        return payload.getShort(payload.readerIndex());
     }
 
     @Override
     default int asI32() {
-        return this.payload().getInt(0);
+        final ByteBuf payload = this.payload();
+        return payload.getInt(payload.readerIndex());
     }
 
     @Override
