@@ -551,6 +551,7 @@ fun isJavaProject(project: Project): Boolean {
                 "xtream-codec-server-reactive-debug-tcp",
                 "xtream-codec-server-reactive-debug-udp",
                 "jt-808-server-spring-boot-starter-reactive-debug",
+                "jt-808-server-loadtest",
                 "jt-808-attachment-server-quick-start-blocking",
                 "jt-808-attachment-server-quick-start-nonblocking",
                 "jt-808-server-quick-start",

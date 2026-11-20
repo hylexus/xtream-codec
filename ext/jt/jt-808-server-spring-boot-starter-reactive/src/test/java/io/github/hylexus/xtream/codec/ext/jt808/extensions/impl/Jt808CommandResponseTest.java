@@ -1,0 +1,115 @@
+/*
+ * Copyright 2024-present the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.github.hylexus.xtream.codec.ext.jt808.extensions.impl;
+
+import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
+import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class Jt808CommandResponseTest {
+    @Test
+    void shouldKeepResponseReceivedBeforeWriteCompletes() {
+        final var sender = new TestSender();
+        sender.write = () -> Mono.fromRunnable(() -> {
+            sender.reply("first");
+            sender.reply("duplicate");
+        });
+
+        assertEquals("first", sender.send().block(Duration.ofSeconds(1)));
+    }
+
+    @Test
+    void cancellationAndDuplicateKeyShouldNotDisplaceExistingWaiter() {
+        final var sender = new TestSender();
+        sender.write = Mono::never;
+        final var waiting = sender.send().subscribe();
+        try {
+            final var first = assertThrows(IllegalStateException.class, () -> sender.send().block(Duration.ofSeconds(1)));
+            final var second = assertThrows(IllegalStateException.class, () -> sender.send().block(Duration.ofSeconds(1)));
+            assertTrue(first.getMessage().startsWith("A command is already awaiting a response for key "));
+            assertEquals(first.getMessage(), second.getMessage());
+        } finally {
+            waiting.dispose();
+        }
+
+        sender.write = () -> Mono.fromRunnable(() -> sender.reply("after cancellation"));
+        assertEquals("after cancellation", sender.send().block(Duration.ofSeconds(1)));
+    }
+
+    @Test
+    void writeFailureShouldWinOverEarlyResponseAndReleasePendingKey() {
+        final var sender = new TestSender();
+        final var failure = new IllegalArgumentException("写入失败");
+        sender.write = () -> Mono.defer(() -> {
+            sender.reply("early");
+            return Mono.error(failure);
+        });
+
+        assertSame(failure, assertThrows(IllegalArgumentException.class, () -> sender.send().block(Duration.ofSeconds(1))));
+        sender.write = () -> Mono.fromRunnable(() -> sender.reply("retry"));
+        assertEquals("retry", sender.send().block(Duration.ofSeconds(1)));
+    }
+
+    @NullMarked
+    private static final class TestSender extends DefaultJt808XtreamCommandSender {
+        private static final String TERMINAL = "00000000000000000001";
+        private static final int FLOW_ID = 42;
+        private final Jt808Session session = mock(Jt808Session.class);
+        private Supplier<Mono<Void>> write = Mono::empty;
+
+        private TestSender() {
+            super(ByteBufAllocator.DEFAULT, null, null, increment -> FLOW_ID, null);
+            when(session.terminalId()).thenReturn(TERMINAL);
+            when(session.protocolVersion()).thenReturn(Jt808ProtocolVersion.VERSION_2019);
+        }
+
+        private Mono<String> send() {
+            return this.sendObjectAndWaitingResponse("test-session", Mono.just(new Object()), 0x0001);
+        }
+
+        private void reply(String value) {
+            this.setClientResponse(Jt808CommandKey.of(TERMINAL, 0x0001, FLOW_ID), value);
+        }
+
+        @Override
+        protected Mono<Jt808Session> getSessionById(String sessionId) {
+            return Mono.just(session);
+        }
+
+        @Override
+        protected Mono<ByteBuf> encodeJt808Message(Jt808ProtocolVersion version, String terminalId, int flowId, Object body) {
+            return Mono.just(Unpooled.EMPTY_BUFFER);
+        }
+
+        @Override
+        protected Mono<Void> doWrite(Publisher<? extends ByteBuf> data, Jt808Session selected) {
+            return Mono.from(data).then(Mono.defer(write));
+        }
+    }
+}

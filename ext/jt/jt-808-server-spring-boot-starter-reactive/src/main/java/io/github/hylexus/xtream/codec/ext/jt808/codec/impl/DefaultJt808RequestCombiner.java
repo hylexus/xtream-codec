@@ -105,6 +105,8 @@ public class DefaultJt808RequestCombiner implements Jt808RequestCombiner {
                     .messageBodyProps(newMessageBodyProps)
                     .version(oldHeader.version())
                     .terminalId(oldHeader.terminalId())
+                    // 对整条消息的应答引用第 1 包流水号，最后到达的可能是任意子包。
+                    .flowId(allPackages.getFirst().header().flowId())
                     .build();
 
             return jt808Request.mutate()

@@ -120,7 +120,13 @@ public class Jt808AttachmentServerUdpHandlerAdapter extends Jt808InstructionServ
         final Channel channel = inboundInfo.channel();
         final InetSocketAddress remoteAddress = inboundInfo.remoteAddress();
         final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.ATTACHMENT_SERVER, requestId, allocator, nettyInbound, XtreamInbound.Type.UDP, payload, channel, remoteAddress);
-        this.requestLifecycleListener.afterRequestDecoded(nettyInbound, payload, request);
-        return request;
+        try {
+            this.requestLifecycleListener.afterRequestDecoded(nettyInbound, payload, request);
+            return request;
+        } catch (Throwable error) {
+            // 回调失败时请求还未交给 Exchange，由入口释放解码正文。
+            request.release();
+            throw error;
+        }
     }
 }

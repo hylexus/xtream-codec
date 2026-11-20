@@ -35,6 +35,7 @@ import java.time.Instant;
 
 /**
  * @author hylexus
+ * @author Codex (AI)
  */
 public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandlerAdapter {
 
@@ -54,12 +55,17 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
     public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
         return nettyInbound.receiveObject().flatMap(object -> {
             if (object instanceof DatagramPacket datagramPacket) {
-                final InboundInfo inboundInfo = this.initUdpInboundInfo(nettyInbound, datagramPacket);
-                return handleRequest(nettyInbound, nettyOutbound, datagramPacket, inboundInfo)
+                datagramPacket.retain();
+                return Mono
+                        .defer(() -> {
+                            final InboundInfo inboundInfo = this.initUdpInboundInfo(nettyInbound, datagramPacket);
+                            return handleRequest(nettyInbound, nettyOutbound, datagramPacket, inboundInfo);
+                        })
                         .onErrorResume(Throwable.class, throwable -> {
                             log.error("Unexpected Exception", throwable);
                             return Mono.empty();
-                        });
+                        })
+                        .doFinally(signal -> datagramPacket.release());
             } else {
                 return Mono.error(new IllegalStateException("Cannot handle message. type = [" + object.getClass() + "]"));
             }

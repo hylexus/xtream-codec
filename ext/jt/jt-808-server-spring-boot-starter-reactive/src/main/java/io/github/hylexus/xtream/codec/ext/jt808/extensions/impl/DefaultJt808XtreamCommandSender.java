@@ -16,7 +16,6 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.extensions.impl;
 
-import io.github.hylexus.xtream.codec.common.utils.FormatUtils;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener;
 import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808ResponseEncoder;
 import io.github.hylexus.xtream.codec.ext.jt808.exception.Jt808SessionNotFoundException;
@@ -29,17 +28,18 @@ import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionManager;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSessionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
+import reactor.core.publisher.Sinks;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author hylexus
@@ -50,7 +50,7 @@ public class DefaultJt808XtreamCommandSender implements Jt808CommandSender {
     protected final Jt808SessionManager sessionManager;
     protected final Jt808ResponseEncoder jt808ResponseEncoder;
     protected final Jt808FlowIdGenerator flowIdGenerator;
-    private final Map<Jt808CommandKey, MonoSink<Object>> sinkMap = new HashMap<>();
+    private final ConcurrentMap<Jt808CommandKey, Sinks.One<Object>> pendingResponses = new ConcurrentHashMap<>();
     protected final Jt808RequestLifecycleListener requestLifecycleListener;
 
     public DefaultJt808XtreamCommandSender(ByteBufAllocator bufferFactory, Jt808SessionManager sessionManager, Jt808ResponseEncoder jt808ResponseEncoder, Jt808FlowIdGenerator flowIdGenerator, Jt808RequestLifecycleListener requestLifecycleListener) {
@@ -93,31 +93,39 @@ public class DefaultJt808XtreamCommandSender implements Jt808CommandSender {
 
     @Override
     public <R> Mono<R> sendObjectAndWaitingResponse(String sessionId, Mono<Object> bodyMono, int messageId) {
-        return this.getSessionById(sessionId).flatMap(session -> {
+        return this.getSessionById(sessionId).flatMap(session -> bodyMono.flatMap(body -> {
             final String terminalId = session.terminalId();
             final Jt808ProtocolVersion version = session.protocolVersion();
             final int flowId = this.flowIdGenerator.nextFlowId();
             final Jt808CommandKey commandKey = Jt808CommandKey.of(terminalId, messageId, flowId);
 
-            final Mono<R> mono = Mono.create(sink -> {
-                // ...
-                sinkMap.put(commandKey, sink);
-            }).map(it -> {
-                @SuppressWarnings("unchecked") R r = (R) it;
-                return r;
-            }).doFinally(signalType -> {
-                // ...
-                sinkMap.remove(commandKey);
+            return Mono.using(
+                    () -> {
+                        // 终端可能在写入完成前就回包，先登记等待项才能保留提前到达的应答。
+                        final Sinks.One<Object> clientResponse = Sinks.one();
+                        if (this.pendingResponses.putIfAbsent(commandKey, clientResponse) != null) {
+                            throw new IllegalStateException("A command is already awaiting a response for key " + commandKey);
+                        }
+                        log.info("[CommandSender][{}] Registered response waiter", commandKey);
+                        return clientResponse;
+                    },
+                    (Sinks.One<Object> clientResponse) -> {
+                        final Mono<ByteBuf> buffer = Mono.defer(() -> this.encodeJt808Message(version, terminalId, flowId, body));
+                        return this.doWrite(buffer, session)
+                                .then(clientResponse.asMono()
+                                        .doOnSubscribe(ignored -> log.info("[CommandSender][{}] Waiting for terminal response", commandKey))
+                                );
+                    },
+                    (Sinks.One<Object> response) -> {
+                        if (this.pendingResponses.remove(commandKey, response)) {
+                            log.info("[CommandSender][{}] Removed response waiter", commandKey);
+                        }
+                    }
+            ).map(value -> {
+                @SuppressWarnings("unchecked") final R response = (R) value;
+                return response;
             });
-
-            return bodyMono.flatMap(body -> {
-                final Mono<ByteBuf> buffer = this.encodeJt808Message(version, terminalId, flowId, body);
-                return this.doWrite(buffer, session);
-            }).then(mono).doFinally(signalType -> {
-                // ...
-                sinkMap.remove(commandKey);
-            });
-        });
+        }));
     }
 
     @Override
@@ -131,10 +139,18 @@ public class DefaultJt808XtreamCommandSender implements Jt808CommandSender {
     }
 
     @Override
-    public void setClientResponse(Jt808CommandKey commandKey, Object clientResponse) {
-        final MonoSink<Object> sink = this.sinkMap.get(commandKey);
-        if (sink != null) {
-            sink.success(clientResponse);
+    public void setClientResponse(Jt808CommandKey commandKey, @Nullable Object clientResponse) {
+        final Sinks.One<Object> sink = this.pendingResponses.get(commandKey);
+        log.info("[CommandSender][{}] Received terminal response (waiterPresent={})", commandKey, sink != null);
+        if (sink == null) {
+            return;
+        }
+
+        // 已取消的等待项会被移除，重复应答由单值 sink 忽略
+        if (clientResponse == null) {
+            sink.tryEmitEmpty();
+        } else {
+            sink.tryEmitValue(clientResponse);
         }
     }
 
@@ -158,7 +174,6 @@ public class DefaultJt808XtreamCommandSender implements Jt808CommandSender {
         } else {
             buffer = this.jt808ResponseEncoder.encode(body, version, terminalId, annotation);
         }
-        log.info("command sender ::: {}", FormatUtils.toHexString(buffer));
         return Mono.just(buffer);
     }
 

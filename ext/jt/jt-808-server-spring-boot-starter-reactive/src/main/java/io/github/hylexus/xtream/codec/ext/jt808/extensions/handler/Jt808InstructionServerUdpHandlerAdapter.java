@@ -40,9 +40,10 @@ import java.util.List;
 
 /**
  * @author hylexus
+ * @author Codex (AI)
  */
 public class Jt808InstructionServerUdpHandlerAdapter extends DefaultUdpXtreamNettyHandlerAdapter {
-    // private static final Logger log = LoggerFactory.getLogger(Jt808InstructionServerUdpHandlerAdapter.class);
+    private static final Logger log = LoggerFactory.getLogger(Jt808InstructionServerUdpHandlerAdapter.class);
     protected final Jt808UdpDatagramPackageSplitter splitter;
     protected final Jt808RequestDecoder requestDecoder;
     protected final Jt808RequestLifecycleListener requestLifecycleListener;
@@ -67,15 +68,24 @@ public class Jt808InstructionServerUdpHandlerAdapter extends DefaultUdpXtreamNet
         // 每个(完整)包都触发一次处理逻辑
         return Flux.fromIterable(byteBufList).flatMap(byteBuf -> {
             // ...
-            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, inboundInfo);
-        }).then();
+            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, inboundInfo)
+                    .onErrorResume(error -> {
+                        log.error("Unexpected Exception", error);
+                        return Mono.empty();
+                    });
+        }).doOnDiscard(ByteBuf.class, XtreamBytes::releaseBuf).then();
     }
 
     protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {
-        final XtreamExchange exchange = this.createUdpExchange(allocator, nettyInbound, nettyOutbound, payload, inboundInfo);
-        return this.doUdpExchange(exchange).doFinally(signalType -> {
+        return Mono.defer(() -> {
+            final XtreamExchange exchange = this.createUdpExchange(allocator, nettyInbound, nettyOutbound, payload, inboundInfo);
+            return this.doUdpExchange(exchange).doFinally(signalType -> {
+                // ...
+                exchange.request().release();
+            });
+        }).doFinally(signalType -> {
+            // ...
             XtreamBytes.releaseBuf(payload);
-            exchange.request().release();
         });
     }
 
@@ -85,8 +95,13 @@ public class Jt808InstructionServerUdpHandlerAdapter extends DefaultUdpXtreamNet
         final Channel channel = inboundInfo.channel();
         final InetSocketAddress remoteAddress = inboundInfo.remoteAddress();
         final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.INSTRUCTION_SERVER, requestId, allocator, nettyInbound, XtreamInbound.Type.UDP, payload, channel, remoteAddress);
-        this.requestLifecycleListener.afterRequestDecoded(nettyInbound, payload, request);
-        return request;
+        try {
+            this.requestLifecycleListener.afterRequestDecoded(nettyInbound, payload, request);
+            return request;
+        } catch (Throwable error) {
+            request.release();
+            throw error;
+        }
     }
 
 }

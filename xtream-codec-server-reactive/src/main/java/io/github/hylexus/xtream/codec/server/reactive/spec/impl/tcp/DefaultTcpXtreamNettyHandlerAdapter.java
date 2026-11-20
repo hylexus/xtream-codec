@@ -27,6 +27,7 @@ import io.netty.buffer.ByteBufAllocator;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
@@ -35,6 +36,7 @@ import java.time.Instant;
 
 /**
  * @author hylexus
+ * @author Codex (AI)
  */
 public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandlerAdapter {
 
@@ -53,23 +55,30 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
     @Override
     public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
         final InboundInfo inboundInfo = this.initTcpInboundInfo(nettyInbound);
-        return nettyInbound.receive().flatMap(byteBuf -> {
-            if (byteBuf.readableBytes() <= 0) {
-                return Mono.empty();
-            }
-            byteBuf.retain();
-            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, inboundInfo)
-                    .onErrorResume(Throwable.class, throwable -> {
-                        log.error("Unexpected Exception", throwable);
-                        return Mono.empty();
-                    }).doFinally(signalType -> {
-                        // ...
-                        XtreamBytes.releaseBuf(byteBuf);
-                    });
-        }).onErrorResume(throwable -> {
+        return this.handleRequests(nettyInbound, nettyOutbound, inboundInfo).onErrorResume(throwable -> {
             log.error("Unexpected Error", throwable);
             return Mono.empty();
         });
+    }
+
+    protected Flux<Void> handleRequests(NettyInbound inbound, NettyOutbound outbound, InboundInfo inboundInfo) {
+        // 每个连接顺序处理；异步等待期间保留入站引用，取消时释放未处理数据。
+        return inbound
+                .receive()
+                .retain()
+                .concatMap(payload -> Mono
+                                .defer(() -> payload.isReadable()
+                                        ? this.handleSingleRequest(inbound, outbound, payload, inboundInfo)
+                                        : Mono.empty()
+                                )
+                                .onErrorResume(throwable -> {
+                                    log.error("Unexpected Exception", throwable);
+                                    return Mono.empty();
+                                })
+                                .doFinally(signal -> XtreamBytes.releaseBuf(payload)),
+                        0
+                )
+                .doOnDiscard(ByteBuf.class, XtreamBytes::releaseBuf);
     }
 
     protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {

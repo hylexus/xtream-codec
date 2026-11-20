@@ -125,8 +125,14 @@ public class Jt808AttachmentServerTcpHandlerAdapter extends DefaultTcpXtreamNett
         final XtreamInbound.Type requestType = XtreamInbound.Type.TCP;
         final Channel channel = inboundInfo.channel();
         final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.ATTACHMENT_SERVER, requestId, allocator, nettyInbound, requestType, byteBuf, channel, inboundInfo.remoteAddress());
-        this.requestLifecycleListener.afterRequestDecoded(nettyInbound, byteBuf, request);
-        return request;
+        try {
+            this.requestLifecycleListener.afterRequestDecoded(nettyInbound, byteBuf, request);
+            return request;
+        } catch (Throwable error) {
+            // 回调失败时请求还未交给 Exchange，由入口释放解码正文。
+            request.release();
+            throw error;
+        }
     }
 
 }

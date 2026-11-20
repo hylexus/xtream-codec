@@ -30,6 +30,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.function.Supplier;
 
 /**
  * @author hylexus
@@ -62,9 +63,8 @@ public class Jt808ResponseEntityHandlerResultHandler implements XtreamHandlerRes
         return this.adaptReturnValue(result.getReturnValue()).flatMap(responseEntity -> {
             final Jt808Request request = exchange.request().castAs(Jt808Request.class);
             final Jt808MessageDescriber messageDescriber = this.createMessageDescriptor(responseEntity, request);
-            final ByteBuf responseBuf = this.jt808ResponseEncoder.encode(responseEntity.getBody(), messageDescriber);
-            this.lifecycleListener.beforeResponseSend(request, responseBuf);
-            return exchange.response().writeWith(Mono.just(responseBuf));
+            final Supplier<ByteBuf> responseBuf = () -> this.jt808ResponseEncoder.encode(responseEntity.getBody(), messageDescriber);
+            return Jt808ResponseWriter.write(exchange.response(), request, this.lifecycleListener, responseBuf);
         });
     }
 

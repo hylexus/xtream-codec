@@ -46,21 +46,23 @@ public class Jt808RequestCombinerFilter implements Jt808RequestFilter {
             return chain.filter(exchange);
         }
 
-        // 合并子包
-        final Jt808Request mergedRequest = this.requestCombiner.tryMergeSubPackage(jt808Request);
-        // 如果还有子包没到达，终止后续流程，直至所有子包都到达
-        if (mergedRequest == null) {
-            return Mono.empty();
-        }
+        return Mono.defer(() -> {
+            final Jt808Request mergedRequest = this.requestCombiner.tryMergeSubPackage(jt808Request);
+            if (mergedRequest == null) {
+                return Mono.empty();
+            }
+            // 合并正文归本过滤器持有；先挂清理逻辑，再调用可能同步抛错的下游。
+            return Mono.defer(() -> {
+                // 所有子包都已经到达，继续执行后续流程
+                final XtreamExchange mutatedExchange = this.mutatedExchange(exchange, mergedRequest);
 
-        // 所有子包都已经到达，继续执行后续流程
-        final XtreamExchange mutatedExchange = this.mutatedExchange(exchange, mergedRequest);
+                this.lifecycleListener.afterSubPackageMerged(mutatedExchange, mergedRequest);
 
-        this.lifecycleListener.afterSubPackageMerged(mutatedExchange, mergedRequest);
-
-        return chain.filter(mutatedExchange).doFinally(signalType -> {
-            // ...
-            mergedRequest.release();
+                return chain.filter(mutatedExchange);
+            }).doFinally(signalType -> {
+                // ...
+                mergedRequest.release();
+            });
         });
     }
 
