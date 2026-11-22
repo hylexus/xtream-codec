@@ -69,7 +69,7 @@ public class DefaultXtreamSession extends AbstractXtreamOutbound implements Xtre
 
     @Override
     public XtreamSession lastCommunicateTime(Instant current) {
-        this.lastCommunicateTime = creationTime;
+        this.lastCommunicateTime = current;
         return this;
     }
 

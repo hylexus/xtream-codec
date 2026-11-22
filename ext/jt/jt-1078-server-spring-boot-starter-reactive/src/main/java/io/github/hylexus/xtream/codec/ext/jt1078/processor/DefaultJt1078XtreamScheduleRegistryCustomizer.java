@@ -21,6 +21,9 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegist
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistryCustomizer;
 import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.scheduler.*;
 import io.github.hylexus.xtream.codec.server.reactive.spec.resources.XtreamReactorThreadFactory;
+import org.springframework.beans.factory.DisposableBean;
+import reactor.core.Disposable;
+import reactor.core.Disposables;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
@@ -29,9 +32,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 // todo 重复代码重构
-public class DefaultJt1078XtreamScheduleRegistryCustomizer implements XtreamSchedulerRegistryCustomizer {
+public class DefaultJt1078XtreamScheduleRegistryCustomizer implements XtreamSchedulerRegistryCustomizer, DisposableBean {
     protected final XtreamServerSchedulerProperties schedulerProperties;
     protected final String schedulerName;
+    private final Disposable.Composite ownedSchedulers = Disposables.composite();
 
     public DefaultJt1078XtreamScheduleRegistryCustomizer(String schedulerName, XtreamServerSchedulerProperties schedulerProperties) {
         this.schedulerProperties = schedulerProperties;
@@ -41,7 +45,21 @@ public class DefaultJt1078XtreamScheduleRegistryCustomizer implements XtreamSche
     @Override
     public void customize(XtreamSchedulerRegistry registry) {
         final Scheduler scheduler = createScheduler(this.schedulerProperties);
-        registry.registerScheduler(this.schedulerProperties.toSchedulerConfig(this.schedulerName), scheduler);
+        boolean registered = false;
+        try {
+            registered = registry.registerScheduler(this.schedulerProperties.toSchedulerConfig(this.schedulerName), scheduler);
+        } finally {
+            if (registered) {
+                this.ownedSchedulers.add(scheduler);
+            } else {
+                scheduler.dispose();
+            }
+        }
+    }
+
+    @Override
+    public void destroy() {
+        this.ownedSchedulers.dispose();
     }
 
     @SuppressWarnings("deprecation")

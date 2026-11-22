@@ -79,7 +79,7 @@ public class BuiltinJt808InstructionServerTcpConfiguration {
                 .build();
     }
 
-    @Bean(BEAN_NAME_JT_808_TCP_XTREAM_NETTY_RESOURCE_FACTORY_INSTRUCTION_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_TCP_XTREAM_NETTY_RESOURCE_FACTORY_INSTRUCTION_SERVER, destroyMethod = "dispose")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_TCP_XTREAM_NETTY_RESOURCE_FACTORY_INSTRUCTION_SERVER)
     TcpXtreamNettyResourceFactory tcpXtreamNettyResourceFactory(XtreamJt808ServerProperties serverProperties) {
         final XtreamJt808ServerProperties.TcpLoopResourcesProperty loopResources = serverProperties.getInstructionServer().getTcpServer().getLoopResources();
@@ -93,7 +93,7 @@ public class BuiltinJt808InstructionServerTcpConfiguration {
         ));
     }
 
-    @Bean(BEAN_NAME_JT_808_TCP_XTREAM_SERVER_INSTRUCTION_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_TCP_XTREAM_SERVER_INSTRUCTION_SERVER, destroyMethod = "stop")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_TCP_XTREAM_SERVER_INSTRUCTION_SERVER)
     TcpXtreamServer tcpXtreamServer(
             @Qualifier(BEAN_NAME_JT_808_TCP_XTREAM_NETTY_HANDLER_ADAPTER_INSTRUCTION_SERVER) TcpXtreamNettyHandlerAdapter tcpXtreamNettyHandlerAdapter,

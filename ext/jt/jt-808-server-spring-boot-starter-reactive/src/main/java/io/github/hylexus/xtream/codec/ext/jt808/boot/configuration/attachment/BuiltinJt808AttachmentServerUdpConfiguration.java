@@ -87,7 +87,7 @@ public class BuiltinJt808AttachmentServerUdpConfiguration {
                 .build();
     }
 
-    @Bean(BEAN_NAME_JT_808_UDP_XTREAM_NETTY_RESOURCE_FACTORY_ATTACHMENT_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_UDP_XTREAM_NETTY_RESOURCE_FACTORY_ATTACHMENT_SERVER, destroyMethod = "dispose")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_UDP_XTREAM_NETTY_RESOURCE_FACTORY_ATTACHMENT_SERVER)
     UdpXtreamNettyResourceFactory udpXtreamNettyResourceFactory(XtreamJt808ServerProperties serverProperties) {
         final XtreamJt808ServerProperties.UdpLoopResourcesProperty loopResources = serverProperties.getAttachmentServer().getUdpServer().getLoopResources();
@@ -101,7 +101,7 @@ public class BuiltinJt808AttachmentServerUdpConfiguration {
         ));
     }
 
-    @Bean(BEAN_NAME_JT_808_UDP_XTREAM_SERVER_ATTACHMENT_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_UDP_XTREAM_SERVER_ATTACHMENT_SERVER, destroyMethod = "stop")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_UDP_XTREAM_SERVER_ATTACHMENT_SERVER)
     UdpXtreamServer udpXtreamServer(
             @Qualifier(BEAN_NAME_JT_808_UDP_XTREAM_NETTY_HANDLER_ADAPTER_ATTACHMENT_SERVER) UdpXtreamNettyHandlerAdapter udpXtreamNettyHandlerAdapter,

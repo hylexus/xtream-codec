@@ -24,13 +24,14 @@ import reactor.core.scheduler.Schedulers;
 /**
  * 默认实现
  * <p>
- * 通过 {@link Schedulers#newSingle(String)} 来确保单线程调用 {@link #publish(XtreamEvent)} 方法
+ * 通过 {@link Schedulers#newSingle(String)} 将实际事件投递串行化
  *
  * @author hylexus
  */
 public class DefaultXtreamEventPublisher extends AbstractXtreamEventPublisher {
 
     private final Scheduler publishScheduler;
+    private boolean shuttingDown;
 
     public DefaultXtreamEventPublisher(XtreamSchedulerRegistry schedulerRegistry, String name) {
         super(schedulerRegistry);
@@ -41,13 +42,26 @@ public class DefaultXtreamEventPublisher extends AbstractXtreamEventPublisher {
      * {@inheritDoc}
      */
     @Override
-    public void publish(XtreamEvent event) {
-        this.publishScheduler.schedule(() -> super.publish(event));
+    public synchronized void publish(XtreamEvent event) {
+        if (!this.shuttingDown) {
+            this.publishScheduler.schedule(() -> super.publish(event));
+        }
     }
 
     @Override
-    public void shutdown() {
-        super.shutdown();
+    public synchronized void shutdown() {
+        if (this.shuttingDown) {
+            return;
+        }
+        this.shuttingDown = true;
+        // 与事件投递在同一线程上终止，使关闭信号跟在已提交的事件之后。
+        this.publishScheduler.schedule(() -> {
+            try {
+                super.shutdown();
+            } finally {
+                this.publishScheduler.dispose();
+            }
+        });
     }
 
 }

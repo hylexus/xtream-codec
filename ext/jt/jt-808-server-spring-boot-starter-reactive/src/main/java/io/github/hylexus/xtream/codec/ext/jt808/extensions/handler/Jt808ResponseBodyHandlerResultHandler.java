@@ -31,6 +31,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author hylexus
@@ -56,9 +57,8 @@ public class Jt808ResponseBodyHandlerResultHandler implements XtreamHandlerResul
         final Jt808RequestHeader requestHeader = jt808Request.header();
 
         return this.adaptReturnValue(result.getReturnValue()).flatMap(body -> {
-            final ByteBuf responseBuf = this.jt808ResponseEncoder.encode(body, requestHeader.version(), requestHeader.terminalId(), annotation);
-            this.lifecycleListener.beforeResponseSend(jt808Request, responseBuf);
-            return exchange.response().writeWith(Mono.just(responseBuf));
+            final Supplier<ByteBuf> responseBuf = () -> this.jt808ResponseEncoder.encode(body, requestHeader.version(), requestHeader.terminalId(), annotation);
+            return Jt808ResponseWriter.write(exchange.response(), jt808Request, this.lifecycleListener, responseBuf);
         });
     }
 

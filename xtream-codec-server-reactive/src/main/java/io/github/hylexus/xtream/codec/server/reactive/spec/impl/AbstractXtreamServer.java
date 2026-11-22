@@ -49,7 +49,11 @@ public abstract class AbstractXtreamServer<
     }
 
     @Override
-    public void start() {
+    public synchronized void start() {
+        final DisposableChannel running = this.disposableServer;
+        if (running != null && !running.isDisposed()) {
+            return;
+        }
         try {
             this.disposableServer = this.initServer();
         } catch (Throwable e) {
@@ -74,7 +78,7 @@ public abstract class AbstractXtreamServer<
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         final DisposableChannel server = this.disposableServer;
         if (server != null) {
             server.disposeNow();

@@ -10,5 +10,6 @@ dependencies {
 
     compileOnly("io.projectreactor:reactor-core-micrometer")
     compileOnly("com.lmax:disruptor")
+    testRuntimeOnly("com.lmax:disruptor")
 
 }

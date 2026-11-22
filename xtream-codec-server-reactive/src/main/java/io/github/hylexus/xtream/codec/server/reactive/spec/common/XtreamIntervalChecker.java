@@ -61,7 +61,11 @@ public class XtreamIntervalChecker {
         this.maxBackoff = maxBackoff;
     }
 
-    public void start() {
+    public synchronized void start() {
+        if (this.subscription != null && !this.subscription.isDisposed()) {
+            return;
+        }
+        this.stop();
         this.scheduler = Schedulers.newSingle(this.name);
         this.subscription = Flux.interval(this.interval)
                 .doOnSubscribe((s) -> log.debug("Scheduled {}-check every {}", this.name, this.interval))
@@ -80,7 +84,7 @@ public class XtreamIntervalChecker {
         return this.checkFn.apply(this.name, i).then();
     }
 
-    public void stop() {
+    public synchronized void stop() {
         if (this.subscription != null) {
             this.subscription.dispose();
             this.subscription = null;

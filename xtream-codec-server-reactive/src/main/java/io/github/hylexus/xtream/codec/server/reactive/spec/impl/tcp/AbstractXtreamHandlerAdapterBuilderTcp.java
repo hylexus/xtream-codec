@@ -26,7 +26,7 @@ public abstract class AbstractXtreamHandlerAdapterBuilderTcp<C extends AbstractX
         extends AbstractXtreamHandlerAdapterBuilder<C> {
 
     public AbstractXtreamHandlerAdapterBuilderTcp(ByteBufAllocator allocator) {
-        super(allocator);
+        super(allocator, false);
     }
 
     @Override

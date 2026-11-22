@@ -18,6 +18,7 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec;
 
 
+import io.github.hylexus.xtream.codec.server.reactive.spec.exception.SessionCreationRejectedException;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
@@ -54,6 +55,11 @@ public interface XtreamSessionManager<S extends XtreamSession> {
 
     Mono<S> getSession(XtreamExchange exchange);
 
+    /**
+     * 创建会话，或复用同键的有效会话。
+     *
+     * @return 发出会话。TCP 连接失效或会话在创建过程中被移除时，发出 {@link SessionCreationRejectedException}。
+     */
     Mono<S> createSession(String sessionId, XtreamExchange exchange);
 
     default Mono<S> createSession(XtreamExchange exchange) {

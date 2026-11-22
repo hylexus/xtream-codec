@@ -28,6 +28,8 @@ import reactor.core.publisher.Sinks;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -43,6 +45,8 @@ public abstract class AbstractXtreamEventPublisher implements XtreamEventPublish
     protected final Sinks.Many<XtreamEvent> sink;
     protected final XtreamSchedulerRegistry schedulerRegistry;
     protected final Predicate<XtreamEvent.XtreamEventType> defaultPredicate;
+    private final CountDownLatch subscriptionsDrained = new CountDownLatch(1);
+    private boolean acceptingSubscriptions = true;
 
     public AbstractXtreamEventPublisher(XtreamSchedulerRegistry schedulerRegistry) {
         this.schedulerRegistry = schedulerRegistry;
@@ -83,44 +87,47 @@ public abstract class AbstractXtreamEventPublisher implements XtreamEventPublish
 
     @Override
     public Flux<XtreamEvent> subscribe(XtreamEventSubscriberInfo info) {
-        // info.interestedEventsCode() 由外部确保返回一个已经计算好的常量(而不是每次调用都计算一次)
-        final Set<Integer> interestedEventsCode = info.interestedEventsCode();
-        if (interestedEventsCode.isEmpty()) {
-            log.error("Interested events code cannot be empty for subscriber: {}", info);
-            return Flux.error(new IllegalArgumentException("Interested events code cannot be empty"));
-        }
-
-        // 新增订阅者
-        final XtreamEventSubscriberInfo old = this.subscribers.putIfAbsent(info.id(), info);
-        if (old != null) {
-            log.error("Subscriber already exists: {}", info);
-            return Flux.error(new IllegalStateException("Subscriber already exists: " + info));
-        }
-
-        // 增加事件类型的引用计数
-        synchronized (this.interestedEventTypes) {
-            for (final Integer code : interestedEventsCode) {
-                this.interestedEventTypes.compute(code, (key, count) -> count == null ? 1 : count + 1);
+        return Flux.defer(() -> {
+            // info.interestedEventsCode() 由外部确保返回一个已经计算好的常量(而不是每次调用都计算一次)
+            final Set<Integer> interestedEventsCode = info.interestedEventsCode();
+            if (interestedEventsCode.isEmpty()) {
+                log.error("Interested events code cannot be empty for subscriber: {}", info);
+                return Flux.error(new IllegalArgumentException("Interested events code cannot be empty"));
             }
-        }
 
-        return sink.asFlux()
-                .filter(event -> interestedEventsCode.contains(
-                        XtreamEvent.XtreamEventType.ALL.code())
-                                 || interestedEventsCode.contains(event.type().code())
-                )
-                .publishOn(this.schedulerRegistry.eventPublisherScheduler())
-                .doFinally(signalType -> {
-                    // ...
-                    this.unsubscribe(info);
-                });
+            final Flux<XtreamEvent> events = this.sink.asFlux()
+                    .filter(event -> interestedEventsCode.contains(XtreamEvent.XtreamEventType.ALL.code())
+                                     || interestedEventsCode.contains(event.type().code())
+                    )
+                    .publishOn(this.schedulerRegistry.eventPublisherScheduler());
+
+            synchronized (this.interestedEventTypes) {
+                if (!this.acceptingSubscriptions) {
+                    return Flux.empty();
+                }
+                // 新增订阅者
+                if (this.subscribers.putIfAbsent(info.id(), info) != null) {
+                    log.error("Subscriber already exists: {}", info);
+                    return Flux.error(new IllegalStateException("Subscriber already exists: " + info));
+                }
+                // 增加事件类型的引用计数
+                for (final Integer code : interestedEventsCode) {
+                    this.interestedEventTypes.merge(code, 1, Integer::sum);
+                }
+            }
+
+            return events.doFinally(signalType -> {
+                // ...
+                this.unsubscribe(info);
+            });
+        });
     }
 
     protected void unsubscribe(XtreamEventSubscriberInfo info) {
-        // 移除订阅者
-        this.subscribers.remove(info.id());
-        // 减少事件类型的引用计数
         synchronized (this.interestedEventTypes) {
+            if (!this.subscribers.remove(info.id(), info)) {
+                return;
+            }
             for (final int code : info.interestedEventsCode()) {
                 this.interestedEventTypes.compute(code, (key, count) -> {
                     // 引用计数 <= 1  ==> 移除
@@ -132,12 +139,40 @@ public abstract class AbstractXtreamEventPublisher implements XtreamEventPublish
                     }
                 });
             }
+            this.signalIfSubscriptionsDrained();
         }
     }
 
     @Override
     public void shutdown() {
+        synchronized (this.interestedEventTypes) {
+            this.acceptingSubscriptions = false;
+        }
         this.sink.tryEmitComplete();
+        synchronized (this.interestedEventTypes) {
+            this.signalIfSubscriptionsDrained();
+        }
+    }
+
+    @Override
+    public void shutdownGracefully() {
+        this.shutdown();
+        try {
+            // 订阅者可能一直不请求数据，最多等待五秒，避免阻塞容器退出。
+            if (!this.subscriptionsDrained.await(5, TimeUnit.SECONDS)) {
+                log.warn("Timed out waiting for event subscriptions to finish");
+            }
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            log.warn("Interrupted while waiting for event subscriptions to finish");
+        }
+    }
+
+    private void signalIfSubscriptionsDrained() {
+        // 在订阅登记锁内调用，确保关闭后不会引入新的订阅。
+        if (!this.acceptingSubscriptions && this.subscribers.isEmpty()) {
+            this.subscriptionsDrained.countDown();
+        }
     }
 
     @Override

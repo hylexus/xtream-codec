@@ -24,6 +24,7 @@ import com.lmax.disruptor.dsl.ProducerType;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamSchedulerRegistry;
 import io.github.hylexus.xtream.codec.server.reactive.spec.event.XtreamEvent;
 import io.github.hylexus.xtream.codec.server.reactive.spec.event.builtin.disruptor.XtreamEventDisruptorHolder;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.ThreadFactory;
 
@@ -36,10 +37,21 @@ import java.util.concurrent.ThreadFactory;
 public class DisruptorBasedXtreamEventPublisher extends AbstractXtreamEventPublisher {
 
     private final Disruptor<XtreamEventDisruptorHolder> disruptor;
+    // 标记正在执行本实例消费任务的线程，避免 shutdown() 在消费线程上等待队列排空。
+    // 子类可通过 initDisruptor() 注册多个消费者，各线程的标记独立，避免共享线程引用被覆盖。
+    private final ThreadLocal<@Nullable Boolean> onConsumerThread = new ThreadLocal<>();
+    private boolean shuttingDown;
 
     public DisruptorBasedXtreamEventPublisher(XtreamSchedulerRegistry schedulerRegistry, int bufferSize, ThreadFactory threadFactory) {
         super(schedulerRegistry);
-        this.disruptor = initDisruptor(bufferSize, threadFactory);
+        this.disruptor = initDisruptor(bufferSize, task -> threadFactory.newThread(() -> {
+            this.onConsumerThread.set(true);
+            try {
+                task.run();
+            } finally {
+                this.onConsumerThread.remove();
+            }
+        }));
         this.disruptor.start();
     }
 
@@ -65,19 +77,46 @@ public class DisruptorBasedXtreamEventPublisher extends AbstractXtreamEventPubli
      * {@inheritDoc}
      */
     @Override
-    public void publish(XtreamEvent event) {
+    public synchronized void publish(XtreamEvent event) {
         final RingBuffer<XtreamEventDisruptorHolder> ringBuffer = this.disruptor.getRingBuffer();
-        final long seq = ringBuffer.next();
+        // 队列满时先等待容量；只有实际入队的事件才计入关闭时的排空范围。
+        // TODO 后续评估满队列时的等待上限与超载策略，避免消费回调重入发布时等待自身。
+        boolean interrupted = false;
         try {
-            final XtreamEventDisruptorHolder holder = ringBuffer.get(seq);
-            holder.setEvent(event);
+            while (!this.shuttingDown && !ringBuffer.tryPublishEvent((holder, sequence, value) -> holder.setEvent(value), event)) {
+                try {
+                    this.wait(1L);
+                } catch (InterruptedException ignored) {
+                    interrupted = true;
+                }
+            }
         } finally {
-            ringBuffer.publish(seq);
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
+    /**
+     * 从消费线程调用时，停止接纳新事件后返回，由另一个线程等待队列排空。
+     */
     @Override
     public void shutdown() {
+        synchronized (this) {
+            if (this.shuttingDown) {
+                return;
+            }
+            this.shuttingDown = true;
+            this.notifyAll();
+        }
+        if (Boolean.TRUE.equals(this.onConsumerThread.get())) {
+            Thread.ofPlatform().daemon().name("xtream-disruptor-shutdown").start(this::finishShutdown);
+        } else {
+            this.finishShutdown();
+        }
+    }
+
+    private void finishShutdown() {
         this.disruptor.shutdown();
         super.shutdown();
     }

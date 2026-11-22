@@ -52,7 +52,7 @@ public interface Jt808CommandSender extends InternalXtreamCommandSender<Jt808Ses
      *
      * @see #sendObjectAndWaitingResponse(String, Mono, int)
      */
-    void setClientResponse(Jt808CommandKey commandKey, Object clientResponse);
+    void setClientResponse(Jt808CommandKey commandKey, @Nullable Object clientResponse);
 
     interface Jt808CommandKey {
 

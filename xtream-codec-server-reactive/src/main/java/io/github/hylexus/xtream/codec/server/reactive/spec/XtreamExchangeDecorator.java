@@ -47,7 +47,10 @@ public class XtreamExchangeDecorator implements XtreamExchange {
 
     @Override
     public ByteBufAllocator bufferFactory() {
-        return delegate.bufferFactory();
+        final XtreamResponse overridden = this.response;
+        return overridden != null && overridden != this.delegate.response()
+                ? overridden.bufferFactory()
+                : this.delegate.bufferFactory();
     }
 
     @Override

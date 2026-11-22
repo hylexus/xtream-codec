@@ -59,6 +59,10 @@ include("debug:jt")
 include("debug:jt:jt-1078-server-spring-boot-starter-reactive-debug")
 include("debug:jt:jt-808-server-spring-boot-starter-reactive-debug")
 
+include("loadtest")
+include("loadtest:jt")
+include("loadtest:jt:jt-808-server-loadtest")
+
 include("quick-start")
 include("quick-start:custom-annotation-server")
 include("quick-start:jt")

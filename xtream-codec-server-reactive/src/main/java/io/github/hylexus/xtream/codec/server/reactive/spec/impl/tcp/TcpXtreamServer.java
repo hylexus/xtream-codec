@@ -19,10 +19,16 @@ package io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp;
 import io.github.hylexus.xtream.codec.core.annotation.OrderedComponent;
 import io.github.hylexus.xtream.codec.server.reactive.spec.NettyServerCustomizer;
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.AbstractXtreamServer;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.ImmediateEventExecutor;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.DisposableServer;
+import reactor.netty.FutureMono;
 import reactor.netty.tcp.TcpServer;
 import reactor.netty.tcp.TcpServerConfig;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +38,7 @@ import java.util.List;
 public class TcpXtreamServer extends AbstractXtreamServer<TcpServer, TcpServerConfig, TcpNettyServerCustomizer> {
 
     private final List<TcpNettyServerCustomizer> nettyServerCustomizers;
+    private @Nullable ChannelGroup childChannels;
 
     public TcpXtreamServer(String name, List<TcpNettyServerCustomizer> nettyServerCustomizers) {
         super(name);
@@ -46,7 +53,27 @@ public class TcpXtreamServer extends AbstractXtreamServer<TcpServer, TcpServerCo
         for (final NettyServerCustomizer<TcpServer, TcpServerConfig> customizer : this.nettyServerCustomizers) {
             tcpServer = customizer.customize(tcpServer);
         }
-        return tcpServer.bindNow();
+        // TODO: 专项压测大规模长连接下连接组的堆开销和停服耗时，再决定是否优化。
+        // 同一次绑定的连接归属同一个组，关闭期间迟到的连接也会立即关闭。
+        final DefaultChannelGroup children = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE, true);
+        final DisposableServer server = tcpServer
+                .doOnConnection(connection -> children.add(connection.channel()))
+                .bindNow();
+        this.childChannels = children;
+        return server;
+    }
+
+    @Override
+    public synchronized void stop() {
+        final var children = this.childChannels;
+        this.childChannels = null;
+        try {
+            if (children != null) {
+                FutureMono.from(children.close()).block(Duration.ofSeconds(3));
+            }
+        } finally {
+            super.stop();
+        }
     }
 
     @Override

@@ -22,6 +22,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.socket.DatagramPacket;
+import io.netty.util.ReferenceCounted;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -91,6 +92,7 @@ public abstract class AbstractXtreamOutbound implements XtreamOutbound {
         return Flux.from(publisher)
                 .flatMap(source -> Flux.from(source).map(byteBuf -> new DatagramPacket(byteBuf, remoteAddress)))
                 .flatMap(datagramPacket -> this.outbound().sendObject(datagramPacket))
+                .doOnDiscard(ReferenceCounted.class, ReferenceCounted::release)
                 .then();
     }
 }

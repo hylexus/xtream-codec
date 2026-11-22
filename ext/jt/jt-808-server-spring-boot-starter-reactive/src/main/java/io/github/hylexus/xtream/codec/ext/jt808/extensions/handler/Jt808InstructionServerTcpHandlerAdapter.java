@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 /**
  * @author <a href="https://gitee.com/qinglang1208">何事惊慌</a>
  * @author hylexus
+ * @author Codex (AI)
  */
 public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNettyHandlerAdapter {
     private static final Logger log = LoggerFactory.getLogger(Jt808InstructionServerTcpHandlerAdapter.class);
@@ -54,16 +55,7 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
     @Override
     public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
         final InboundInfo inboundInfo = this.initTcpInboundInfo(nettyInbound);
-        return nettyInbound.receive().flatMap(byteBuf -> {
-            if (byteBuf.readableBytes() <= 0) {
-                return Mono.empty();
-            }
-            return this.handleSingleRequest(nettyInbound, nettyOutbound, byteBuf, inboundInfo)
-                    .onErrorResume(Throwable.class, throwable -> {
-                        log.error("Unexpected Exception", throwable);
-                        return Mono.empty();
-                    });
-        }).doOnError(SocketException.class, throwable -> {
+        return this.handleRequests(nettyInbound, nettyOutbound, inboundInfo).doOnError(SocketException.class, throwable -> {
             this.doWithSessionManager(manager -> {
                 boolean closed = false;
                 Channel channel = inboundInfo.channel();
@@ -118,8 +110,13 @@ public class Jt808InstructionServerTcpHandlerAdapter extends DefaultTcpXtreamNet
         final InetSocketAddress remoteAddress = inboundInfo.remoteAddress();
         final String requestId = this.generateRequestId(nettyInbound);
         final Jt808Request request = this.requestDecoder.decode(Jt808ServerType.INSTRUCTION_SERVER, requestId, allocator, nettyInbound, XtreamInbound.Type.TCP, byteBuf, channel, remoteAddress);
-        this.requestLifecycleListener.afterRequestDecoded(nettyInbound, byteBuf, request);
-        return request;
+        try {
+            this.requestLifecycleListener.afterRequestDecoded(nettyInbound, byteBuf, request);
+            return request;
+        } catch (Throwable error) {
+            request.release();
+            throw error;
+        }
     }
 
 }

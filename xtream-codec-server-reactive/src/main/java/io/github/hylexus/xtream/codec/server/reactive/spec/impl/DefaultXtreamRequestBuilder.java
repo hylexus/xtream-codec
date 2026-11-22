@@ -32,7 +32,7 @@ public class DefaultXtreamRequestBuilder
     @Override
     public XtreamRequest build() {
         return new DefaultXtreamRequest(
-                this.delegateRequest.version(),
+                this.version,
                 this.delegateRequest.requestId(),
                 this.delegateRequest.bufferFactory(),
                 this.delegateRequest.underlyingInbound(),

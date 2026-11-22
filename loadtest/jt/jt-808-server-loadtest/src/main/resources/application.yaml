@@ -1,0 +1,73 @@
+#
+# Copyright 2024-present the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+spring:
+  application:
+    name: jt-808-server-loadtest
+  main:
+    web-application-type: none
+    keep-alive: true
+    banner-mode: console
+
+loadtest:
+  auth-code: ${LOADTEST_AUTH_CODE:jt808-loadtest}
+  tcp-backlog: ${LOADTEST_TCP_BACKLOG:2048}
+  summary-interval: 30s
+
+jt808-server:
+  features:
+    request-dispatcher-scheduler:
+      enabled: true
+    request-logger:
+      enabled: false
+    dashboard:
+      enabled: false
+  instruction-server:
+    tcp-server:
+      enabled: true
+      host: 0.0.0.0
+      port: 3927
+      max-instruction-frame-length: 4096
+      session-idle-state-checker:
+        all-idle-time: 10m
+    udp-server:
+      enabled: true
+      host: 0.0.0.0
+      port: 3721
+      session-idle-state-checker:
+        max-idle-time: 10m
+  attachment-server:
+    tcp-server:
+      enabled: false
+    udp-server:
+      enabled: false
+  schedulers:
+    request-dispatcher:
+      type: parallel
+    # 参数解析和本模块的无阻塞处理器均在分发线程执行。
+    non-blocking-handler:
+      type: immediate
+
+logging:
+  config: classpath:logback-spring.xml
+  file:
+    path: ${LOADTEST_LOG_PATH:logs/jt-808-server-loadtest}
+  level:
+    root: info
+    io.github.hylexus.xtream.codec: warn
+    io.github.hylexus.xtream.codec.server.reactive.spec.impl.AbstractXtreamServer: info
+    io.github.hylexus.xtream.codec.ext.jt808.spec.XtreamTcpHeatBeatHandler: error
+    io.netty.handler.logging.LoggingHandler: warn

@@ -62,7 +62,7 @@ public class BuiltinJt1078ServerTcpConfiguration {
         );
     }
 
-    @Bean(BEAN_NAME_JT1078_TCP_XTREAM_NETTY_RESOURCE_FACTORY)
+    @Bean(value = BEAN_NAME_JT1078_TCP_XTREAM_NETTY_RESOURCE_FACTORY, destroyMethod = "dispose")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT1078_TCP_XTREAM_NETTY_RESOURCE_FACTORY)
     TcpXtreamNettyResourceFactory tcpXtreamNettyResourceFactory(XtreamJt1078ServerProperties serverProperties) {
         final XtreamJt1078ServerProperties.TcpLoopResourcesProperty loopResources = serverProperties.getTcpServer().getLoopResources();
@@ -76,7 +76,7 @@ public class BuiltinJt1078ServerTcpConfiguration {
         ));
     }
 
-    @Bean(BEAN_NAME_JT1078_TCP_XTREAM_SERVER)
+    @Bean(value = BEAN_NAME_JT1078_TCP_XTREAM_SERVER, destroyMethod = "stop")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT1078_TCP_XTREAM_SERVER)
     TcpXtreamServer tcpXtreamServer(
             @Qualifier(BEAN_NAME_JT1078_TCP_XTREAM_NETTY_HANDLER_ADAPTER) TcpXtreamNettyHandlerAdapter tcpXtreamNettyHandlerAdapter,

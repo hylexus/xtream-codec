@@ -60,6 +60,15 @@ public interface XtreamEventPublisher {
 
     void shutdown();
 
+    /**
+     * 从生命周期管理线程发起关闭。支持等待的实现可以在有界时间内等待订阅结束。
+     *
+     * @since 0.11.0
+     */
+    default void shutdownGracefully() {
+        this.shutdown();
+    }
+
     Stream<XtreamEventSubscriberInfo> subscriberView();
 
     int subscriberCount();

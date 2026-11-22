@@ -30,7 +30,7 @@ public interface Jt808SessionManager extends XtreamSessionManager<Jt808Session> 
     default Optional<Jt808Session> findByTerminalId(String terminalId) {
         return this.list()
                 .filter(session -> session.terminalId().equals(terminalId))
-                .min(Comparator.comparing(XtreamSession::lastCommunicateTime));
+                .max(Comparator.comparing(XtreamSession::lastCommunicateTime));
     }
 
     @Override

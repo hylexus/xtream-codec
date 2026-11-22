@@ -46,16 +46,22 @@ public abstract class AbstractXtreamHandlerAdapterBuilder<C extends AbstractXtre
 
     private final List<XtreamFilter> xtreamFilters;
     private final List<XtreamRequestExceptionHandler> exceptionHandlers;
+    private final boolean defaultUdpIdleCheckEnabled;
 
     protected @Nullable XtreamSessionManager<? extends XtreamSession> sessionManager;
 
     public AbstractXtreamHandlerAdapterBuilder(ByteBufAllocator allocator) {
+        this(allocator, true);
+    }
+
+    protected AbstractXtreamHandlerAdapterBuilder(ByteBufAllocator allocator, boolean defaultUdpIdleCheckEnabled) {
         this.handlerMappings = new ArrayList<>();
         this.handlerAdapters = new ArrayList<>();
         this.resultHandlers = new ArrayList<>();
         this.xtreamFilters = new ArrayList<>();
         this.exceptionHandlers = new ArrayList<>();
         this.byteBufAllocator = allocator;
+        this.defaultUdpIdleCheckEnabled = defaultUdpIdleCheckEnabled;
     }
 
     @SuppressWarnings("unchecked")
@@ -182,10 +188,22 @@ public abstract class AbstractXtreamHandlerAdapterBuilder<C extends AbstractXtre
     public abstract XtreamNettyHandlerAdapter build();
 
     protected XtreamHandler createRequestHandler() {
+        final XtreamHandler handler = this.createHandlerChain();
         if (this.sessionManager == null) {
-            // todo 优化
-            this.sessionManager = new DefaultXtreamSessionManager(true, new UdpSessionIdleStateCheckerProps(), new XtreamSessionIdGenerator.DefalutXtreamSessionIdGenerator());
+            this.sessionManager = newDefaultSessionManager(this.defaultUdpIdleCheckEnabled);
         }
+        return handler;
+    }
+
+    protected static DefaultXtreamSessionManager newDefaultSessionManager(boolean udpIdleCheckEnabled) {
+        return new DefaultXtreamSessionManager(
+                udpIdleCheckEnabled,
+                udpIdleCheckEnabled ? new UdpSessionIdleStateCheckerProps() : null,
+                new XtreamSessionIdGenerator.DefalutXtreamSessionIdGenerator()
+        );
+    }
+
+    protected final XtreamHandler createHandlerChain() {
         if (this.handlerMappings.isEmpty()) {
             throw new IllegalStateException("No [" + XtreamHandlerMapping.class.getSimpleName() + "] instance configured.");
         }

@@ -18,19 +18,22 @@ package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
+import io.github.hylexus.xtream.codec.server.reactive.spec.exception.SessionCreationRejectedException;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author hylexus
+ * @author Codex (AI)
  */
 public class DefaultXtreamExchange implements XtreamExchange {
     protected final XtreamRequest request;
     protected final XtreamResponse response;
     protected final Mono<XtreamSession> sessionMono;
+    protected final Map<String, Object> attributes = new ConcurrentHashMap<>();
 
     public DefaultXtreamExchange(XtreamSession session, XtreamRequest request, XtreamResponse response) {
         this.request = request;
@@ -42,8 +45,8 @@ public class DefaultXtreamExchange implements XtreamExchange {
         this.request = request;
         this.response = response;
         @SuppressWarnings("unchecked") final Mono<XtreamSession> session = sessionManager.getSession(this, true);
-        // this.sessionMono = session.cache();
-        this.sessionMono = session;
+        // 断连或创建期间关闭时，入站请求结束处理。其他异常继续交给请求错误处理链。
+        this.sessionMono = session.onErrorResume(SessionCreationRejectedException.class, ignored -> Mono.empty()).cache();
     }
 
     @Override
@@ -63,7 +66,7 @@ public class DefaultXtreamExchange implements XtreamExchange {
 
     @Override
     public Map<String, Object> attributes() {
-        return new HashMap<>();
+        return this.attributes;
     }
 
     @Override

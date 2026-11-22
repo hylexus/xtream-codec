@@ -31,6 +31,15 @@ public sealed interface XtreamNettyResourceFactory
      */
     boolean preferNative();
 
+    /**
+     * 在使用此工厂的服务停止后，释放由工厂管理的资源。
+     * 默认实现为空操作，适用于由外部管理事件循环的工厂。
+     *
+     * @since 0.11.0
+     */
+    default void dispose() {
+    }
+
     record LoopResourcesProperty(
             String prefix,
             int selectCount,
