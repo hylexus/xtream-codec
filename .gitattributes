@@ -1,0 +1,6 @@
+# 保留上游许可原文的换行和空白。
+licenses/MPL-2.0.txt -text -whitespace
+licenses/jvm/open_source_licenses.txt -text -whitespace
+licenses/frontend/open_source_licenses.txt -text -whitespace
+licenses/source/open_source_licenses.txt -text -whitespace
+licenses/jump3r/NOTICE.txt -text -whitespace

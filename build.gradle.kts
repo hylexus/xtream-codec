@@ -2,6 +2,7 @@ import io.github.hylexus.xtream.codec.gradle.utils.XtreamConfig.xtreamConfig
 import io.github.hylexus.xtream.codec.gradle.utils.logInfo2
 import io.github.hylexus.xtream.codec.gradle.utils.logTip
 import net.ltgt.gradle.errorprone.errorprone
+import java.security.MessageDigest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -15,7 +16,6 @@ plugins {
     id("checkstyle")
     id("net.minecraftforge.licenser") apply false
     id("com.github.jk1.dependency-license-report")
-    id("com.namics.oss.gradle.license-enforce-plugin")
     id("net.ltgt.errorprone") apply false
 }
 
@@ -44,6 +44,57 @@ run {
     xtreamConfig.needSign
 }
 val mavenRepoConfig = xtreamConfig.mavenRepoConfig
+
+// 上游版权按审查记录中的比较版本保留，避免统一格式化覆盖派生源码声明。
+val upstreamCopyrights = mapOf(
+    "XtreamInternalStringUtils.java" to "Copyright 2002-2024 the original author or authors.",
+    "XtreamVersion.java" to "Copyright 2002-2019 the original author or authors.",
+    "XtreamMethodParameter.java" to "Copyright 2002-2023 the original author or authors.",
+    "XtreamExchange.java" to "Copyright 2002-2023 the original author or authors.",
+    "XtreamFilterChain.java" to "Copyright 2002-2015 the original author or authors.",
+    "XtreamExchangeDecorator.java" to "Copyright 2002-2023 the original author or authors.",
+    "XtreamSessionManager.java" to "Copyright 2002-2016 the original author or authors.",
+    "XtreamHandler.java" to "Copyright 2002-2016 the original author or authors.",
+    "XtreamFilter.java" to "Copyright 2002-2015 the original author or authors.",
+    "ExceptionHandlingXtreamHandler.java" to "Copyright 2002-2023 the original author or authors.",
+    "DispatcherXtreamHandler.java" to "Copyright 2002-2023 the original author or authors.",
+    "DefaultXtreamFilterChain.java" to "Copyright 2002-2021 the original author or authors.",
+    "FilteringXtreamHandler.java" to "Copyright 2002-2018 the original author or authors.",
+    "XtreamDispatchExceptionHandler.java" to "Copyright 2002-2023 the original author or authors.",
+    "XtreamRequestExceptionHandler.java" to "Copyright 2002-2016 the original author or authors.",
+    "XtreamHandlerMapping.java" to "Copyright 2002-2021 the original author or authors.",
+    "XtreamHandlerResultHandler.java" to "Copyright 2002-2022 the original author or authors.",
+    "XtreamHandlerAdapter.java" to "Copyright 2002-2022 the original author or authors.",
+    "XtreamHandlerResult.java" to "Copyright 2002-2022 the original author or authors.",
+    "XtreamReactorThreadFactory.java" to "Copyright (c) 2018-2021 VMware Inc. or its affiliates, All Rights Reserved.",
+    "XtreamHandlerMethod.java" to "Copyright 2002-2024 the original author or authors.",
+    "XtreamMappingDescriptionProvider.java" to "Copyright 2012-2023 the original author or authors.",
+    "DispatcherHandlerXtreamMappingDescriptionProvider.java" to "Copyright 2012-2023 the original author or authors.",
+    "XtreamWebProxyHttpHeaderFilter.java" to "Copyright 2014-2023 the original author or authors.",
+    "XtreamWebProxy.java" to "Copyright 2014-2023 the original author or authors.",
+    "XtreamWebProxyUtils.java" to "Copyright 2014-2023 the original author or authors.",
+    "XtreamWebProxyBuiltinFilters.java" to "Copyright 2014-2023 the original author or authors.",
+    "XtreamWebProxyExchangeFilter.java" to "Copyright 2014-2023 the original author or authors.",
+    "XtreamIntervalChecker.java" to "Copyright 2014-2023 the original author or authors.",
+    "DefaultJt808DashboardMetricsService.java" to "Copyright 2017 VMware, Inc.",
+)
+
+val sourceLicenseHeaders = mapOf(
+    "Message8105CodecSample.java" to listOf("MIT-SmallChi-JT808.txt"),
+    "DefaultSpsDecoder.java" to listOf("MIT-SmallChi-JT1078.txt", "MIT-EyerH264Decoder.txt"),
+    "AbstractG711AudioCodec.java" to listOf("MIT-maz-g711.txt"),
+    "G711ALawJt1078AudioCodec.java" to listOf("MIT-maz-g711.txt"),
+    "G711MuLawJt1078AudioCodec.java" to listOf("MIT-maz-g711.txt"),
+    "DefaultPcmToMp3Encoder.java" to listOf("Apache-2.0-matrixy.txt"),
+    "DefaultFlvEncoder.java" to listOf("Apache-2.0-matrixy.txt", "MIT-SmallChi-JT1078.txt"),
+)
+fun licenseSections(path: String): Map<String, String> =
+    Regex("""(?ms)^===== BEGIN (.+?) =====\n(.*?)^===== END \1 =====$""")
+        .findAll(file(path).readText())
+        .associate { it.groupValues[1] to it.groupValues[2].trimEnd() }
+
+val sourceLicenseTexts = licenseSections("licenses/source/open_source_licenses.txt")
+val licenseHeaders = licenseSections("build-script/license/headers.txt")
 
 // region Java
 configure(subprojects) {
@@ -199,9 +250,36 @@ configure(subprojects) {
         pluginManager.apply("net.minecraftforge.licenser")
         val creationYear = DateTimeFormatter.ofPattern("yyyy").format(LocalDate.now())
         configure<net.minecraftforge.licenser.LicenseExtension> {
-            // setHeader(rootProject.file("build-script/license/license-header"))
             header.set(rootProject.resources.text.fromFile("build-script/license/license-header"))
             skipExistingHeaders.set(false)
+            matching("**/AdpcmImaJt1078AudioCodec.java", closureOf<net.minecraftforge.licenser.LicenseProperties> {
+                header.set(rootProject.resources.text.fromString(licenseHeaders.getValue("adpcm-header")))
+            })
+            matching("**/Jt1078ByteToMessageDecoder.java", closureOf<net.minecraftforge.licenser.LicenseProperties> {
+                header.set(rootProject.resources.text.fromString(licenseHeaders.getValue("sky-header")))
+            })
+            upstreamCopyrights.forEach { (fileName, copyright) ->
+                matching("**/$fileName", closureOf<net.minecraftforge.licenser.LicenseProperties> {
+                    header.set(rootProject.resources.text.fromString(
+                        "$copyright\n" + rootProject.file("build-script/license/license-header").readText().replaceFirst(
+                            "Copyright 2024-present the original author or authors.",
+                            "Modifications Copyright 2024-present the xtream-codec authors."
+                        )
+                    ))
+                })
+            }
+            sourceLicenseHeaders.forEach { (fileName, licenses) ->
+                matching("**/$fileName", closureOf<net.minecraftforge.licenser.LicenseProperties> {
+                    val upstreamNotices = licenses.joinToString("\n\n") {
+                        sourceLicenseTexts.getValue(it)
+                    }
+                    val modifications = rootProject.file("build-script/license/license-header").readText().replaceFirst(
+                        "Copyright 2024-present the original author or authors.",
+                        "Modifications Copyright 2024-present the xtream-codec authors."
+                    )
+                    header.set(rootProject.resources.text.fromString("$upstreamNotices\n\nProject modifications:\n$modifications"))
+                })
+            }
             exclude("**/spring.factories")
             exclude("**/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
             properties {
@@ -241,7 +319,9 @@ configure(subprojects) {
 
         // Set custom report renderer, implementing ReportRenderer.
         // Yes, you can write your own to support any format necessary.
-        renderers = arrayOf(com.github.jk1.license.render.TextReportRenderer("THIRD-PARTY-NOTICES.txt"))
+        renderers = arrayOf<com.github.jk1.license.render.ReportRenderer>(
+            com.github.jk1.license.render.TextReportRenderer("THIRD-PARTY-NOTICES.txt")
+        )
 
         // This is for the allowed-licenses-file in checkLicense Task
         // Accepts File, URL or String path to local or remote file
@@ -249,11 +329,18 @@ configure(subprojects) {
         allowedLicensesFile = rootProject.file("build-script/license/allowed-licenses.json")
     }
 
-    pluginManager.apply("com.namics.oss.gradle.license-enforce-plugin")
-    tasks.enforceLicenses {
-        allowedCategories = listOf("Apache", "MIT")
-        allowedLicenses = listOf("Mulan Permissive Software License, Version 2")
+    // 保留原检查入口，共用运行时依赖扫描及白名单，避免两套规则得到不同结果。
+    tasks.register("enforceLicenses") {
+        group = "verification"
+        description = "使用统一白名单检查运行时依赖许可。"
+        dependsOn(tasks.named("checkLicense"))
     }
+}
+
+tasks.register("enforceLicenses") {
+    group = "verification"
+    description = "检查所有 Java 子模块的运行时依赖许可。"
+    dependsOn(subprojects.filter { isJavaProject(it) }.map { it.tasks.named("checkLicense") })
 }
 // endregion Java
 
@@ -270,8 +357,110 @@ configure(subprojects) {
         }
     }
 
+    val projectLicenseMaterials = copySpec {
+        from(rootProject.file("LICENSE")) {
+            into("META-INF")
+            rename { "LICENSE.txt" }
+        }
+        from(rootProject.file("NOTICE")) {
+            into("META-INF")
+            rename { "NOTICE.txt" }
+        }
+        from(rootProject.file("THIRD-PARTY-SOURCE-NOTICES.txt")) {
+            into("META-INF")
+        }
+        from(rootProject.file("licenses/source/open_source_licenses.txt")) {
+            into("META-INF/licenses/source")
+        }
+        if (project.name == "jt-1078-server-spring-boot-starter-reactive") {
+            from(rootProject.file("licenses/MPL-2.0.txt")) {
+                into("META-INF/licenses")
+            }
+            from(project.file("src/main/java")) {
+                include("**/AdpcmImaJt1078AudioCodec.java")
+                includeEmptyDirs = false
+                into("META-INF/third-party-sources/adpcm")
+            }
+        }
+    }
+
+    // 仅在执行相应打包任务时解析运行时图，源码版本与实际 jump3r 构件保持一致。
+    val jump3rRuntime = providers.provider {
+        configurations.getByName("runtimeClasspath").resolvedConfiguration.resolvedArtifacts.filter {
+            it.moduleVersion.id.group == "de.sciss" && it.name == "jump3r"
+        }
+    }
+    val jump3rMaterialsDir = layout.buildDirectory.dir("generated/jump3r-license-materials")
+    val prepareJump3rLicenseMaterials = tasks.register("prepareJump3rLicenseMaterials") {
+        inputs.files(jump3rRuntime.map { artifacts -> artifacts.map { it.file } })
+        inputs.file(rootProject.file("licenses/jump3r/NOTICE.txt"))
+        inputs.file(rootProject.file("build-script/license/jump3r.py"))
+        inputs.file(rootProject.file("licenses/LGPL-2.1.txt"))
+        outputs.dir(jump3rMaterialsDir)
+        doLast {
+            val destination = jump3rMaterialsDir.get().asFile
+            delete(destination)
+            destination.mkdirs()
+            jump3rRuntime.get().forEach { artifact ->
+                val libraryVersion = artifact.moduleVersion.id.version
+                val sourceConfiguration = configurations.detachedConfiguration(
+                    dependencies.create("de.sciss:jump3r:$libraryVersion:sources@jar")
+                ).apply { isTransitive = false }
+                val sourceArchive = sourceConfiguration.singleFile
+                val materials = destination.resolve("META-INF/third-party-sources/jump3r")
+                materials.mkdirs()
+                copy {
+                    from(rootProject.file("licenses/jump3r/NOTICE.txt"))
+                    from(rootProject.file("build-script/license/jump3r.py"))
+                    from(sourceArchive)
+                    into(materials)
+                }
+                copy {
+                    from(rootProject.file("licenses/LGPL-2.1.txt"))
+                    into(destination.resolve("META-INF/licenses"))
+                }
+                fun sha256(file: File): String = MessageDigest.getInstance("SHA-256")
+                    .digest(file.readBytes()).joinToString("") { "%02x".format(it) }
+                materials.resolve("ARTIFACTS.txt").writeText(
+                    "de.sciss:jump3r:$libraryVersion (unmodified)\n" +
+                        "${artifact.file.name} SHA-256 ${sha256(artifact.file)}\n" +
+                        "${sourceArchive.name} SHA-256 ${sha256(sourceArchive)}\n"
+                )
+            }
+        }
+    }
+
+    // 应用共用一份许可汇总，仅追加实际 EPL 版本的源码地址。
+    val applicationEplRuntime = providers.provider {
+        configurations.getByName("runtimeClasspath").resolvedConfiguration.resolvedArtifacts.filter {
+            "${it.moduleVersion.id.group}:${it.name}" in setOf(
+                "ch.qos.logback:logback-core", "ch.qos.logback:logback-classic",
+                "jakarta.annotation:jakarta.annotation-api", "org.aspectj:aspectjweaver"
+            )
+        }.sortedBy { it.moduleVersion.id.toString() }
+    }
+    val applicationMaterialsDir = layout.buildDirectory.dir("generated/application-license-materials")
+    val prepareApplicationLicenseMaterials = tasks.register("prepareApplicationLicenseMaterials") {
+        inputs.files(applicationEplRuntime.map { artifacts -> artifacts.map { it.file } })
+        inputs.file(rootProject.file("licenses/jvm/open_source_licenses.txt"))
+        outputs.dir(applicationMaterialsDir)
+        doLast {
+            val destination = applicationMaterialsDir.get().asFile
+            delete(destination)
+            val metaInf = destination.resolve("META-INF").apply { mkdirs() }
+            val notice = StringBuilder(rootProject.file("licenses/jvm/open_source_licenses.txt").readText(Charsets.UTF_8))
+            notice.append("\n实际 EPL 依赖的源码获取地址\nSource availability for bundled EPL dependencies\n\n")
+            applicationEplRuntime.get().forEach { artifact ->
+                val id = artifact.moduleVersion.id
+                val base = "https://repo.maven.apache.org/maven2/${id.group.replace('.', '/')}/${artifact.name}/${id.version}"
+                notice.append("$id\n源码地址 / Source URL: $base/${artifact.name}-${id.version}-sources.jar\n\n")
+            }
+            metaInf.resolve("open_source_licenses.txt").writeText(notice.toString(), Charsets.UTF_8)
+        }
+    }
+
     tasks.jar {
-        dependsOn("generateLicenseReport")
+        with(projectLicenseMaterials)
         manifest {
             manifest.attributes["Implementation-Title"] = project.name
             manifest.attributes["Implementation-Version"] = xtreamConfig.projectVersion
@@ -279,22 +468,14 @@ configure(subprojects) {
             manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.vendor")})"
             manifest.attributes["X-Requires-Java-Version"] = xtreamConfig.javaVersion.toInt()
         }
+    }
 
-        from(rootProject.projectDir) {
-            include("LICENSE")
-            into("META-INF")
-            rename("LICENSE", "LICENSE.txt")
-            // https://docs.gradle.org/current/userguide/working_with_files.html#sec:filtering_files
-            expand(
-                "copyright" to LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy")),
-                "version" to xtreamConfig.projectVersion,
-            )
-        }
-
-        from(project.projectDir.absolutePath + "/build/reports/dependency-license/") {
-            include("THIRD-PARTY-NOTICES.txt")
-            into("META-INF")
-            rename("THIRD-PARTY-NOTICES.txt", "NOTICE.txt")
+    tasks.withType<Jar>().matching { it.name in setOf("bootJar", "shadowJar") }.configureEach {
+        dependsOn(prepareApplicationLicenseMaterials, prepareJump3rLicenseMaterials)
+        from(applicationMaterialsDir)
+        from(jump3rMaterialsDir)
+        if (name == "bootJar") {
+            with(projectLicenseMaterials)
         }
     }
 
@@ -324,6 +505,7 @@ configure(subprojects) {
         description = "Assembles a jar archive containing the main source files."
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         archiveClassifier.set("sources")
+        with(projectLicenseMaterials)
         from(sourceSets.getByName("main").java.srcDirs)
     }
 
@@ -331,6 +513,7 @@ configure(subprojects) {
         group = JavaBasePlugin.DOCUMENTATION_GROUP
         description = "Assembles a jar archive containing the generated Javadoc."
         archiveClassifier.set("javadoc")
+        with(projectLicenseMaterials)
         from(tasks.named("javadoc"))
     }
 

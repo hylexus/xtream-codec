@@ -1,5 +1,6 @@
 import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
+import {frontendNotices} from '../../../build-script/license/frontend-notices.mjs'
 import ElementPlus from 'unplugin-element-plus/vite';
 import UnoCSS from 'unocss/vite'
 import path from 'path';
@@ -7,7 +8,7 @@ import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [
+    plugins: [frontendNotices(),
         vue(),
         ElementPlus({}),
         UnoCSS(),

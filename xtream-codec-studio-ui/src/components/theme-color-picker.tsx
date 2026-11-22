@@ -22,17 +22,12 @@ export function ThemeColorPicker() {
   const selectedColor = COLORS.find((item) => item.id === color) || COLORS[0];
   useEffect(() => {
     document.documentElement.dataset.themeColor = color;
-    const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-    if (icon) {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="${selectedColor.hex}"/><text x="16" y="22" fill="white" text-anchor="middle" font-family="monospace" font-size="18">01</text></svg>`;
-      icon.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
-    }
     try {
       localStorage.setItem('xtream-codec-theme-color', color);
     } catch {
       // 浏览器禁用存储时仍允许切换当前页面的主题色。
     }
-  }, [color, selectedColor.hex]);
+  }, [color]);
   return (
     <Popover>
       <Button

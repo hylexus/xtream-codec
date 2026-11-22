@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { frontendNotices } from '../build-script/license/frontend-notices.mjs';
 
 const schemaPath = new URL(
   '../xtream-codec-core/src/main/resources/io/github/hylexus/xtream/codec/core/dynamic/schema/dynamic-codec-schema.json',
@@ -16,6 +17,7 @@ export default defineConfig(({ mode }) => {
   };
   return {
     plugins: [
+      frontendNotices(),
       react(),
       tailwindcss(),
       {

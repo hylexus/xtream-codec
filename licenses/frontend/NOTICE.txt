@@ -1,0 +1,9 @@
+xtream-codec
+https://github.com/hylexus/xtream-codec
+Copyright 2024-present the original author or authors.
+
+项目原创代码按 Apache-2.0 提供。另有许可声明的文件及第三方材料适用各自的条款。遵守适用许可证即可使用、修改、再分发及商用。
+Original project code is provided under Apache-2.0. Files with separate license notices and third-party materials are subject to their respective terms. You may use, modify, redistribute, and make commercial use of the project under the applicable licenses.
+
+项目状态、免责与第三方商业化 / Project status, disclaimer and third-party commercialization
+https://hylexus.github.io/xtream-codec/disclaimer.html

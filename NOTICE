@@ -1,0 +1,192 @@
+xtream-codec
+https://github.com/hylexus/xtream-codec
+Copyright 2024-present the original author or authors.
+
+项目原创代码按 Apache-2.0 提供。另有许可声明的文件及第三方材料适用各自的条款。遵守适用许可证即可使用、修改、再分发及商用。
+Original project code is provided under Apache-2.0. Files with separate license notices and third-party materials are subject to their respective terms. You may use, modify, redistribute, and make commercial use of the project under the applicable licenses.
+
+项目状态、免责与第三方商业化 / Project status, disclaimer and third-party commercialization
+https://hylexus.github.io/xtream-codec/disclaimer.html
+
+本声明汇总 xtream-codec 各模块的第三方归属。各条声明适用于发行物中实际包含的相应代码或组件。
+This notice collects third-party attributions across xtream-codec modules. Each attribution applies to the corresponding code or component included in the distribution.
+
+相关著作权归各自的著作权人所有。
+Copyright remains with the respective copyright holders.
+
+本声明仅提供归属信息，不修改任何许可证条款。
+This notice is informational and does not modify any license terms.
+
+Spring Framework
+https://github.com/spring-projects/spring-framework
+采用 Apache License, Version 2.0 许可。
+Licensed under the Apache License, Version 2.0.
+
+改编内容包括字符串工具、方法元数据，以及响应式处理器、交换、过滤器和分发抽象。
+Adaptations include string utilities, method metadata and reactive handler,
+exchange, filter and dispatch abstractions.
+
+相关代码已针对 xtream-codec 修改，各源码文件标明了其对应的上游类。
+Modified for xtream-codec; individual source files identify their upstream classes.
+
+上游比较类的作者归属另行记录于 THIRD-PARTY-SOURCE-NOTICES.txt，
+该文件在分发归档中位于 META-INF/ 下。
+Upstream comparison-class author attributions are recorded separately in
+THIRD-PARTY-SOURCE-NOTICES.txt (under META-INF/ in distribution archives).
+
+这些归属信息不构成当前项目的贡献者名单。
+These attributions do not constitute a list of contributors to this project.
+
+以下原文转载自用于比较的 Spring Framework 6.1.8 发行包；
+该版本号不代表已确认历史上最初引入代码的精确版本：
+The following notice is reproduced from the Spring Framework 6.1.8 comparison
+distribution; this version is not a claim of the exact historical import:
+
+Spring Framework 6.1.8
+Copyright (c) 2002-2024 Pivotal, Inc.
+
+This product is licensed to you under the Apache License, Version 2.0
+(the "License"). You may not use this product except in compliance with
+the License.
+
+This product may include a number of subcomponents with separate
+copyright notices and license terms. Your use of the source code for
+these subcomponents is subject to the terms and conditions of the
+subcomponent's license, as noted in the license.txt file.
+
+Spring Boot
+https://github.com/spring-projects/spring-boot
+Copyright 2012-2023 the original author or authors.
+采用 Apache License, Version 2.0 许可。
+Licensed under the Apache License, Version 2.0.
+
+改编内容包括 actuator 映射描述提供器，已针对 xtream-codec 处理器修改。
+Adaptations include actuator mapping description providers, modified for
+xtream-codec handlers.
+
+以下原文转载自用于比较的 Spring Boot 3.3.0 发行包；
+该版本号不代表已确认历史上最初引入代码的精确版本：
+The following notice is reproduced from the Spring Boot 3.3.0 comparison
+distribution; this version is not a claim of the exact historical import:
+
+Spring Boot 3.3.0
+Copyright (c) 2012-2024 VMware, Inc.
+
+This product is licensed to you under the Apache License, Version 2.0
+(the "License"). You may not use this product except in compliance with
+the License.
+
+Project Reactor
+https://github.com/reactor/reactor-core
+Copyright (c) 2018-2021 VMware Inc. or its affiliates, All Rights Reserved.
+采用 Apache License, Version 2.0 许可。
+Licensed under the Apache License, Version 2.0.
+
+ReactorThreadFactory 已改编为 XtreamReactorThreadFactory。
+ReactorThreadFactory was adapted as XtreamReactorThreadFactory.
+
+Spring Boot Admin
+https://github.com/codecentric/spring-boot-admin
+Copyright 2014-2023 the original author or authors.
+采用 Apache License, Version 2.0 许可。
+Licensed under the Apache License, Version 2.0.
+
+改编内容包括 HTTP 代理辅助工具和间隔检查，已针对 xtream-codec 修改。
+Adaptations include HTTP proxy helpers and interval checks, modified for
+xtream-codec.
+
+源码注释标明了上游类，以及已记录的比较提交。
+Source comments identify the upstream classes and, where recorded,
+comparison commits.
+
+其他源码改编来源包括采用 MIT License 的 SmallChi/JT808、SmallChi/JT1078、
+EyerH264Decoder 和 mazcpnt/maz-g711。
+Further source adaptations include SmallChi/JT808, SmallChi/JT1078,
+EyerH264Decoder and mazcpnt/maz-g711 under the MIT License.
+Copyright (c) 2018 SmallChi(Koike) (JT808)
+Copyright (c) 2019 SmallChi(Koike) (JT1078)
+Copyright (c) 2021 Redknot (EyerH264Decoder)
+Copyright (c) 2021 mz8023yt (maz-g711)
+
+这些来源的完整上游授权文本集中在 licenses/source/open_source_licenses.txt，
+在 Java 归档中位于 META-INF/licenses/source/；下文方括号为汇总中的分节名称。
+Their complete upstream grants are consolidated in licenses/source/open_source_licenses.txt
+under META-INF/licenses/source/ in Java archives; square brackets below identify sections in the summary.
+
+文件对应关系和比较快照记录于 THIRD-PARTY-SOURCE-NOTICES.txt。
+File mappings and comparison snapshots are recorded in
+THIRD-PARTY-SOURCE-NOTICES.txt.
+
+matrixy/jtt1078-video-server
+https://gitee.com/matrixy/jtt1078-video-server
+Copyright [2019] [matrixy]
+采用 Apache License, Version 2.0 许可。
+Licensed under the Apache License, Version 2.0.
+
+改编内容包括 MP3 编码及 FLV/ADPCM 相关代码。
+Adaptations include MP3 encoding and FLV/ADPCM-related code.
+
+原仓库的许可声明保存在 licenses/source/open_source_licenses.txt [Apache-2.0-matrixy.txt]。
+The original repository license notice is retained in
+licenses/source/open_source_licenses.txt [Apache-2.0-matrixy.txt].
+
+用于比较的 ldming/JT1078 仓库是 SmallChi/JT1078 的镜像，
+保留了上文列出的 SmallChi MIT 声明。
+The ldming/JT1078 comparison repository is a SmallChi/JT1078 mirror and
+retains the SmallChi MIT notice identified above.
+
+sky/jt1078
+https://gitee.com/hui_hui_zhou/open-source-repository
+已匹配的消息解码器部分以采用 Mulan PSL v2 许可的 2024 年快照为比较依据。
+Matching message-decoder portions are compared against the 2024 snapshot
+under Mulan PSL v2.
+
+完整的中英文许可证保存在 licenses/source/open_source_licenses.txt [MulanPSL-2.0-sky.txt]。
+The full bilingual license is retained in licenses/source/open_source_licenses.txt [MulanPSL-2.0-sky.txt].
+
+此处的 Mulan 许可归属仅涉及上述已匹配的消息解码器部分。
+The Mulan attribution here covers only the matching message-decoder portions above.
+
+Micrometer
+Copyright 2017 VMware, Inc.
+采用 Apache License, Version 2.0 许可。
+Licensed under the Apache License, Version 2.0.
+
+线程状态计数方法改编自 JvmThreadMetrics。
+The thread-state counting method is adapted from JvmThreadMetrics.
+
+用于比较的完整 NOTICE 保存在 licenses/source/open_source_licenses.txt [Apache-2.0-Micrometer-NOTICE.txt]。
+The full comparison NOTICE is retained in
+licenses/source/open_source_licenses.txt [Apache-2.0-Micrometer-NOTICE.txt].
+
+Dashboard UI 目录包含来自 Next UI Vite 模板的代码。
+The Dashboard UI directories contain code from the Next UI Vite template.
+Copyright (c) 2024 Next UI
+
+MIT 许可证原文保留在各 Dashboard UI 目录中。
+The original MIT license is retained in each Dashboard UI directory.
+
+第三方依赖保留各自的许可证。
+Third-party dependencies retain their own licenses.
+
+Boot 和 Shadow 应用的 JVM 补充许可见应用归档中的 META-INF/open_source_licenses.txt。
+Supplemental JVM licenses for Boot and Shadow applications are available at
+META-INF/open_source_licenses.txt in the application archive.
+
+JT1078 IMA ADPCM 实现包含采用 MPL-2.0 许可的 Symphonia 改编内容；
+详情见 THIRD-PARTY-SOURCE-NOTICES.txt 及随附的源码和许可证。
+The JT1078 IMA ADPCM implementation includes Symphonia adaptations under
+MPL-2.0; see THIRD-PARTY-SOURCE-NOTICES.txt and the supplied source/license.
+
+jump3r 的上游 Maven POM 声明 LGPL-2.1-or-later。实际捆绑该库的 Boot 和 Shadow
+应用在 META-INF/third-party-sources/jump3r/ 附带同版本源码、声明和重建工具。
+使用未签名且无前置启动脚本的 Spring Boot JAR 时，也可用该工具替换嵌套库。
+The upstream Maven POM for jump3r declares LGPL-2.1-or-later. Boot and Shadow
+applications that bundle the library include matching sources, notices, and
+the rebuild tool under META-INF/third-party-sources/jump3r/. The tool can also
+replace the nested library in unsigned Spring Boot JARs without a prepended
+launch script.
+
+源码来源及尚待核实的事项记录于源码仓库中的 build-script/license/README.md。
+Source provenance and outstanding verification items are documented in
+build-script/license/README.md in the source repository.

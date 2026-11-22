@@ -1,11 +1,12 @@
-import {defineConfig} from 'vite'
+import {createLogger, defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
+import {frontendNotices} from '../../../build-script/license/frontend-notices.mjs'
 import ElementPlus from 'unplugin-element-plus/vite';
 import UnoCSS from 'unocss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [vue(), ElementPlus({}), UnoCSS()],
+    plugins: [frontendNotices(), vue(), ElementPlus({}), UnoCSS()],
     server: {
         host: '0.0.0.0',
         proxy: {
@@ -13,7 +14,7 @@ export default defineConfig({
                 target: "http://localhost:9999",
                 changeOrigin: true,
                 rewrite: (path) => {
-                    console.log(`Proxying request: ${path} -> http://localhost:9999${path}`);
+                    createLogger().info(`Proxying request: ${path} -> http://localhost:9999${path}`);
                     return path;
                 },
             },
@@ -21,7 +22,7 @@ export default defineConfig({
                 target: "http://localhost:9999",
                 changeOrigin: true,
                 rewrite: (path) => {
-                    console.log(`Proxying request: ${path} -> http://localhost:9999${path}`);
+                    createLogger().info(`Proxying request: ${path} -> http://localhost:9999${path}`);
                     return path;
                 },
             },

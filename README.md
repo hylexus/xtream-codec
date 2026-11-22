@@ -2,7 +2,7 @@
 
 <p align="center">
     <a href="https://github.com/hylexus/xtream-codec">
-        <img alt="xtream-codec logo" src="docs/src/.vuepress/public/logo.png" width="50%" />
+        <img alt="xtream-codec logo" src="assets/branding/wordmark.svg" width="60%" />
     </a>
 </p>
 
@@ -42,6 +42,13 @@
     </a>
 </p>
 
+> [!IMPORTANT]
+> 遵守适用许可证即可使用、修改、再分发及商用。
+>
+> You may use, modify, redistribute and use xtream-codec commercially under the applicable licenses.
+>
+> [免责声明与第三方商业化 / Disclaimer and third-party commercialization](docs/src/disclaimer.md)
+
 ## Tips / 提示
 
 > 2026.1 版的 idea 中打开项目可能会报错
@@ -49,7 +56,7 @@
 - 临时解决方案: 临时禁用掉 idea 内置的 `Spark` 插件
 - 详情参考: [https://youtrack.jetbrains.com/issue/IDEA-386409](https://youtrack.jetbrains.com/issue/IDEA-386409)
 
-> AI 生成的代码都会有标记，比如 `@author opencode (AI)`
+> 部分代码和资源在 AI 辅助下完成，相关记录见源码或[静态资源说明](assets/STATIC-ASSETS.md)。
 
 ## ProjectNaming / 项目命名
 
@@ -251,12 +258,18 @@ docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/
 
 ## License / 开源协议
 
-`xtream-codec` 使用 [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) 开源许可证。 详情见 [LICENSE](LICENSE) 文件。
+`xtream-codec` 的项目代码使用 [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)，文件或目录另有声明的除外。 详情见 [LICENSE](LICENSE) 和 [NOTICE](NOTICE)。
+
+- 第三方源码、依赖和模板保留各自的许可证；两个 Dashboard UI 目录保留 Next UI 模板的 MIT 许可
+- JT1078 的 Symphonia 派生 ADPCM 文件适用 MPL-2.0，归档附带对应源码
+- jump3r 的上游 Maven POM 声明 LGPL-2.1-or-later。实际捆绑该库的 Boot 和 Shadow 应用附带同版本源码、许可材料和重建工具。该工具也可替换未签名且无前置启动脚本的 Spring Boot JAR 中的嵌套库。详见 [第三方许可材料](licenses/README.md)。
+- 前端生产构建生成 `THIRD-PARTY-FRONTEND-NOTICES.txt`，静态部署、JAR 和镜像分发时须保留
 
 第三方依赖的许可证信息:
 
-- 请参考生成的 **.jar** 文件中的 `META-INF/NOTICE.txt` 文件 。
-- 或者, 执行 `./gradlew clean generateLicenseReport` 之后查看生成的 `build/reports/dependency-license/THIRD-PARTY-NOTICES.txt` 文件。
+- 项目归属声明见 JAR 中的 `META-INF/NOTICE.txt`。Boot 和 Shadow 应用的 JVM 补充许可见 `META-INF/open_source_licenses.txt`。
+- 运行 `./gradlew generateLicenseReport` 可在各模块的 `build/reports/dependency-license/` 下生成 `THIRD-PARTY-NOTICES.txt`。
+- 来源核实情况与发布待办见 [许可证审查记录](build-script/license/README.md)。JVM 报告不覆盖复制源码和 npm 依赖，当前仍有待核实事项。
 
 ## Funding / 打赏
 

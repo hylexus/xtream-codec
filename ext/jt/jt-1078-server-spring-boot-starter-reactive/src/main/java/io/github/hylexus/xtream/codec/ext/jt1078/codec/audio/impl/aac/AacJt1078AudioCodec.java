@@ -23,7 +23,10 @@ import io.netty.buffer.ByteBuf;
 import jakarta.annotation.Nonnull;
 
 /**
- * 这个实现来自 <a href="https://gitee.com/hui_hui_zhou/open-source-repository">sky/jt1078</a> 的作者 sky
+ * 识别并跳过 7 字节 ADTS 头的处理思路参考 sky。
+ * 相关 JT1078 项目：<a href="https://gitee.com/hui_hui_zhou/open-source-repository">sky/jt1078</a>。
+ *
+ * @author Codex (AI)
  */
 public class AacJt1078AudioCodec implements Jt1078AudioCodec {
 

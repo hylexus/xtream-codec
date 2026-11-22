@@ -1,17 +1,25 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright [2019] [matrixy]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Symphonia
+ * Copyright (c) 2019-2022 The Project Symphonia Developers.
+ * Modifications Copyright 2024-present the xtream-codec authors.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 package io.github.hylexus.xtream.codec.ext.jt1078.codec.audio.impl.adpcm;
@@ -31,23 +39,21 @@ import java.util.StringJoiner;
 /**
  * IMA(Interactive Multimedia Association) ADPCM 解码算法实现。
  * <p>
- * <h3>NOTES!!!</h3>
- * 该算法是从下面几个 代码库/资料 中改造而来：
- * <p>
- * 该算法是从下面几个 代码库/资料 中改造而来：
- * <p>
- * 该算法是从下面几个 代码库/资料 中改造而来：
+ * 从以下来源适配为 JT1078 Java 解码器；Symphonia 派生文件适用 MPL-2.0。
+ * 许可、修改范围及尚待核实的来源见仓库 THIRD-PARTY-SOURCE-NOTICES.txt。
+ * 对应 Java 源码随模块 JAR 的 META-INF/third-party-sources/adpcm/ 分发。
  * <ol>
  *     <li><a href="https://github.com/pdeljanov/Symphonia/blob/b157bb58826a2035405702f481b6fdcbd922cbf3/symphonia-codec-adpcm/src/codec_ima.rs#L65">symphonia-codec-adpcm/src/codec_ima.rs#L65(Rust 版本的音频库)</a></li>
  *     <li><a href="https://gitee.com/matrixy/jtt1078-video-server/blob/flv/src/main/java/cn/org/hentai/jtt1078/codec/ADPCMCodec.java#L181">cn.org.hentai.jtt1078.codec.ADPCMCodec</a></li>
- *     <li><a href="https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf">https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf</a></li>
  * </ol>
+ * Microchip 应用笔记保留为历史技术参考；其原 C 示例和未调用的移植方法已移除。
  *
  * @see <a href="https://wiki.multimedia.cx/index.php/IMA_ADPCM">https://wiki.multimedia.cx/index.php/IMA_ADPCM</a>
  * @see <a href="https://github.com/pdeljanov/Symphonia.git">https://github.com/pdeljanov/Symphonia.git(Rust 版本的音频库)</a>
  * @see <a href="https://www.cs.columbia.edu/~hgs/audio/dvi/IMA_ADPCM.pdf">https://www.cs.columbia.edu/~hgs/audio/dvi/IMA_ADPCM.pdf</a>
  * @see <a href="https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf">https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf</a>
  * @see <a href="https://www.hentai.org.cn/article?id=8">https://www.hentai.org.cn/article?id=8</a>
+ * @author Codex (AI)
  */
 public class AdpcmImaJt1078AudioCodec extends AbstractJt1078AudioCodec {
 
@@ -55,8 +61,6 @@ public class AdpcmImaJt1078AudioCodec extends AbstractJt1078AudioCodec {
     private static final int[] IMA_INDEX_TABLE = {
             -1, -1, -1, -1, 2, 4, 6, 8,
             -1, -1, -1, -1, 2, 4, 6, 8
-            // 0xff, 0xff, 0xff, 0xff, 2, 4, 6, 8,
-            // 0xff, 0xff, 0xff, 0xff, 2, 4, 6, 8
     };
 
     private static final int[] IMA_STEP_TABLE = {
@@ -126,106 +130,6 @@ public class AdpcmImaJt1078AudioCodec extends AbstractJt1078AudioCodec {
         status.predictor = this.ensurePredictorRange(predictor);
         status.stepIndex = this.ensureIndexCapacity(status.stepIndex + IMA_INDEX_TABLE[nibble]);
 
-        return status.predictor;
-    }
-
-    /**
-     * 参考这里的算法: <a href="https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf">https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf</a>
-     *
-     * <pre>{@code
-     * long step; // Quantizer step size
-     * signed long predsample; // Output of ADPCM predictor
-     * signed long diffq; // Dequantized predicted difference
-     * int index; // Index into step size table
-     *
-     * signed long ADPCMDecoder(char code )
-     * {
-     * // Restore previous values of predicted sample and quantizer step size index
-     * predsample =state.prevsample;
-     * index =state.previndex;
-     *
-     * // Find quantizer step size from lookup table using index
-     * step = StepSizeTable[index];
-     *
-     * // Inverse quantize the ADPCM code into a difference using the quantizer step size
-     * diffq = step >> 3;
-     * if( code & 4 )
-     *   diffq += step;
-     * if( code & 2 )
-     *   diffq += step >> 1;
-     * if( code & 1 )
-     *   diffq += step >> 2;
-     *
-     * // Add the difference to the predicted sample
-     * if( code & 8 )
-     *   predsample -= diffq;
-     * else
-     *   predsample += diffq;
-     *
-     * // Check for overflow of the new predicted sample
-     * if( predsample > 32767 )
-     *   predsample = 32767;
-     * else if( predsample < -32768 )
-     *   predsample = -32768;
-     *
-     * // Find new quantizer step size by adding the old index and a table lookup using the ADPCM code
-     * index += IndexTable[code];
-     *
-     * // Check for overflow of the new quantizer step size index
-     * if( index < 0 )
-     *   index = 0;
-     * if( index > 88 )
-     *   index = 88;
-     * // Save predicted sample and quantizer step size index for next iteration
-     * state.prevsample = predsample;
-     * state.previndex = index;
-     *
-     * // Return the new speech sample
-     * return( predsample );
-     *
-     * }
-     * }</pre>
-     *
-     * @see <a href="https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf">https://ww1.microchip.com/downloads/en/AppNotes/00643b.pdf</a>
-     */
-    @SuppressWarnings({"checkstyle:VariableDeclarationUsageDistance", "unused"})
-    private short expandNibbleV2(AdpcmImaBlockStatus status, short code) {
-        int predSample = status.predictor;
-        byte index = status.stepIndex;
-        final int step = IMA_STEP_TABLE[index];
-        int diffq = step >> 3;
-        if ((code & 4) > 0) {
-            diffq += step;
-        }
-        if ((code & 2) > 0) {
-            diffq += step >> 1;
-        }
-        if ((code & 1) > 0) {
-            diffq += step >> 2;
-        }
-
-        if ((code & 8) > 0) {
-            predSample -= diffq;
-        } else {
-            predSample += diffq;
-        }
-
-        if (predSample > 32767) {
-            predSample = 32767;
-        }
-        if (predSample < -32768) {
-            predSample = -32768;
-        }
-
-        index += (byte) IMA_INDEX_TABLE[code];
-        if (index < 0) {
-            index = 0;
-        }
-        if (index > 88) {
-            index = 88;
-        }
-        status.predictor = (short) predSample;
-        status.stepIndex = index;
         return status.predictor;
     }
 

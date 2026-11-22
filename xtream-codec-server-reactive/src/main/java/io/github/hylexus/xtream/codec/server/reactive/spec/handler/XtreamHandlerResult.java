@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +25,10 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The current class is derived from and modified based on `org.springframework.web.reactive.HandlerResult`.
  *
+ * <p>上游类的作者归属见 {@code THIRD-PARTY-SOURCE-NOTICES.txt}（发行包内位于 {@code META-INF/}）。
+ *
  * @author hylexus
+ * @author Codex (AI)
  */
 public class XtreamHandlerResult {
 

@@ -1,0 +1,54 @@
+源码许可头模板
+Source license header templates
+
+各分节由 Gradle 提取使用；分节标识不写入 Java 文件。
+Gradle extracts each section as a header; section identifiers are not written to Java files.
+
+===== BEGIN adpcm-header =====
+Copyright [2019] [matrixy]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Symphonia
+Copyright (c) 2019-2022 The Project Symphonia Developers.
+Modifications Copyright 2024-present the xtream-codec authors.
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+===== END adpcm-header =====
+
+===== BEGIN sky-header =====
+Upstream portions adapted from sky/jt1078 are licensed under Mulan PSL v2.
+The compared MessageDecoderHandler.java credits xingkong as its author.
+See THIRD-PARTY-SOURCE-NOTICES.txt for the fixed source and scope.
+The complete upstream license is supplied in licenses/source/open_source_licenses.txt [MulanPSL-2.0-sky.txt]
+(META-INF/licenses/source/ in Java archives).
+
+Project modifications:
+Modifications Copyright 2024-present the xtream-codec authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+===== END sky-header =====

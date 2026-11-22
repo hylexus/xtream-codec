@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <radialGradient id="blue" cx="0" cy="0" r="1" gradientTransform="translate(230 200) rotate(30) scale(1200 900)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4D7CFE" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#4D7CFE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cyan" cx="0" cy="0" r="1" gradientTransform="translate(1710 850) rotate(-150) scale(1000 800)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3C5" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#22D3C5" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M72 0H0V72" stroke="#A9C2E5" stroke-opacity=".055"/>
+    </pattern>
+  </defs>
+  <path fill="#0B1224" d="M0 0H1920V1080H0Z"/>
+  <path fill="url(#blue)" d="M0 0H1920V1080H0Z"/>
+  <path fill="url(#cyan)" d="M0 0H1920V1080H0Z"/>
+  <path fill="url(#grid)" d="M0 0H1920V1080H0Z"/>
+  <g stroke="#4D7CFE" stroke-opacity=".18" stroke-width="2">
+    <path d="M-120 250H250C470 250 420 830 690 830H1110C1370 830 1380 350 1640 350H2040"/>
+    <path d="M-120 270H240C450 270 410 850 680 850H1120C1390 850 1390 370 1650 370H2040"/>
+  </g>
+  <g stroke="#22D3C5" stroke-opacity=".18" stroke-width="2">
+    <path d="M-120 880H190C460 880 520 190 790 190H1250C1520 190 1450 790 1750 790H2040"/>
+    <path d="M-120 900H200C480 900 530 210 800 210H1240C1500 210 1440 810 1760 810H2040"/>
+  </g>
+  <g fill="#4D7CFE" fill-opacity=".5">
+    <circle cx="250" cy="250" r="5"/>
+    <circle cx="1110" cy="830" r="5"/>
+    <circle cx="1640" cy="350" r="5"/>
+  </g>
+  <g fill="#22D3C5" fill-opacity=".5">
+    <circle cx="190" cy="880" r="5"/>
+    <circle cx="790" cy="190" r="5"/>
+    <circle cx="1750" cy="790" r="5"/>
+  </g>
+</svg>

@@ -1,0 +1,422 @@
+xtream-codec 第三方源码归属声明
+Third-party source attributions for xtream-codec
+================================================
+
+本文件记录所比较的上游类的归属信息。
+This file records attribution from upstream comparison classes.
+
+下列姓名为这些上游类在所列版本中注明的作者。
+The names below are the authors listed by those upstream classes at the stated versions.
+
+这些姓名不是 xtream-codec 的贡献者名单，不表示相关人员为本项目背书，
+也不能证明每位列名人员都编写了本项目所适配的每一部分代码。
+They are not a list of contributors to xtream-codec, an endorsement of this project,
+or evidence that every listed person authored each portion adapted here.
+
+所列比较版本不能确定历史上实际引入代码的精确版本。
+The comparison versions do not establish the exact historical import versions.
+
+适配后的文件仍保留原有的文件级版权和许可声明。
+Original file-level copyright and license notices remain in the adapted files.
+
+xtream-codec 的修改部分在文件头中单独标明。
+The xtream-codec modifications are identified separately in their headers.
+
+其他上游比较快照（审查日期：2026-10-24）
+Further upstream comparison snapshots (reviewed 2026-10-24)
+---------------------------------------------------------
+固定比较来源和证据限制见 build-script/license/README.md；完整许可与声明集中在
+licenses/source/open_source_licenses.txt（在 JAR 中位于 META-INF/licenses/source/）。
+Fixed comparison sources and evidence limitations are recorded in build-script/license/README.md;
+complete licenses and notices are consolidated in licenses/source/open_source_licenses.txt
+(META-INF/licenses/source/ in JARs).
+
+下文方括号标注该汇总中的分节名称。
+Square brackets below identify sections within that summary.
+
+matrixy/jtt1078-video-server, Apache License, Version 2.0
+Copyright [2019] [matrixy]
+提交：7cf571bbd89d988ff1081e790775a538aa5abc0c。
+Commit 7cf571bbd89d988ff1081e790775a538aa5abc0c.
+
+DefaultPcmToMp3Encoder 由 MP3Encoder.java（Created by matrixy on 2020/4/27）
+适配而来，保留对应的缓冲区和分块循环，并结合项目音频格式、编码器延迟创建、
+Netty 缓冲区及生命周期管理。
+MP3Encoder.java (Created by matrixy on 2020/4/27) is adapted by
+DefaultPcmToMp3Encoder, retaining the corresponding buffer/chunk loop and
+incorporating project audio formats, lazy encoder creation, Netty buffers
+and lifecycle management.
+
+FlvEncoder.java（Created by matrixy on 2020/1/3）及 FlvAudioTagEncoder.java
+（author:zhouyili (11861744@qq.com)）是 DefaultFlvEncoder 的封装、序列头缓存
+及音视频标签处理的比较来源。
+FlvEncoder.java (Created by matrixy on 2020/1/3) and FlvAudioTagEncoder.java
+(author:zhouyili (11861744@qq.com)) are comparison sources for
+DefaultFlvEncoder's framing, sequence-header caching and audio/video tags.
+
+ADPCMCodec.java（Created by houcheng on 2019-12-05）是历史上的 ADPCM 参考来源。
+ADPCMCodec.java (Created by houcheng on 2019-12-05) is a historical
+ADPCM reference.
+
+其声明与 Symphonia 的 MPL 授权一并保留；这不表示当前整个解码器均归属于 matrixy。
+Its notice is retained alongside the Symphonia MPL grant;
+this does not attribute all of the current decoder to matrixy.
+
+带方括号的版权原文及原始授权完整保留在 licenses/source/open_source_licenses.txt [Apache-2.0-matrixy.txt]。
+The exact bracketed copyright and original grant are preserved in
+licenses/source/open_source_licenses.txt [Apache-2.0-matrixy.txt].
+
+ldming/JT1078，SmallChi 镜像，MIT License
+ldming/JT1078, SmallChi mirror, MIT License
+提交：3604422593af7d8a343333f52fc93d2092f18261。
+Commit 3604422593af7d8a343333f52fc93d2092f18261.
+
+所比较的 FlvEncoder.cs、FlvMessagePackWriter_Flv.cs 和 AVCDecoderConfigurationRecord.cs
+为 DefaultFlvEncoder 提供 C# FLV 实现的比较依据。
+The compared FlvEncoder.cs, FlvMessagePackWriter_Flv.cs and
+AVCDecoderConfigurationRecord.cs provide the C# FLV comparison for
+DefaultFlvEncoder.
+
+该仓库自述为 SmallChi/JT1078 的镜像，其 LICENSE 与所附
+licenses/source/open_source_licenses.txt [MIT-SmallChi-JT1078.txt] 逐字节一致，包括 SmallChi 的版权声明。
+The repository describes itself as a SmallChi/JT1078
+mirror and its LICENSE is byte-identical to the supplied
+licenses/source/open_source_licenses.txt [MIT-SmallChi-JT1078.txt], including SmallChi's copyright.
+
+sky/jt1078, Mulan Permissive Software License, Version 2
+比较提交：37ebeb29bfff29a13848a6e4d753a6ae85f10e3a（2024 年）。
+Comparison commit 37ebeb29bfff29a13848a6e4d753a6ae85f10e3a (2024).
+
+公开的 MessageDecoderHandler.java 将作者记为 xingkong（@date 2021-09-04）。
+The public MessageDecoderHandler.java credits xingkong (@date 2021-09-04).
+
+Jt1078ByteToMessageDecoder 将字段解码及按条件处理时间戳、帧间隔的逻辑
+适配到项目的消息头、会话及 6/10 字节 SIM。
+Jt1078ByteToMessageDecoder adapts field decoding and conditional timestamp/
+frame-interval handling to project headers, sessions and 6/10-byte SIMs.
+
+此处的 Mulan 许可归属以该固定快照为依据，仅涉及上述已匹配的解码器部分。
+The Mulan attribution here is based on that fixed snapshot and covers only
+the matching decoder portions above.
+
+快照比较依据见 build-script/license/README.md。
+Snapshot comparison evidence is recorded in build-script/license/README.md.
+
+完整上游许可证：licenses/source/open_source_licenses.txt [MulanPSL-2.0-sky.txt]。
+Full upstream license: licenses/source/open_source_licenses.txt [MulanPSL-2.0-sky.txt].
+
+Micrometer 1.13.0, Apache License, Version 2.0
+Copyright 2017 VMware, Inc.
+DefaultJt808DashboardMetricsService#getThreadStateCount 复制了
+io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics 中明确标记的方法。
+DefaultJt808DashboardMetricsService#getThreadStateCount copies the marked
+method from io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics.
+
+比较类将 Jon Schneider 和 Johnny Lim 列为上游类作者。
+The compared class lists Jon Schneider and Johnny Lim as upstream class authors.
+
+所比较的 NOTICE 全文保留在 licenses/source/open_source_licenses.txt [Apache-2.0-Micrometer-NOTICE.txt]。
+The complete comparison NOTICE is retained in
+licenses/source/open_source_licenses.txt [Apache-2.0-Micrometer-NOTICE.txt].
+
+Spring Boot Admin, Apache License, Version 2.0
+Copyright 2014-2023 the original author or authors.
+提交 1433ca5b8343247075ff775d558c9a82341e2ac6 中的 HttpHeaderFilter、
+InstanceWebProxy、InstanceWebClient、InstanceExchangeFilterFunction 和 IntervalCheck；
+以及提交 83db63e82e916357d36b1e6b4d552e1b6506ecc9 中的 reactive/servlet InstancesProxyController。
+Commit 1433ca5b8343247075ff775d558c9a82341e2ac6: HttpHeaderFilter,
+InstanceWebProxy, InstanceWebClient, InstanceExchangeFilterFunction and
+IntervalCheck; commit 83db63e82e916357d36b1e6b4d552e1b6506ecc9:
+reactive/servlet InstancesProxyController.
+
+适配后的类为 XtreamWebProxyHttpHeaderFilter、XtreamWebProxy、XtreamWebProxyBuiltinFilters、
+XtreamWebProxyExchangeFilter、XtreamWebProxyUtils 和 XtreamIntervalChecker。
+Adapted as XtreamWebProxyHttpHeaderFilter, XtreamWebProxy,
+XtreamWebProxyBuiltinFilters, XtreamWebProxyExchangeFilter,
+XtreamWebProxyUtils and XtreamIntervalChecker.
+
+所比较的 HttpHeaderFilter、InstanceWebProxy、InstanceExchangeFilterFunction 和 IntervalCheck
+将 Johannes Edmeier 列为上游类作者。
+The comparison HttpHeaderFilter, InstanceWebProxy,
+InstanceExchangeFilterFunction and IntervalCheck list Johannes Edmeier as
+their upstream class author.
+
+其他比较文件没有作者标签。
+The other compared files have no author tag.
+
+SmallChi/JT808, MIT License
+Copyright (c) 2018 SmallChi(Koike)
+提交 e79d18c3b465f5c450a1d6ba0edc6d9d51c7b13b 中的
+src/JT808.Protocol/MessageBody/JT808_0x8105.cs 被适配为 Message8105CodecSample.java，
+结合 Java/Netty 及项目字段编解码器。
+Commit e79d18c3b465f5c450a1d6ba0edc6d9d51c7b13b:
+src/JT808.Protocol/MessageBody/JT808_0x8105.cs, adapted as
+Message8105CodecSample.java for Java/Netty and project field codecs.
+
+完整上游声明：licenses/source/open_source_licenses.txt [MIT-SmallChi-JT808.txt]。
+Full upstream notice: licenses/source/open_source_licenses.txt [MIT-SmallChi-JT808.txt].
+
+SmallChi/JT1078, MIT License
+Copyright (c) 2019 SmallChi(Koike)
+DefaultSpsDecoder.java 参考并适配了提交 c4931a8ec37678fb5ecedcc749ffe3c9f4c890fe 中的
+src/JT1078.Protocol/MessagePack/EXPGolombReader.cs，用于 SPS 解析、裁剪及宽高比处理。
+Commit c4931a8ec37678fb5ecedcc749ffe3c9f4c890fe:
+src/JT1078.Protocol/MessagePack/EXPGolombReader.cs, referenced and adapted by
+DefaultSpsDecoder.java for SPS parsing, crop and aspect-ratio handling.
+
+完整上游声明：licenses/source/open_source_licenses.txt [MIT-SmallChi-JT1078.txt]。
+Full upstream notice: licenses/source/open_source_licenses.txt [MIT-SmallChi-JT1078.txt].
+
+EyerH264Decoder, MIT License
+Copyright (c) 2021 Redknot
+DefaultSpsDecoder.java 适配了提交 59e0a396f0b9c0a4a2c034ba6d44fae22297e979 中的
+EyerH264Decoder/NaluSPS.cpp，用于 Java SPS 解析。
+Commit 59e0a396f0b9c0a4a2c034ba6d44fae22297e979: EyerH264Decoder/NaluSPS.cpp,
+adapted by DefaultSpsDecoder.java for Java SPS parsing.
+
+完整上游声明：licenses/source/open_source_licenses.txt [MIT-EyerH264Decoder.txt]。
+Full upstream notice: licenses/source/open_source_licenses.txt [MIT-EyerH264Decoder.txt].
+
+mazcpnt/maz-g711, MIT License
+Copyright (c) 2021 mz8023yt
+比较提交：8b6736f55f2cf832fbaaf3dfc9796d400d63880c，文件 maz_cpnt_g711.c。
+Comparison commit 8b6736f55f2cf832fbaaf3dfc9796d400d63880c, maz_cpnt_g711.c.
+
+适配后的类为 AbstractG711AudioCodec、G711ALawJt1078AudioCodec 和 G711MuLawJt1078AudioCodec，
+使用 Netty 缓冲区及 Java byte/short 处理。
+Adapted as AbstractG711AudioCodec, G711ALawJt1078AudioCodec and
+G711MuLawJt1078AudioCodec, with Netty buffers and Java byte/short handling.
+
+原始文件头记载如下：
+The original file header states:
+  maz_cpnt_g711.c
+  Created on: 2021年03月13日
+  Author: wangbing
+  Email : mz8023yt@163.com
+  Gitee : https://gitee.com/mazcpnt/maz-g711
+
+完整上游声明：licenses/source/open_source_licenses.txt [MIT-maz-g711.txt]。
+Full upstream notice: licenses/source/open_source_licenses.txt [MIT-maz-g711.txt].
+
+上述 MIT 声明也保留在适配后的源码文件头中。
+The MIT notices above are also retained in the adapted source file headers.
+
+在 Java 归档中，上述许可文本路径位于 META-INF/ 下。
+In Java archives, the license text paths above are under META-INF/.
+
+项目的 Apache 许可声明适用于 xtream-codec 的修改部分；上游声明及许可授权保持完整。
+The project Apache license statement applies to xtream-codec modifications;
+the upstream notices and permission grants remain intact.
+
+下列 Spring Framework、Spring Boot 和 Reactor 比较类使用 Apache License, Version 2.0；
+参见 LICENSE（在分发归档中为 META-INF/LICENSE.txt）。
+The Spring Framework, Spring Boot and Reactor comparison classes below use
+the Apache License, Version 2.0; see LICENSE
+(in distribution archives, META-INF/LICENSE.txt).
+
+比较源码归档：
+Comparison source archives:
+- Spring Framework 6.1.8 (spring-core, spring-web, spring-webflux)
+  https://github.com/spring-projects/spring-framework/tree/v6.1.8
+- Spring Boot 3.3.0 (spring-boot-actuator)
+  https://github.com/spring-projects/spring-boot/tree/v3.3.0
+- Reactor Core 3.6.6
+  https://github.com/reactor/reactor-core/tree/v3.6.6
+
+1. DispatcherHandlerXtreamMappingDescriptionProvider.java
+本地文件 / Local file: ext/jt/jt-808-server-dashboard-spring-boot-starter-reactive/src/main/java/io/github/hylexus/xtream/codec/ext/jt808/dashboard/actuate/mapping/DispatcherHandlerXtreamMappingDescriptionProvider.java
+上游类 / Upstream class: org.springframework.boot.actuate.web.mappings.reactive.DispatcherHandlersMappingDescriptionProvider
+比较版本 / Comparison version: 3.3.0
+Copyright 2012-2023 the original author or authors.
+上游类作者 / Upstream class authors: Andy Wilkinson
+
+2. XtreamMappingDescriptionProvider.java
+本地文件 / Local file: ext/jt/jt-808-server-dashboard-spring-boot-starter-reactive/src/main/java/io/github/hylexus/xtream/codec/ext/jt808/dashboard/actuate/mapping/XtreamMappingDescriptionProvider.java
+上游类 / Upstream class: org.springframework.boot.actuate.web.mappings.MappingDescriptionProvider
+比较版本 / Comparison version: 3.3.0
+Copyright 2012-2023 the original author or authors.
+上游类作者 / Upstream class authors: Andy Wilkinson
+
+3. XtreamInternalStringUtils.java
+本地文件 / Local file: xtream-codec-base/src/main/java/io/github/hylexus/xtream/codec/base/utils/XtreamInternalStringUtils.java
+上游类 / Upstream class: org.springframework.util.StringUtils
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2024 the original author or authors.
+上游类作者 / Upstream class authors: Rod Johnson; Juergen Hoeller; Keith Donald; Rob Harrop; Rick Evans; Arjen Poutsma; Sam Brannen; Brian Clozel
+
+4. XtreamVersion.java
+本地文件 / Local file: xtream-codec-core/src/main/java/io/github/hylexus/xtream/codec/common/XtreamVersion.java
+上游类 / Upstream class: org.springframework.core.SpringVersion
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2019 the original author or authors.
+上游类作者 / Upstream class authors: Juergen Hoeller
+
+5. XtreamMethodParameter.java
+本地文件 / Local file: xtream-codec-core/src/main/java/io/github/hylexus/xtream/codec/common/bean/XtreamMethodParameter.java
+上游类 / Upstream class: org.springframework.core.MethodParameter
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2023 the original author or authors.
+上游类作者 / Upstream class authors: Juergen Hoeller; Rob Harrop; Andy Clement; Sam Brannen; Sebastien Deleuze; Phillip Webb
+
+6. XtreamExchange.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/XtreamExchange.java
+上游类 / Upstream class: org.springframework.web.server.ServerWebExchange
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2023 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+7. XtreamExchangeDecorator.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/XtreamExchangeDecorator.java
+上游类 / Upstream class: org.springframework.web.server.ServerWebExchange
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2023 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+8. XtreamFilter.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/XtreamFilter.java
+上游类 / Upstream class: org.springframework.web.server.WebFilter
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2015 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+9. XtreamFilterChain.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/XtreamFilterChain.java
+上游类 / Upstream class: org.springframework.web.server.WebFilterChain
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2015 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+10. XtreamHandler.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/XtreamHandler.java
+上游类 / Upstream class: org.springframework.web.server.WebHandler
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2016 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+11. XtreamSessionManager.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/XtreamSessionManager.java
+上游类 / Upstream class: org.springframework.web.server.session.WebSessionManager
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2016 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+12. XtreamHandlerMethod.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/common/XtreamHandlerMethod.java
+上游类 / Upstream class: org.springframework.web.method.HandlerMethod
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2024 the original author or authors.
+上游类作者 / Upstream class authors: Arjen Poutsma; Rossen Stoyanchev; Juergen Hoeller; Sam Brannen
+
+13. XtreamDispatchExceptionHandler.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/handler/XtreamDispatchExceptionHandler.java
+上游类 / Upstream class: org.springframework.web.reactive.DispatchExceptionHandler
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2023 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+14. XtreamHandlerAdapter.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/handler/XtreamHandlerAdapter.java
+上游类 / Upstream class: org.springframework.web.reactive.HandlerAdapter
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2022 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev; Sebastien Deleuze
+
+15. XtreamHandlerMapping.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/handler/XtreamHandlerMapping.java
+上游类 / Upstream class: org.springframework.web.reactive.HandlerMapping
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2021 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev; Sebastien Deleuze
+
+16. XtreamHandlerResult.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/handler/XtreamHandlerResult.java
+上游类 / Upstream class: org.springframework.web.reactive.HandlerResult
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2022 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+17. XtreamHandlerResultHandler.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/handler/XtreamHandlerResultHandler.java
+上游类 / Upstream class: org.springframework.web.reactive.HandlerResultHandler
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2022 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev; Sebastien Deleuze
+
+18. XtreamRequestExceptionHandler.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/handler/XtreamRequestExceptionHandler.java
+上游类 / Upstream class: org.springframework.web.server.WebExceptionHandler
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2016 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+19. DefaultXtreamFilterChain.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/impl/DefaultXtreamFilterChain.java
+上游类 / Upstream class: org.springframework.web.server.handler.DefaultWebFilterChain
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2021 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+20. DispatcherXtreamHandler.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/impl/DispatcherXtreamHandler.java
+上游类 / Upstream class: org.springframework.web.reactive.DispatcherHandler
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2023 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev; Sebastien Deleuze; Juergen Hoeller
+
+21. ExceptionHandlingXtreamHandler.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/impl/ExceptionHandlingXtreamHandler.java
+上游类 / Upstream class: org.springframework.web.server.handler.ExceptionHandlingWebHandler
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2023 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+22. FilteringXtreamHandler.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/impl/FilteringXtreamHandler.java
+上游类 / Upstream class: org.springframework.web.server.handler.FilteringWebHandler
+比较版本 / Comparison version: 6.1.8
+Copyright 2002-2018 the original author or authors.
+上游类作者 / Upstream class authors: Rossen Stoyanchev
+
+23. XtreamReactorThreadFactory.java
+本地文件 / Local file: xtream-codec-server-reactive/src/main/java/io/github/hylexus/xtream/codec/server/reactive/spec/resources/XtreamReactorThreadFactory.java
+上游类 / Upstream class: reactor.core.scheduler.ReactorThreadFactory
+比较版本 / Comparison version: 3.6.6
+Copyright (c) 2018-2021 VMware Inc. or its affiliates, All Rights Reserved.
+上游类作者 / Upstream class authors: Simon Baslé
+
+其他源码来源及待核实事项记录于 build-script/license/README.md。
+Other source provenance and outstanding verification items are recorded in
+build-script/license/README.md.
+
+本归属清单不表示这些待办已解决，也不修改适用的许可证。
+This attribution list does not resolve those outstanding items
+or modify the applicable licenses.
+
+Symphonia / JT1078 IMA ADPCM
+--------------------------
+AdpcmImaJt1078AudioCodec.java 由 Symphonia 的 codec_ima.rs 适配而来，
+比较提交为 b157bb58826a2035405702f481b6fdcbd922cbf3：
+AdpcmImaJt1078AudioCodec.java is adapted from codec_ima.rs in Symphonia,
+commit b157bb58826a2035405702f481b6fdcbd922cbf3:
+https://github.com/pdeljanov/Symphonia/blob/b157bb58826a2035405702f481b6fdcbd922cbf3/symphonia-codec-adpcm/src/codec_ima.rs
+Copyright (c) 2019-2022 The Project Symphonia Developers.
+Mozilla Public License, v. 2.0 (licenses/MPL-2.0.txt).
+
+Java 适配包括 Netty 缓冲区、JT1078 帧处理及样本输出。
+Java adaptations include Netty buffers, JT1078 framing and sample output.
+
+predictor 转换和半字节顺序与上游不同。
+The predictor conversion and nibble order differ from upstream.
+
+模块 JAR 在 META-INF/third-party-sources/adpcm/ 下提供对应的 Java 源码，
+并在 META-INF/licenses/ 下提供 MPL 许可文本。
+The module JAR supplies the corresponding Java source under
+META-INF/third-party-sources/adpcm/ and the MPL under META-INF/licenses/.
+
+matrixy 比较来源的授权单独保留；MPL 声明不代表其他来源授予权利。
+The matrixy comparison grant is retained separately; the MPL notice
+does not grant rights on behalf of other sources.
+
+当前源码比较及历史 Microchip 引用的核对记录见 build-script/license/README.md 的音频来源记录。
+The current-source comparison and review of the historical Microchip reference
+are recorded in the audio source section of build-script/license/README.md.

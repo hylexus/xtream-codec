@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2017 VMware, Inc.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +117,7 @@ public class DefaultJt808DashboardMetricsService implements Jt808DashboardMetric
         );
     }
 
-    // Copied from `io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics#getThreadStateCount()`
+    // 此方法复制自 Micrometer 的 JvmThreadMetrics#getThreadStateCount()，来源及许可见 THIRD-PARTY-SOURCE-NOTICES.txt。
     static long getThreadStateCount(ThreadMXBean threadBean, Thread.State state) {
         return Arrays.stream(threadBean.getThreadInfo(threadBean.getAllThreadIds()))
                 .filter(threadInfo -> threadInfo != null && threadInfo.getThreadState() == state)

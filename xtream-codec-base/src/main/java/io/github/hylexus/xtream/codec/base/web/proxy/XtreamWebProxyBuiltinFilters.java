@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +28,13 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 /**
+ * 上游固定比较快照及作者归属见 THIRD-PARTY-SOURCE-NOTICES.txt；项目修改单独标注。
+ * <p>
  * @see <a href="https://github.com/codecentric/spring-boot-admin">https://github.com/codecentric/spring-boot-admin</a>
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/1433ca5b8343247075ff775d558c9a82341e2ac6/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/InstanceWebProxy.java#L58">de.codecentric.boot.admin.server.web.InstanceWebProxy</a>
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/1433ca5b8343247075ff775d558c9a82341e2ac6/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/client/InstanceWebClient.java#L31">de.codecentric.boot.admin.server.web.client.InstanceWebClient</a>
+ *
+ * @author Codex (AI)
  */
 @NullMarked
 public final class XtreamWebProxyBuiltinFilters {

@@ -388,19 +388,9 @@ public interface XtreamBitOperator {
     }
 
     /**
-     * 这个方法是从 {@code java.lang.Long#toUnsignedBigInteger(long)} 中复制过来的。
+     * 通过公开 API 将 long 的无符号十进制表示转换为非负整数。
      */
     static BigInteger toUnsignedBigInteger(long i) {
-        if (i >= 0L) {
-            return BigInteger.valueOf(i);
-        } else {
-            int upper = (int) (i >>> 32);
-            int lower = (int) i;
-
-            // return (upper << 32) + lower
-            return (BigInteger.valueOf(Integer.toUnsignedLong(upper)))
-                    .shiftLeft(32)
-                    .add(BigInteger.valueOf(Integer.toUnsignedLong(lower)));
-        }
+        return new BigInteger(Long.toUnsignedString(i));
     }
 }

@@ -1,5 +1,28 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * MIT License
+ *
+ * Copyright (c) 2021 mz8023yt
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Project modifications:
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +48,14 @@ import io.netty.buffer.ByteBufAllocator;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * 上游 MIT 全文保留于文件头及 licenses/source/；固定比较快照和改造范围见 THIRD-PARTY-SOURCE-NOTICES.txt。
+ * <p>
  * 当前类是从 <a href="https://gitee.com/mazcpnt/maz-g711/blob/master/maz_cpnt_g711.c">maz_cpnt_g711.c</a> 复制过来修改的。
  * <p>
  * The current class is derived from and modified based on <a href="https://gitee.com/mazcpnt/maz-g711/blob/master/maz_cpnt_g711.c">maz_cpnt_g711.c</a>.
  *
  * @author hylexus
+ * @author Codex (AI)
  */
 public abstract class AbstractG711AudioCodec extends AbstractJt1078AudioCodec {
 

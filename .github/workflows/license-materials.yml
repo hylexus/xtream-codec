@@ -1,0 +1,113 @@
+name: License materials and dependency policy
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+jobs:
+  materials:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3
+      - name: Verify material failure cases
+        run: |
+          python3 -B build-script/license/test_check_materials.py
+      - name: Build and verify all eight frontends and docs fonts
+        run: python3 -B build-script/license/check-materials.py
+      - name: Build representative archives
+        run: |
+          ./gradlew :xtream-codec-base:jar :xtream-codec-base:sourcesJar :xtream-codec-base:javaDocJar \
+            :ext:jt:jt-1078-server-spring-boot-starter-reactive:jar \
+            :quick-start:jt:jt-1078-server-quick-start-nonblocking:jar \
+            :quick-start:jt:jt-1078-server-quick-start-nonblocking:bootJar \
+            :quick-start:jt:jt-808-server-quick-start-with-storage-blocking:jar \
+            :quick-start:jt:jt-808-server-quick-start-with-storage-blocking:bootJar \
+            :quick-start:jt:jt-808-server-quick-start-with-storage-nonblocking:jar \
+            :quick-start:jt:jt-808-server-quick-start-with-storage-nonblocking:bootJar \
+            :xtream-codec-studio-app:shadowJar \
+            -Pxtream.backend.build.debug-module-fatjar.enabled=true \
+            -Pxtream.frontend.build.jt-1078-server-quick-start-ui.enabled=true \
+            -Pxtream.frontend.build.jt-808-server-quick-start-with-storage-ui.enabled=true \
+            -Pxtream.frontend.build.jt-808-server-dashboard-ui.enabled=true \
+            -Pxtream.frontend.build.xtream-codec-studio-ui.enabled=true --no-parallel
+      - name: Verify actual distribution bytes
+        run: |
+          jt1078_libs=quick-start/jt/jt-1078-server-quick-start-nonblocking/build/libs
+          jt808_blocking=quick-start/jt/jt-808-server-quick-start-with-storage-blocking/build/libs/jt-808-server-quick-start-with-storage-blocking.jar
+          jt808_nonblocking=quick-start/jt/jt-808-server-quick-start-with-storage-nonblocking/build/libs/jt-808-server-quick-start-with-storage-nonblocking.jar
+          studio_archives=(xtream-codec-studio-app/build/libs/*-all.jar)
+          test "${#studio_archives[@]}" -eq 1
+          frontend_notice=THIRD-PARTY-FRONTEND-NOTICES.txt
+          jar tf "$jt1078_libs/jt-1078-server-quick-start-nonblocking.jar" | grep -Fx 'BOOT-INF/classes/static/quickstart-ui/index.html'
+          for archive in "$jt808_blocking" "$jt808_nonblocking"; do
+            jar tf "$archive" | grep -Fx 'BOOT-INF/classes/static/quickstart-ui/index.html'
+            archive="$archive" python3 - <<'PY'
+          import os
+          from io import BytesIO
+          from zipfile import ZipFile
+
+          archive = os.environ["archive"]
+          with ZipFile(archive) as outer:
+              dashboard = next(
+                  name for name in outer.namelist()
+                  if name.startswith("BOOT-INF/lib/jt-808-server-dashboard-spring-boot-starter-reactive-")
+              )
+              with ZipFile(BytesIO(outer.read(dashboard))) as nested:
+                  assert "static/dashboard/808/index.html" in nested.namelist(), dashboard
+          PY
+          done
+          python3 -B build-script/license/check-materials.py --jar \
+            xtream-codec-base/build/libs/*.jar \
+            ext/jt/jt-1078-server-spring-boot-starter-reactive/build/libs/*.jar \
+            "$jt1078_libs"/*.jar \
+            quick-start/jt/jt-808-server-quick-start-with-storage-blocking/build/libs/jt-808-server-quick-start-with-storage-blocking.jar \
+            quick-start/jt/jt-808-server-quick-start-with-storage-nonblocking/build/libs/jt-808-server-quick-start-with-storage-nonblocking.jar \
+            xtream-codec-studio-app/build/libs/*.jar \
+            --jar-frontend "$jt1078_libs/jt-1078-server-quick-start-nonblocking.jar" \
+              "BOOT-INF/classes/static/quickstart-ui/$frontend_notice" "quick-start/jt/jt-1078-server-quick-start-ui/dist/$frontend_notice" \
+            --jar-frontend "${studio_archives[0]}" "ui/$frontend_notice" "xtream-codec-studio-ui/dist/$frontend_notice"
+      - name: Upload frontend build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-license-check-logs
+          path: build/reports/frontend-license-checks/*.log
+
+  dependency-policy:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3
+      # 元数据政策按需运行；已知 jump3r 待审仍会使此显式检查失败。
+      - name: Check actual runtime dependency policy
+        run: ./gradlew :enforceLicenses --continue --no-parallel
+      - name: Upload policy evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-license-reports
+          path: '**/build/reports/dependency-license/*.json'

@@ -1,28 +1,58 @@
 {
   "allowedLicenses": [
     {
-      "moduleLicense": "Apache License, Version 2.0"
+      "moduleLicense": "\\QApache License, Version 2.0\\E"
     },
     {
-      "moduleLicense": "The Apache Software License, Version 2.0"
+      "moduleLicense": "\\QThe Apache Software License, Version 2.0\\E"
     },
     {
-      "moduleLicense": "Apache 2.0"
+      "moduleLicense": "\\QThe Apache License, Version 2.0\\E"
     },
     {
-      "moduleLicense": "Apache License 2.0"
+      "moduleLicense": "\\QApache 2.0\\E"
     },
     {
-      "moduleLicense": "Public Domain, per Creative Commons CC0"
+      "moduleLicense": "\\QApache License 2.0\\E"
     },
     {
-      "moduleLicense": "MIT License"
+      "moduleLicense": "\\QApache-2.0\\E"
     },
     {
-      "moduleLicense": "The MIT License"
+      "moduleLicense": "\\QApache 2\\E"
     },
     {
-      "moduleLicense": "MIT-0"
+      "moduleLicense": "\\QPublic Domain, per Creative Commons CC0\\E"
+    },
+    {
+      "moduleLicense": "\\QMIT License\\E"
+    },
+    {
+      "moduleLicense": "\\QThe MIT License\\E"
+    },
+    {
+      "moduleLicense": "\\QMIT\\E"
+    },
+    {
+      "moduleLicense": "\\QThe MIT License (MIT)\\E"
+    },
+    {
+      "moduleLicense": "\\QMIT-0\\E"
+    },
+    {
+      "moduleLicense": "\\QBSD-2-Clause\\E"
+    },
+    {
+      "moduleLicense": "\\QBSD-3-Clause\\E"
+    },
+    {
+      "moduleLicense": "\\QThe 2-Clause BSD License\\E"
+    },
+    {
+      "moduleLicense": "\\QBouncy Castle Licence\\E"
+    },
+    {
+      "moduleLicense": "\\QEclipse Public License - v 2.0\\E"
     }
   ]
 }

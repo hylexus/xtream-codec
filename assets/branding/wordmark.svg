@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="624" height="112" viewBox="0 0 624 112" fill="none" role="img" aria-label="xtream codec">
+  <!-- 标志开始 -->
+  <g transform="translate(8 8)">
+    <rect width="96" height="96" rx="24" fill="#0B1224"/>
+    <g>
+      <path d="M29 66C48 66 48 30 67 30" stroke="#4D7CFE" stroke-width="10"/>
+      <path d="M16 65L28 55Q30 53 30 56V76Q30 79 28 77L16 67Q14 66 16 65ZM80 29L68 19Q66 17 66 20V40Q66 43 68 41L80 31Q82 30 80 29Z" fill="#4D7CFE"/>
+    </g>
+    <g transform="translate(0 96) scale(1 -1)">
+      <path d="M29 66C48 66 48 30 67 30" stroke="#0B1224" stroke-width="14"/>
+      <path d="M29 66C48 66 48 30 67 30" stroke="#22D3C5" stroke-width="10"/>
+      <path d="M16 65L28 55Q30 53 30 56V76Q30 79 28 77L16 67Q14 66 16 65ZM80 29L68 19Q66 17 66 20V40Q66 43 68 41L80 31Q82 30 80 29Z" fill="#22D3C5"/>
+    </g>
+  </g>
+  <!-- 标志结束 -->
+  <g transform="translate(136 35) scale(1.18)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 10L22 34M22 10L0 34M38 0V27Q38 34 46 34H51M29 10H51M65 34V10M65 19Q70 10 81 10M94 22H116V20Q116 10 105 10Q94 10 94 22Q94 34 105 34H114M151 34V10H140Q129 10 129 22Q129 34 140 34Q151 34 151 22M166 34V10M166 19Q166 10 175 10Q184 10 184 19V34M184 19Q184 10 193 10Q202 10 202 19V34" stroke="#4D7CFE"/>
+    <path d="M249 10H240Q229 10 229 22Q229 34 240 34H249M273 10Q262 10 262 22Q262 34 273 34Q284 34 284 22Q284 10 273 10ZM319 0V34M319 10H308Q297 10 297 22Q297 34 308 34Q319 34 319 22M333 22H355V20Q355 10 344 10Q333 10 333 22Q333 34 344 34H353M389 10H380Q369 10 369 22Q369 34 380 34H389" stroke="#079DA8"/>
+  </g>
+</svg>

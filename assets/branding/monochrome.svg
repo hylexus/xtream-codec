@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none" role="img" aria-label="xtream-codec">
+  <defs>
+    <mask id="xtream-codec-overpass" maskUnits="userSpaceOnUse" x="0" y="0" width="96" height="96">
+      <rect width="96" height="96" fill="white"/>
+      <g transform="translate(0 96) scale(1 -1)">
+        <path d="M29 66C48 66 48 30 67 30" stroke="black" stroke-width="14"/>
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#xtream-codec-overpass)">
+    <path d="M29 66C48 66 48 30 67 30" stroke="currentColor" stroke-width="10"/>
+    <path d="M16 65L28 55Q30 53 30 56V76Q30 79 28 77L16 67Q14 66 16 65ZM80 29L68 19Q66 17 66 20V40Q66 43 68 41L80 31Q82 30 80 29Z" fill="currentColor"/>
+  </g>
+  <g transform="translate(0 96) scale(1 -1)">
+    <path d="M29 66C48 66 48 30 67 30" stroke="currentColor" stroke-width="10"/>
+    <path d="M16 65L28 55Q30 53 30 56V76Q30 79 28 77L16 67Q14 66 16 65ZM80 29L68 19Q66 17 66 20V40Q66 43 68 41L80 31Q82 30 80 29Z" fill="currentColor"/>
+  </g>
+</svg>

@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2002-2024 the original author or authors.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +28,12 @@ import org.springframework.util.StringUtils;
  * <h4>这个类存在的原因</h4>
  * 为了 <a href="https://github.com/hylexus/jt-framework">jt-framework</a> 适配 xtream-codec-core，详情见: <a href="https://github.com/hylexus/xtream-codec/issues/11">issue#11</a>
  *
+ * <p>上游类的作者归属见 {@code THIRD-PARTY-SOURCE-NOTICES.txt}（发行包内位于 {@code META-INF/}）。
+ *
  * @see StringUtils org.springframework.util.StringUtils
  * @see <a href="https://github.com/hylexus/xtream-codec/issues/11">issue#11</a>
  * @since 0.5.0-rc.1
+ * @author Codex (AI)
  */
 @ApiStatus.Internal
 @ApiStatus.AvailableSince("0.5.0-rc.1")

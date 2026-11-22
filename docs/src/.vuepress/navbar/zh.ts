@@ -35,7 +35,13 @@ export const zhNavbar = navbar([
                     {text: 'vuepress-theme-hope', icon: 'fa-brands fa-vuejs', link: 'https://theme-hope.vuejs.press/zh/'},
                 ],
             },
+            {text: 'NetworkCat（App Store）', icon: 'ethernet', link: 'https://apps.apple.com/cn/app/networkcat/id6503148471?mt=12'},
         ]
+    },
+    {
+        text: '免责声明',
+        icon: 'scale-balanced',
+        link: '/disclaimer.md'
     },
     {
         text: '关于我们',

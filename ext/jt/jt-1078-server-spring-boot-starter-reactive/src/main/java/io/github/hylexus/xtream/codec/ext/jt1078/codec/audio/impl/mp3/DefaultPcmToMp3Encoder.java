@@ -1,5 +1,20 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright [2019] [matrixy]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Project modifications:
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +48,9 @@ import javax.sound.sampled.AudioFormat;
 
 /**
  * 这个实现类也是从 <a href="https://gitee.com/matrixy/jtt1078-video-server">https://gitee.com/matrixy/jtt1078-video-server</a> 复制过来之后修改的。
+ * 固定比较版本、上游作者归属及改动范围见仓库 THIRD-PARTY-SOURCE-NOTICES.txt。
  *
+ * @author Codex (AI)
  * @see <a href="https://gitee.com/matrixy/jtt1078-video-server/blob/flv/src/main/java/cn/org/hentai/jtt1078/codec/MP3Encoder.java#L12">https://gitee.com/matrixy/jtt1078-video-server/blob/flv/src/main/java/cn/org/hentai/jtt1078/codec/MP3Encoder.java#L12</a>
  * @see <a href="https://sourceforge.net/projects/jump3r/">https://sourceforge.net/projects/jump3r/</a>
  * @see <a href="https://pure-java-mp3-encoder.blogspot.com/">https://pure-java-mp3-encoder.blogspot.com/</a>

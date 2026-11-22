@@ -126,28 +126,7 @@ tag:
 
 ### JT/T 808 的相关说明
 
-::: tip
-
-在 `JT/T 808` 协议中:
-
-- 对于数字类型而言，都是无符号数
-    - 然而 **Java** 本身没有无符号数的概念
-    - 所以在映射到 **Java** 数据类型时，往往需要将数据类型的范围扩大一倍，以避免溢出的风险
-        - 以 `BYTE` 类型为例: `JT/T 808` 协议中指的是 **1** 字节的 *无* 符号整数
-        - 虽然 **Java** 的 `byte/Byte` 也是 **1** 字节
-        - 但是 **Java** 的 `byte/Byte` 是 _有_ 符号数
-        - 所以不得不将 `JT/T 808` 的 `BYTE` 映射到 **Java** 的 `short/Short` 以避免溢出的风险
-- 对于字符串类型而言，`JT/T 808` 协议都是 "GBK" 编码
-
-所以，`JT/T 808` 风格的注解，可以看做是 `Rust` 风格注解的子集，两者的对应关系参考 [内置类型对比](#内置类型对比)
-
-:::
-
-::: details 点击查看 JT/T 808 官方文档中的数据类型声明
-
-![](/img/core/annotation/jt-808-data-types.png)
-
-:::
+下文介绍如何用项目的注解读写 JT/T 808—2019 中的数据类型。`BYTE`、`WORD` 和 `DWORD` 分别占 1、2 和 4 字节。在 Java 中用更宽的整数类型保留无符号值，例如用 `short` 表示 `BYTE` 的 `0` 至 `255`。JT/T 808 风格注解与 Rust 风格注解的对应关系见[内置类型对比](#内置类型对比)。
 
 ### 整数类型
 
@@ -169,16 +148,16 @@ tag:
 
 ### 字符串类型
 
-- `@Preset.RustStyle.Str`
+- `@Preset.JtStyle.Str`
     - 字符串
     - 编码: 默认 `GBK`
     - **JavaType**: `java.lang.String`
 
 ### BCD
 
-- `@Preset.RustStyle.Bcd`
-    - 字符串
-    - 编码固定为: `BCD_8421`
+- `@Preset.JtStyle.Bcd`
+    - `BCD[n]` 占 `n` 字节，每字节编码两位十进制数字
+    - 使用 `BCD_8421` 编码
     - **JavaType**: `java.lang.String`
 - `@Preset.JtStyle.BcdDateTime`
     - **N 字节**
@@ -203,19 +182,13 @@ tag:
 
 ### 其他
 
-- `@Preset.RustStyle.Bytes`
-    - **N 字节**
+- `@Preset.JtStyle.Bytes`
+    - `BYTE[n]` 对应 `n` 个原始字节
     - **JavaType**: `byte[]`
 
 ## 内置类型对比
 
 ### **`Rust风格`** **VS `JT/T 808`风格**
-
-::: details 点击查看 JT/T 808 官方文档中的数据类型声明
-
-![](/img/core/annotation/jt-808-data-types.png)
-
-:::
 
 下面表格是 `@Preset.RustStyle.xxx` 和 `@Preset.JtStyle` 的对应关系，当然你也可以自定义自己的注解:
 

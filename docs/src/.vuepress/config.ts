@@ -2,8 +2,20 @@ import {defineUserConfig} from "vuepress";
 import theme from "./theme.js";
 import {path} from "vuepress/utils"
 import llmstxt from "vuepress-plugin-llms";
+import {viteBundler} from "@vuepress/bundler-vite";
+import {frontendNotices} from "../../../build-script/license/frontend-notices.mjs";
 
 export default defineUserConfig({
+    bundler: viteBundler({
+        configureVite(config, isServer) {
+            if (!isServer) config.plugins = [...(config.plugins ?? []), frontendNotices({
+                additionalLicenseFiles: [
+                    'src/.vuepress/public/webfonts/LICENSE.txt',
+                    'src/.vuepress/public/webfonts/README.txt',
+                ],
+            })];
+        },
+    }),
     base: "/xtream-codec/",
     port: 8090,
     locales: {

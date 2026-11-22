@@ -200,58 +200,10 @@ public interface AudioFlvTag {
     }
 
     /**
-     * 备注：下面注释是从 <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio</a> 网页源码复制过来的。
-     * <p>
-     * Note: The following comments were copied from the source code of the webpage <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio</a>.
+     * MPEG-4 AudioSpecificConfig 的音频对象类型；数值和名称见各枚举常量。
      *
-     * <ul>
-     * <li>0: Null</li>
-     * <li>1: <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> Main</li>
-     * <li>2: <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> LC (Low Complexity)</li>
-     * <li>3: <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> SSR (Scalable Sample Rate)</li>
-     * <li>4: <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> LTP (Long Term Prediction)</li>
-     * <li>5: SBR (<a href="/index.php/Spectral_Band_Replication" title="Spectral Band Replication">Spectral Band Replication</a>)</li>
-     * <li>6: <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> Scalable</li>
-     * <li>7: <a href="/index.php/TwinVQ" title="TwinVQ">TwinVQ</a></li>
-     * <li>8: <a href="/index.php?title=CELP&amp;action=edit&amp;redlink=1" class="new" title="CELP (page does not exist)">CELP</a> (Code Excited Linear Prediction)</li>
-     * <li>9: HXVC (Harmonic Vector eXcitation Coding)</li>
-     * <li>10: Reserved</li>
-     * <li>11: Reserved</li>
-     * <li>12: TTSI (Text-To-Speech Interface)</li>
-     * <li>13: Main Synthesis</li>
-     * <li>14: Wavetable Synthesis</li>
-     * <li>15: General MIDI</li>
-     * <li>16: Algorithmic Synthesis and Audio Effects</li>
-     * <li>17: ER (Error Resilient) <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> LC</li>
-     * <li>18: Reserved</li>
-     * <li>19: ER <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> LTP</li>
-     * <li>20: ER <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> Scalable</li>
-     * <li>21: ER <a href="/index.php/TwinVQ" title="TwinVQ">TwinVQ</a></li>
-     * <li>22: ER <a href="/index.php/BSAC" class="mw-redirect" title="BSAC">BSAC</a> (Bit-Sliced Arithmetic Coding)</li>
-     * <li>23: ER <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> LD (Low Delay)</li>
-     * <li>24: ER <a href="/index.php?title=CELP&amp;action=edit&amp;redlink=1" class="new" title="CELP (page does not exist)">CELP</a></li>
-     * <li>25: ER HVXC</li>
-     * <li>26: ER HILN (Harmonic and Individual Lines plus Noise)</li>
-     * <li>27: ER Parametric</li>
-     * <li>28: SSC (SinuSoidal Coding)</li>
-     * <li>29: PS (<a href="/index.php?title=Parametric_Stereo&amp;action=edit&amp;redlink=1" class="new" title="Parametric Stereo (page does not exist)">Parametric Stereo</a>)</li>
-     * <li>30: <a href="/index.php/MPEG_Surround" class="mw-redirect" title="MPEG Surround">MPEG Surround</a></li>
-     * <li>31: (Escape value)</li>
-     * <li>32: <a href="/index.php?title=MP1&amp;action=edit&amp;redlink=1" class="new" title="MP1 (page does not exist)">Layer-1</a></li>
-     * <li>33: <a href="/index.php/MP2" title="MP2">Layer-2</a></li>
-     * <li>34: <a href="/index.php/MP3" title="MP3">Layer-3</a></li>
-     * <li>35: DST (Direct Stream Transfer)</li>
-     * <li>36: <a href="/index.php/MPEG-4_ALS" class="mw-redirect" title="MPEG-4 ALS">ALS</a> (Audio Lossless)</li>
-     * <li>37: <a href="/index.php/MPEG-4_SLS" title="MPEG-4 SLS">SLS</a> (Scalable LosslesS)</li>
-     * <li>38: <a href="/index.php/MPEG-4_SLS" title="MPEG-4 SLS">SLS</a> non-core</li>
-     * <li>39: ER <a href="/index.php/AAC" class="mw-redirect" title="AAC">AAC</a> ELD (Enhanced Low Delay)</li>
-     * <li>40: SMR (Symbolic Music Representation) Simple</li>
-     * <li>41: SMR Main</li>
-     * <li>42: <a href="/index.php?title=USAC&amp;action=edit&amp;redlink=1" class="new" title="USAC (page does not exist)">USAC</a> (Unified Speech and Audio Coding) (no <a href="/index.php/SBR" class="mw-redirect" title="SBR">SBR</a>)</li>
-     * <li>43: SAOC (Spatial Audio Object Coding)</li>
-     * <li>44: LD <a href="/index.php/MPEG_Surround" class="mw-redirect" title="MPEG Surround">MPEG Surround</a></li>
-     * <li>45: <a href="/index.php?title=USAC&amp;action=edit&amp;redlink=1" class="new" title="USAC (page does not exist)">USAC</a></li>
-     * </ul>
+     * @see <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">MPEG-4 Audio 参考条目</a>
+     * @author Codex (AI)
      */
     enum AacSeqHeaderObjectType {
         NULL((byte) 0, "Null"),
@@ -319,28 +271,10 @@ public interface AudioFlvTag {
     }
 
     /**
-     * 备注：下面注释是从 <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio</a> 网页源码复制过来的。
-     * <p>
-     * Note: The following comments were copied from the source code of the webpage <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio</a>.
+     * MPEG-4 AudioSpecificConfig 的采样率索引；索引 15 表示频率由附加字段指定。
      *
-     * <ul>
-     * <li>0: 96000 Hz</li>
-     * <li>1: 88200 Hz</li>
-     * <li>2: 64000 Hz</li>
-     * <li>3: 48000 Hz</li>
-     * <li>4: 44100 Hz</li>
-     * <li>5: 32000 Hz</li>
-     * <li>6: 24000 Hz</li>
-     * <li>7: 22050 Hz</li>
-     * <li>8: 16000 Hz</li>
-     * <li>9: 12000 Hz</li>
-     * <li>10: 11025 Hz</li>
-     * <li>11: 8000 Hz</li>
-     * <li>12: 7350 Hz</li>
-     * <li>13: Reserved</li>
-     * <li>14: Reserved</li>
-     * <li>15: frequency is written explictly</li>
-     * </ul>
+     * @see <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">MPEG-4 Audio 参考条目</a>
+     * @author Codex (AI)
      */
     enum AacSeqHeaderSampleRate {
         RATE_0_96000_HZ((byte) 0, "96000 Hz"),
@@ -378,21 +312,10 @@ public interface AudioFlvTag {
     }
 
     /**
-     * 备注：下面注释是从 <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio</a> 网页源码复制过来的。
-     * <p>
-     * Note: The following comments were copied from the source code of the webpage <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio</a>.
+     * MPEG-4 AudioSpecificConfig 的声道配置索引；声道位置说明见各枚举常量。
      *
-     * <ul>
-     * <li>0: Defined in AOT Specific Config</li>
-     * <li>1: 1 channel: front-center</li>
-     * <li>2: 2 channels: front-left, front-right</li>
-     * <li>3: 3 channels: front-center, front-left, front-right</li>
-     * <li>4: 4 channels: front-center, front-left, front-right, back-center</li>
-     * <li>5: 5 channels: front-center, front-left, front-right, back-left, back-right</li>
-     * <li>6: 6 channels: front-center, front-left, front-right, back-left, back-right, LFE-channel</li>
-     * <li>7: 8 channels: front-center, front-left, front-right, side-left, side-right, back-left, back-right, LFE-channel</li>
-     * <li>8-15: Reserved</li>
-     * </ul>
+     * @see <a href="https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio">MPEG-4 Audio 参考条目</a>
+     * @author Codex (AI)
      */
     enum AacSeqHeaderChannelConfig {
         CONFIG_0_DEFINED_IN_AOT_SPECIFIC_CONFIG((byte) 0, "Defined in AOT Specific Config"),

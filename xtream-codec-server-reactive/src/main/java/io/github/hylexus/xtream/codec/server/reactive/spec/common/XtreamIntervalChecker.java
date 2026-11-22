@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +32,14 @@ import java.util.function.BiFunction;
 import java.util.logging.Level;
 
 /**
+ * 上游固定比较快照及作者归属见 THIRD-PARTY-SOURCE-NOTICES.txt；项目修改单独标注。
+ * <p>
  * 当前类是从 `de.codecentric.boot.admin.server.services.IntervalCheck` 复制过来修改的。
  * <p>
  * The current class is derived from and modified based on `de.codecentric.boot.admin.server.services.IntervalCheck`.
  *
  * @author hylexus
+ * @author Codex (AI)
  */
 public class XtreamIntervalChecker {
 

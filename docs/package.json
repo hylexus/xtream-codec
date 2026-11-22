@@ -2,7 +2,7 @@
   "name": "xtream-codec",
   "version": "0.10.0",
   "description": "docs for xtream-codec",
-  "license": "Apache License 2.0",
+  "license": "Apache-2.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0",

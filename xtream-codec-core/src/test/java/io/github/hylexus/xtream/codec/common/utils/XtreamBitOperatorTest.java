@@ -20,12 +20,27 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.util.Random;
 
 import static io.github.hylexus.xtream.codec.common.utils.XtreamBitOperator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class XtreamBitOperatorTest {
+
+    @Test
+    void testUnsignedLongConversion() {
+        final BigInteger modulus = BigInteger.ONE.shiftLeft(64);
+        final long[] boundaries = {0, 1, -1, Long.MIN_VALUE, Long.MIN_VALUE + 1, Long.MAX_VALUE};
+        for (long value : boundaries) {
+            assertEquals(BigInteger.valueOf(value).mod(modulus), immutable(value).unsignedLongValue());
+        }
+        final Random random = new Random(1078);
+        for (int index = 0; index < 1000; index++) {
+            final long value = random.nextLong();
+            assertEquals(BigInteger.valueOf(value).mod(modulus), immutable(value).unsignedLongValue());
+        }
+    }
 
     @Test
     void testRange() {

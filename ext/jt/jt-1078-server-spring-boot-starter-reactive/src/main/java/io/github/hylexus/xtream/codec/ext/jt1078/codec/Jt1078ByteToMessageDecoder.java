@@ -1,5 +1,12 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Upstream portions adapted from sky/jt1078 are licensed under Mulan PSL v2.
+ * The compared MessageDecoderHandler.java credits xingkong as its author.
+ * See THIRD-PARTY-SOURCE-NOTICES.txt for the fixed source and scope.
+ * The complete upstream license is supplied in licenses/source/open_source_licenses.txt [MulanPSL-2.0-sky.txt]
+ * (META-INF/licenses/source/ in Java archives).
+ *
+ * Project modifications:
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +45,10 @@ import java.util.UUID;
 
 /**
  * 这个实现来自 <a href="https://gitee.com/hui_hui_zhou/open-source-repository">sky/jt1078</a> 的作者 sky
+ * 对照其 2024 年公开快照的 MessageDecoderHandler，保留适用的 Mulan PSL v2；
+ * 上游作者标签、项目适配范围及后续 README 差异见仓库 THIRD-PARTY-SOURCE-NOTICES.txt。
  *
+ * @author Codex (AI)
  * @see <a href="https://gitee.com/hui_hui_zhou/open-source-repository">sky/jt1078</a>
  * @see Jt1078ServerTcpHandlerAdapter
  */

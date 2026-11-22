@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +43,8 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
+ * 上游固定比较快照及作者归属见 THIRD-PARTY-SOURCE-NOTICES.txt；项目修改单独标注。
+ * <p>
  * 当前类是从 `de.codecentric.boot.admin.server.web.reactive.InstancesProxyController` 复制过来修改的。
  * <p>
  * The current class is derived from and modified based on `de.codecentric.boot.admin.server.web.reactive.InstancesProxyController`.
@@ -50,6 +53,8 @@ import java.util.function.Function;
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/1433ca5b8343247075ff775d558c9a82341e2ac6/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/InstanceWebProxy.java#L58">de.codecentric.boot.admin.server.web.InstanceWebProxy</a>
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/83db63e82e916357d36b1e6b4d552e1b6506ecc9/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/reactive/InstancesProxyController.java#L51">de.codecentric.boot.admin.server.web.reactive.InstancesProxyController</a>
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/83db63e82e916357d36b1e6b4d552e1b6506ecc9/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/servlet/InstancesProxyController.java#L58">de.codecentric.boot.admin.server.web.servlet.InstancesProxyController</a>
+ *
+ * @author Codex (AI)
  */
 public final class XtreamWebProxyUtils {
 

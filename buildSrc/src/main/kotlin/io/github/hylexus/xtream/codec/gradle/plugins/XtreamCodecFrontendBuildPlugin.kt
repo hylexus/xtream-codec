@@ -63,8 +63,18 @@ class XtreamCodecFrontendBuildPlugin : Plugin<Project> {
 
                     // 前端项目发生变化才执行
                     inputs.dir(projectDir.resolve("src"))
+                    inputs.files(project.fileTree(projectDir.resolve("public")))
+                    inputs.file(projectDir.resolve("index.html"))
                     inputs.file(projectDir.resolve("package.json"))
                     inputs.file(projectDir.resolve("pnpm-lock.yaml"))
+                    inputs.file(projectDir.resolve("vite.config.ts"))
+                    inputs.files(project.rootProject.files(
+                        "build-script/license/frontend-notices.mjs",
+                        "build-script/license/frontend-notices.d.mts",
+                        "LICENSE"
+                    ))
+                    inputs.files(project.rootProject.fileTree("licenses/frontend"))
+                    inputs.files(project.fileTree(projectDir) { include("LICENSE*") })
                     inputs.files(extension.additionalInputs)
                     outputs.dir(distDir)
 

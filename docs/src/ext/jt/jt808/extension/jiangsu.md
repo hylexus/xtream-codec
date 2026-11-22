@@ -11,13 +11,56 @@ tag:
 
 `jt-808-server-spring-boot-starter-reactive` 中已经内置了对苏标的支持。
 
-::: danger 说明
+## 附件上传时序
 
-下图来自互联网(不知道原版出处)，如果有版权问题，请联系我删除。
+终端完成 JT/T 808 鉴权后，从带报警附加项的位置上报开始触发附件上传。
+
+![苏标附件上传时序图](/img/ext/jt/jt808/extension/su-biao-attachment-flow.svg)
+
+`0x9212` 的结果为 `0x00` 时，终端可以继续上传下一份附件。结果为 `0x01` 时，终端按应答中的偏移量和长度补传文件片段。下方示例的 `0x9212` 固定返回 `0x00`。
+
+::: details Mermaid 源码
+
+```mermaid
+---
+config:
+    theme: neutral
+    fontFamily: system-ui, sans-serif
+    sequence:
+        mirrorActors: false
+---
+sequenceDiagram
+    %% 将此代码块的内容保存为 attachment-flow.mmd，然后在仓库根目录运行下方命令。
+    %% npx --yes --package @mermaid-js/mermaid-cli@11.12.0 mmdc -i attachment-flow.mmd -o docs/src/.vuepress/public/img/ext/jt/jt808/extension/su-biao-attachment-flow.svg -b white
+    accTitle: 苏标附件上传时序
+    accDescr: 终端上报报警后，指令服务器下发附件上传指令。终端向附件服务器逐个上传文件，按上传结果继续上传或补传指定片段。
+    participant T as 终端
+    participant I as 指令服务器
+    participant A as 附件服务器
+
+    T->>I: 0x0200 位置上报（含报警附加项）
+    I-->>T: 0x8001 平台通用应答
+    I->>T: 0x9208 下发附件服务器地址、端口及报警标识
+    T-->>I: 0x0001 终端通用应答
+    Note over T,A: 终端按指令中的地址和端口接入附件服务器
+    T->>A: 0x1210 上报报警附件列表
+    A-->>T: 0x8001 平台通用应答
+
+    loop 逐个上传附件
+        T->>A: 0x1211 上报文件信息
+        A-->>T: 0x8001 平台通用应答
+        T->>A: 0x30316364 分片发送文件数据
+        T->>A: 0x1212 通知文件上传完成
+        A-->>T: 0x9212 返回结果（0x00 完成／0x01 补传）
+        loop 收到 0x01 时
+            T->>A: 0x30316364 补传指定偏移量和长度的数据
+            T->>A: 0x1212 再次通知文件上传完成
+            A-->>T: 0x9212 返回上传结果
+        end
+    end
+```
 
 :::
-
-![苏标附件服务器通信流程图](/img/ext/jt/jt808/extension/subiao.png)
 
 ## 启用附件服务
 
@@ -141,7 +184,7 @@ public class AttachmentFileHandler {
     }
 
     /**
-     * 这里对应的是苏标附件上传的码流: 0x31326364(并不是 1078 协议中的码流)
+     * 这里对应的是苏标附件上传的码流 0x30316364
      */
     @Jt808RequestHandlerMapping(messageIds = 0x30316364, desc = "苏标扩展码流")
     public Mono<Void> processMsg30316364(Jt808Request request, @Jt808RequestBody BuiltinMessage30316364 body, @Nullable Jt808Session session) {

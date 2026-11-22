@@ -39,8 +39,22 @@ val executableJar = tasks.named<ShadowJar>("shadowJar") {
     filesMatching(listOf("META-INF/services/**", "META-INF/*.kotlin_module")) {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
+    // 同名声明可能属于不同依赖，必须先保留再合并，不能按路径直接去重。
+    val licenseResources = listOf(
+        "META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/LICENSE.md",
+        "META-INF/NOTICE", "META-INF/NOTICE.txt", "META-INF/NOTICE.md",
+        "META-INF/THIRD-PARTY-NOTICES.txt",
+        "META-INF/THIRD-PARTY-SOURCE-NOTICES.txt",
+        "LICENSE", "LICENSE.txt", "NOTICE", "NOTICE.txt",
+    )
+    licenseResources.forEach { append(it) }
+    eachFile {
+        if (licenseResources.any { it.equals(path, ignoreCase = true) }) {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
+    }
     from(tasks.jar.map { zipTree(it.archiveFile.get().asFile) }) {
-        include("META-INF/LICENSE.txt", "META-INF/NOTICE.txt")
+        include("META-INF/LICENSE.txt", "META-INF/NOTICE.txt", "META-INF/THIRD-PARTY-SOURCE-NOTICES.txt")
     }
     doFirst {
         val ui = layout.buildDirectory.dir("resources/main/ui").get().asFile

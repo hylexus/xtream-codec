@@ -1,0 +1,145 @@
+前端补充许可与归属
+Supplemental frontend licenses and attributions
+
+本文件集中保存少量 npm 包未随包附带的许可原文，由各前端共用；不是全部依赖清单，各节仅适用于实际包含的相应组件。
+This file collects original license texts omitted from a small number of npm packages and is shared by the frontends. It is not a complete dependency inventory; each section applies only where the corresponding component is included.
+
+构建优先收集安装包自带的完整许可与声明。缺少许可正文时，仅对下列按包名列明且元数据声明 MIT 的包采用本补充；不绑定具体版本，也不以许可短名生成替代正文。
+Builds collect complete licenses and notices supplied by installed packages. When license text is missing, this supplement covers only the named packages below that declare MIT in their metadata. It is not tied to exact versions and does not generate replacement text from a license identifier.
+
+比较版本和固定来源用于说明原文依据；依赖升级时按上游许可与发行材料更新适用段落，无需维护逐版本放行表或额外审查哈希。
+Comparison releases and fixed sources identify the basis for the texts. Update applicable sections using upstream licenses and release materials on upgrades, without maintaining per-version approval tables or additional review hashes.
+
+版权、许可和免责原文保持完整。以下作者和权利人属于上游归属，不表示参与或背书本项目；项目 Apache-2.0 不替代第三方许可。
+Original copyrights, licenses and disclaimers are retained. Authors and rights holders below identify upstream attribution, without implying participation in or endorsement of this project; the project's Apache-2.0 license does not replace third-party licenses.
+
+============================================================
+适用包 / Packages: @uiw/react-codemirror, @uiw/codemirror-extensions-basic-setup
+比较版本 / Comparison releases: 4.25.11, 4.25.12
+上游来源 / Upstream sources:
+https://github.com/uiwjs/react-codemirror/blob/990500ad9ae72400272c873df3ae061860ff00c2/LICENSE
+https://github.com/uiwjs/react-codemirror/blob/1e2e11f865860c6bd5029d71a2a09bd894ed5bad/LICENSE
+
+两个比较版本的上游 LICENSE 正文相同，仅保留一份。
+The upstream LICENSE texts in the two comparison releases are identical and are retained once.
+
+上游原文 / Upstream text
+------------------------------------------------------------
+MIT License
+
+Copyright (c) 2021 uiw
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+============================================================
+适用包 / Packages: @radix-ui/react-compose-refs, @radix-ui/react-use-callback-ref, @radix-ui/react-use-layout-effect
+比较版本 / Comparison releases: react-compose-refs 1.1.2; react-use-callback-ref 1.1.1; react-use-layout-effect 1.1.1
+上游来源 / Upstream source:
+https://github.com/radix-ui/primitives/blob/fcef0668a5c827e5a4baac405474d75680f9a4eb/LICENSE
+
+上游原文 / Upstream text
+------------------------------------------------------------
+MIT License
+
+Copyright (c) 2022 WorkOS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+============================================================
+适用包 / Packages: @ant-design/icons-svg
+比较版本 / Comparison release: 4.4.2
+上游来源 / Upstream source:
+https://github.com/ant-design/ant-design-icons/blob/038764e4e46499212751a452704f64231fa756ba/LICENSE
+
+上游原文 / Upstream text
+------------------------------------------------------------
+MIT LICENSE
+
+Copyright (c) 2018-present Ant UED, https://xtech.antfin.com/
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+============================================================
+适用包 / Packages: mitt
+比较版本 / Comparison release: 2.1.0
+上游来源 / Upstream source:
+https://github.com/developit/mitt/blob/22c5dcba10736aecb1f39ee88d9f85278108c988/README.md
+
+原始 README 的许可链接与 Jason Miller 归属原样保留，不推定版权年份；其链接指向的 MIT 权限与免责条款另列于后，不作为上游独立 LICENSE 文件。
+The original README license link and attribution to Jason Miller are retained without inferring a copyright year. The linked MIT permission and disclaimer terms follow separately and are not presented as a standalone upstream LICENSE file.
+
+上游原文 / Upstream text
+------------------------------------------------------------
+## License
+
+[MIT License](https://opensource.org/licenses/MIT) © [Jason Miller](https://jasonformat.com/)
+
+链接所指的标准条款 / Standard terms linked above
+------------------------------------------------------------
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+

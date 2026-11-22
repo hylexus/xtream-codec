@@ -3,10 +3,11 @@ import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { visualizer } from "rollup-plugin-visualizer";
 import tailwindcss from "@tailwindcss/vite";
+import { frontendNotices } from "../../../build-script/license/frontend-notices.mjs";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tsconfigPaths(), visualizer(), tailwindcss()],
+  plugins: [react(), tsconfigPaths(), visualizer(), tailwindcss(), frontendNotices()],
   base: process.env.VITE_BASE_PATH || "/dashboard-ui/",
   server: {
     proxy: {

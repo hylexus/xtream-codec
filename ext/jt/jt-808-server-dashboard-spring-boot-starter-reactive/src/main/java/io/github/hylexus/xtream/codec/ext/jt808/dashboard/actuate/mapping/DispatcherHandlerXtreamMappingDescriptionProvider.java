@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +35,10 @@ import java.util.stream.Stream;
  * <p>
  * The current class is derived from and modified based on `org.springframework.boot.actuate.web.mappings.reactive.DispatcherHandlersMappingDescriptionProvider`.
  *
+ * <p>上游类的作者归属见 {@code THIRD-PARTY-SOURCE-NOTICES.txt}（发行包内位于 {@code META-INF/}）。
+ *
  * @author hylexus
+ * @author Codex (AI)
  */
 public class DispatcherHandlerXtreamMappingDescriptionProvider implements XtreamMappingDescriptionProvider {
     private final List<XtreamHandlerMapping> handlerMappingList;

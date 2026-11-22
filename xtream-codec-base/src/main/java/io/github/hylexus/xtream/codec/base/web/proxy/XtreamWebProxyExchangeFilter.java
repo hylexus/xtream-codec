@@ -1,5 +1,6 @@
 /*
- * Copyright 2024-present the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
+ * Modifications Copyright 2024-present the xtream-codec authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +23,16 @@ import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
 /**
+ * 上游固定比较快照及作者归属见 THIRD-PARTY-SOURCE-NOTICES.txt；项目修改单独标注。
+ * <p>
  * 当前类是从 `de.codecentric.boot.admin.server.web.client.InstanceExchangeFilterFunction` 复制过来修改的。
  * <p>
  * The current class is derived from and modified based on `de.codecentric.boot.admin.server.web.client.InstanceExchangeFilterFunction`.
  *
  * @see <a href="https://github.com/codecentric/spring-boot-admin">https://github.com/codecentric/spring-boot-admin</a>
  * @see <a href="https://github.com/codecentric/spring-boot-admin/blob/1433ca5b8343247075ff775d558c9a82341e2ac6/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/web/client/InstanceExchangeFilterFunction.java#L33">de.codecentric.boot.admin.server.web.client.InstanceExchangeFilterFunction</a>
+ *
+ * @author Codex (AI)
  */
 @FunctionalInterface
 public interface XtreamWebProxyExchangeFilter {
