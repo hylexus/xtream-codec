@@ -262,7 +262,7 @@ docker run -it --rm -p 8888:8888 registry.cn-hangzhou.aliyuncs.com/xtream-codec/
 
 - 第三方源码、依赖和模板保留各自的许可证；两个 Dashboard UI 目录保留 Next UI 模板的 MIT 许可
 - JT1078 的 Symphonia 派生 ADPCM 文件适用 MPL-2.0，归档附带对应源码
-- jump3r 的上游 Maven POM 声明 LGPL-2.1-or-later。实际捆绑该库的 Boot 和 Shadow 应用附带同版本源码、许可材料和重建工具。该工具也可替换未签名且无前置启动脚本的 Spring Boot JAR 中的嵌套库。详见 [第三方许可材料](licenses/README.md)。
+- jump3r 的上游 Maven POM 声明 LGPL-2.1-or-later。实际捆绑该库的 Boot 和 Shadow 应用附带同版本源码、许可材料和重建工具。该工具也可替换未签名且无前置启动脚本的 Spring Boot JAR 中的嵌套库。详见 [第三方许可材料](THIRD-PARTY-MATERIALS.md)。
 - 前端生产构建生成 `THIRD-PARTY-FRONTEND-NOTICES.txt`，静态部署、JAR 和镜像分发时须保留
 
 第三方依赖的许可证信息:

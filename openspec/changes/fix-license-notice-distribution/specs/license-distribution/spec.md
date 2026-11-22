@@ -290,11 +290,11 @@
 
 ### Requirement: 许可维护说明集中维护
 
-项目 SHALL 将源码来源、音频比较、依赖政策、分发检查及 CI 用法集中在 `build-script/license/README.md`，删除被替代的说明并更新当前链接。固定来源、必要证据限制及具体待办 SHALL 保留，重复材料位置及验证过程 SHALL 精简；图片待核实范围 SHALL 保留在 `assets/STATIC-ASSETS.md`，路径与哈希清单 SHALL 按需生成。`licenses/` 的结构及上游许可正文 SHALL 保持不变，项目自写工具用法 SHALL 与实际命令一致。
+项目 SHALL 将源码来源、音频比较、依赖政策、分发检查及 CI 用法集中在 `build-script/license/README.md`，删除被替代的说明并更新当前链接。固定来源、必要证据限制及具体待办 SHALL 保留，重复材料位置及验证过程 SHALL 精简；图片待核实范围 SHALL 保留在 `assets/STATIC-ASSETS.md`，路径与哈希清单 SHALL 按需生成。第三方许可材料的索引 SHALL 放在根目录的 `THIRD-PARTY-MATERIALS.md` 中，并从项目 README 链接到该索引。`licenses/` 中的分发材料及其路径 SHALL 保持不变，项目自写工具用法 SHALL 与实际命令一致。
 
 #### Scenario: 查阅维护说明
 
-- **WHEN** 维护者查看许可目录 README 或跟随已有来源与资源说明中的链接
+- **WHEN** 维护者通过根 README 查看第三方许可材料索引，或跟随已有来源与资源说明中的链接
 - **THEN** 能找到统一检查命令及对应来源限制，未解决的 FFT、历史音频和图片事项保持明确，当前仓库文档无指向已删除说明的链接
 
 ### Requirement: 工具和模板共用入口

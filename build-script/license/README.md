@@ -18,7 +18,7 @@ Ordinary third-party JARs are maintained using upstream POMs, official licenses,
 应用材料的集中组织参考 Spring Boot CLI 的 [open_source_licenses.txt](https://github.com/spring-projects/spring-boot/blob/9e8d20d7417af0220bd2780a4bcb51ce9e84722f/cli/spring-boot-cli/src/main/content/legal/open_source_licenses.txt)。升级依据上游许可和发行材料更新适用段落，不维护逐版本放行表或普通依赖的逐文件哈希；具体许可矛盾、修改、重定位或重新打包另行核对。
 Application materials follow Spring Boot CLI's consolidated organization. Update applicable sections from upstream licenses and distribution materials on upgrades, without per-version approval tables or per-file hashes for ordinary dependencies; investigate specific conflicts, modifications, relocations or repackaging separately.
 
-默认源码许可头独立维护于 `license-header`，ADPCM 和 sky 专用头集中于 `headers.txt` 的两个分节，MIT 等专用头从源码许可汇总提取，不能用项目统一头覆盖上游声明。`.gitattributes` 保留上游原文的换行和空白。许可内容索引见 [`licenses/README.md`](../../licenses/README.md)。
+默认源码许可头独立维护于 `license-header`，ADPCM 和 sky 专用头集中于 `headers.txt` 的两个分节，MIT 等专用头从源码许可汇总提取，不能用项目统一头覆盖上游声明。`.gitattributes` 保留上游原文的换行和空白。许可内容索引见 [`THIRD-PARTY-MATERIALS.md`](../../THIRD-PARTY-MATERIALS.md)。
 
 前端生成器同时纳入工具注入的辅助代码和生成样式。完整相同的正文只输出一次，每个包仍保留名称、版本、文件及正文引用；版权或条款不同的正文分别保留。空入口和完全移除的纯转导出不纳入。双语说明在生成器及来源材料维护，不手工修改 dist；后端复制静态资源时保留 `THIRD-PARTY-FRONTEND-NOTICES.txt`。
 
