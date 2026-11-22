@@ -54,7 +54,7 @@ public class BuiltinJt808ServerSchedulerConfiguration {
         return new DefaultXtreamSchedulerRegistry(customizers, (config, scheduler) -> scheduler);
     }
 
-    @Bean(destroyMethod = "shutdown")
+    @Bean(destroyMethod = "shutdownGracefully")
     @ConditionalOnMissingBean
     XtreamEventPublisher xtreamEventPublisher(XtreamJt808ServerProperties serverProperties, XtreamSchedulerRegistry schedulerRegistry) {
         final XtreamJt808ServerProperties.XtreamEventPublisherProps publisherProps = serverProperties.getEventPublisher();

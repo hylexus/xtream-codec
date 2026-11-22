@@ -32,7 +32,6 @@ import java.util.function.Function;
  *
  * @author hylexus
  */
-@SuppressWarnings("LombokGetterMayBeUsed")
 public abstract class XtreamHandlerMethod {
 
     protected final Class<?> containerClass;

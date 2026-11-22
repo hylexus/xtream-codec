@@ -64,7 +64,7 @@ public class BuiltinJt1078ServerUdpConfiguration {
         );
     }
 
-    @Bean(BEAN_NAME_JT1078_UDP_XTREAM_NETTY_RESOURCE_FACTORY)
+    @Bean(value = BEAN_NAME_JT1078_UDP_XTREAM_NETTY_RESOURCE_FACTORY, destroyMethod = "dispose")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT1078_UDP_XTREAM_NETTY_RESOURCE_FACTORY)
     UdpXtreamNettyResourceFactory udpXtreamNettyResourceFactory(XtreamJt1078ServerProperties serverProperties) {
         final XtreamJt1078ServerProperties.UdpLoopResourcesProperty loopResources = serverProperties.getUdpServer().getLoopResources();
@@ -78,7 +78,7 @@ public class BuiltinJt1078ServerUdpConfiguration {
         ));
     }
 
-    @Bean(BEAN_NAME_JT1078_UDP_XTREAM_SERVER)
+    @Bean(value = BEAN_NAME_JT1078_UDP_XTREAM_SERVER, destroyMethod = "stop")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT1078_UDP_XTREAM_SERVER)
     UdpXtreamServer tcpXtreamServer(
             @Qualifier(BEAN_NAME_JT1078_UDP_XTREAM_NETTY_HANDLER_ADAPTER) UdpXtreamNettyHandlerAdapter nettyHandlerAdapter,

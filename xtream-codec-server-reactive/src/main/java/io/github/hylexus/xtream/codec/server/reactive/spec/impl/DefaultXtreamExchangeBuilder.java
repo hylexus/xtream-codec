@@ -42,7 +42,7 @@ public class DefaultXtreamExchangeBuilder implements XtreamExchange.XtreamExchan
 
     @Override
     public XtreamExchange.XtreamExchangeBuilder request(Consumer<XtreamRequest.XtreamRequestBuilder> requestBuilder) {
-        final XtreamRequest.XtreamRequestBuilder builder = this.delegate.request().mutate();
+        final XtreamRequest.XtreamRequestBuilder builder = this.request.mutate();
         requestBuilder.accept(builder);
         final XtreamRequest newRequest = builder.build();
         return this.request(newRequest);

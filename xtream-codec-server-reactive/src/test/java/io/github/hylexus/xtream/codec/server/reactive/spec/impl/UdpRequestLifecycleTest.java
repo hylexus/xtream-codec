@@ -64,6 +64,27 @@ class UdpRequestLifecycleTest {
     }
 
     @Test
+    void asynchronousFailureReleasesItsReferenceAndKeepsProcessing() {
+        final var first = packet(1);
+        final var second = packet(2);
+        final var received = new ArrayList<Integer>();
+        final var adapter = new TestAdapter(packet -> Mono.defer(() -> {
+            final int id = packet.content().getUnsignedByte(0);
+            received.add(id);
+            return id == 1 ? Mono.error(new IllegalStateException("测试异步 UDP 异常")) : Mono.empty();
+        }));
+        try {
+            Flux.from(adapter.apply(inbound(first, second), null)).then().block(Duration.ofSeconds(1));
+            assertEquals(List.of(1, 2), received);
+            assertEquals(1, first.refCnt());
+            assertEquals(1, second.refCnt());
+        } finally {
+            first.release();
+            second.release();
+        }
+    }
+
+    @Test
     void cancellationShouldReleaseRetainedDatagram() {
         final var packet = packet(1);
         final var adapter = new TestAdapter(ignored -> Mono.never());

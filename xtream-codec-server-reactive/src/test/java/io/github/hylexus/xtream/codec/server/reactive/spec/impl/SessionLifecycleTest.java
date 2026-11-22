@@ -17,6 +17,7 @@
 package io.github.hylexus.xtream.codec.server.reactive.spec.impl;
 
 import io.github.hylexus.xtream.codec.server.reactive.spec.*;
+import io.github.hylexus.xtream.codec.server.reactive.spec.domain.values.UdpSessionIdleStateCheckerProps;
 import io.github.hylexus.xtream.codec.server.reactive.spec.exception.SessionCreationRejectedException;
 import io.github.hylexus.xtream.codec.server.reactive.spec.exception.SessionCreationRejectedException.Reason;
 import io.netty.buffer.ByteBufAllocator;
@@ -33,6 +34,7 @@ import java.lang.reflect.Proxy;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -43,6 +45,7 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@NullMarked
 class SessionLifecycleTest {
     private static final XtreamSessionEventListener.SessionCloseReason REASON = XtreamSessionEventListener.DefaultSessionCloseReason.CLOSED_BY_CLIENT;
 
@@ -265,7 +268,54 @@ class SessionLifecycleTest {
         }
     }
 
-    private static Fixture fixture(TestManager manager, String id, XtreamInbound.Type type) {
+    @Test
+    void idleScanClosesOnlyExpiredUdpSessionsAndKeepsTheTransportActive() {
+        final var props = new UdpSessionIdleStateCheckerProps().setMaxIdleTime(Duration.ofSeconds(10));
+        final var manager = new TestManager(props);
+        final List<XtreamSessionEventListener.SessionCloseReason> reasons = new ArrayList<>();
+        manager.addListener(new XtreamSessionEventListener<>() {
+            @Override
+            public void beforeSessionClose(XtreamSession session, SessionCloseReason reason) {
+                reasons.add(reason);
+            }
+        });
+        manager.doCheckUdpSessionStatus();
+        try (
+                var expired = fixture(manager, "expired", XtreamInbound.Type.UDP);
+                var fresh = fixture(manager, "fresh", XtreamInbound.Type.UDP);
+                var tcp = fixture(manager, "tcp", XtreamInbound.Type.TCP)
+        ) {
+            final var expiredSession = expired.exchange().session().block();
+            final var freshSession = fresh.exchange().session().block();
+            final var tcpSession = tcp.exchange().session().block();
+            assertNotNull(expiredSession);
+            assertNotNull(freshSession);
+            assertNotNull(tcpSession);
+            expiredSession.lastCommunicateTime(Instant.EPOCH);
+            freshSession.lastCommunicateTime(Instant.MAX);
+            tcpSession.lastCommunicateTime(Instant.EPOCH);
+            assertFalse(manager.isExpired(expiredSession, Instant.EPOCH.plusSeconds(10)));
+            assertTrue(manager.isExpired(expiredSession, Instant.EPOCH.plusSeconds(11)));
+
+            manager.doCheckUdpSessionStatus();
+            manager.doCheckUdpSessionStatus();
+            assertEquals(List.of(XtreamSessionEventListener.DefaultSessionCloseReason.EXPIRED), reasons);
+            assertNull(manager.getSessionById("expired").block());
+            assertSame(freshSession, manager.getSessionById("fresh").block());
+            assertSame(tcpSession, manager.getSessionById("tcp").block());
+            assertEquals(1, manager.countUdp());
+            assertEquals(1, manager.countTcp());
+            assertTrue(expired.channel().isActive());
+            assertTrue(tcp.channel().isActive());
+            manager.closeSession(freshSession, REASON);
+            manager.closeSession(tcpSession, REASON);
+            assertFalse(tcp.channel().isActive());
+        } finally {
+            manager.shutdown();
+        }
+    }
+
+    private static Fixture fixture(DefaultXtreamSessionManager manager, String id, XtreamInbound.Type type) {
         final EmbeddedChannel channel = new EmbeddedChannel();
         final var remote = new InetSocketAddress(InetAddress.getLoopbackAddress(), 12345);
         final NettyOutbound outbound = (NettyOutbound) Proxy.newProxyInstance(SessionLifecycleTest.class.getClassLoader(), new Class<?>[]{NettyOutbound.class}, (proxy, method, args) -> {
@@ -306,7 +356,11 @@ class SessionLifecycleTest {
         private boolean closeDuringCreation;
 
         private TestManager() {
-            super(false, null, new XtreamSessionIdGenerator.DefalutXtreamSessionIdGenerator() {
+            this(null);
+        }
+
+        private TestManager(@Nullable UdpSessionIdleStateCheckerProps props) {
+            super(false, props, new XtreamSessionIdGenerator.DefalutXtreamSessionIdGenerator() {
                 @Override
                 public String generateSessionId(XtreamExchange exchange) {
                     return exchange.request().requestId();

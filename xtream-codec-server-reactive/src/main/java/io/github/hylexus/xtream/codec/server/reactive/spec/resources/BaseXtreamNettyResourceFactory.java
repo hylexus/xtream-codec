@@ -18,6 +18,8 @@ package io.github.hylexus.xtream.codec.server.reactive.spec.resources;
 
 import reactor.netty.resources.LoopResources;
 
+import java.time.Duration;
+
 public abstract non-sealed class BaseXtreamNettyResourceFactory implements XtreamNettyResourceFactory {
     protected LoopResources loopResources;
     protected boolean preferNative;
@@ -42,4 +44,13 @@ public abstract non-sealed class BaseXtreamNettyResourceFactory implements Xtrea
     public boolean preferNative() {
         return this.preferNative;
     }
+
+    /**
+     * 在使用此工厂的服务停止后，等待工厂创建的事件循环终止。
+     */
+    @Override
+    public void dispose() {
+        this.loopResources.disposeLater(Duration.ZERO, Duration.ofSeconds(LoopResources.DEFAULT_SHUTDOWN_TIMEOUT)).block();
+    }
+
 }

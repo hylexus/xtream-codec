@@ -83,7 +83,7 @@ public class BuiltinJt808AttachmentServerTcpConfiguration {
                 .build();
     }
 
-    @Bean(BEAN_NAME_JT_808_TCP_XTREAM_NETTY_RESOURCE_FACTORY_ATTACHMENT_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_TCP_XTREAM_NETTY_RESOURCE_FACTORY_ATTACHMENT_SERVER, destroyMethod = "dispose")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_TCP_XTREAM_NETTY_RESOURCE_FACTORY_ATTACHMENT_SERVER)
     TcpXtreamNettyResourceFactory tcpXtreamNettyResourceFactory(XtreamJt808ServerProperties serverProperties) {
         final XtreamJt808ServerProperties.TcpLoopResourcesProperty loopResources = serverProperties.getAttachmentServer().getTcpServer().getLoopResources();
@@ -97,7 +97,7 @@ public class BuiltinJt808AttachmentServerTcpConfiguration {
         ));
     }
 
-    @Bean(BEAN_NAME_JT_808_TCP_XTREAM_SERVER_ATTACHMENT_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_TCP_XTREAM_SERVER_ATTACHMENT_SERVER, destroyMethod = "stop")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_TCP_XTREAM_SERVER_ATTACHMENT_SERVER)
     TcpXtreamServer tcpXtreamServer(
             @Qualifier(BEAN_NAME_JT_808_TCP_XTREAM_NETTY_HANDLER_ADAPTER_ATTACHMENT_SERVER) TcpXtreamNettyHandlerAdapter tcpXtreamNettyHandlerAdapter,

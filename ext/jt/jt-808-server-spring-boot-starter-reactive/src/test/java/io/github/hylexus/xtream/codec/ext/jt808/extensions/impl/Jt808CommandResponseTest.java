@@ -16,8 +16,13 @@
 
 package io.github.hylexus.xtream.codec.ext.jt808.extensions.impl;
 
+import io.github.hylexus.xtream.codec.ext.jt808.builtin.messages.response.BuiltinMessage8201;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808RequestLifecycleListener.NoopJt808RequestLifecycleListener;
+import io.github.hylexus.xtream.codec.ext.jt808.codec.Jt808ResponseEncoder;
+import io.github.hylexus.xtream.codec.ext.jt808.extensions.Jt808CommandSender.Jt808CommandKey;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808ProtocolVersion;
 import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808Session;
+import io.github.hylexus.xtream.codec.ext.jt808.spec.Jt808SessionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -27,12 +32,49 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class Jt808CommandResponseTest {
+    @Test
+    void shouldSendToNewSessionWhenTerminalReconnectsBeforeSubscription() {
+        final var terminalId = "00000000000000000001";
+        final int responseMessageId = 0x0201;
+        final int flowId = 42;
+        final var oldSession = session("old-session", terminalId);
+        final var newSession = session("new-session", terminalId);
+        final var sessions = new HashMap<String, Jt808Session>();
+        sessions.put(oldSession.id(), oldSession);
+        final var manager = mock(Jt808SessionManager.class, CALLS_REAL_METHODS);
+        when(manager.list()).thenAnswer(ignored -> sessions.values().stream());
+        when(manager.getSessionById(anyString())).thenAnswer(call -> Mono.justOrEmpty(sessions.get(call.getArgument(0))));
+
+        final var body = new BuiltinMessage8201();
+        final var command = Unpooled.EMPTY_BUFFER;
+        final var key = Jt808CommandKey.of(terminalId, responseMessageId, flowId);
+        final var encoder = mock(Jt808ResponseEncoder.class);
+        when(encoder.encode(eq(body), eq(Jt808ProtocolVersion.VERSION_2019), eq(terminalId), eq(flowId), any())).thenReturn(command);
+        final var sender = new DefaultJt808XtreamCommandSender(ByteBufAllocator.DEFAULT, manager, encoder,
+                increment -> flowId, new NoopJt808RequestLifecycleListener());
+        when(oldSession.writeWith(any())).thenReturn(Mono.error(new IllegalStateException("旧会话已断开")));
+        when(newSession.writeWith(any())).thenAnswer(call -> Mono.from(call.<Publisher<? extends ByteBuf>>getArgument(0))
+                .doOnNext(buffer -> {
+                    assertSame(command, buffer);
+                    sender.setClientResponse(key, "location response");
+                }).then());
+
+        final Mono<String> reply = sender.sendObjectAndWaitingResponseWithTerminalId(terminalId, Mono.just(body), responseMessageId);
+        sessions.remove(oldSession.id());
+        sessions.put(newSession.id(), newSession);
+
+        assertEquals("location response", reply.block(Duration.ofSeconds(2)));
+        verify(oldSession, never()).writeWith(any());
+        verify(newSession).writeWith(any());
+    }
+
     @Test
     void shouldKeepResponseReceivedBeforeWriteCompletes() {
         final var sender = new TestSender();
@@ -74,6 +116,14 @@ class Jt808CommandResponseTest {
         assertSame(failure, assertThrows(IllegalArgumentException.class, () -> sender.send().block(Duration.ofSeconds(1))));
         sender.write = () -> Mono.fromRunnable(() -> sender.reply("retry"));
         assertEquals("retry", sender.send().block(Duration.ofSeconds(1)));
+    }
+
+    private static Jt808Session session(String id, String terminalId) {
+        final var session = mock(Jt808Session.class);
+        when(session.id()).thenReturn(id);
+        when(session.terminalId()).thenReturn(terminalId);
+        when(session.protocolVersion()).thenReturn(Jt808ProtocolVersion.VERSION_2019);
+        return session;
     }
 
     @NullMarked

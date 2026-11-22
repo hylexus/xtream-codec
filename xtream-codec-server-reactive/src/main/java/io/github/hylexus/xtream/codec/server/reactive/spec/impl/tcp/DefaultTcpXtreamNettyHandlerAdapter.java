@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.FutureMono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
@@ -62,23 +63,27 @@ public class DefaultTcpXtreamNettyHandlerAdapter implements TcpXtreamNettyHandle
     }
 
     protected Flux<Void> handleRequests(NettyInbound inbound, NettyOutbound outbound, InboundInfo inboundInfo) {
-        // 每个连接顺序处理；异步等待期间保留入站引用，取消时释放未处理数据。
         return inbound
                 .receive()
-                .retain()
-                .concatMap(payload -> Mono
-                                .defer(() -> payload.isReadable()
-                                        ? this.handleSingleRequest(inbound, outbound, payload, inboundInfo)
-                                        : Mono.empty()
-                                )
-                                .onErrorResume(throwable -> {
-                                    log.error("Unexpected Exception", throwable);
-                                    return Mono.empty();
-                                })
-                                .doFinally(signal -> XtreamBytes.releaseBuf(payload)),
+                .concatMap(
+                        (ByteBuf payload) -> {
+                            // 仅保留交给请求链的入站引用，未交付的缓冲区由 Reactor Netty 管理。
+                            payload.retain();
+                            return Mono
+                                    .defer(() -> payload.isReadable()
+                                            ? this.handleSingleRequest(inbound, outbound, payload, inboundInfo)
+                                            : Mono.empty()
+                                    )
+                                    .onErrorResume(throwable -> {
+                                        log.error("Unexpected Exception", throwable);
+                                        return Mono.empty();
+                                    })
+                                    .doFinally(signal -> XtreamBytes.releaseBuf(payload));
+                        },
                         0
                 )
-                .doOnDiscard(ByteBuf.class, XtreamBytes::releaseBuf);
+                // 入站完成后 concatMap 仍会等待在途业务，通道关闭时应取消该业务。
+                .takeUntilOther(FutureMono.from(inboundInfo.channel().closeFuture()));
     }
 
     protected Mono<Void> handleSingleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, ByteBuf payload, InboundInfo inboundInfo) {

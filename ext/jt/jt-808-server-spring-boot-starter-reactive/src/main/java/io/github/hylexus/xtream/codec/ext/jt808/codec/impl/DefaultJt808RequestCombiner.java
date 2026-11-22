@@ -38,11 +38,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-public class DefaultJt808RequestCombiner implements Jt808RequestCombiner {
+public class DefaultJt808RequestCombiner implements Jt808RequestCombiner, AutoCloseable {
     protected final SimpleCache cache;
     protected final ByteBufAllocator allocator;
+    private boolean closed;
 
     public DefaultJt808RequestCombiner(ByteBufAllocator allocator, int maximumCacheSize, Duration cacheItemTtl) {
         this.cache = new SimpleCache(maximumCacheSize, cacheItemTtl);
@@ -66,9 +68,13 @@ public class DefaultJt808RequestCombiner implements Jt808RequestCombiner {
         return subPackages.values().iterator().next().traceId();
     }
 
-    @Nullable
     @Override
-    public Jt808Request tryMergeSubPackage(Jt808Request jt808Request) {
+    public synchronized @Nullable Jt808Request tryMergeSubPackage(Jt808Request jt808Request) {
+        // TODO: 用多终端并发分包压测评估实例锁的争用，再决定是否按分包组缩小锁粒度。
+        // 容器关闭时可能还有请求在途，关闭后不再保留它们的正文。
+        if (this.closed) {
+            return null;
+        }
         final String key = this.buildSubPackageCacheKey(jt808Request.header());
         final Map<Integer, CacheItem> subPackages = this.cacheAndGetSubPackages(key, jt808Request);
 
@@ -78,6 +84,12 @@ public class DefaultJt808RequestCombiner implements Jt808RequestCombiner {
         }
         // 还有子包没到达 ==> null
         return null;
+    }
+
+    @Override
+    public synchronized void close() {
+        this.closed = true;
+        this.cache.releaseIncompleteGroups();
     }
 
     private Jt808Request mergeRequest(String key, Map<Integer, CacheItem> subPackages, Jt808Request jt808Request) {
@@ -174,6 +186,17 @@ public class DefaultJt808RequestCombiner implements Jt808RequestCombiner {
 
         public void invalidate(String key) {
             this.cache.invalidate(key);
+        }
+
+        private void releaseIncompleteGroups() {
+            final ConcurrentMap<String, Map<Integer, CacheItem>> groups = this.cache.asMap();
+            groups.forEach((key, group) -> {
+                // 成功移除时由关闭流程释放引用，已经淘汰的分包由移除监听器释放。
+                if (groups.remove(key, group)) {
+                    group.values().forEach(item -> XtreamBytes.releaseBuf(item.temporarySubPackageBodyByteBuf()));
+                }
+            });
+            this.cache.cleanUp();
         }
     }
 }

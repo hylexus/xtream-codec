@@ -170,6 +170,7 @@ public abstract class AbstractXtreamSessionManager<S extends XtreamSession> impl
         if (created.get()) {
             // 用户监听器可以重入会话管理器，不能在 Map 的原子更新内调用。
             try {
+                this.onSessionRegistered(session, exchange);
                 this.invokeListener(listener -> listener.afterSessionCreate(session));
             } finally {
                 // 原子取走登记
@@ -207,6 +208,9 @@ public abstract class AbstractXtreamSessionManager<S extends XtreamSession> impl
     }
 
     protected abstract S doCreateSession(String sessionId, XtreamExchange exchange);
+
+    protected void onSessionRegistered(S session, XtreamExchange exchange) {
+    }
 
     @Override
     public Mono<S> getSessionById(String sessionId) {

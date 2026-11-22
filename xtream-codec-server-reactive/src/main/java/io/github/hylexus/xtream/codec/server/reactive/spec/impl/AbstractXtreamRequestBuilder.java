@@ -20,7 +20,6 @@ import io.github.hylexus.xtream.codec.common.utils.XtreamBytes;
 import io.github.hylexus.xtream.codec.server.reactive.spec.XtreamRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetSocketAddress;
@@ -48,20 +47,22 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
     }
 
     @Override
-    public @NonNull B payload(ByteBuf payload, boolean autoRelease) {
+    @SuppressWarnings("ReferenceEquality")
+    public B payload(ByteBuf payload, boolean autoRelease) {
         final ByteBuf old = this.payload;
         try {
             this.payload = payload;
             return self();
         } finally {
-            if (autoRelease) {
+            // 同一缓冲区继续由请求持有。内容相同的另一块缓冲区仍需要释放旧引用。
+            if (autoRelease && old != payload) {
                 XtreamBytes.releaseBuf(old);
             }
         }
     }
 
     @Override
-    public @NonNull B remoteAddress(InetSocketAddress remoteAddress) {
+    public B remoteAddress(InetSocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
         return self();
     }
@@ -73,6 +74,6 @@ public abstract class AbstractXtreamRequestBuilder<B extends XtreamRequest.Xtrea
     }
 
     @Override
-    public abstract @NonNull R build();
+    public abstract R build();
 
 }

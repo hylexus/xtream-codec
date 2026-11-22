@@ -20,9 +20,11 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.impl.tcp.DefaultTcpXt
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.ReferenceCountUtil;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
@@ -30,11 +32,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.netty.ByteBufFlux;
+import reactor.netty.Connection;
+import reactor.netty.ConnectionObserver;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
+import reactor.netty.channel.ChannelOperations;
 import reactor.util.context.Context;
 
-import java.lang.reflect.Proxy;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.time.Duration;
@@ -45,6 +49,13 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TcpRequestLifecycleTest {
+    private final List<EmbeddedChannel> channels = new ArrayList<>();
+
+    @AfterEach
+    void closeChannels() {
+        this.channels.forEach(EmbeddedChannel::finishAndReleaseAll);
+    }
+
     @Test
     void messagesOnOneConnectionShouldWaitForPreviousCompletion() {
         final List<ByteBuf> buffers = buffers(1, 2);
@@ -151,12 +162,12 @@ class TcpRequestLifecycleTest {
         return result;
     }
 
-    private static NettyInbound inbound(List<ByteBuf> buffers) {
-        // 模拟 Reactor Netty 在交付入站报文后释放其持有的引用。
+    private NettyInbound inbound(List<ByteBuf> buffers) {
+        // 模拟 Reactor Netty 在交付入站报文后释放引用，取消时也清理尚未交付的报文。
         final ByteBufFlux source = ByteBufFlux.fromInbound(new Flux<ByteBuf>() {
             @Override
             public void subscribe(CoreSubscriber<? super ByteBuf> actual) {
-                Flux.fromIterable(buffers).subscribe(new CoreSubscriber<>() {
+                Flux.fromIterable(buffers).doOnDiscard(ByteBuf.class, ReferenceCountUtil::release).subscribe(new CoreSubscriber<>() {
                     @Override
                     public Context currentContext() {
                         return actual.currentContext();
@@ -188,8 +199,19 @@ class TcpRequestLifecycleTest {
                 });
             }
         });
-        return (NettyInbound) Proxy.newProxyInstance(TcpRequestLifecycleTest.class.getClassLoader(), new Class<?>[]{NettyInbound.class},
-                (proxy, method, args) -> method.getName().equals("receive") ? source : null);
+        final EmbeddedChannel channel = new EmbeddedChannel() {
+            @Override
+            protected InetSocketAddress remoteAddress0() {
+                return new InetSocketAddress(InetAddress.getLoopbackAddress(), 12345);
+            }
+        };
+        this.channels.add(channel);
+        return new ChannelOperations<NettyInbound, NettyOutbound>(Connection.from(channel), ConnectionObserver.emptyListener()) {
+            @Override
+            public ByteBufFlux receive() {
+                return source;
+            }
+        };
     }
 
     private static void assertReleased(List<ByteBuf> buffers) {
@@ -211,11 +233,6 @@ class TcpRequestLifecycleTest {
         private TestAdapter(Function<ByteBuf, Mono<Void>> handler) {
             super(ByteBufAllocator.DEFAULT, null, exchange -> Mono.empty());
             this.handler = handler;
-        }
-
-        @Override
-        public InboundInfo initTcpInboundInfo(NettyInbound inbound) {
-            return new InboundInfo(null, new InetSocketAddress(InetAddress.getLoopbackAddress(), 12345));
         }
 
         @Override

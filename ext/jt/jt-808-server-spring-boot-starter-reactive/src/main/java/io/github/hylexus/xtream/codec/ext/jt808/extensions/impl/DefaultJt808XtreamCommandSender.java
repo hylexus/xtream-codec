@@ -130,12 +130,15 @@ public class DefaultJt808XtreamCommandSender implements Jt808CommandSender {
 
     @Override
     public <R> Mono<R> sendObjectAndWaitingResponseWithTerminalId(String terminalId, Mono<Object> body, int messageId) {
-        final Optional<Jt808Session> optionalJt808Session = this.sessionManager.findByTerminalId(terminalId);
-        if (optionalJt808Session.isEmpty()) {
-            return Mono.error(new Jt808SessionNotFoundException(terminalId));
-        }
-        final Jt808Session jt808Session = optionalJt808Session.get();
-        return this.sendObjectAndWaitingResponse(jt808Session.id(), body, messageId);
+        // 终端可能在创建 Mono 后、订阅前重连。等到订阅时再查找会话，避免向已断开的旧会话下发。
+        return Mono.defer(() -> {
+            final Optional<Jt808Session> optionalJt808Session = this.sessionManager.findByTerminalId(terminalId);
+            if (optionalJt808Session.isEmpty()) {
+                return Mono.error(new Jt808SessionNotFoundException(terminalId));
+            }
+            final Jt808Session jt808Session = optionalJt808Session.get();
+            return this.sendObjectAndWaitingResponse(jt808Session.id(), body, messageId);
+        });
     }
 
     @Override

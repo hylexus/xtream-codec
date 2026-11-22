@@ -27,6 +27,7 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import reactor.core.publisher.Mono;
@@ -39,6 +40,7 @@ import java.net.InetSocketAddress;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@NullMarked
 class Jt808RequestBufferTest {
     @Test
     void udpSynchronousDecodeFailureShouldReleaseFrame() {

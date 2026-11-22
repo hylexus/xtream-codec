@@ -23,11 +23,15 @@ import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamReq
 import io.github.hylexus.xtream.codec.server.reactive.spec.impl.DefaultXtreamResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.FutureMono;
 import reactor.netty.NettyInbound;
 import reactor.netty.NettyOutbound;
 
@@ -53,7 +57,7 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
 
     @Override
     public Publisher<Void> apply(NettyInbound nettyInbound, NettyOutbound nettyOutbound) {
-        return nettyInbound.receiveObject().flatMap(object -> {
+        final Flux<Void> requests = nettyInbound.receiveObject().flatMap(object -> {
             if (object instanceof DatagramPacket datagramPacket) {
                 datagramPacket.retain();
                 return Mono
@@ -73,6 +77,14 @@ public class DefaultUdpXtreamNettyHandlerAdapter implements UdpXtreamNettyHandle
             log.error("Unexpected Error", throwable);
             return Mono.empty();
         });
+
+        final @Nullable Channel[] channelHolder = new Channel[1];
+        nettyInbound.withConnection(connection -> channelHolder[0] = connection.channel());
+        final Channel channel = channelHolder[0];
+        // 入站完成时 flatMap 会等待在途请求，通道关闭时直接取消这些请求。
+        return channel == null
+                ? requests
+                : requests.takeUntilOther(FutureMono.from(channel.closeFuture()));
     }
 
     protected Mono<Void> handleRequest(NettyInbound nettyInbound, NettyOutbound nettyOutbound, DatagramPacket datagramPacket, InboundInfo inboundInfo) {

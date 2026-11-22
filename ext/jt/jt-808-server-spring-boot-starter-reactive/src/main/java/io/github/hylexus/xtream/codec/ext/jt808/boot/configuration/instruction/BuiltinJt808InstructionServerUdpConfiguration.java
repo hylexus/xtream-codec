@@ -81,7 +81,7 @@ public class BuiltinJt808InstructionServerUdpConfiguration {
                 .build();
     }
 
-    @Bean(BEAN_NAME_JT_808_UDP_XTREAM_NETTY_RESOURCE_FACTORY_INSTRUCTION_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_UDP_XTREAM_NETTY_RESOURCE_FACTORY_INSTRUCTION_SERVER, destroyMethod = "dispose")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_UDP_XTREAM_NETTY_RESOURCE_FACTORY_INSTRUCTION_SERVER)
     UdpXtreamNettyResourceFactory udpXtreamNettyResourceFactory(XtreamJt808ServerProperties serverProperties) {
         final XtreamJt808ServerProperties.UdpLoopResourcesProperty loopResources = serverProperties.getInstructionServer().getUdpServer().getLoopResources();
@@ -95,7 +95,7 @@ public class BuiltinJt808InstructionServerUdpConfiguration {
         ));
     }
 
-    @Bean(BEAN_NAME_JT_808_UDP_XTREAM_SERVER_INSTRUCTION_SERVER)
+    @Bean(value = BEAN_NAME_JT_808_UDP_XTREAM_SERVER_INSTRUCTION_SERVER, destroyMethod = "stop")
     @ConditionalOnMissingBean(name = BEAN_NAME_JT_808_UDP_XTREAM_SERVER_INSTRUCTION_SERVER)
     UdpXtreamServer udpXtreamServer(
             @Qualifier(BEAN_NAME_JT_808_UDP_XTREAM_NETTY_HANDLER_ADAPTER_INSTRUCTION_SERVER) UdpXtreamNettyHandlerAdapter udpXtreamNettyHandlerAdapter,

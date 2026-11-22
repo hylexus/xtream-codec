@@ -47,9 +47,26 @@ public class XtreamResponseBodyHandlerResultHandler implements XtreamHandlerResu
 
     @Override
     public Mono<Void> handleResult(XtreamExchange exchange, XtreamHandlerResult result) {
+        final Object value = result.getReturnValue();
+        final var response = exchange.response();
         final int version = exchange.request().version();
-        final Flux<ByteBuf> byteBufFlux = this.encode(exchange.response().bufferFactory(), version, result.getReturnValue());
-        return exchange.response().writeWith(byteBufFlux);
+        if (value instanceof ByteBuf buffer) {
+            // 出站取用原始缓冲区后，仍将该缓冲区交给可覆写的编码入口。
+            return OutboundByteBuf.write(
+                    buffer,
+                    (Mono<ByteBuf> body) -> response.writeWith(body.flux()
+                            .concatMap(
+                                    raw -> {
+                                        // ...
+                                        return this.encode(response.bufferFactory(), version, raw);
+                                    },
+                                    0
+                            )
+                    )
+            );
+        }
+        final Flux<ByteBuf> byteBufFlux = this.encode(response.bufferFactory(), version, value);
+        return response.writeWith(byteBufFlux);
     }
 
     @Override
@@ -62,7 +79,7 @@ public class XtreamResponseBodyHandlerResultHandler implements XtreamHandlerResu
             case null -> Flux.error(new IllegalArgumentException("message is null"));
             case Mono<?> mono -> mono.map(msg -> this.doEncode(version, msg, allocator)).flux();
             case Flux<?> flux -> flux.map(msg -> this.doEncode(version, msg, allocator));
-            case Object obj -> Flux.just(this.doEncode(version, obj, allocator));
+            case Object obj -> Flux.defer(() -> Flux.just(this.doEncode(version, obj, allocator)));
         };
     }
 

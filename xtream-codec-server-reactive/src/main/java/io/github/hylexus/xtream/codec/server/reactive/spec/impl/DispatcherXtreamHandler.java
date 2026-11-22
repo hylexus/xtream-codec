@@ -64,7 +64,7 @@ public class DispatcherXtreamHandler implements XtreamHandler {
         if (this.handlerAdapters != null) {
             for (XtreamHandlerAdapter adapter : this.handlerAdapters) {
                 if (adapter.supports(handler)) {
-                    Mono<XtreamHandlerResult> resultMono = adapter.handle(exchange, handler);
+                    Mono<XtreamHandlerResult> resultMono = Mono.defer(() -> adapter.handle(exchange, handler));
                     return handleResultMono(exchange, resultMono);
                 }
             }
@@ -84,7 +84,7 @@ public class DispatcherXtreamHandler implements XtreamHandler {
             }
         }
         return resultMono.flatMap(result -> {
-            Mono<Void> voidMono = handleResult(exchange, result, "Handler " + result.getHandler());
+            Mono<Void> voidMono = Mono.defer(() -> handleResult(exchange, result, "Handler " + result.getHandler()));
             final XtreamDispatchExceptionHandler exceptionHandler = result.getExceptionHandler();
             if (exceptionHandler != null) {
                 voidMono = voidMono.onErrorResume(ex -> {
